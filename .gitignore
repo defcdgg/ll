@@ -1,5 +1,6 @@
 *.dump
 *.elf
+*.map
 *.o
 *.gba
 

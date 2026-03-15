@@ -4,4 +4,10 @@
 *.o
 *.gba
 
+
+.venv
 build/
+matchs/
+tools/devkitARM
+tools/decomp-permuter
+tools/decomp-permuter-agbcc

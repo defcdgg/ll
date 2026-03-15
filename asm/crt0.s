@@ -131,3 +131,24 @@ _08000250: .4byte 0x03007FFC
 _08000254: .4byte sub_800128C
 _08000258: .4byte 0x0805769C
 _0800025C: .4byte 0x0805769C
+
+
+	arm_func_start sub_8000260
+sub_8000260: @ 0x08000260
+	push {r8, sb, sl, fp}
+	mov ip, #0x4000000
+	ldr fp, _0800029C @ =0x03004DF0
+	add sl, fp, #0x28
+	mov sb, #1
+	mov r8, #0
+	strb r8, [ip, #0x208]
+	ldm sl, {r0, r1}
+	stm sl!, {r1}
+	stm sl!, {r0}
+	ldrb r0, [fp, #5]
+	strb r8, [fp, #5]
+	strb sb, [ip, #0x208]
+	pop {r8, sb, sl, fp}
+	bx lr
+	.align 2, 0
+_0800029C: .4byte 0x03004DF0

@@ -510,5 +510,63 @@ void sub_8000C98(u16 arg0) {
 
 }
 
+u32 sub_8000D5C(void) {
+    u8 flag;
+    u32 bit_offset;
+    u16 lz_token;
+    s32 match_length;
+    s32 match_offset;
+    s32 i;
+
+    if ( gLzContext.size > gLzContext.remainingSize) 
+    {
+        gLzContext.size = gLzContext.remainingSize;
+    }
+    
+    gLzContext.processedSize = 0;
+    
+    if (gLzContext.size >= 0)
+    {
+        while(  gLzContext.size > gLzContext.processedSize )
+        {
+            flag = gLzContext.flags[gLzContext.bitIndex >> 3];
+            bit_offset = gLzContext.bitIndex & 7;
+
+            if((flag >> bit_offset) & 1)
+            {
+                lz_token = gLzContext.src[0] + (gLzContext.src[1] << 8);
+                gLzContext.src += 2;
+                
+                match_offset = (lz_token & 0x0FFF) + 1;
+                match_length = (lz_token >> 12) + 3;
+                
+
+                for (i = 0; i < match_length; i++)
+                {
+                    *gLzContext.dest = *(gLzContext.dest - match_offset);
+                    gLzContext.dest++;
+                    gLzContext.processedSize++;    
+                }
+            }
+            else
+            {
+                *gLzContext.dest++ = *gLzContext.src++;
+                gLzContext.processedSize++;
+            }
+            
+            gLzContext.bitIndex++;
+        }
+
+    }
+
+    if (gLzContext.remainingSize > gLzContext.size) {
+        gLzContext.remainingSize -= gLzContext.processedSize;
+        return gLzContext.remainingSize;
+    }
+    
+    return 0;
+    
+
+}
 
 

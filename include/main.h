@@ -13,6 +13,18 @@ typedef struct
     u8 unk5E;
 }Unk_03004F20;
 
+struct LzContext
+{
+    u8* dest;
+    u8* src;
+    u8* flags;
+    u32 unkC;
+    u32 bitIndex;
+    u32 size;
+    u32 processedSize;
+    u32 remainingSize;
+};
+
 
 
 static inline void inl_cpufastset(void*src, void* dst, u32 sz)
@@ -30,6 +42,9 @@ extern u8 gUnk_02005380[];
 extern s32 gUnk_03001940;
 extern u32 gUnk_03001948;
 extern u16 gUnk_03001988;
+
+extern struct LzContext gLzContext;
+
 extern u8 gUnk_030019C0[];
 
 extern u8 gUnk_03001AC0;

@@ -8,111 +8,6 @@
 
 
 
-	thumb_func_start sub_8000C98
-sub_8000C98: @ 0x08000C98
-	push {r4, r5, r6, r7, lr}
-	mov r7, sl
-	mov r6, sb
-	mov r5, r8
-	push {r5, r6, r7}
-	sub sp, #4
-	lsls r0, r0, #0x10
-	lsrs r0, r0, #0x10
-	adds r1, r0, #0
-	movs r7, #0x7f
-	cmp r0, #2
-	beq _08000CCE
-	cmp r0, #2
-	bgt _08000CBA
-	cmp r0, #1
-	beq _08000CC4
-	b _08000D3E
-_08000CBA:
-	cmp r1, #3
-	beq _08000CD8
-	cmp r1, #4
-	beq _08000CE2
-	b _08000D3E
-_08000CC4:
-	movs r2, #0xc
-	movs r0, #0x20
-	movs r1, #0xc
-	movs r3, #0x10
-	b _08000CEC
-_08000CCE:
-	movs r2, #0x10
-	movs r0, #8
-	movs r1, #4
-	movs r3, #0x10
-	b _08000CEA
-_08000CD8:
-	movs r2, #0x10
-	movs r0, #0x20
-	movs r1, #0x20
-	movs r3, #4
-	b _08000CEC
-_08000CE2:
-	movs r2, #4
-	movs r0, #1
-	movs r1, #0x10
-	movs r3, #1
-_08000CEA:
-	movs r7, #0x3f
-_08000CEC:
-	movs r5, #0
-	lsls r0, r0, #0x18
-	str r0, [sp]
-	lsls r2, r2, #0x18
-	mov sl, r2
-	lsls r3, r3, #0x18
-	mov sb, r3
-	lsls r1, r1, #0x18
-	mov r8, r1
-	ldr r6, _08000D50 @ =0x080576D0
-_08000D00:
-	ldr r0, _08000D54 @ =0x03001B60
-	adds r4, r5, r0
-	ldr r1, [sp]
-	asrs r0, r1, #0x18
-	muls r0, r5, r0
-	ands r0, r7
-	adds r0, r0, r6
-	ldrb r0, [r0]
-	mov r2, sl
-	asrs r1, r2, #0x18
-	bl __divsi3
-	strb r0, [r4]
-	ldr r0, _08000D58 @ =0x030019C0
-	adds r4, r5, r0
-	mov r1, sb
-	asrs r0, r1, #0x18
-	muls r0, r5, r0
-	ands r0, r7
-	adds r0, r0, r6
-	ldrb r0, [r0]
-	mov r2, r8
-	asrs r1, r2, #0x18
-	bl __divsi3
-	strb r0, [r4]
-	adds r0, r5, #1
-	lsls r0, r0, #0x10
-	lsrs r5, r0, #0x10
-	cmp r5, #0xfe
-	bls _08000D00
-_08000D3E:
-	add sp, #4
-	pop {r3, r4, r5}
-	mov r8, r3
-	mov sb, r4
-	mov sl, r5
-	pop {r4, r5, r6, r7}
-	pop {r0}
-	bx r0
-	.align 2, 0
-_08000D50: .4byte 0x080576D0
-_08000D54: .4byte 0x03001B60
-_08000D58: .4byte 0x030019C0
-
 	thumb_func_start sub_8000D5C
 sub_8000D5C: @ 0x08000D5C
 	push {r4, r5, r6, r7, lr}
@@ -753,8 +648,8 @@ _0800123C: .4byte 0x04000130
 _08001240: .4byte 0x03001CA0
 _08001244: .4byte 0x030019B0
 
-	thumb_func_start nullsub_3
-nullsub_3: @ 0x08001248
+	thumb_func_start DummyIntr3
+DummyIntr3: @ 0x08001248
 	bx lr
 	.align 2, 0
 
@@ -790,13 +685,13 @@ _08001280:
 	pop {r0}
 	bx r0
 
-	thumb_func_start __malloc_lock
-__malloc_lock: @ 0x08001284
+	thumb_func_start DummyIntr4
+DummyIntr4: @ 0x08001284
 	bx lr
 	.align 2, 0
 
-	thumb_func_start __malloc_unlock
-__malloc_unlock: @ 0x08001288
+	thumb_func_start DummyIntr5
+DummyIntr5: @ 0x08001288
 	bx lr
 	.align 2, 0
 

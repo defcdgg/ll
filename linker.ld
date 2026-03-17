@@ -111,6 +111,7 @@ SECTIONS {
     } >rom =0
 
     .rodata ALIGN(4) : SUBALIGN(4) {
+        src/code_80002A0.o(.rodata);
         data/data.o(.rodata);
         src/m4a_tables.o(.rodata);
         data/sound_data.o(.rodata);

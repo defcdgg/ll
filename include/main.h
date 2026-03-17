@@ -5,7 +5,6 @@
 #include "include_asm.h"
 
 
-
 typedef struct
 {
     u16 unk0;
@@ -90,6 +89,15 @@ extern u8 gUnk_03004DC0;
 extern Unk_03004F20 gUnk_03004F20;
 
 extern u16 gUnk_03007FF8;
+
+void sub_800065C(void);
+
+extern void sub_800124C();
+extern void sub_8016FC0();
+
+extern void DummyIntr3();
+extern void DummyIntr4();
+
 
 extern void sub_8001014();
 extern void sub_8001090();

@@ -6,5 +6,5 @@
 	.equiv MPLAY_SIZE, 12
 	.equiv SONG_SIZE, 8
 
-gUnk_0805769C:: @ 0805769C
-	.incbin "baserom.gba", 0x5769C, 0x657B78
+gUnk_08057750:: @ 08057750
+	.incbin "baserom.gba", 0x57750, 0x6AF214 - 0x57750

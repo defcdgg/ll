@@ -10,5 +10,9 @@ __attribute__((naked)) void NAME(void){\
     asm(".include \"asm/nonmatching/" STR(NAME) ".inc\"");\
 }
 
+#define INCLUDE_ASM1(NAME) \
+__attribute__((naked)) void NAME(u16 arg0){\
+    asm(".include \"asm/nonmatching/" STR(NAME) ".inc\"");\
+}
 
 #endif

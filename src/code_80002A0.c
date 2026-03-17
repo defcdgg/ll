@@ -34,6 +34,34 @@ u8 const gUnk_080576D0[] = {
   0xda, 0xdf, 0xe3, 0xe8, 0xed, 0xf2, 0xf7, 0xfc
 };
 
+u8 const gUnk_08057750[] = 
+{
+  0xe8, 0x86, 0xe1, 0x87, 0xdf, 0x8f, 0xed, 0x82, 0x23, 0x45, 0x05, 0x49,
+  0x1a, 0x71, 0x0a, 0x8b, 0x24, 0x40, 0x3d, 0x4f, 0x29, 0x36, 0x32, 0x4e,
+  0xff, 0x85, 0x9f, 0x92, 0x98, 0x30, 0xf1, 0x35, 0x2a, 0xfe, 0x79, 0xfa,
+  0x80, 0x89, 0x06, 0x9d, 0x43, 0x74, 0x3f, 0x8a, 0x48, 0xf5, 0x5e, 0xe9,
+  0xfc, 0x13, 0x77, 0x03, 0x76, 0x61, 0x16, 0x75, 0x27, 0x3c, 0xd6, 0x4a,
+  0xc1, 0x02, 0xbe, 0x0c, 0x0e, 0x4c, 0xcc, 0x34, 0xc5, 0x25, 0x00, 0x38,
+  0xee, 0xa2, 0xc6, 0x14, 0xe0, 0x58, 0xef, 0x5d, 0x1e, 0x9e, 0xec, 0x8c,
+  0xea, 0x97, 0x1f, 0x83, 0x31, 0x91, 0x8d, 0xa4, 0x88, 0x2f, 0x5a, 0xa9,
+  0x9b, 0x53, 0x21, 0x56, 0x4d, 0x78, 0x9a, 0x6f, 0x73, 0x68, 0xfd, 0x52,
+  0xf9, 0x6b, 0x8e, 0x5f, 0x37, 0x41, 0x09, 0x5b, 0x08, 0x44, 0x3a, 0x5c,
+  0x39, 0x67, 0x42, 0x6a, 0x4b, 0x3b, 0x33, 0x1d, 0x22, 0xad, 0xaa, 0x94,
+  0x84, 0x60, 0x20, 0x65, 0x55, 0x11, 0x95, 0xa6, 0x90, 0xa0, 0x62, 0x81,
+  0x59, 0x1b, 0x57, 0x2d, 0x50, 0x2e, 0x6d, 0x19, 0x99, 0x7b, 0x96, 0x66,
+  0xab, 0x04, 0x93, 0xaf, 0x9c, 0x7c, 0xae, 0x7f, 0x28, 0x54, 0xa8, 0x6e,
+  0x01, 0x7d, 0x72, 0x64, 0x7e, 0x69, 0x1c, 0x63, 0xf3, 0xd1, 0xc9, 0xd8,
+  0xc4, 0x12, 0xf7, 0x17, 0xa7, 0xfb, 0xdc, 0x15, 0xd7, 0xac, 0xa1, 0x2b,
+  0xb3, 0xdb, 0xb1, 0xc7, 0xc2, 0xcf, 0xb2, 0xd0, 0xe6, 0x26, 0xf6, 0xba,
+  0x0f, 0xc0, 0xc3, 0xd3, 0x0d, 0xd5, 0xd2, 0xda, 0xb7, 0xbc, 0xf4, 0xa3,
+  0x07, 0xbd, 0xe3, 0xca, 0xde, 0xd4, 0x2c, 0xcb, 0x6c, 0xf8, 0x10, 0x0b,
+  0x3e, 0xb4, 0x7a, 0xb5, 0x70, 0xe7, 0xa5, 0xd9, 0xb8, 0xe4, 0x51, 0xe5,
+  0xe2, 0xb9, 0x47, 0xbf, 0x46, 0xce, 0xdd, 0xbb, 0xc8, 0x18, 0xb6, 0xeb,
+  0xb0, 0xf2, 0xcd, 0xf0, 
+  0xff, 0xff, 0xff, 0xff
+};
+
+
 
 void sub_80002A0(void) {
     u16 val;
@@ -154,7 +182,7 @@ void sub_80004F8(void) {
     gUnk_03001B54 = (val >> 2) + gUnk_030025FC;
 }
 
-INCLUDE_ASM(sub_80005A8)
+INCLUDE_ASM1(sub_80005A8)
 
 void sub_800065C(void) {
 
@@ -415,7 +443,7 @@ s32 sub_800096C(void) {
 }
 
 
-void sub_8000B58(void) {
+void sub_8000B58(u32 arg0) {
     u16 i;
 
     DmaFill16(3, 0, (void*)VRAM, VRAM_SIZE);
@@ -570,3 +598,202 @@ u32 sub_8000D5C(void) {
 }
 
 
+void sub_8000E1C(u8 arg0) {
+    
+    REG_IME = 0;
+
+    if (arg0 == 0)
+    {
+        gUnk_0300259C = 4;
+        DmaCopy16(3, IntrMain, gIntrMainBuf, sizeof(gIntrMainBuf));
+        REG_IE = INTR_FLAG_VBLANK | INTR_FLAG_HBLANK | INTR_FLAG_GAMEPAK; 
+        REG_DISPSTAT = REG_DISPSTAT | 0x10;
+    }
+    else
+    {
+        gUnk_0300259C = 5;
+        DmaCopy16(3, sub_8000170, gIntrMainBuf, sizeof(gIntrMainBuf));
+        REG_IE = 0xFFFD & REG_IE; 
+        REG_DISPSTAT = 0xFFEF & REG_DISPSTAT ;
+    }
+    
+    INTR_VECTOR = &gIntrMainBuf;
+    REG_IME = 1;
+}
+
+void sub_8000ED8(void) {
+    
+    while ( (REG_VCOUNT & 0xFF ) > 0xC8);
+
+    REG_DISPCNT &= 0xFF7F;
+    VBlankIntrWait();
+    
+    while ( REG_DISPSTAT & DISPSTAT_VBLANK );
+    
+    sub_805360C();
+    sub_805369C(0);
+    VBlankIntrWait();
+    
+    while ( REG_DISPSTAT & DISPSTAT_VBLANK );
+    
+    sub_80533F0();
+}
+
+void sub_8000F54(void) {
+    gUnk_0300259C = 0;
+    gUnk_03001944 = 0xB;
+    gUnk_03002600 = 0;
+    sub_8053688();
+    VBlankIntrWait();
+    sub_80533F0();
+    sub_80535F4();
+    VBlankIntrWait();
+    sub_80533F0();
+}
+
+void nullsub_5(){}
+
+void sub_8000F94(void) {
+    VBlankIntrWait();
+    sub_80533F0();
+}
+
+
+void sub_8000FA4(void) {
+    VBlankIntrWait();
+    while ( REG_DISPSTAT & DISPSTAT_VBLANK );
+    sub_80533F0();
+}
+
+
+
+void sub_8000FD0(u8* dest, struct Unk_LzData* arg1, u32 arg2) {
+    u8* ptr;
+
+    gLzContext.unkC = arg1->uncompressedSize;
+    gLzContext.remainingSize = gLzContext.unkC;
+    gLzContext.dest = dest;
+    ptr = arg1->data;
+    gLzContext.src = ptr;
+    gLzContext.flags = ptr + arg1->size;
+    gLzContext.bitIndex = 0;
+    gLzContext.size = arg2;
+}
+
+u8 sub_8000FF8(void) {
+    return gUnk_08057750[gUnk_030025A4++];
+}
+
+void sub_8001014(void) {
+    u16 i;
+
+    for(i = 0; i < 0x40; i++)
+    {
+        gUnk_03001C60[i] = 0;
+    }
+}
+
+u8 sub_8001030(u16 arg0) {
+    return gUnk_03001C60[arg0 >> 3] & (1 << (arg0 & 7));
+}
+
+
+void sub_8001050(u16 arg0) {
+    gUnk_03001C60[arg0 >> 3] |= (1 <<  (arg0 & 7));
+}
+
+void sub_8001070(u16 arg0) {
+    gUnk_03001C60[arg0 >> 3] &= ~(1 <<  (arg0 & 7));
+}
+
+void sub_8001090(void) {
+    u16 i;
+
+    for(i = 0; i < 0x50; i++)
+    {
+        gUnk_030018F0[i] = 0;
+    }
+}
+
+
+u8 sub_80010AC(u16 arg0) {
+    return gUnk_030018F0[arg0 >> 3] & (1 << (arg0 & 7));
+}
+
+void sub_80010CC(u16 arg0) {
+    gUnk_030018F0[arg0 >> 3] |= 1 <<  (arg0 & 7);
+}
+
+void sub_80010EC(u16 arg0) {
+    gUnk_030018F0[arg0 >> 3] &= ~(1 <<  (arg0 & 7));
+}
+
+void sub_800110C(void) {
+    u16 i;
+
+    for(i = 0x3D; i < 0x50; i++)
+    {
+        gUnk_030018F0[i] = 0;
+    }
+}
+
+
+void sub_8001128(void) {
+    RegisterRamReset(3);
+    REG_WAITCNT = WAITCNT_PREFETCH_ENABLE | WAITCNT_WS0_N_3 | WAITCNT_WS0_S_1;
+    gUnk_03001AC0 = 0;
+    sub_8009B64();
+    DmaCopy32(3, gIntrTable, gUnk_03001950, sizeof(gUnk_03001950) );
+    DmaCopy16(3, IntrMain, gIntrMainBuf, sizeof(gIntrMainBuf));
+ 
+    INTR_VECTOR = gIntrMainBuf;
+    gUnk_03001944 = 0xB;
+    gUnk_03002600 = 0;
+    
+    REG_IE = INTR_FLAG_VBLANK | INTR_FLAG_HBLANK | INTR_FLAG_GAMEPAK; 
+    REG_DISPSTAT = DISPSTAT_HBLANK_INTR | DISPSTAT_VBLANK_INTR;
+    REG_IME   = 1;
+        
+    VBlankIntrWait();
+    REG_DISPCNT = 0x37C0;
+    sub_8000B58(0);
+    sub_805359C();
+    sub_8021130();
+    gUnk_03002600 = 0;
+}
+
+void sub_80011F0(void) {
+    u16 key;
+
+    key = ~REG_KEYINPUT;
+    gUnk_03001CA0 = key & ~gUnk_030019B0;
+    gUnk_030019B0 = key;
+}
+
+void sub_800121C(void) {
+    u16 key;
+
+    key = ~REG_KEYINPUT;
+    gUnk_03001CA0 = key & ~gUnk_030019B0;
+    gUnk_030019B0 = key;
+}
+
+void DummyIntr3(){}
+
+
+void sub_800124C(void) {
+    switch (gUnk_0300259C) 
+    {
+        case 1:
+        case 3:
+            sub_80005A8(0xFF & REG_VCOUNT);
+            break;
+        case 2:
+            sub_801887C();
+            break;
+    }
+}
+
+void DummyIntr4(){}
+
+void DummyIntr5(){}

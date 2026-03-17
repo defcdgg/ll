@@ -26,6 +26,14 @@ struct LzContext
 };
 
 
+struct Unk_LzData
+{
+    u32 uncompressedSize;
+    u32 size;
+    u8 data[1];
+};
+
+
 
 static inline void inl_cpufastset(void*src, void* dst, u32 sz)
 {
@@ -40,10 +48,16 @@ extern u8 gUnk_02005380[];
 
 
 extern s32 gUnk_03001940;
+extern u8 gUnk_03001944;
 extern u32 gUnk_03001948;
 extern u16 gUnk_03001988;
 
 extern struct LzContext gLzContext;
+
+extern u8 gUnk_030018F0[0x50];
+
+extern u32 gUnk_03001950[14];
+extern u16 gUnk_030019B0;
 
 extern u8 gUnk_030019C0[];
 
@@ -53,9 +67,13 @@ extern u32 gUnk_03001B50;
 extern u8 gUnk_03001B54;
 extern u8 gUnk_03001B60[];
 
+extern u8 gUnk_03001C60[0x40];
+extern u16 gUnk_03001CA0;
 extern u32 gUnk_03001CB0;
 
 extern u32 gUnk_03001D30;
+
+extern u32 gIntrMainBuf[512];
 
 extern u8 gUnk_0300259C;
 extern u32 gUnk_030025A0;
@@ -68,6 +86,8 @@ extern u8 gUnk_030025D8;
 
 extern u8 gUnk_030025F4;
 extern u16 gUnk_030025FC;
+extern u16 gUnk_03002600;
+
 extern u8 gUnk_03002604;
 extern s16 gUnk_03002C40;
 extern u8 gUnk_03002C48;
@@ -105,7 +125,12 @@ extern Unk_03004F20 gUnk_03004F20;
 
 extern u16 gUnk_03007FF8;
 
+
 void sub_800065C(void);
+
+extern void IntrMain();
+
+extern void sub_8000170();
 
 extern void sub_800124C();
 extern void sub_8016FC0();
@@ -118,6 +143,7 @@ extern void sub_8001014();
 extern void sub_8001090();
 extern void sub_8002F6C();
 extern void sub_8003264();
+extern void sub_80038CC();
 extern void sub_8004AC0();
 extern void sub_8004ADC();
 extern void sub_8004B60();
@@ -131,6 +157,8 @@ extern void sub_8008E94();
 extern void sub_8009168();
 extern void sub_8009A5C();
 
+extern void sub_8009B64();
+
 extern void sub_800B14C();
 
 extern void sub_8016F30();
@@ -143,17 +171,18 @@ extern void sub_8017600(u32*, u32*, u32, u32);
 extern void sub_801761C();
 
 extern void sub_8018070();
+extern void sub_801887C();
+extern void sub_8021130();
 
 extern void sub_805008C();
-extern void sub_80038CC();
-
-extern void sub_8053838(s32);
-extern void sub_805369C(s32);
 
 extern void sub_80533F0();
-extern void sub_8053688();
+extern void sub_805359C();
 extern void sub_80535F4();
-
+extern void sub_805360C();
+extern void sub_8053688();
+extern void sub_805369C(s32);
+extern void sub_8053838(s32);
 
 
 #endif

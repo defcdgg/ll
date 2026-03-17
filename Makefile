@@ -119,7 +119,7 @@ CPPFLAGS := $(INCLUDE_CPP_ARGS) -Wno-trigraphs -DMODERN=$(MODERN)
 ifeq ($(MODERN),0)
   CPPFLAGS += -I tools/agbcc/include -I tools/agbcc -nostdinc -iquote include -DREVISION=$(REVISION) -D$(GAME_LANGUAGE)
   CC1 := tools/agbcc/bin/agbcc$(EXE)
-  override CFLAGS += -mthumb-interwork -Wimplicit -Wparentheses -Werror -O$(O_LEVEL) -fhex-asm -ffix-debug-line
+  override CFLAGS += -mthumb-interwork -Wimplicit -Wparentheses -Werror -O$(O_LEVEL) -fhex-asm -ffix-debug-line -fprologue-bugfix
   LIBPATH := -L $(ROOT_DIR)/tools/agbcc/lib
   LIB := $(LIBPATH) -lgcc -lc
 else
@@ -374,6 +374,7 @@ $(ELF): $(LD_SCRIPT) $(OBJS)
 $(ROM): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 	$(FIX) $@ -p --silent
+	cmp ${ROM_NAME} baserom.gba
 
 # Symbol file (`make syms`)
 $(SYM): $(ELF)

@@ -113,7 +113,7 @@ void sub_80004F8(void) {
     REG_BLDCNT = gUnk_03004658;
     REG_BLDALPHA = gUnk_03004550;
     
-    DmaCopy16(3, UNK_VRAM_BUFFER, 0x0600F800, 0x800);
+    DmaCopy16(3, VRAM_BUF_2005800, 0x0600F800, 0x800);
 
     sub_8005020();
     val = (gUnk_03001988 - 1) & 0x3FF;
@@ -123,8 +123,127 @@ void sub_80004F8(void) {
 
 INCLUDE_ASM(sub_80005A8)
 
-INCLUDE_ASM(sub_800065C)
+void sub_800065C(void) {
 
+    switch (gUnk_0300259C) 
+    {
+        case 1:
+            m4aSoundVSync();
+            sub_80002A0();
+            break;
+        case 2:
+            m4aSoundVSync();
+            sub_8018070();
+            break;
+        case 3:
+            m4aSoundVSync();
+            sub_80004F8();
+            break;
+        case 4:
+            m4aSoundVSync();
+            sub_8004ADC();
+            
+            REG_BG1HOFS = 0;
+            REG_BG1VOFS = 0;
+            REG_BG2HOFS = 4;
+            REG_BG2VOFS = 0;
+            REG_BG3HOFS = 4;
+            REG_BG3VOFS = 0;
+    
+            REG_BLDCNT = gUnk_03004658;
+            REG_BLDALPHA = gUnk_03004550;
+    
+            DmaCopy16(3, gUnk_030035C0, OAM, 0x400);
+            DmaCopy16(3, VRAM_BUF_2005800, 0x0600F800, 0x800);
+    
+            if (gUnk_03004DC0 != 0)
+            {
+                DmaCopy16(3, VRAM_BUF_2005000, 0x0600F000, 0x800);
+                gUnk_03004DC0 = 0;
+            }
+            
+            sub_8005020();
+            break;
+        case 5:
+            sub_8016F30();
+            m4aSoundVSync();
+            sub_8004ADC();
+            sub_8003264();
+            
+            // CpuFastCopy(gUnk_030035C0, (u32*)0x07000000, 0x400);
+            inl_cpufastset(gUnk_030035C0, (void*)0x07000000, 0x400);
+    
+            REG_BG1HOFS = 0;
+            REG_BG1VOFS = 0;
+            REG_BG2HOFS = 0;
+            REG_BG2VOFS = 0;
+            REG_BG3HOFS = 0;
+            REG_BG3VOFS = 0;
+            REG_BLDCNT = gUnk_03004658;
+            REG_BLDALPHA = gUnk_03004550;
+            
+            // CpuFastCopy(gUnk_02005800, 0x0600F800, 0x800);
+            inl_cpufastset(VRAM_BUF_2005800, (void*)0x0600F800, 0x800);
+    
+            if (gUnk_03004DC0 != 0) 
+            {
+                // CpuFastCopy(gUnk_02005000, 0x0600F000, 0x800);
+                inl_cpufastset(VRAM_BUF_2005000, (void*)0x0600F000,  0x800);
+                gUnk_03004DC0 = 0;
+            }
+    
+            break;
+        case 6:
+            m4aSoundVSync();
+            
+            REG_BG1HOFS = 0;
+            REG_BG1VOFS = 0;
+            REG_BG2HOFS = 0;
+            REG_BG2VOFS = 0;
+            REG_BG3HOFS = 0;
+            REG_BG3VOFS = 0;
+            
+            sub_8004ADC();
+            DmaCopy16(3, gUnk_030035C0, OAM, 0x400);
+    
+            sub_8008E94();
+            sub_805008C();
+            
+            REG_BLDCNT = gUnk_03004658;
+            if(gUnk_03004658 & 0x80)
+            {
+                REG_BLDY = gUnk_03004550;
+            }
+            else
+            {
+                REG_BLDALPHA = gUnk_03004550;
+            }
+            
+            sub_8005020();
+            sub_80038CC();
+            break;
+        default:
+            m4aSoundVSync();
+            break;
+    }
+        
+    gUnk_030025A4++;
+    
+    if (gUnk_03001948 <= 0x0CDFD7EE) 
+    {
+        gUnk_03001948++;
+    } 
+    else 
+    {
+        gUnk_03001948 = 0x0CDFD7F0;
+    }
+
+    gUnk_030025A0++;
+    REG_IME = 0;
+    gUnk_03007FF8 |= 1;
+    REG_IME = 1;
+
+}
 
 void sub_80008CC(void) {
 
@@ -309,3 +428,4 @@ void sub_8000B58(void) {
     gUnk_0300483C = 0;
     gUnk_03002C48 = 0;
 }
+

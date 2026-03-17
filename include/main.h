@@ -5,6 +5,7 @@
 #include "include_asm.h"
 
 
+
 typedef struct
 {
     u16 unk0;
@@ -14,26 +15,37 @@ typedef struct
 }Unk_03004F20;
 
 
+
+static inline void inl_cpufastset(void*src, void* dst, u32 sz)
+{
+    CpuFastCopy(src, dst, sz);
+}
+
 extern u8 gUnk_02004000[];
 extern u8 gUnk_02005380[];
 
-#define UNK_VRAM_BUFFER (u16*)0x2005800
+#define VRAM_BUF_2005000 (u16*)0x2005000
+#define VRAM_BUF_2005800 (u16*)0x2005800
+
 
 extern s32 gUnk_03001940;
 extern u32 gUnk_03001948;
 extern u16 gUnk_03001988;
+extern u8 gUnk_030019C0[];
+
 extern u8 gUnk_03001AC0;
 extern u32 gUnk_03001AD0;
 extern u32 gUnk_03001B50;
 extern u8 gUnk_03001B54;
-// extern u8 gUnk_03001B60[];
+extern u8 gUnk_03001B60[];
 
 extern u32 gUnk_03001CB0;
 
 extern u32 gUnk_03001D30;
 
 extern u8 gUnk_0300259C;
-
+extern u32 gUnk_030025A0;
+extern u8 gUnk_030025A4;
 extern u32 gUnk_030025A8;
 
 extern u16 gUnk_030025B4;
@@ -73,12 +85,16 @@ extern u8 gUnk_03004D40;
 
 extern u8 gUnk_03004D4C;
 
+extern u8 gUnk_03004DC0;
 
 extern Unk_03004F20 gUnk_03004F20;
+
+extern u16 gUnk_03007FF8;
 
 extern void sub_8001014();
 extern void sub_8001090();
 extern void sub_8002F6C();
+extern void sub_8003264();
 extern void sub_8004AC0();
 extern void sub_8004ADC();
 extern void sub_8004B60();
@@ -88,10 +104,13 @@ extern void sub_8004BBC();
 extern void sub_8005020();
 
 extern void sub_8008D18();
+extern void sub_8008E94();
 extern void sub_8009168();
 extern void sub_8009A5C();
 
 extern void sub_800B14C();
+
+extern void sub_8016F30();
 
 extern s32 sub_80171E4();
 
@@ -99,6 +118,8 @@ extern u32 sub_8017588();
 
 extern void sub_8017600(u32*, u32*, u32, u32);
 extern void sub_801761C();
+
+extern void sub_8018070();
 
 extern void sub_805008C();
 extern void sub_80038CC();

@@ -72,10 +72,8 @@ typedef union {
     } split;
 
     struct {
-        u16 attr0;
-        u16 attr1;
-        u16 attr2;
-        u16 affineParam;
+        u32 unk0;
+        u32 unk4;
     } all;
 } OamData;
 

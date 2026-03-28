@@ -30,6 +30,7 @@ _0800129A:
 _080012B0: .4byte 0x03001AC0
 _080012B4: .4byte 0x087E83F0
 
+
 	thumb_func_start sub_80012B8
 sub_80012B8: @ 0x080012B8
 	push {r4, r5, r6, lr}

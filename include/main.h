@@ -5,6 +5,21 @@
 #include "include_asm.h"
 
 
+
+typedef void (*GameFunc)(void);
+
+void sub_08003088(void);
+
+
+
+// GameFunc gGameFuncTable[] = {
+//     sub_08003088
+// };
+
+// GameFunc gUnk_087E83F8[] = {
+//     sub_8001538
+// };
+
 typedef struct
 {
     u16 unk0;

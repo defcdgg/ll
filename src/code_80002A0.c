@@ -182,7 +182,29 @@ void sub_80004F8(void) {
     gUnk_03001B54 = (val >> 2) + gUnk_030025FC;
 }
 
-INCLUDE_ASM1(sub_80005A8)
+
+
+void sub_80005A8(u16 arg0) 
+{
+    switch (gUnk_03004610)
+    {   
+        case 1:
+        case 2:
+            REG_BG1HOFS = gUnk_03001B60[(gUnk_03001B54 + arg0) & 0xFF] + (gUnk_030025B4 & 0x1F);
+            REG_BG1VOFS = gUnk_030019C0[(gUnk_03001B54 + arg0) & 0xFF] + (gUnk_030025FC & 0x1F);
+            break;
+
+        case 3:
+            REG_BG1HOFS = gUnk_03001B60[(gUnk_03001B54 + arg0) & 0xFF];
+            REG_BG1VOFS = gUnk_030019C0[(gUnk_03001B54 + arg0) & 0xFF]; 
+            break;
+
+        case 4:
+            REG_BG1HOFS = gUnk_03001B60[(gUnk_03001B54 + arg0) & 0xFF];
+            REG_BG1VOFS = gUnk_030019C0[(gUnk_03001B54 + arg0) & 0xFF]; 
+            break;
+    }
+}
 
 void sub_800065C(void) {
 
@@ -797,3 +819,16 @@ void sub_800124C(void) {
 void DummyIntr4(){}
 
 void DummyIntr5(){}
+
+
+// void sub_800128C(void) {
+//     gUnk_03001AC0 = 0;
+//     sub_8001128();
+
+//     while(1)
+//     {
+//         gGameFuncTable[gUnk_03001AC0]();
+//         VBlankIntrWait();
+//         sub_80533F0();  
+//     }
+// }

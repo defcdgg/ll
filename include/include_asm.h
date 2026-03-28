@@ -3,16 +3,11 @@
 
 
 
-#define STR(x) #x
+#ifndef INCLUDE_ASM
+#define INCLUDE_ASM(FOLDER, NAME)                                                                                                     \
+    asm(".include \"" FOLDER "/" #NAME ".s\"\n")
+#endif
 
-#define INCLUDE_ASM(NAME) \
-__attribute__((naked)) void NAME(void){\
-    asm(".include \"asm/nonmatching/" STR(NAME) ".inc\"");\
-}
-
-#define INCLUDE_ASM1(NAME) \
-__attribute__((naked)) void NAME(u16 arg0){\
-    asm(".include \"asm/nonmatching/" STR(NAME) ".inc\"");\
-}
+asm(".include \"asm/macros.inc\"\n");
 
 #endif

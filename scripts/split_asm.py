@@ -7,7 +7,7 @@ import os
 
 def match_func(content):
 
-    filepath = "asm/nonmatching"
+    filepath = "asm/nonmatchings"
 
     os.makedirs(filepath, exist_ok=True)
 

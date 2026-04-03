@@ -1,7 +1,7 @@
+ENTRY(__start)
+
 gNumMusicPlayers = 5;
 gMaxLines = 0x1E;
-
-ENTRY(__start)
 
 MEMORY {
     ewram (w!x) : ORIGIN = 0x02000000, LENGTH = 256K
@@ -21,8 +21,7 @@ SECTIONS {
 
     iwram (NOLOAD) : ALIGN(4) {
         . = 0x00000000; gUnk_03000000 = .;
-
-
+        . = 0x00000002; gUnk_03000002 = .;
         . = 0x00001544;
         . = ALIGN(4);
         *libgcc.a:dp-bit.o(.bss);
@@ -52,37 +51,63 @@ SECTIONS {
         . = 0x000025A0; gUnk_030025A0 = .;
         . = 0x000025A4; gUnk_030025A4 = .;
         . = 0x000025A8; gUnk_030025A8 = .;
+        . = 0x000025B0; gUnk_030025B0 = .;
 
         . = 0x000025B4; gUnk_030025B4 = .;
-        . = 0x000025D8; gUnk_030025D8 = .;
-        . = 0x000025F4; gUnk_030025F4 = .;
-        . = 0x000025FC; gUnk_030025FC = .;
-        . = 0x00002600; gUnk_03002600 = .;    
-        . = 0x00002604; gUnk_03002604 = .;    
-        . = 0x00002C40; gUnk_03002C40 = .;
-        . = 0x00002C48; gUnk_03002C48 = .;
+        . = 0x000025B8; gUnk_030025B8 = .;
+        . = 0x000025C0; gUnk_030025C0 = .;
 
+        . = 0x000025D8; gUnk_030025D8 = .;
+        . = 0x000025E0; gUnk_030025E0 = .;
+        . = 0x000025F0; gUnk_030025F0 = .;
+        . = 0x000025F4; gUnk_030025F4 = .;
+        . = 0x000025F8; gUnk_030025F8 = .;
+        . = 0x000025FC; gUnk_030025FC = .;
+        . = 0x00002600; gUnk_03002600 = .;
+        . = 0x00002604; gUnk_03002604 = .;
+        . = 0x00002608; gUnk_03002608 = .;
+        . = 0x0000260C; gUnk_0300260C = .;
+        . = 0x00002C38; gUnk_03002C38 = .;
+        . = 0x00002C3C; gUnk_03002C3C = .;
+        . = 0x00002C40; gUnk_03002C40 = .;
+        . = 0x00002C44; gUnk_03002C44 = .;
+        . = 0x00002C48; gUnk_03002C48 = .;
+        . = 0x00002C4C; gUnk_03002C4C = .;
+        . = 0x00002C50; gUnk_03002C50 = .;
+        . = 0x00002C58; gUnk_03002C58 = .;
+        . = 0x00002E80; gUnk_03002E80 = .;
         . = 0x000032D0; gUnk_030032D0 = .;
         . = 0x000035C0; gUnk_030035C0 = .;
 
         . = 0x00004550; gUnk_03004550 = .;
 
         . = 0x00004610; gUnk_03004610 = .;
+        . = 0x00004614; gUnk_03004614 = .;
+        . = 0x00004624; gUnk_03004624 = .;
+        . = 0x00004634; gUnk_03004634 = .;
+        . = 0x00004638; gUnk_03004638 = .;
         . = 0x00004648; gUnk_03004648 = .;
 
         . = 0x00004658; gUnk_03004658 = .;
         . = 0x0000465C; gUnk_0300465C = .;
+        . = 0x0000468C; gUnk_0300468C = .;
         . = 0x00004698; gUnk_03004698 = .;
-
+        . = 0x000047A4; gUnk_030047A4 = .;
+        . = 0x000047E4; gUnk_030047E4 = .;
         . = 0x00004800; gUnk_03004800 = .;
+        . = 0x00004820; gUnk_03004820 = .;
         . = 0x00004828; gUnk_03004828 = .;
         . = 0x0000483C; gUnk_0300483C = .;
         . = 0x00004840; gUnk_03004840 = .; 
 
-        . = 0x00004848; gUnk_03004848 = .; 
+        . = 0x00004848; gUnk_03004848 = .;
         . = 0x0000484C; gUnk_0300484C = .;
+        . = 0x00004850; gUnk_03004850 = .;
         . = 0x00004854; gUnk_03004854 = .;
         . = 0x00004910; gUnk_03004910 = .;
+        . = 0x00004980; gUnk_03004980 = .;
+        . = 0x00004A88; gUnk_03004A88 = .;
+        . = 0x00004AA0; gUnk_03004AA0 = .;
         . = 0x00004D40; gUnk_03004D40 = .;
         . = 0x00004D4C; gUnk_03004D4C = .;
         . = 0x00004DC0; gUnk_03004DC0 = .;
@@ -94,11 +119,11 @@ SECTIONS {
         . = 0x00008000;
     } >iwram
 
-
-    .text : ALIGN(4) {
+    .text = 0x8000000;
+    ROM : ALIGN(4) {
         asm/crt0.o(.text);
-        src/code_80002A0.o(.text);
-        asm/code.o(.text);
+        src/code_0.o(.text);
+
         asm/m4a_asm.o(.text);
         src/m4a.o(.text);
         asm/libagbsyscall.o(.text);
@@ -117,30 +142,13 @@ SECTIONS {
         *libgcc.a:_muldi3.o(.text);
         *libgcc.a:_negdi2.o(.text);
         *libc.a:memcpy.o(.text);
-    } >rom =0
+    }
 
     .rodata ALIGN(4) : SUBALIGN(4) {
-        src/code_80002A0.o(.rodata);
+        src/code_0.o(.rodata);
         data/data.o(.rodata);
         src/m4a_tables.o(.rodata);
         data/sound_data.o(.rodata);
     } >rom =0
-
-
-    /* DWARF 2 sections */
-    .debug_aranges  0 : { *(.debug_aranges) }
-    .debug_pubnames 0 : { *(.debug_pubnames) }
-    .debug_info     0 : { *(.debug_info) }
-    .debug_abbrev   0 : { *(.debug_abbrev) }
-    .debug_line     0 : { *(.debug_line) }
-    .debug_frame    0 : { *(.debug_frame) }
-    .debug_str      0 : { *(.debug_str) }
-    .debug_loc      0 : { *(.debug_loc) }
-    .debug_macinfo  0 : { *(.debug_macinfo) }
-
-    /* Discard everything not specifically mentioned above. */
-    /DISCARD/ :
-    {
-        *(*);
-    }
 }
+

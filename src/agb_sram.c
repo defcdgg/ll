@@ -1,4 +1,5 @@
-#include "agb_sram.h"
+#include "gba/agb_sram.h"
+#include "gba/io.h"
 
 const char gAgbSramLibVer[] = "SRAM_V112";
 
@@ -16,10 +17,10 @@ void ReadSram(const u8 *src, u8 *dest, u32 size)
     u16 size_;
 
     REG_WAITCNT = (REG_WAITCNT & ~3) | 3;
-    s = (void *)((uintptr_t)ReadSram_Core);
-    s = (void *)((uintptr_t)s ^ 1);
+    s = (void *)((u32)ReadSram_Core);
+    s = (void *)((u32)s ^ 1);
     d = readSramFast_Work;
-    size_ = ((uintptr_t)ReadSram - (uintptr_t)ReadSram_Core) / 2;
+    size_ = ((u32)ReadSram - (u32)ReadSram_Core) / 2;
     while (size_ != 0)
     {
         *d++ = *s++;
@@ -51,10 +52,10 @@ u32 VerifySram(const u8 *src, u8 *dest, u32 size)
     u16 size_;
 
     REG_WAITCNT = (REG_WAITCNT & ~3) | 3;
-    s = (void *)((uintptr_t)VerifySram_Core);
-    s = (void *)((uintptr_t)s ^ 1);
+    s = (void *)((u32)VerifySram_Core);
+    s = (void *)((u32)s ^ 1);
     d = verifySramFast_Work;
-    size_ = ((uintptr_t)VerifySram - (uintptr_t)VerifySram_Core) / 2;
+    size_ = ((u32)VerifySram - (u32)VerifySram_Core) / 2;
     while (size_ != 0)
     {
         *d++ = *s++;

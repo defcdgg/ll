@@ -1,14 +1,12 @@
 #ifndef GUARD_GBA_GBA_H
 #define GUARD_GBA_GBA_H
 
-#include <string.h>
 #include "defines.h"
-#include "io_reg.h"
+#include "io.h"
 #include "types.h"
-#include "multi_boot.h"
 #include "syscall.h"
 #include "macro.h"
-#include "isagbprint.h"
-#include "m4a.h"
+#include "agb_sram.h"
+
 
 #endif // GUARD_GBA_GBA_H

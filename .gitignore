@@ -33,6 +33,13 @@ __pycache__/
 # OS
 .DS_Store
 
-
+# clangd
+.cache
 compile_commands.json
+
+# ida
+*.i64
+*.id0
+*.id1
+
 code.s

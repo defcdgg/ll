@@ -63,7 +63,7 @@ OBJS_REL := $(patsubst $(OBJ_DIR)/%,%,$(OBJS))
 
 ### FLAGS ###
 
-ASFLAGS  := -mcpu=arm7tdmi -mthumb-interwork
+ASFLAGS  := -mcpu=arm7tdmi -mthumb-interwork  -I sound
 CPPFLAGS := -nostdinc -I tools/agbcc/include -iquote include
 CC1FLAGS := -mthumb-interwork -Wimplicit -Wparentheses -O2 -fhex-asm -fprologue-bugfix
 

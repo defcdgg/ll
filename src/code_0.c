@@ -309,13 +309,13 @@ void sub_800065C(void) {
         
     gUnk_030025A4++;
     
-    if (gUnk_03001948 <= 0x0CDFD7EE) 
+    if (gGameTimer <= 0x0CDFD7EE) 
     {
-        gUnk_03001948++;
+        gGameTimer++;
     } 
     else 
     {
-        gUnk_03001948 = 0x0CDFD7F0;
+        gGameTimer = 0x0CDFD7F0;
     }
 
     gUnk_030025A0++;
@@ -350,7 +350,7 @@ void sub_80008CC(void) {
 
     sub_80533F0();
     VBlankIntrWait();
-    REG_DISPCNT |= 0x80;
+    REG_DISPCNT |= DISPCNT_FORCED_BLANK;
 }
 
 
@@ -473,7 +473,7 @@ void sub_8000B58(u32 arg0) {
     sub_8004B8C();
     sub_8004BBC();
 
-    gUnk_03001948 = 0;
+    gGameTimer = 0;
     gUnk_030032D0 = 0;
     gUnk_03002604 = 0;
     gUnk_03004910 = 0;
@@ -773,7 +773,8 @@ void sub_8001128(void) {
     REG_IME   = 1;
         
     VBlankIntrWait();
-    REG_DISPCNT = 0x37C0;
+    REG_DISPCNT = DISPCNT_MODE_0 | DISPCNT_OBJ_1D_MAP | DISPCNT_FORCED_BLANK
+        | DISPCNT_BG0_ON | DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_OBJ_ON | DISPCNT_WIN0_ON;;
     sub_8000B58(0);
     sub_805359C();
     sub_8021130();
@@ -899,7 +900,7 @@ void sub_8001354(void) {
 
     REG_WIN0H = 0xF0;
     REG_WIN0V = 0xA0;
-    REG_DISPCNT |= 0x2000;
+    REG_DISPCNT |= DISPCNT_WIN0_ON;
     REG_WININ = 0;
     REG_WINOUT = 0;
 
@@ -982,7 +983,7 @@ void sub_8001538(void) {
 
     gUnk_03004980[0xDD] = 2;
     gUnk_03002C38 = 0x12C;
-    gUnk_03001948 = 0;
+    gGameTimer = 0;
     gUnk_030025F8 = 0x60;
     gUnk_03002C3C = 0x50;
     
@@ -990,7 +991,7 @@ void sub_8001538(void) {
     
     REG_WIN0H = 0xF0;
     REG_WIN0V = 0xA0;
-    REG_DISPCNT |= 0x2000;
+    REG_DISPCNT |= DISPCNT_WIN0_ON;
     REG_WININ = 0;
     REG_WINOUT = 0;
 
@@ -1127,7 +1128,7 @@ void sub_80018D4(void) {
             sub_8008DD8();
             REG_WIN0H = 0xF0;
             REG_WIN0V = 0xA0;
-            REG_DISPCNT |= 0x2000;
+            REG_DISPCNT |= DISPCNT_WIN0_ON;
             REG_WININ = 0;
             REG_WINOUT = 0;
             gUnk_0300259C = 1;
@@ -1156,7 +1157,7 @@ void sub_80018D4(void) {
     gUnk_03002600 = 0;
     REG_WIN0H = 0xF0;
     REG_WIN0V = 0xA0;
-    REG_DISPCNT |= 0x2000;
+    REG_DISPCNT |= DISPCNT_WIN0_ON;
     REG_WININ = 0;
     REG_WINOUT = 0;
     
@@ -1399,7 +1400,7 @@ void sub_8002154(void) {
 
 void sub_8002380(u8 arg0) {
     Unk_03002E80* temp_r4;
-    Unk_03003AC0* temp_r0;
+    struct Unk_03003AC0* temp_r0;
     u8 flag;
 
     if ((gUnk_030025A0 & 1) == (arg0 & 1)) 
@@ -1442,10 +1443,116 @@ INCLUDE_ASM("asm/nonmatchings", sub_800243C);
 INCLUDE_ASM("asm/nonmatchings", sub_800271C);
 INCLUDE_ASM("asm/nonmatchings", sub_80029D8);
 INCLUDE_ASM("asm/nonmatchings", sub_8002B54);
-INCLUDE_ASM("asm/nonmatchings", sub_8002D54);
-INCLUDE_ASM("asm/nonmatchings", sub_8002DDC);
+u8 sub_8002D54(void) {
+
+    if(gUnk_03004820 == 0)
+        return 0;
+
+    if(gUnk_030019B0 & DPAD_ANY)
+    {
+        if(sub_8001030(0xBB) == 0)
+        {
+            gUnk_030025D4--;
+            if(gUnk_030025D4 == 0)
+            {
+                gUnk_030025D4 = ((sub_8000FF8() & 7) << 5) + 0xE8; 
+                if(gUnk_030047B0 == 0x7B)
+                {
+                    gUnk_030025D4 >>= 1;
+                }
+                return 1;
+            }
+        }
+        else
+        {
+            if(gUnk_030025D4 < 0xE8)
+            {
+                gUnk_030025D4 = 0xE8;
+                
+                if(gUnk_030047B0 == 0x7B)
+                {
+                    gUnk_030025D4 = 0x74;
+                }
+            }
+        }
+    }
+    
+    return 0;
+}
+
+void sub_8002DDC(void) {
+
+    if (gUnk_03002604 == 0) {
+        return;
+    }
+    switch (gUnk_03002604) 
+    {
+    case 1:
+        REG_DISPCNT &= 0xFEFF;
+        gUnk_03004658 = 0x1E41;
+        gUnk_03004550 = 0xF00;
+        gUnk_03000004 = 0;
+        return;
+        
+    case 2:
+    case 3:
+    case 4:
+    case 10:
+        break;
+        
+    case 5:
+        REG_DISPCNT |= 0x100;
+        gUnk_03004550 = 0xF00;
+        gUnk_03002604++;
+        break;
+        
+    case 6:
+        gUnk_03000004++;
+        gUnk_03004550 &= 0xF00;
+        gUnk_03004550 |= (gUnk_03000004 >> 2) & 0x1F;
+        if((gUnk_03000004 >> 2) == 0x1F)
+        {
+            gUnk_03002604++;
+            gUnk_03000004 = 0;
+        }
+        break;
+
+    case 7:
+        gUnk_03000004++;
+        if( !(gUnk_03000004 & 3))
+        {
+            gUnk_03004550 -= 0x100;
+            if(!(gUnk_03004550 & 0xFF00))
+            {
+                gUnk_03002604++;
+                gUnk_03000004 = gUnk_03004550 & 0xFF00;
+            }
+        }
+        break;
+
+    case 8:
+        gUnk_03000004++;
+        if(gUnk_03000004 > 0x1B3)
+        {
+            gUnk_03002604++;
+            gUnk_03000004 = 0;
+        }
+        break;
+    case 9:
+        gUnk_03000004++;
+        gUnk_03004550 = (((gUnk_03000004 >> 2) & 0x1F) << 8) | ((0x1F - (gUnk_03000004 >> 2)) & 0x1F);
+        if(gUnk_03004550 == 0x1F00)
+        {
+            gUnk_03002604++;
+            gUnk_03000004 = 0;
+        }
+        break;
+
+    }
+}
+
 INCLUDE_ASM("asm/nonmatchings", sub_8002F6C); //Matched
-INCLUDE_ASM("asm/nonmatchings", sub_8003088);
+INCLUDE_ASM("asm/nonmatchings", sub_8003088); //Matched
 
 void sub_80030B0() {
     if (gUnk_03004840 == 0 && gUnk_03002600 == 1)
@@ -1560,7 +1667,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_800375C);
 void sub_80037DC(u8 arg0) {
     u8 temp_r3;
     Unk_03002E80* ptr03002E80;
-    Unk_03003AC0* ptr03003AC0;
+    struct Unk_03003AC0* ptr03003AC0;
 
     ptr03002E80 = &gUnk_03002E80[arg0];
 
@@ -1599,7 +1706,7 @@ void sub_80037DC(u8 arg0) {
 void sub_800384C(void) {
     u8 temp_r1;
     Unk_03003150* ptr03003150;
-    Unk_03003AC0* ptr03003AC0;
+    struct Unk_03003AC0* ptr03003AC0;
 
     ptr03003150 = &gUnk_03003150;
     temp_r1 = sub_8004BFC();
@@ -1790,7 +1897,7 @@ u8 sub_8004BFC(void) {
     }
     return 0;   
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8004C28);
+INCLUDE_ASM("asm/nonmatchings", sub_8004C28); //Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8004C8C); //Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8004CB8); //Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8004CE8); //Matched
@@ -1905,7 +2012,14 @@ INCLUDE_ASM("asm/nonmatchings", sub_8009370);
 INCLUDE_ASM("asm/nonmatchings", sub_8009428);
 INCLUDE_ASM("asm/nonmatchings", sub_80094FC);
 INCLUDE_ASM("asm/nonmatchings", sub_8009600);
-INCLUDE_ASM("asm/nonmatchings", sub_8009A5C);
+void sub_8009A5C(void) {
+    s16 i;
+
+    for( i = 0; i < 4; i++)
+    {
+        gUnk_03000010[i] = 0;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8009A7C);
 INCLUDE_ASM("asm/nonmatchings", sub_8009AC4);
 INCLUDE_ASM("asm/nonmatchings", sub_8009B04);
@@ -2280,7 +2394,20 @@ INCLUDE_ASM("asm/nonmatchings", sub_8020FB8);
 INCLUDE_ASM("asm/nonmatchings", sub_802103C);
 INCLUDE_ASM("asm/nonmatchings", sub_8021064);
 INCLUDE_ASM("asm/nonmatchings", sub_80210C0);
-INCLUDE_ASM("asm/nonmatchings", sub_8021130);
+
+void sub_8021130(void) {
+    u8 i;
+
+    for ( i = 0; i < 10; i++ )
+    {
+        gUnk_03000788[i][0] = 0;
+        gUnk_03000788[i][1] = 0;
+        gUnk_03000788[i][2] = 0;
+        gUnk_03000788[i][3] = 0;
+        gUnk_03000788[i][4] = 0;
+    } 
+    gUnk_030007BA = 0;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8021184);
 INCLUDE_ASM("asm/nonmatchings", sub_80212B4);
 INCLUDE_ASM("asm/nonmatchings", sub_802151C);
@@ -2800,6 +2927,8 @@ INCLUDE_ASM("asm/nonmatchings", sub_80533A0);
 INCLUDE_ASM("asm/nonmatchings", sub_80533B4);
 INCLUDE_ASM("asm/nonmatchings", sub_80533D4);
 INCLUDE_ASM("asm/nonmatchings", sub_80533F0);
+
+
 INCLUDE_ASM("asm/nonmatchings", sub_80534B4);
 
 void sub_805359C() {
@@ -2833,14 +2962,14 @@ void sub_8053688(void) {
     m4aSongNumStop(gUnk_03000F3A);
 }
 
-void sub_805369C(u16 arg0) {
+void sub_805369C(u16 volume) {
 
-    if (arg0 < 2) 
+    if (volume < 2) 
     {
-        arg0 = 2;
+        volume = 2;
     }
-    *(u16* )0x03000F3C = arg0;
-    m4aMPlayVolumeControl((struct MusicPlayerInfo* )0x03005AB0, 0xFF, arg0);
+    *(u16* )0x03000F3C = volume;
+    m4aMPlayVolumeControl((struct MusicPlayerInfo* )0x03005AB0, 0xFF, volume);
 }
 
 void sub_80536C0(u8 arg0) {

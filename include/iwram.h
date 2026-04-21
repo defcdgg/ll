@@ -26,8 +26,11 @@ struct Unk_LzData
 
 extern u16 gUnk_03000000;
 extern u16 gUnk_03000002;
+extern u16 gUnk_03000004;
+extern u8 gUnk_03000010[4];
 
-extern u8 gUnk_03000010[];
+extern u8 gUnk_03000788[][5];
+extern u8 gUnk_030007BA;
 
 extern u8 gUnk_03000DDE;
 extern u8 gUnk_03000E04;
@@ -42,17 +45,16 @@ extern u8 gUnk_03000F42;
 extern u8 gUnk_03000F43;
 extern u8 gUnk_03000F50;
 
+extern u8 gUnk_030018F0[0x50];
 
 extern s32 gUnk_03001940;
 extern u8 gUnk_03001944;
-extern u32 gUnk_03001948;
+extern u32 gGameTimer;              //3001948
+extern u32 gUnk_03001950[14];
 extern u16 gUnk_03001988;
 
-extern struct LzContext gLzContext;
+extern struct LzContext gLzContext; //3001990
 
-extern u8 gUnk_030018F0[0x50];
-extern u32 gUnk_03001948;
-extern u32 gUnk_03001950[14];
 extern u16 gUnk_030019B0;
 
 extern u8 gUnk_030019C0[];
@@ -77,8 +79,9 @@ extern u8 gUnk_030025A4;
 extern u32 gUnk_030025A8;
 extern u8  gUnk_030025B0;
 extern u16 gUnk_030025B4;
-extern s8 gUnk_030025B8;
+extern u8 gUnk_030025B8;
 extern u16 gUnk_030025C0[8];
+extern u16 gUnk_030025D4;
 extern u8 gUnk_030025D8;
 extern u16 gUnk_030025E0[8];
 extern u8 gUnk_030025F0;
@@ -206,7 +209,8 @@ typedef struct
 
 extern Unk_030039C0 gUnk_030039C0[32];
 
-typedef struct
+
+struct Unk_03003AC0
 {
     u8 field_0;
     u8 field_1;
@@ -214,12 +218,24 @@ typedef struct
     u16 field_4;
     u16 field_6;
     u8 pad[4];
-    u32 field_C;
+    struct Unk_03003AC0* field_C;
     u16 field_10;
     u16 field_12;
-}Unk_03003AC0;
+};
+// typedef struct
+// {
+//     u8 field_0;
+//     u8 field_1;
+//     u16 field_2;
+//     u16 field_4;
+//     u16 field_6;
+//     u8 pad[4];
+//     u32 field_C;
+//     u16 field_10;
+//     u16 field_12;
+// }Unk_03003AC0;
 
-extern Unk_03003AC0 gUnk_03003AC0[128];
+extern struct Unk_03003AC0 gUnk_03003AC0[128];
 
 extern u16 gUnk_03004550;
 extern u8 gUnk_03004608;
@@ -266,11 +282,12 @@ extern Unk_030046A0 gUnk_030046A0[];
 extern u16 gUnk_0300467C;
 
 extern u8 gUnk_030047A4;
+extern u16 gUnk_030047B0;
 extern u8 gUnk_030047B8;
 extern u8 gUnk_030047BC;
 extern u8 gUnk_030047E4;
 extern u16 gUnk_03004800[];
-extern s8 gUnk_03004820;
+extern u8 gUnk_03004820;
 extern u8 gUnk_03004824;
 
 extern u16 gUnk_03004828;

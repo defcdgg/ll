@@ -22,7 +22,10 @@ SECTIONS {
     iwram (NOLOAD) : ALIGN(4) {
         . = 0x00000000; gUnk_03000000 = .;
         . = 0x00000002; gUnk_03000002 = .;
+        . = 0x00000004; gUnk_03000004 = .;
         . = 0x00000010; gUnk_03000010 = .;
+        . = 0x00000788; gUnk_03000788 = .;
+        . = 0x000007BA; gUnk_030007BA = .;
         . = 0x00000DDE; gUnk_03000DDE = .;
         . = 0x00000E04; gUnk_03000E04 = .;
         . = 0x00000E70; gUnk_03000E70 = .;
@@ -35,6 +38,12 @@ SECTIONS {
         . = 0x00000F42; gUnk_03000F42 = .;
         . = 0x00000F43; gUnk_03000F43 = .;
         . = 0x00000F50; gUnk_03000F50 = .;
+        . = 0x00000F58; gMPlayTrack_0 = .;
+        . = 0x00001408; gMPlayTrack_1 = .;
+        . = 0x00001458; gMPlayTrack_2 = .;
+        . = 0x000014A8; gMPlayTrack_3 = .;
+        . = 0x000014F8; gMPlayTrack_4 = .;
+
         . = 0x00001544;
         . = ALIGN(4);
         *libgcc.a:dp-bit.o(.bss);
@@ -44,7 +53,7 @@ SECTIONS {
         . = 0x000018F0; gUnk_030018F0 = .;
         . = 0x00001940; gUnk_03001940 = .;
         . = 0x00001944; gUnk_03001944 = .;
-        . = 0x00001948; gUnk_03001948 = .;
+        . = 0x00001948; gGameTimer = .;
         . = 0x00001950; gUnk_03001950 = .;
         . = 0x00001988; gUnk_03001988 = .;
         . = 0x00001990; gLzContext = .;
@@ -69,7 +78,7 @@ SECTIONS {
         . = 0x000025B4; gUnk_030025B4 = .;
         . = 0x000025B8; gUnk_030025B8 = .;
         . = 0x000025C0; gUnk_030025C0 = .;
-
+        . = 0x000025D4; gUnk_030025D4 = .;
         . = 0x000025D8; gUnk_030025D8 = .;
         . = 0x000025E0; gUnk_030025E0 = .;
         . = 0x000025F0; gUnk_030025F0 = .;
@@ -119,6 +128,7 @@ SECTIONS {
         . = 0x000046A0; gUnk_030046A0 = .;
 
         . = 0x000047A4; gUnk_030047A4 = .;
+        . = 0x000047B0; gUnk_030047B0 = .;
         . = 0x000047B8; gUnk_030047B8 = .;
         . = 0x000047BC; gUnk_030047BC = .;
         . = 0x000047E4; gUnk_030047E4 = .;
@@ -152,8 +162,7 @@ SECTIONS {
         . = 0x00008000;
     } >iwram
 
-    .text = 0x8000000;
-    ROM : ALIGN(4) {
+    .text : ALIGN(4) {
         asm/crt0.o(.text);
         src/code_0.o(.text);
 
@@ -182,6 +191,14 @@ SECTIONS {
         data/data.o(.rodata);
         src/m4a_tables.o(.rodata);
         data/sound_data.o(.rodata);
-    } >rom =0
+        src/agb_sram.o(.rodata);
+        . = ORIGIN(rom) + 0x7E83F0;
+        data/data1.o(.rodata);
+
+    } >rom =0xFF
+
+
+
+    
 }
 

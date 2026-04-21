@@ -7,6 +7,8 @@ extern void sub_8000170();
 
 void sub_800065C();
 
+u8 sub_8000FF8();
+
 
 void sub_8001014();
 void sub_8001090();
@@ -260,8 +262,8 @@ void sub_8013C00();
 void sub_8013F3C();
 void sub_8013FE8();
 void sub_8014084();
-void sub_80140D0();
-void sub_8014124();
+void sub_80140D0(u8);
+void sub_8014124(u8);
 void sub_801417C();
 void sub_8014488();
 void sub_801455C();

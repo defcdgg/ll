@@ -489,8 +489,8 @@ void sub_8000B58(u32 arg0) {
     
     for (i = 0; i < 128; i++)
     {
-        gUnk_030035C0[i].field_0 = 0;
-        gUnk_030035C0[i].field_4 = 0;
+        gUnk_030035C0[i].attrs[0] = 0;
+        gUnk_030035C0[i].attrs[1] = 0;
     }
 
     sub_8004AC0();
@@ -868,8 +868,8 @@ void sub_8001354(void) {
 
     for (i = 0; i < 128; i++)
     {
-        gUnk_030035C0[i].field_0 = 0;
-        gUnk_030035C0[i].field_4 = 0;
+        gUnk_030035C0[i].attrs[0] = 0;
+        gUnk_030035C0[i].attrs[1] = 0;
     }
     
     sub_8004AC0();
@@ -960,18 +960,18 @@ void sub_8001538(void) {
     gUnk_03004638 = 0;
     gUnk_030047A4 = 0;
     gUnk_03004614 = 0;
-    gUnk_03004AA0.unk0 = 0;
-    gUnk_03004AA0.unk1 |= 0xFF;
-    gUnk_03004AA0.unk2 |= 0xFF;
-    gUnk_03004AA0.unk3 |= 0xFF;
-    gUnk_03004AA0.unk4 |= 0xFF;
-    gUnk_03004AA0.unk5 |= 0xFF;
-    gUnk_03004A88.unk0 = 0;
-    gUnk_03004A88.unk1 |= 0xFF;
-    gUnk_03004A88.unk2 |= 0xFF;
-    gUnk_03004A88.unk3 |= 0xFF;
-    gUnk_03004A88.unk4 |= 0xFF;
-    gUnk_03004A88.unk5 |= 0xFF;
+    gUnk_03004AA0.field_0 = 0;
+    gUnk_03004AA0.field_1 |= 0xFF;
+    gUnk_03004AA0.field_2 |= 0xFF;
+    gUnk_03004AA0.field_3 |= 0xFF;
+    gUnk_03004AA0.field_4 |= 0xFF;
+    gUnk_03004AA0.field_5 |= 0xFF;
+    gUnk_03004A88.field_0 = 0;
+    gUnk_03004A88.field_1 |= 0xFF;
+    gUnk_03004A88.field_2 |= 0xFF;
+    gUnk_03004A88.field_3 |= 0xFF;
+    gUnk_03004A88.field_4 |= 0xFF;
+    gUnk_03004A88.field_5 |= 0xFF;
     
     sub_800A924();
 
@@ -1114,8 +1114,8 @@ void sub_80018D4(void) {
     
     for(i = 0; i < 0x80; i++)
     {
-        gUnk_030035C0[i].field_0 = 0;
-        gUnk_030035C0[i].field_4 = 0;
+        gUnk_030035C0[i].attrs[0] = 0;
+        gUnk_030035C0[i].attrs[1] = 0;
     }
 
     sub_8004AC0();
@@ -1244,8 +1244,8 @@ void sub_8001BD0(void) {
 
     for( i = 0; i < 128; i++)
     {
-        gUnk_030035C0[i].field_0 = 0;
-        gUnk_030035C0[i].field_4 = 0;
+        gUnk_030035C0[i].attrs[0] = 0;
+        gUnk_030035C0[i].attrs[1] = 0;
     }
 
     sub_8004AC0();
@@ -1598,7 +1598,7 @@ void sub_8003168() {
         gUnk_03002C4C = (gUnk_03002C4C + 1) & 1;
         gUnk_03002600 = 1;
         sub_8009B44();
-        sub_80089E0(4U);
+        sub_80089E0(4);
         sub_80536EC(0x2E);
     }
     sub_80081C0();
@@ -1628,8 +1628,8 @@ void sub_8003208(void) {
 
     for( i = 0; i < 128; i++ )
     {
-        gUnk_030035C0[i].field_0 = 0;
-        gUnk_030035C0[i].field_4 = 0;
+        gUnk_030035C0[i].attrs[0] = 0;
+        gUnk_030035C0[i].attrs[1] = 0;
     }
 
     sub_8004AC0();
@@ -1740,7 +1740,7 @@ void sub_800384C(void) {
         ptr03003AC0->field_C = 0;
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_80038CC);
+INCLUDE_ASM("asm/nonmatchings", sub_80038CC); //Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8003958);
 INCLUDE_ASM("asm/nonmatchings", sub_8003B08);
 INCLUDE_ASM("asm/nonmatchings", sub_8003C54);
@@ -1917,7 +1917,9 @@ INCLUDE_ASM("asm/nonmatchings", sub_8004D38);
 INCLUDE_ASM("asm/nonmatchings", sub_8004D8C);
 INCLUDE_ASM("asm/nonmatchings", sub_8004DA4);
 INCLUDE_ASM("asm/nonmatchings", sub_8004DD0);
-INCLUDE_ASM("asm/nonmatchings", sub_8004E04);
+void sub_8004E04(void) {
+    gUnk_03002C44 |= 1;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8004E14);
 INCLUDE_ASM("asm/nonmatchings", sub_8004E48);
 INCLUDE_ASM("asm/nonmatchings", sub_8004E7C);
@@ -1959,7 +1961,27 @@ INCLUDE_ASM("asm/nonmatchings", sub_8008788);
 INCLUDE_ASM("asm/nonmatchings", sub_80088B4);
 INCLUDE_ASM("asm/nonmatchings", sub_80088F4);
 INCLUDE_ASM("asm/nonmatchings", sub_8008978);
-INCLUDE_ASM("asm/nonmatchings", sub_80089E0);
+void sub_80089E0(u16 arg0) {
+
+    switch(arg0)
+    {
+        case 1:
+            gUnk_03004604 = 0;
+            REG_WIN0H = DISPLAY_WIDTH;
+            REG_WIN0V = DISPLAY_HEIGHT;
+            REG_WININ = 0x3F;
+            REG_WINOUT = 0;
+            break;
+        case 0:
+            gUnk_03004604 = DISPLAY_WIDTH;
+            break;
+        default:
+             sub_8009428(arg0 - 3);
+            break;
+    }
+
+    gUnk_03004840 = arg0;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8008A3C);
 void sub_8008A60(void) {
     s16 i;
@@ -1971,7 +1993,17 @@ void sub_8008A60(void) {
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8008A80);
 INCLUDE_ASM("asm/nonmatchings", sub_8008B14);
-INCLUDE_ASM("asm/nonmatchings", sub_8008B5C);
+void sub_8008B5C(void) {
+    gUnk_03004670.field_0 = gUnk_03004AA0.field_0;
+    gUnk_030047D0.field_0 = gUnk_03004AA0.field_0;
+
+    sub_8004C8C(0, gUnk_03004AA0.field_0);
+    sub_8004CB8(0, gUnk_03004AA0.field_0);
+    gUnk_03004670.field_1 = 11;
+    gUnk_030047D0.field_1 = 11;
+    sub_8004C8C(1, 0xBU);
+    sub_8004CB8(1, 0xBU);
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8008BA4);
 INCLUDE_ASM("asm/nonmatchings", sub_8008BE4);
 INCLUDE_ASM("asm/nonmatchings", sub_8008BFC);
@@ -2304,7 +2336,45 @@ INCLUDE_ASM("asm/nonmatchings", sub_801B878);
 INCLUDE_ASM("asm/nonmatchings", sub_801B8AC);
 INCLUDE_ASM("asm/nonmatchings", sub_801B8E8);
 INCLUDE_ASM("asm/nonmatchings", sub_801B8FC);
-INCLUDE_ASM("asm/nonmatchings", sub_801B920);
+void sub_801B920(void) {
+    u8 i;
+
+    GameOamData* oamPtr;
+    Unk_030034C0* srcPtr;
+
+    oamPtr = &gUnk_030035C0[0];
+    srcPtr = gUnk_030034C0;
+
+
+    for(i = 0; i < 32; i++)
+    {
+        oamPtr->fields.AffineParam = srcPtr->field_0;
+        oamPtr++;
+        oamPtr->fields.AffineParam = srcPtr->field_2;
+        oamPtr++;
+        oamPtr->fields.AffineParam = srcPtr->field_4;
+        oamPtr++;
+        oamPtr->fields.AffineParam = srcPtr->field_6;
+        oamPtr++;
+        srcPtr++;
+     }
+
+    // do {
+    //     oamPtr[0].fields.AffineParam = srcPtr->field_0;
+    //     oamPtr++;
+    //     oamPtr[0].fields.AffineParam = srcPtr->field_2;
+    //     oamPtr++;
+    //     oamPtr[0].fields.AffineParam = srcPtr->field_4;
+    //     oamPtr++;
+    //     oamPtr[0].fields.AffineParam = srcPtr->field_6;
+
+    //     oamPtr++;
+    //     srcPtr++;
+    //     i++;
+    // } while (i < 32);
+
+
+}
 INCLUDE_ASM("asm/nonmatchings", sub_801B954);
 INCLUDE_ASM("asm/nonmatchings", sub_801B95C);
 INCLUDE_ASM("asm/nonmatchings", sub_801B964);

@@ -124,8 +124,7 @@ typedef struct {
   u8 field_11;
   u8 field_12;
   u8 field_13;
-  u8 field_14;
-  u8 field_15;
+  u16 field_14;
   u8 field_16;
   u8 field_17;
   u8 field_18;
@@ -192,13 +191,30 @@ typedef struct
 
 extern Unk_030034C0 gUnk_030034C0[];
 
-typedef struct
-{
-    u32 field_0;
-    u32 field_4;
-} Unk_030035C0;
+typedef union{
+    struct {
+        u32 VPos:8;
+        u32 AffineMode:2;
+        u32 ObjMode:2;
+        u32 Mosaic:1;
+        u32 ColorMode:1;
+        u32 Shape:2;
+        u32 HPos:9;
+        u32 AffineParamNo_L:3;
+        u32 HFlip:1;
+        u32 VFlip:1;
+        u32 Size:2;
 
-extern Unk_030035C0 gUnk_030035C0[128];
+        u16 CharNo:10;
+        u16 Priority:2;
+        u16 Pltt:4;
+        u16 AffineParam;
+    }fields;
+
+    u32 attrs[2];
+
+}GameOamData;
+extern GameOamData gUnk_030035C0[128];
 
 
 typedef struct
@@ -238,6 +254,7 @@ struct Unk_03003AC0
 extern struct Unk_03003AC0 gUnk_03003AC0[128];
 
 extern u16 gUnk_03004550;
+extern u16 gUnk_03004604;
 extern u8 gUnk_03004608;
 extern u16 gUnk_03004610;
 extern u16 gUnk_03004614;
@@ -256,6 +273,16 @@ extern u16 gUnk_03004648;
 extern u16 gUnk_03004658;
 extern u16 gUnk_0300465C;
 extern u8 gUnk_0300466C;
+
+typedef struct
+{
+    u8 field_0;
+    u8 field_1;
+}Unk_03004670;
+
+extern Unk_03004670 gUnk_03004670;
+
+extern u16 gUnk_0300467C;
 
 
 
@@ -279,12 +306,16 @@ typedef struct{
 
 extern Unk_030046A0 gUnk_030046A0[];
 
-extern u16 gUnk_0300467C;
+
 
 extern u8 gUnk_030047A4;
 extern u16 gUnk_030047B0;
 extern u8 gUnk_030047B8;
 extern u8 gUnk_030047BC;
+
+extern Unk_03004670 gUnk_030047D0;
+
+
 extern u8 gUnk_030047E4;
 extern u16 gUnk_03004800[];
 extern u8 gUnk_03004820;
@@ -318,12 +349,12 @@ extern u8 gUnk_03004920;
 extern u8 gUnk_03004980[];
 
 typedef struct{
-    u8 unk0;
-    u8 unk1;
-    u8 unk2;
-    u8 unk3;
-    u8 unk4;
-    u8 unk5;
+    u8 field_0;
+    u8 field_1;
+    u8 field_2;
+    u8 field_3;
+    u8 field_4;
+    u8 field_5;
 }Unk_03004AA0;
 
 extern Unk_03004AA0 gUnk_03004AA0;

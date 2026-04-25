@@ -29,6 +29,20 @@ extern u16 gUnk_03000002;
 extern u16 gUnk_03000004;
 extern u8 gUnk_03000010[4];
 
+extern u16 gUnk_03000324;
+
+typedef struct{
+    u16 field_0;
+    u16 field_2;
+    u16 field_4;
+    u16 field_6;
+    u16 field_8;
+    u16 field_A;
+    u16 field_C;
+    u16 field_E;
+}Unk_03000500;
+extern Unk_03000500 gUnk_03000500;
+
 extern u8 gUnk_03000788[][5];
 extern u8 gUnk_030007BA;
 
@@ -167,7 +181,9 @@ typedef struct
 
 extern Unk_03003150 gUnk_03003150;
 
+extern u16 gUnk_03003240;
 extern u8 gUnk_030032D0;
+extern u16 gUnk_030032D4;
 
 extern u8 gUnk_03003360[32];
 
@@ -181,6 +197,8 @@ typedef struct
 
 extern Unk_03003380 gUnk_03003380[32];
 
+extern u8 gUnk_030034B0;
+
 typedef struct
 {
     u16 field_0;
@@ -188,6 +206,7 @@ typedef struct
     u16 field_4;
     u16 field_6;
 }Unk_030034C0;
+
 
 extern Unk_030034C0 gUnk_030034C0[];
 
@@ -253,9 +272,11 @@ struct Unk_03003AC0
 
 extern struct Unk_03003AC0 gUnk_03003AC0[128];
 
+extern u8 gUnk_03004540;
 extern u16 gUnk_03004550;
 extern u16 gUnk_03004604;
 extern u8 gUnk_03004608;
+extern u8 gUnk_0300460C;
 extern u16 gUnk_03004610;
 extern u16 gUnk_03004614;
 
@@ -280,8 +301,8 @@ typedef struct
     u8 field_1;
 }Unk_03004670;
 
-extern Unk_03004670 gUnk_03004670;
-
+// extern Unk_03004670 gUnk_03004670;
+extern u8 gUnk_03004670[];
 extern u16 gUnk_0300467C;
 
 
@@ -313,7 +334,10 @@ extern u16 gUnk_030047B0;
 extern u8 gUnk_030047B8;
 extern u8 gUnk_030047BC;
 
-extern Unk_03004670 gUnk_030047D0;
+extern u16 gUnk_030047C0;
+
+// extern Unk_03004670 gUnk_030047D0;
+extern u8 gUnk_030047D0[];
 
 
 extern u8 gUnk_030047E4;
@@ -348,17 +372,65 @@ extern u8 gUnk_03004910;
 extern u8 gUnk_03004920;
 extern u8 gUnk_03004980[];
 
-typedef struct{
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-    u8 field_4;
-    u8 field_5;
-}Unk_03004AA0;
+// typedef struct{
+//     u8 field_0;
+//     u8 field_1;
+//     u8 field_2;
+//     u8 field_3;
+//     u8 field_4;
+//     u8 field_5;
+// }Unk_03004AA0;
 
-extern Unk_03004AA0 gUnk_03004AA0;
-extern Unk_03004AA0 gUnk_03004A88;
+// extern Unk_03004AA0 gUnk_03004AA0;
+// extern Unk_03004AA0 gUnk_03004A88;
+extern u8 gUnk_03004A88[];
+extern u8 gUnk_03004AA0[];
+
+typedef struct{
+    u8 lv;
+    u8 field_1;
+    u16 hp;
+    u16 mp;
+    u16 atc;
+    u16 def;
+    u16 agl;
+    u16 men;
+    u16 res;
+    u8  noa;
+    u8 luc;
+    u16 max_hp;
+    u16 max_mp;
+    u8 base_atc;
+    u8 base_def;
+    u8 base_agl;
+    u8 base_men;
+    u8 base_res;
+    u8 base_noa;
+    u8 base_luc;
+    
+    u8 equip_atc;
+    u8 equip_def;
+    u8 equip_agl;
+    u8 equip_men;
+    u8 equip_res;
+    u8 equip_noa;
+    u8 equip_luc;
+
+    u8 equip_slot1;
+    u8 equip_slot2;
+    u8 equip_slot3;
+    u8 equip_slot4;
+    u8 equip_slot5;
+    u8 equip_slot6;
+
+    u8 skills[8];
+    u8 field_unk[6];
+
+    u32 exp;
+    u32 next_exp;
+}Unk_03004AC0;
+
+extern Unk_03004AC0 gUnk_03004AC0[];
 
 extern u8 gUnk_03004D40;
 

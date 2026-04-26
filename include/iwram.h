@@ -3,6 +3,13 @@
 
 #include "gba/types.h"
 
+typedef struct UnkNode {
+    u8 key;   // offset 0, 用于比较排序
+    u8 pad[3];
+    struct UnkNode *prev;  // offset 4
+    struct UnkNode *next;  // offset 8
+} UnkNode;
+
 struct LzContext
 {
     u8* dest;
@@ -29,7 +36,41 @@ extern u16 gUnk_03000002;
 extern u16 gUnk_03000004;
 extern u8 gUnk_03000010[4];
 
+typedef struct{
+    u8 field_0;
+    u8 field_1;
+    u8 field_2;
+    u8 field_3;
+    u16 field_4;
+    u16 field_6;
+}Unk_03000048;
+extern Unk_03000048 gUnk_03000048;
+
+extern u8 gUnk_03000186;
+extern u8 gUnk_03000187;
+extern u8 gUnk_03000188[];
+extern u8* gUnk_030001D0[];
+
+extern u8 gUnk_03000220;
+extern u32 gUnk_03000248;
+extern u16 gUnk_03000312;
+extern u16 gUnk_03000314;
+extern u8 gUnk_03000316;
 extern u16 gUnk_03000324;
+extern u32 gUnk_03000328;
+extern u8 gUnk_0300032E;
+extern u16 gUnk_03000330[];
+extern u32 gUnk_03000340;
+typedef struct {
+    u8 padding0[12];
+    u8 field_C;
+    u8 padding1[7];
+} Unk_03000348;
+extern Unk_03000348 gUnk_03000348[];
+
+extern u16 gUnk_03000384;
+
+extern u8 gUnk_030004F8;
 
 typedef struct{
     u16 field_0;
@@ -42,9 +83,31 @@ typedef struct{
     u16 field_E;
 }Unk_03000500;
 extern Unk_03000500 gUnk_03000500;
+extern u16 gUnk_03000510;
+extern u8 gUnk_03000512;
+extern u8 gUnk_03000514;
 
+extern u32 gUnk_0300062C;
+extern u8 gUnk_03000630;
+extern u32 gUnk_03000718;
+extern u8 gUnk_0300071C;
+extern u32 gUnk_03000730;
+extern u8 gUnk_0300073D;
+extern u8 gUnk_03000744;
+extern u8 gUnk_03000748[];
 extern u8 gUnk_03000788[][5];
 extern u8 gUnk_030007BA;
+extern s8 gUnk_03000814;
+extern s8 gUnk_03000815;
+extern u8 gUnk_03000816;
+extern u8 gUnk_03000865;
+extern u16 gUnk_03000882;
+extern u8 gUnk_03000889;
+extern u8 gUnk_03000910;
+extern u8 gUnk_03000948;
+extern u16 gUnk_03000ADE;
+extern u16 gUnk_03000AE0;
+extern u16 gUnk_03000AE2;
 
 extern u8 gUnk_03000DDE;
 extern u8 gUnk_03000E04;
@@ -433,10 +496,21 @@ typedef struct{
 extern Unk_03004AC0 gUnk_03004AC0[];
 
 extern u8 gUnk_03004D40;
+extern u8 gUnk_03004D44;
 
 extern u8 gUnk_03004D4C;
+extern u8 gUnk_03004D60[];
 
 extern u8 gUnk_03004DC0;
+extern u8 gUnk_03004DC4;
+extern u8 gUnk_03004DC8[];
+
+extern u8 gUnk_03004DD0;
+extern u8 gUnk_03004DD4;
+extern u8 gUnk_03004DD8;
+
+extern u8 gUnk_03004DF0[];
+
 typedef struct
 {
     u16 unk0;
@@ -445,6 +519,17 @@ typedef struct
     u8 unk5E;
 }Unk_03004F20;
 extern Unk_03004F20 gUnk_03004F20;
+
+typedef struct{
+    u32* field_0;
+    u32* field_4;
+    u16 field_8;
+    u16 field_A;
+    u16 field_C;
+    u16 field_E;
+}Unk_03004F80;
+
+extern Unk_03004F80 gUnk_03004F80;
 
 extern u8 gUnk_03004F90[];
 

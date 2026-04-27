@@ -95,14 +95,21 @@ extern u32 gUnk_03000730;
 extern u8 gUnk_0300073D;
 extern u8 gUnk_03000744;
 extern u8 gUnk_03000748[];
+extern u8 gUnk_03000758[];
+extern u8 gUnk_03000763;
 extern u8 gUnk_03000788[][5];
 extern u8 gUnk_030007BA;
 extern s8 gUnk_03000814;
 extern s8 gUnk_03000815;
 extern u8 gUnk_03000816;
+extern u8 gUnk_03000826;
 extern u8 gUnk_03000865;
 extern u16 gUnk_03000882;
 extern u8 gUnk_03000889;
+extern u8 gUnk_030008F1;
+extern u8 gUnk_030008F2;
+extern u8 gUnk_030008F3;
+extern u16 gUnk_03000906;
 extern u8 gUnk_03000910;
 extern u8 gUnk_03000948;
 extern u16 gUnk_03000ADE;
@@ -394,6 +401,7 @@ extern Unk_030046A0 gUnk_030046A0[];
 
 extern u8 gUnk_030047A4;
 extern u16 gUnk_030047B0;
+extern u8 gUnk_030047B4;
 extern u8 gUnk_030047B8;
 extern u8 gUnk_030047BC;
 
@@ -417,7 +425,7 @@ extern u16 gUnk_03004848;
 extern u16 gUnk_0300484C;
 extern u8 gUnk_03004850;
 extern u8 gUnk_03004854;
-
+extern u8 gUnk_03004860;
 extern u8 gUnk_03004870[32];
 
 typedef struct {

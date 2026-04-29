@@ -10,7 +10,7 @@ void sub_800065C();
 
 u8 sub_8000FF8();
 
-
+s32 sub_800096C();
 void sub_8001014();
 void sub_8001090();
 void sub_800124C();
@@ -81,8 +81,8 @@ void sub_8004BBC();
 void sub_8004BE0();
 u8 sub_8004BFC();
 struct Unk_03003AC0* sub_8004C28(struct Unk_03003AC0*, u8 , u16 , u16 , u16 );
-void sub_8004C8C();
-void sub_8004CB8();
+void sub_8004C8C(u8,u8);
+void sub_8004CB8(u8,u8);
 void sub_8004CE8();
 void sub_8004D20(u8, u8, u8);
 void sub_8004D38(u8);
@@ -153,7 +153,7 @@ void sub_8008E44();
 void sub_8008E94();
 void sub_8008F28(u8);
 void sub_8008FD0();
-void sub_800908C();
+void sub_800908C(u8);
 void sub_8009114();
 void sub_8009168();
 void sub_8009184(u8);
@@ -218,7 +218,7 @@ void sub_800C0D8();
 void sub_800C194();
 void sub_800C2F8();
 
-void sub_800E170();
+void sub_800E170(u8, u8, u8);
 void sub_800E244();
 void sub_800E668();
 void sub_800E71C();

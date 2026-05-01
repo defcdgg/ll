@@ -60,6 +60,7 @@ typedef struct{
     u8 pad[0x14-8];
 }Unk_03000058;
 extern Unk_03000058 gUnk_03000058[];
+extern Unk_03000058 gUnk_030000BC[];
 
 extern u8 gUnk_03000186;
 extern u8 gUnk_03000187;
@@ -67,10 +68,15 @@ extern u8 gUnk_03000188[];
 extern u8 gUnk_03000198;
 extern u8 gUnk_03000199;
 extern u8 gUnk_030001A0[];
+extern u8 gUnk_030001B4[];
 
 extern u8* gUnk_030001D0[];
 
 extern u8 gUnk_03000220;
+extern u8 gUnk_03000224;
+extern u8 gUnk_03000225;
+extern u8 gUnk_03000226;
+extern u8 gUnk_03000227;
 extern u32 gUnk_03000248;
 extern u16 gUnk_03000312;
 extern u16 gUnk_03000314;

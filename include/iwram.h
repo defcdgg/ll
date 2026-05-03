@@ -73,6 +73,7 @@ extern u8 gUnk_030001B4[];
 extern u8* gUnk_030001D0[];
 
 extern u8 gUnk_03000220;
+extern u8 gUnk_03000221;
 extern u8 gUnk_03000224;
 extern u8 gUnk_03000225;
 extern u8 gUnk_03000226;
@@ -212,7 +213,7 @@ extern u16 gUnk_03002C4C;
 extern u8  gUnk_03002C50;
 extern u8  gUnk_03002C58[8];
 
-extern u32 gUnk_03002C80[128];
+extern struct Unk_03003AC0* gUnk_03002C80[128];
 
 typedef struct {
   u8 field_0;
@@ -366,6 +367,7 @@ struct Unk_03003AC0
 // }Unk_03003AC0;
 
 extern struct Unk_03003AC0 gUnk_03003AC0[128];
+
 
 extern u8 gUnk_03004540;
 extern u16 gUnk_03004550;

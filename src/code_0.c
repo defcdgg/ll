@@ -2695,9 +2695,9 @@ s32 sub_80109F8(u8 arg0) {
 INCLUDE_ASM("asm/nonmatchings", sub_8010BEC);
 INCLUDE_ASM("asm/nonmatchings", sub_8010CCC);
 INCLUDE_ASM("asm/nonmatchings", sub_8010D80);
-INCLUDE_ASM("asm/nonmatchings", sub_8010E58);
+INCLUDE_ASM("asm/nonmatchings", sub_8010E58); //Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8010F10);
-INCLUDE_ASM("asm/nonmatchings", sub_801114C);
+INCLUDE_ASM("asm/nonmatchings", sub_801114C); //Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8011268);
 INCLUDE_ASM("asm/nonmatchings", sub_80113CC);
 INCLUDE_ASM("asm/nonmatchings", sub_8011454);
@@ -2720,8 +2720,40 @@ INCLUDE_ASM("asm/nonmatchings", sub_8014A68);
 INCLUDE_ASM("asm/nonmatchings", sub_801543C); //Matched
 INCLUDE_ASM("asm/nonmatchings", sub_80154E8);
 INCLUDE_ASM("asm/nonmatchings", sub_8015658);
-INCLUDE_ASM("asm/nonmatchings", sub_8015AF0);
-INCLUDE_ASM("asm/nonmatchings", sub_8015B90);
+
+static inline void SetBgUnknown1(u16* buf, u16 val)
+{
+    *buf = val;
+}
+
+static inline void SetBgUnknown(u16* buf, u16 val)
+{
+    *buf = val + 0xb240;
+}
+INCLUDE_ASM("asm/nonmatchings", sub_8015AF0);//Matched
+
+
+void sub_8015B90(void) {
+    
+    if(sub_8016AA0() != 0)
+    {
+
+        SetBgUnknown( (u16*)0x02005992,(((gUnk_03000198 >> 3) & 1) + 0x826) );
+    }
+    else
+    {
+        SetBgUnknown1((u16*)0x02005992, 0xb27F);
+    }
+
+    if(sub_8016AD4(4) != 0)
+    {
+        SetBgUnknown((u16*)0x02005BD2,(((gUnk_03000198 >> 3) & 1) + 0x26));
+    }
+    else
+    {
+        SetBgUnknown1((u16*)0x02005BD2, 0xB27F);
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8015C18);
 INCLUDE_ASM("asm/nonmatchings", sub_8015E1C);
 void sub_8015E88(void) {
@@ -2769,7 +2801,7 @@ void sub_8015FB4(u8 arg0) {
     gUnk_03004DC4 = 1;
     gUnk_03001944 = 0xD;
 
-    ClearBuffer((u16* )0x02005800,0x1e,0x14);
+    ClearBuffer((u16* )0x02005800,30,20);
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8016038); //Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8016068); //Matched
@@ -2877,8 +2909,8 @@ u8 sub_8016424(s32 *ptr, s32 divisor) {
 void sub_8016444(u16* arg0, u16 arg1, u8 arg2) {
     sub_8016368(sub_8016460(arg0, arg1, arg2), 0xC9, 0xB);
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8016460);
-INCLUDE_ASM("asm/nonmatchings", sub_80164C0);
+INCLUDE_ASM("asm/nonmatchings", sub_8016460); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_80164C0); //Matched
 void sub_80164F8(u16 arg0) {
     sub_8016508(arg0, 0xB);
 }
@@ -3097,16 +3129,93 @@ void sub_8016A6C(void) {
     }
     gUnk_03000199 = 0;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8016AA0);
-INCLUDE_ASM("asm/nonmatchings", sub_8016AD4);
+u8 sub_8016AA0(void) {
+    u8 index;
+    u8 value;
+    index = gUnk_03000199;
+
+    if(index == 1)
+        return 0;
+
+    while(index != 0)
+    {
+        index--;
+        if(gUnk_03004980[index] != 0)
+            return index;
+    }
+    return 0;
+}
+u8 sub_8016AD4(u8 arg0) {
+    u8 idx;
+    u8 count;
+
+    idx = gUnk_03000199;
+    count = 0;
+
+    while(count < arg0)
+    {
+        if(gUnk_03004980[idx] != 0) 
+        {
+              count++;
+        }
+        idx++;
+        
+        if(idx == 0xFF)
+            return 0;
+    }
+    
+    while (idx != 0xFF) {
+        if (gUnk_03004980[idx] != 0) {
+                return idx;
+        }
+        idx++;
+    }
+    
+    return 0;
+}
+
 INCLUDE_ASM("asm/nonmatchings", sub_8016B30);
-INCLUDE_ASM("asm/nonmatchings", sub_8016BB0);
-INCLUDE_ASM("asm/nonmatchings", sub_8016BE0);
-INCLUDE_ASM("asm/nonmatchings", sub_8016C10);
+void sub_8016BB0(void) {
+    sub_8013FE8();
+    gUnk_03004D44 = 3;
+    gUnk_03004DD0 = 0xC;
+    gUnk_03000221 = 0;
+    sub_8016508(0x18U, 0xBU);
+}
+void sub_8016BE0(u16* dest, u8* src, u8 arg2) {
+
+    while( *src != 0xFF)
+    {
+        *dest = (arg2 << 12) + 0x200 + *src;
+        dest++;
+        src++;
+    }
+
+}
+
+void sub_8016C10(u16* dest, u8* src) {
+    
+    while( *src != 0xFF)
+    {
+        *dest = 0xF200;
+        dest++;
+        src++;
+    }
+
+}
+
 u16* sub_8016C2C(u8 x, u8 y) {
     return (u16*) 0x2005800 + ((y * 32) + x);
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8016C44); //Matched
+
+void sub_8016C44(void) {
+    struct Unk_03003AC0* ptr = &gUnk_03003AC0[112]; //03004380
+    gUnk_03000048.field_6 = 0;
+    gUnk_03000048.field_4 = 0;
+    sub_8004C28(ptr, 1, 0, 0x81E0, 0x21C0);
+    gUnk_03002C80[0] = ptr;
+    sub_800E668(0);
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8016C88);
 INCLUDE_ASM("asm/nonmatchings", sub_8016D24);
 INCLUDE_ASM("asm/nonmatchings", sub_8016E30);

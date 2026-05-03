@@ -4,6 +4,31 @@
 #include "gba/types.h"
 #include "iwram.h"
 
+
+static inline void ClearBuffer(u16* buf, u8 w, u8 h)
+{
+    u16 x, y;
+    u16* temp_buf;
+    for (y = 0; y < h; y++) {
+        temp_buf = buf;
+    
+        for (x = 0; x < w; x++) {
+            *buf++ = 0xB001;
+        }
+        buf = temp_buf + 0x20;
+    }
+}
+
+static inline void SetBgUnknown1(u16* buf, u16 val)
+{
+    *buf = val;
+}
+
+static inline void SetBgUnknown(u16* buf, u16 val)
+{
+    *buf = val + 0xb240;
+}
+
 extern void sub_8000170();
 
 void sub_800065C();
@@ -13,7 +38,9 @@ u8 sub_8000FF8();
 s32 sub_800096C();
 void sub_8001014();
 void sub_8001090();
+void sub_800110C();
 void sub_800124C();
+
 
 extern void DummyIntr3();
 extern void DummyIntr4();
@@ -244,11 +271,7 @@ void sub_80104F8();
 void sub_8010624();
 void sub_8010770();
 void sub_8010978();
-s32 sub_80109F8(u8);
-void sub_8010BEC(u8);
-void sub_8010CCC();
-void sub_8010D80();
-void sub_8010E58(u8);
+
 void sub_8010F10(u8, u8, u8, u8);
 void sub_801114C();
 void sub_8011268();
@@ -1035,22 +1058,6 @@ u32 sub_8053360(u32*);
 u32 sub_80533A0(u32*);
 u32 sub_80533B4(u32*);
 u32 sub_80533D4(u32*);
-void sub_80533F0();
-void sub_80534B4();
-void sub_805359C();
-u16 sub_80535E8();
-void sub_80535F4();
-void sub_805360C();
-void sub_8053628(u8, u16);
-void sub_8053688();
-void sub_805369C(u16);
-void sub_80536C0(u8);
-void sub_80536EC(u8);
-void sub_8053720();
-u8 sub_8053734(u8);
-void sub_805374C(s32, s32, s32);
-void sub_80537C0();
-void sub_8053838(s32);
-s32 sub_8053884(u8);
+
 
 #endif

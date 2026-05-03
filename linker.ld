@@ -256,6 +256,9 @@ SECTIONS {
     .text : ALIGN(4) {
         asm/crt0.o(.text);
         src/code_0.o(.text);
+        src/save.o(.text);
+        src/code_1.o(.text);
+        src/sound.o(.text);
 
         asm/m4a_asm.o(.text);
         src/m4a.o(.text);

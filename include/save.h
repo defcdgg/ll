@@ -2,7 +2,6 @@
 #define _SAVE_H
 
 #include "gba/types.h"
-#include "iwram.h"
 
 s32 sub_80109F8(u8);
 void sub_8010BEC(u8);

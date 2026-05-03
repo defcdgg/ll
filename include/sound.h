@@ -2,7 +2,6 @@
 #define _SOUND_H
 
 #include "gba/types.h"
-#include "iwram.h"
 
 void sub_80533F0();
 void sub_80534B4();
@@ -17,9 +16,9 @@ void sub_80536C0(u8);
 void sub_80536EC(u8);
 void sub_8053720();
 u8 sub_8053734(u8);
-void sub_805374C(s32, s32, s32);
-void sub_80537C0();
-void sub_8053838(s32);
+void sub_805374C(u16, u8, u8);
+void sub_80537C0(u16, u8);
+void sub_8053838(u8);
 s32 sub_8053884(u8);
 
 #endif

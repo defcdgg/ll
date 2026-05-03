@@ -369,7 +369,8 @@ void sub_80175C0();
 void sub_8017600(u32*, u32*, u32, u32);
 void sub_801761C();
 void sub_8017640();
-void sub_801768C();
+u16 sub_801768C(s16, s16, u8, u8, u8);
+
 void sub_80177AC();
 void sub_8017FA4(s8);
 void sub_8018070();

@@ -148,7 +148,7 @@ extern u16 gUnk_03000E70;
 extern u16 gUnk_03000F38;
 extern u16 gUnk_03000F3A;
 extern u16 gUnk_03000F3C;
-extern u16 gUnk_03000F3E;
+extern s16 gUnk_03000F3E;
 extern u8 gUnk_03000F40;
 extern u8 gUnk_03000F41;
 extern u8 gUnk_03000F42;

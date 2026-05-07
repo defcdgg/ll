@@ -8,10 +8,8 @@
 //         ".syntax divided\n")
 // #endif
 
-#define INCLUDE_ASM(FOLDER, NAME)                                                                                                     \
-    asm(".include \"" FOLDER "/" #NAME ".s\"\n")
+#define INCLUDE_ASM(FOLDER, NAME) asm(".include \"" FOLDER "/" #NAME ".s\"\n")
 #endif
-
 
 // Set up macros once per translation unit
 asm(".include \"asm/macros.inc\"\n");

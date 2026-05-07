@@ -5,9 +5,9 @@
 
 // ASCII encoding of 'Smsh' in reverse
 // This is presumably short for SMASH, the developer of MKS4AGB.
-#define ID_NUMBER 0x68736D53
+#define ID_NUMBER               0x68736D53
 
-#define C_V 0x40 // center value for PAN, BEND, and TUNE
+#define C_V                     0x40 // center value for PAN, BEND, and TUNE
 
 #define SOUND_MODE_REVERB_VAL   0x0000007F
 #define SOUND_MODE_REVERB_SET   0x00000080
@@ -46,13 +46,13 @@ struct WaveData
     s8 data[1]; // samples
 };
 
-#define TONEDATA_TYPE_CGB    0x07
-#define TONEDATA_TYPE_FIX    0x08
-#define TONEDATA_TYPE_SPL    0x40 // key split
-#define TONEDATA_TYPE_RHY    0x80 // rhythm
+#define TONEDATA_TYPE_CGB 0x07
+#define TONEDATA_TYPE_FIX 0x08
+#define TONEDATA_TYPE_SPL 0x40 // key split
+#define TONEDATA_TYPE_RHY 0x80 // rhythm
 
-#define TONEDATA_P_S_PAN    0xc0
-#define TONEDATA_P_S_PAM    TONEDATA_P_S_PAN
+#define TONEDATA_P_S_PAN  0xc0
+#define TONEDATA_P_S_PAM  TONEDATA_P_S_PAN
 
 struct ToneData
 {
@@ -76,13 +76,13 @@ struct ToneData
 #define SOUND_CHANNEL_SF_ENV_DECAY   0x02
 #define SOUND_CHANNEL_SF_ENV_SUSTAIN 0x01
 #define SOUND_CHANNEL_SF_ENV_RELEASE 0x00
-#define SOUND_CHANNEL_SF_ON (SOUND_CHANNEL_SF_START | SOUND_CHANNEL_SF_STOP | SOUND_CHANNEL_SF_IEC | SOUND_CHANNEL_SF_ENV)
+#define SOUND_CHANNEL_SF_ON          (SOUND_CHANNEL_SF_START | SOUND_CHANNEL_SF_STOP | SOUND_CHANNEL_SF_IEC | SOUND_CHANNEL_SF_ENV)
 
-#define CGB_CHANNEL_MO_PIT  0x02
-#define CGB_CHANNEL_MO_VOL  0x01
+#define CGB_CHANNEL_MO_PIT           0x02
+#define CGB_CHANNEL_MO_VOL           0x01
 
-#define CGB_NRx2_ENV_DIR_DEC 0x00
-#define CGB_NRx2_ENV_DIR_INC 0x08
+#define CGB_NRx2_ENV_DIR_DEC         0x00
+#define CGB_NRx2_ENV_DIR_INC         0x08
 
 struct CgbChannel
 {
@@ -110,15 +110,15 @@ struct CgbChannel
     u8 dummy3[3];
     u8 dummy5;
     u8 sustainGoal;
-    u8 n4;                  // NR[1-4]4 register (initial, length bit)
+    u8 n4; // NR[1-4]4 register (initial, length bit)
     u8 pan;
     u8 panMask;
     u8 modify;
     u8 length;
     u8 sweep;
     u32 frequency;
-    u32 *wavePointer;       // instructs CgbMain to load targeted wave
-    u32 *currentPointer;    // stores the currently loaded wave
+    u32 *wavePointer; // instructs CgbMain to load targeted wave
+    u32 *currentPointer; // stores the currently loaded wave
     struct MusicPlayerTrack *track;
     void *prevChannelPointer;
     void *nextChannelPointer;
@@ -137,7 +137,7 @@ struct SoundChannel
     u8 decay;
     u8 sustain;
     u8 release;
-    u8 key;             // midi key as it was translated into final pitch
+    u8 key; // midi key as it was translated into final pitch
     u8 envelopeVolume;
     u8 envelopeVolumeRight;
     u8 envelopeVolumeLeft;
@@ -146,7 +146,7 @@ struct SoundChannel
     u8 dummy1;
     u8 dummy2;
     u8 gateTime;
-    u8 midiKey;         // midi key as it was used in the track data
+    u8 midiKey; // midi key as it was used in the track data
     u8 velocity;
     u8 priority;
     u8 rhythmPan;
@@ -166,7 +166,7 @@ struct SoundChannel
 
 #define MAX_DIRECTSOUND_CHANNELS 12
 
-#define PCM_DMA_BUF_SIZE 1584 // size of Direct Sound buffer
+#define PCM_DMA_BUF_SIZE         1584 // size of Direct Sound buffer
 
 struct MusicPlayerInfo;
 
@@ -196,7 +196,7 @@ struct SoundInfo
     u8 freq;
 
     u8 mode;
-    u8 c15;          // periodically counts from 14 down to 0 (15 states)
+    u8 c15; // periodically counts from 14 down to 0 (15 states)
     u8 pcmDmaPeriod; // number of V-blanks per PCM DMA
     u8 maxLines;
     u8 gap[3];
@@ -313,14 +313,14 @@ struct MusicPlayerTrack
 #define MUSICPLAYER_STATUS_TRACK 0x0000ffff
 #define MUSICPLAYER_STATUS_PAUSE 0x80000000
 
-#define MAX_MUSICPLAYER_TRACKS 16
+#define MAX_MUSICPLAYER_TRACKS   16
 
-#define TRACKS_ALL 0xFFFF
+#define TRACKS_ALL               0xFFFF
 
-#define TEMPORARY_FADE  0x0001
-#define FADE_IN         0x0002
-#define FADE_VOL_MAX    64
-#define FADE_VOL_SHIFT  2
+#define TEMPORARY_FADE           0x0001
+#define FADE_IN                  0x0002
+#define FADE_VOL_MAX             64
+#define FADE_VOL_SHIFT           2
 
 struct MusicPlayerInfo
 {
@@ -365,12 +365,10 @@ struct Song
 extern const struct MusicPlayer gMPlayTable[];
 extern const struct Song gSongTable[];
 
-
-
 extern u8 gMPlayMemAccArea[16];
 
-//u8 gPokemonCrySong[52];
-//u8 gPokemonCrySongs[52 * MAX_POKEMON_CRIES];
+// u8 gPokemonCrySong[52];
+// u8 gPokemonCrySongs[52 * MAX_POKEMON_CRIES];
 
 // #define MAX_POKEMON_CRIES 2
 
@@ -406,7 +404,7 @@ extern char gNumMusicPlayers[];
 extern char gMaxLines[];
 
 #define NUM_MUSIC_PLAYERS ((u16)gNumMusicPlayers)
-#define MAX_LINES ((u32)gMaxLines)
+#define MAX_LINES         ((u32)gMaxLines)
 
 u32 umul3232H32(u32 multiplier, u32 multiplicand);
 void SoundMain(void);

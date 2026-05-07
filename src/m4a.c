@@ -11,11 +11,10 @@
 // u8 gMPlayMemAccArea[0x10] __attribute__((section("common_data"))) = {};
 // struct MusicPlayerInfo gMPlayInfo_4 __attribute__((section("common_data"))) = {};
 
-#define BSS_CODE __attribute__((section(".bss.code")))
+#define BSS_CODE   __attribute__((section(".bss.code")))
 #define ALIGNED(n) __attribute__((aligned(n)))
 
 BSS_CODE ALIGNED(4) char SoundMainRAM_Buffer[0x380] = {0};
-
 
 COMMON_DATA struct SoundInfo gSoundInfo = {0};
 COMMON_DATA MPlayFunc gMPlayJumpTable[36] = {0};
@@ -26,7 +25,6 @@ COMMON_DATA struct MusicPlayerInfo gMPlayInfo_2 = {0};
 COMMON_DATA struct MusicPlayerInfo gMPlayInfo_3 = {0};
 COMMON_DATA u8 gMPlayMemAccArea[0x10] = {0};
 COMMON_DATA struct MusicPlayerInfo gMPlayInfo_4 = {0};
-
 
 u32 MidiKeyToFreq(struct WaveData *wav, u8 key, u8 fineAdjust)
 {
@@ -46,9 +44,7 @@ u32 MidiKeyToFreq(struct WaveData *wav, u8 key, u8 fineAdjust)
     return umul3232H32(wav->freq, val1 + umul3232H32(val2 - val1, fineAdjustShifted));
 }
 
-void nullsub_140(void)
-{
-}
+void nullsub_140(void) { }
 
 void MPlayContinue(struct MusicPlayerInfo *mplayInfo)
 {
@@ -79,10 +75,7 @@ void m4aSoundInit(void)
     CpuCopy32((void *)((s32)SoundMainRAM & ~1), SoundMainRAM_Buffer, sizeof(SoundMainRAM_Buffer));
     SoundInit(&gSoundInfo);
     MPlayExtender(gCgbChans);
-    m4aSoundMode(SOUND_MODE_DA_BIT_9
-               | SOUND_MODE_FREQ_07884
-               | (13 << SOUND_MODE_MASVOL_SHIFT)
-               | (6 << SOUND_MODE_MAXCHN_SHIFT));
+    m4aSoundMode(SOUND_MODE_DA_BIT_9 | SOUND_MODE_FREQ_07884 | (13 << SOUND_MODE_MASVOL_SHIFT) | (6 << SOUND_MODE_MAXCHN_SHIFT));
     for (i = 0; i < NUM_MUSIC_PLAYERS; ++i)
     {
         struct MusicPlayerInfo *mplayInfo = gMPlayTable[i].info;
@@ -121,8 +114,7 @@ void m4aSongNumStartOrChange(u16 n)
     }
     else
     {
-        if ((mplay->info->status & MUSICPLAYER_STATUS_TRACK) == 0
-         || (mplay->info->status & MUSICPLAYER_STATUS_PAUSE))
+        if ((mplay->info->status & MUSICPLAYER_STATUS_TRACK) == 0 || (mplay->info->status & MUSICPLAYER_STATUS_PAUSE))
         {
             MPlayStart(mplay->info, song->header);
         }
@@ -247,11 +239,7 @@ void MPlayExtender(struct CgbChannel *cgbChans)
     struct SoundInfo *soundInfo;
     u32 ident;
 
-    REG_SOUNDCNT_X = SOUND_MASTER_ENABLE
-                   | SOUND_4_ON
-                   | SOUND_3_ON
-                   | SOUND_2_ON
-                   | SOUND_1_ON;
+    REG_SOUNDCNT_X = SOUND_MASTER_ENABLE | SOUND_4_ON | SOUND_3_ON | SOUND_2_ON | SOUND_1_ON;
     REG_SOUNDCNT_L = 0; // set master volume to zero
     REG_NR12 = 0x8;
     REG_NR22 = 0x8;
@@ -317,13 +305,8 @@ void SoundInit(struct SoundInfo *soundInfo)
 
     REG_DMA1CNT_H = DMA_32BIT;
 
-    REG_SOUNDCNT_X = SOUND_MASTER_ENABLE
-                   | SOUND_4_ON
-                   | SOUND_3_ON
-                   | SOUND_2_ON
-                   | SOUND_1_ON;
-    REG_SOUNDCNT_H = SOUND_A_FIFO_RESET | SOUND_A_TIMER_0 | SOUND_A_RIGHT_OUTPUT | SOUND_A_LEFT_OUTPUT
-                   | SOUND_ALL_MIX_FULL;
+    REG_SOUNDCNT_X = SOUND_MASTER_ENABLE | SOUND_4_ON | SOUND_3_ON | SOUND_2_ON | SOUND_1_ON;
+    REG_SOUNDCNT_H = SOUND_A_FIFO_RESET | SOUND_A_TIMER_0 | SOUND_A_RIGHT_OUTPUT | SOUND_A_LEFT_OUTPUT | SOUND_ALL_MIX_FULL;
     REG_SOUNDBIAS_H = (REG_SOUNDBIAS_H & 0x3F) | 0x40;
     REG_DMA1SAD = (s32)soundInfo->pcmBuffer;
     REG_DMA1DAD = (s32)&REG_FIFO_A;
@@ -335,7 +318,7 @@ void SoundInit(struct SoundInfo *soundInfo)
     soundInfo->plynote = ply_note;
     soundInfo->CgbSound = nullsub_141;
     soundInfo->CgbOscOff = (void (*)(u8))nullsub_141;
-    soundInfo->MidiKeyToCgbFreq = (u32 (*)(u8, u8, u8))nullsub_141;
+    soundInfo->MidiKeyToCgbFreq = (u32(*)(u8, u8, u8))nullsub_141;
     soundInfo->ExtVolPit = nullsub_141;
     MPlayJumpTableCopy(gMPlayJumpTable);
     soundInfo->MPlayJumpTable = gMPlayJumpTable;
@@ -453,7 +436,8 @@ void m4aSoundVSyncOff(void)
         if (REG_DMA1CNT & (DMA_REPEAT << 16))
             REG_DMA1CNT = ((DMA_ENABLE | DMA_START_NOW | DMA_32BIT | DMA_SRC_INC | DMA_DEST_FIXED) << 16) | 4;
         // if (REG_DMA2CNT & (DMA_REPEAT << 16))
-        //     REG_DMA2CNT = ((DMA_ENABLE | DMA_START_NOW | DMA_32BIT | DMA_SRC_INC | DMA_DEST_FIXED) << 16) | 4;
+        //     REG_DMA2CNT = ((DMA_ENABLE | DMA_START_NOW | DMA_32BIT | DMA_SRC_INC |
+        //     DMA_DEST_FIXED) << 16) | 4;
         REG_DMA1CNT_H = DMA_32BIT;
         // REG_DMA2CNT_H = DMA_32BIT;
         CpuFill32(0, soundInfo->pcmBuffer, sizeof(soundInfo->pcmBuffer));
@@ -518,8 +502,7 @@ void MPlayStart(struct MusicPlayerInfo *mplayInfo, struct SongHeader *songHeader
     unk_B = mplayInfo->unk_B;
     if (!unk_B
         || ((!mplayInfo->songHeader || !(mplayInfo->tracks[0].flags & MPT_FLG_START))
-            && ((mplayInfo->status & MUSICPLAYER_STATUS_TRACK) == 0
-                || (mplayInfo->status & MUSICPLAYER_STATUS_PAUSE)))
+            && ((mplayInfo->status & MUSICPLAYER_STATUS_TRACK) == 0 || (mplayInfo->status & MUSICPLAYER_STATUS_PAUSE)))
         || (mplayInfo->priority <= songHeader->priority))
     {
         ++mplayInfo->ident;
@@ -587,8 +570,10 @@ void FadeOutBody(struct MusicPlayerInfo *mplayInfo)
     struct MusicPlayerTrack *track;
     u16 fadeOV;
 
-    if (mplayInfo->fadeOI == 0) return;
-    if (--mplayInfo->fadeOC != 0) return;
+    if (mplayInfo->fadeOI == 0)
+        return;
+    if (--mplayInfo->fadeOC != 0)
+        return;
     mplayInfo->fadeOC = mplayInfo->fadeOI;
     if (mplayInfo->fadeOV & FADE_IN)
     {
@@ -612,7 +597,8 @@ void FadeOutBody(struct MusicPlayerInfo *mplayInfo)
                 val = TEMPORARY_FADE;
                 fadeOV = mplayInfo->fadeOV;
                 val &= fadeOV;
-                if (!val) track->flags = 0;
+                if (!val)
+                    track->flags = 0;
                 --i;
                 ++track;
             }
@@ -661,11 +647,7 @@ void TrkVolPitSet(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *tr
     if (track->flags & MPT_FLG_PITSET)
     {
         s32 bend = track->bend * track->bendRange;
-        s32 x = (track->tune + bend)
-              * 4
-              + (track->keyShift << 8)
-              + (track->keyShiftX << 8)
-              + track->pitX;
+        s32 x = (track->tune + bend) * 4 + (track->keyShift << 8) + (track->keyShiftX << 8) + track->pitX;
 
         if (track->modT == 0)
             x += 16 * track->modM;
@@ -722,20 +704,20 @@ void CgbOscOff(u8 chanNum)
 {
     switch (chanNum)
     {
-    case 1:
-        REG_NR12 = 8;
-        REG_NR14 = 0x80;
-        break;
-    case 2:
-        REG_NR22 = 8;
-        REG_NR24 = 0x80;
-        break;
-    case 3:
-        REG_NR30 = 0;
-        break;
-    default:
-        REG_NR42 = 8;
-        REG_NR44 = 0x80;
+        case 1:
+            REG_NR12 = 8;
+            REG_NR14 = 0x80;
+            break;
+        case 2:
+            REG_NR22 = 8;
+            REG_NR24 = 0x80;
+            break;
+        case 3:
+            REG_NR30 = 0;
+            break;
+        default:
+            REG_NR42 = 8;
+            REG_NR44 = 0x80;
     }
 }
 
@@ -809,34 +791,34 @@ void CgbSound(void)
         /* 1. determine hardware channel registers */
         switch (ch)
         {
-        case 1:
-            nrx0ptr = (vu8 *)(REG_ADDR_NR10);
-            nrx1ptr = (vu8 *)(REG_ADDR_NR11);
-            nrx2ptr = (vu8 *)(REG_ADDR_NR12);
-            nrx3ptr = (vu8 *)(REG_ADDR_NR13);
-            nrx4ptr = (vu8 *)(REG_ADDR_NR14);
-            break;
-        case 2:
-            nrx0ptr = (vu8 *)(REG_ADDR_NR10+1);
-            nrx1ptr = (vu8 *)(REG_ADDR_NR21);
-            nrx2ptr = (vu8 *)(REG_ADDR_NR22);
-            nrx3ptr = (vu8 *)(REG_ADDR_NR23);
-            nrx4ptr = (vu8 *)(REG_ADDR_NR24);
-            break;
-        case 3:
-            nrx0ptr = (vu8 *)(REG_ADDR_NR30);
-            nrx1ptr = (vu8 *)(REG_ADDR_NR31);
-            nrx2ptr = (vu8 *)(REG_ADDR_NR32);
-            nrx3ptr = (vu8 *)(REG_ADDR_NR33);
-            nrx4ptr = (vu8 *)(REG_ADDR_NR34);
-            break;
-        default:
-            nrx0ptr = (vu8 *)(REG_ADDR_NR30+1);
-            nrx1ptr = (vu8 *)(REG_ADDR_NR41);
-            nrx2ptr = (vu8 *)(REG_ADDR_NR42);
-            nrx3ptr = (vu8 *)(REG_ADDR_NR43);
-            nrx4ptr = (vu8 *)(REG_ADDR_NR44);
-            break;
+            case 1:
+                nrx0ptr = (vu8 *)(REG_ADDR_NR10);
+                nrx1ptr = (vu8 *)(REG_ADDR_NR11);
+                nrx2ptr = (vu8 *)(REG_ADDR_NR12);
+                nrx3ptr = (vu8 *)(REG_ADDR_NR13);
+                nrx4ptr = (vu8 *)(REG_ADDR_NR14);
+                break;
+            case 2:
+                nrx0ptr = (vu8 *)(REG_ADDR_NR10 + 1);
+                nrx1ptr = (vu8 *)(REG_ADDR_NR21);
+                nrx2ptr = (vu8 *)(REG_ADDR_NR22);
+                nrx3ptr = (vu8 *)(REG_ADDR_NR23);
+                nrx4ptr = (vu8 *)(REG_ADDR_NR24);
+                break;
+            case 3:
+                nrx0ptr = (vu8 *)(REG_ADDR_NR30);
+                nrx1ptr = (vu8 *)(REG_ADDR_NR31);
+                nrx2ptr = (vu8 *)(REG_ADDR_NR32);
+                nrx3ptr = (vu8 *)(REG_ADDR_NR33);
+                nrx4ptr = (vu8 *)(REG_ADDR_NR34);
+                break;
+            default:
+                nrx0ptr = (vu8 *)(REG_ADDR_NR30 + 1);
+                nrx1ptr = (vu8 *)(REG_ADDR_NR41);
+                nrx2ptr = (vu8 *)(REG_ADDR_NR42);
+                nrx3ptr = (vu8 *)(REG_ADDR_NR43);
+                nrx4ptr = (vu8 *)(REG_ADDR_NR44);
+                break;
         }
 
         prevC15 = soundInfo->c15;
@@ -852,39 +834,39 @@ void CgbSound(void)
                 CgbModVol(channels);
                 switch (ch)
                 {
-                case 1:
-                    *nrx0ptr = channels->sweep;
-                    // fallthrough
-                case 2:
-                    *nrx1ptr = ((u32)channels->wavePointer << 6) + channels->length;
-                    goto init_env_step_time_dir;
-                case 3:
-                    if (channels->wavePointer != channels->currentPointer)
-                    {
-                        *nrx0ptr = 0x40;
-                        REG_WAVE_RAM0 = channels->wavePointer[0];
-                        REG_WAVE_RAM1 = channels->wavePointer[1];
-                        REG_WAVE_RAM2 = channels->wavePointer[2];
-                        REG_WAVE_RAM3 = channels->wavePointer[3];
-                        channels->currentPointer = channels->wavePointer;
-                    }
-                    *nrx0ptr = 0;
-                    *nrx1ptr = channels->length;
-                    if (channels->length)
-                        channels->n4 = 0xC0;
-                    else
-                        channels->n4 = 0x80;
-                    break;
-                default:
-                    *nrx1ptr = channels->length;
-                    *nrx3ptr = (u32)channels->wavePointer << 3;
-                init_env_step_time_dir:
-                    envelopeStepTimeAndDir = channels->attack + CGB_NRx2_ENV_DIR_INC;
-                    if (channels->length)
-                        channels->n4 = 0x40;
-                    else
-                        channels->n4 = 0x00;
-                    break;
+                    case 1:
+                        *nrx0ptr = channels->sweep;
+                        // fallthrough
+                    case 2:
+                        *nrx1ptr = ((u32)channels->wavePointer << 6) + channels->length;
+                        goto init_env_step_time_dir;
+                    case 3:
+                        if (channels->wavePointer != channels->currentPointer)
+                        {
+                            *nrx0ptr = 0x40;
+                            REG_WAVE_RAM0 = channels->wavePointer[0];
+                            REG_WAVE_RAM1 = channels->wavePointer[1];
+                            REG_WAVE_RAM2 = channels->wavePointer[2];
+                            REG_WAVE_RAM3 = channels->wavePointer[3];
+                            channels->currentPointer = channels->wavePointer;
+                        }
+                        *nrx0ptr = 0;
+                        *nrx1ptr = channels->length;
+                        if (channels->length)
+                            channels->n4 = 0xC0;
+                        else
+                            channels->n4 = 0x80;
+                        break;
+                    default:
+                        *nrx1ptr = channels->length;
+                        *nrx3ptr = (u32)channels->wavePointer << 3;
+                    init_env_step_time_dir:
+                        envelopeStepTimeAndDir = channels->attack + CGB_NRx2_ENV_DIR_INC;
+                        if (channels->length)
+                            channels->n4 = 0x40;
+                        else
+                            channels->n4 = 0x00;
+                        break;
                 }
                 channels->envelopeCounter = channels->attack;
                 if ((s8)(channels->attack & mask))
@@ -1046,9 +1028,9 @@ void CgbSound(void)
             {
                 int dac_pwm_rate = REG_SOUNDBIAS_H;
 
-                if (dac_pwm_rate < 0x40)        // if PWM rate = 32768 Hz
+                if (dac_pwm_rate < 0x40) // if PWM rate = 32768 Hz
                     channels->frequency = (channels->frequency + 2) & 0x7fc;
-                else if (dac_pwm_rate < 0x80)   // if PWM rate = 65536 Hz
+                else if (dac_pwm_rate < 0x80) // if PWM rate = 65536 Hz
                     channels->frequency = (channels->frequency + 1) & 0x7fe;
             }
 
@@ -1088,7 +1070,6 @@ void CgbSound(void)
         channels->modify = 0;
     }
 }
-
 
 void m4aMPlayTempoControl(struct MusicPlayerInfo *mplayInfo, u16 tempo)
 {
@@ -1261,11 +1242,11 @@ void m4aMPlayLFOSpeedSet(struct MusicPlayerInfo *mplayInfo, u16 trackBits, u8 lf
     mplayInfo->ident = ID_NUMBER;
 }
 
-#define MEMACC_COND_JUMP(cond) \
-if (cond)                      \
-    goto cond_true;            \
-else                           \
-    goto cond_false;           \
+#define MEMACC_COND_JUMP(cond)                                                                                                        \
+    if (cond)                                                                                                                         \
+        goto cond_true;                                                                                                               \
+    else                                                                                                                              \
+        goto cond_false;
 
 void ply_memacc(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track)
 {
@@ -1281,69 +1262,69 @@ void ply_memacc(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *trac
     ++track->cmdPtr;
     switch (op)
     {
-    case 0:
-        *addr = data;
-        return;
-    case 1:
-        *addr += data;
-        return;
-    case 2:
-        *addr -= data;
-        return;
-    case 3:
-        *addr = mplayInfo->memAccArea[data];
-        return;
-    case 4:
-        *addr += mplayInfo->memAccArea[data];
-        return;
-    case 5:
-        *addr -= mplayInfo->memAccArea[data];
-        return;
-    case 6:
-        MEMACC_COND_JUMP(*addr == data)
-        return;
-    case 7:
-        MEMACC_COND_JUMP(*addr != data)
-        return;
-    case 8:
-        MEMACC_COND_JUMP(*addr > data)
-        return;
-    case 9:
-        MEMACC_COND_JUMP(*addr >= data)
-        return;
-    case 10:
-        MEMACC_COND_JUMP(*addr <= data)
-        return;
-    case 11:
-        MEMACC_COND_JUMP(*addr < data)
-        return;
-    case 12:
-        MEMACC_COND_JUMP(*addr == mplayInfo->memAccArea[data])
-        return;
-    case 13:
-        MEMACC_COND_JUMP(*addr != mplayInfo->memAccArea[data])
-        return;
-    case 14:
-        MEMACC_COND_JUMP(*addr > mplayInfo->memAccArea[data])
-        return;
-    case 15:
-        MEMACC_COND_JUMP(*addr >= mplayInfo->memAccArea[data])
-        return;
-    case 16:
-        MEMACC_COND_JUMP(*addr <= mplayInfo->memAccArea[data])
-        return;
-    case 17:
-        MEMACC_COND_JUMP(*addr < mplayInfo->memAccArea[data])
-        return;
-    default:
-        return;
+        case 0:
+            *addr = data;
+            return;
+        case 1:
+            *addr += data;
+            return;
+        case 2:
+            *addr -= data;
+            return;
+        case 3:
+            *addr = mplayInfo->memAccArea[data];
+            return;
+        case 4:
+            *addr += mplayInfo->memAccArea[data];
+            return;
+        case 5:
+            *addr -= mplayInfo->memAccArea[data];
+            return;
+        case 6:
+            MEMACC_COND_JUMP(*addr == data)
+            return;
+        case 7:
+            MEMACC_COND_JUMP(*addr != data)
+            return;
+        case 8:
+            MEMACC_COND_JUMP(*addr > data)
+            return;
+        case 9:
+            MEMACC_COND_JUMP(*addr >= data)
+            return;
+        case 10:
+            MEMACC_COND_JUMP(*addr <= data)
+            return;
+        case 11:
+            MEMACC_COND_JUMP(*addr < data)
+            return;
+        case 12:
+            MEMACC_COND_JUMP(*addr == mplayInfo->memAccArea[data])
+            return;
+        case 13:
+            MEMACC_COND_JUMP(*addr != mplayInfo->memAccArea[data])
+            return;
+        case 14:
+            MEMACC_COND_JUMP(*addr > mplayInfo->memAccArea[data])
+            return;
+        case 15:
+            MEMACC_COND_JUMP(*addr >= mplayInfo->memAccArea[data])
+            return;
+        case 16:
+            MEMACC_COND_JUMP(*addr <= mplayInfo->memAccArea[data])
+            return;
+        case 17:
+            MEMACC_COND_JUMP(*addr < mplayInfo->memAccArea[data])
+            return;
+        default:
+            return;
     }
 cond_true:
-    {
-        void (*func)(struct MusicPlayerInfo *, struct MusicPlayerTrack *) = *(&gMPlayJumpTable[1]);
-        func(mplayInfo, track);
-        return;
-    }
+{
+    void (*func)(struct MusicPlayerInfo *, struct MusicPlayerTrack *) = *(&gMPlayJumpTable[1]);
+    func(mplayInfo, track);
+    return;
+}
 cond_false:
     track->cmdPtr += 4;
 }
@@ -1363,13 +1344,13 @@ void ply_xxx(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track)
     func(mplayInfo, track);
 }
 
-#define READ_XCMD_BYTE(var, n)       \
-{                                    \
-    u32 byte = track->cmdPtr[(n)];   \
-    byte <<= n * 8;                  \
-    (var) &= ~(0xFF << (n * 8));     \
-    (var) |= byte;                   \
-}
+#define READ_XCMD_BYTE(var, n)                                                                                                        \
+    {                                                                                                                                 \
+        u32 byte = track->cmdPtr[(n)];                                                                                                \
+        byte <<= n * 8;                                                                                                               \
+        (var) &= ~(0xFF << (n * 8));                                                                                                  \
+        (var) |= byte;                                                                                                                \
+    }
 
 void ply_xwave(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track)
 {
@@ -1437,6 +1418,4 @@ void ply_xswee(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track
     ++track->cmdPtr;
 }
 
-void nullsub_141(void)
-{
-}
+void nullsub_141(void) { }

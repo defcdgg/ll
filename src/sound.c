@@ -1,10 +1,10 @@
 
-#include "gba/gba.h"
-#include "include_asm.h"
-#include "globals.h"
-#include "m4a.h"
-#include "code_0.h"
 #include "sound.h"
+#include "code_0.h"
+#include "gba/gba.h"
+#include "globals.h"
+#include "include_asm.h"
+#include "m4a.h"
 
 // extern struct SongHeader sfx0;
 
@@ -21,13 +21,14 @@
 //     &gMPlayInfo_4
 // };
 
-void sub_80533F0(void) {
+void sub_80533F0(void)
+{
     u16 volume;
-    if(gUnk_03000F38 & 2)
+    if (gUnk_03000F38 & 2)
     {
         volume = sub_801768C(gUnk_03000F3E, 0x100, gUnk_03000F40, gUnk_03000F41, 0);
         sub_805369C(volume);
-        if(gUnk_03000F41 < gUnk_03000F40)
+        if (gUnk_03000F41 < gUnk_03000F40)
         {
             gUnk_03000F41++;
         }
@@ -36,11 +37,11 @@ void sub_80533F0(void) {
             gUnk_03000F38 &= ~2;
         }
     }
-    else if(gUnk_03000F38 & 4)
+    else if (gUnk_03000F38 & 4)
     {
         volume = sub_801768C(gUnk_03000F3E, -gUnk_03000F3E, gUnk_03000F40, gUnk_03000F41, 0);
         sub_805369C(volume);
-        if(gUnk_03000F41 < gUnk_03000F40)
+        if (gUnk_03000F41 < gUnk_03000F40)
         {
             gUnk_03000F41++;
         }
@@ -54,7 +55,7 @@ void sub_80533F0(void) {
     sub_80534B4();
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_80534B4); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_80534B4); // Matched
 
 // void sub_80534B4(void) {
 //     u8 i;
@@ -94,7 +95,8 @@ INCLUDE_ASM("asm/nonmatchings", sub_80534B4); //Matched
 
 // }
 
-void sub_805359C() {
+void sub_805359C()
+{
     m4aSoundInit();
     gUnk_03000F38 = 0;
     gUnk_03000F3A = 0;
@@ -105,23 +107,27 @@ void sub_805359C() {
     gUnk_03000F50 = 0;
 }
 
-u16 sub_80535E8(void) {
+u16 sub_80535E8(void)
+{
     return gUnk_03000F38;
 }
 
-void sub_80535F4(void) {
+void sub_80535F4(void)
+{
     m4aSoundVSyncOff();
     gUnk_03000F38 |= 1;
 }
 
-void sub_805360C(void) {
+void sub_805360C(void)
+{
     m4aSoundVSyncOn();
     gUnk_03000F38 &= 0xFFFE;
 }
 
-void sub_8053628(u8 arg0, u16 arg1) {
+void sub_8053628(u8 arg0, u16 arg1)
+{
     gUnk_03000F3A = arg0;
-    switch (gUnk_03000F3A) 
+    switch (gUnk_03000F3A)
     {
         case 0x3F:
             gUnk_03000F3A = 0x11B;
@@ -134,48 +140,53 @@ void sub_8053628(u8 arg0, u16 arg1) {
             break;
     }
     m4aSongNumStart(gUnk_03000F3A);
-    m4aMPlayImmInit((struct MusicPlayerInfo* )0x03005AB0);
+    m4aMPlayImmInit((struct MusicPlayerInfo *)0x03005AB0);
     sub_805369C(arg1);
 }
 
-
-void sub_8053688(void) {
+void sub_8053688(void)
+{
     m4aSongNumStop(gUnk_03000F3A);
 }
 
-void sub_805369C(u16 volume) {
+void sub_805369C(u16 volume)
+{
 
-    if (volume < 2) 
+    if (volume < 2)
     {
         volume = 2;
     }
-    *(u16* )0x03000F3C = volume;
-    m4aMPlayVolumeControl((struct MusicPlayerInfo* )0x03005AB0, 0xFF, volume);
+    *(u16 *)0x03000F3C = volume;
+    m4aMPlayVolumeControl((struct MusicPlayerInfo *)0x03005AB0, 0xFF, volume);
 }
 
-void sub_80536C0(u8 arg0) {
+void sub_80536C0(u8 arg0)
+{
     gUnk_03000F3E = 0;
     gUnk_03000F40 = arg0;
     gUnk_03000F41 = 0;
     gUnk_03000F38 |= 2;
 }
 
-void sub_80536EC(u8 arg0) {
+void sub_80536EC(u8 arg0)
+{
     gUnk_03000F3E = gUnk_03000F3C;
     gUnk_03000F40 = arg0;
     gUnk_03000F41 = 0;
     gUnk_03000F38 |= 4;
 }
 
-void sub_8053720(void) {
+void sub_8053720(void)
+{
     m4aSongNumContinue(gUnk_03000F3A);
 }
 
-u8 sub_8053734(u8 arg0) {
+u8 sub_8053734(u8 arg0)
+{
     return (gUnk_03000F42 >> arg0) & 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_805374C); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_805374C); // Matched
 // void sub_805374C(u16 arg0, u8 arg1, u8 arg2) {
 
 //     MPlayStart(gMPlayInfos2[arg1], gSfxSongHeaderTable[arg0]);
@@ -188,8 +199,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_805374C); //Matched
 //     gUnk_03000F43 |= arg2 << arg1;
 // }
 
-
-INCLUDE_ASM("asm/nonmatchings", sub_80537C0); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_80537C0); // Matched
 // void sub_80537C0(u16 arg0, u8 arg1) {
 
 //     MPlayStart(gMPlayInfos2[arg1], gSfxSongHeaderTable[arg0]);
@@ -205,8 +215,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_80537C0); //Matched
 //     m4aMPlayFadeOutTemporarily((struct MusicPlayerInfo* )0x03005AB0, 2);
 // }
 
-
-INCLUDE_ASM("asm/nonmatchings", sub_8053838); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_8053838); // Matched
 
 // void sub_8053838(u8 arg0) {
 //     m4aMPlayStop(gMPlayInfos2[arg0]);
@@ -219,6 +228,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8053838); //Matched
 //     }
 // }
 
-s32 sub_8053884(u8 arg0) {
+s32 sub_8053884(u8 arg0)
+{
     return (gUnk_03000F43 >> arg0) & 1;
 }

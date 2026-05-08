@@ -270,7 +270,8 @@ typedef struct
     u8 field_11;
     u8 field_12;
     u8 field_13;
-    u8 gap14[3];
+    u16 field_14;
+    u8 field_16;
     u8 field_17;
     u8 field_18;
     u8 field_19;
@@ -280,7 +281,7 @@ typedef struct
 } Unk_03003150;
 
 extern Unk_03003150 gUnk_03003150;
-
+extern Unk_03003150 gUnk_03003178[];
 extern u16 gUnk_03003240;
 extern u8 gUnk_030032D0;
 extern u16 gUnk_030032D4;
@@ -392,6 +393,8 @@ extern u8 gUnk_03004634;
 extern u8 gUnk_03004638;
 
 extern u16 gUnk_03004648;
+extern u16 gUnk_0300464C;
+extern u16 gUnk_03004650;
 extern u16 gUnk_03004658;
 extern u16 gUnk_0300465C;
 extern u8 gUnk_0300466C;
@@ -434,11 +437,13 @@ extern u8 gUnk_030047B8;
 extern u8 gUnk_030047BC;
 
 extern u16 gUnk_030047C0;
-
+extern u16 gUnk_030047C4;
 // extern Unk_03004670 gUnk_030047D0;
 extern u8 gUnk_030047D0[];
 
 extern u8 gUnk_030047E4;
+extern u16 gUnk_030047EC;
+
 extern u16 gUnk_03004800[];
 extern u8 gUnk_03004820;
 extern u8 gUnk_03004824;

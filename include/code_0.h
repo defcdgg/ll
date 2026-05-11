@@ -132,7 +132,7 @@ void sub_800526C();
 void sub_80052F8();
 void sub_80053B4(u16, u16);
 void sub_80055E8(u16 *, u16 *, u8, u8);
-void sub_8005B2C();
+u16* sub_8005B2C(s16, s16);
 void sub_8005BB4();
 void sub_8005C70();
 void sub_80064AC();

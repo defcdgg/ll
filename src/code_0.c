@@ -2649,7 +2649,33 @@ INCLUDE_ASM("asm/nonmatchings", sub_800526C);
 INCLUDE_ASM("asm/nonmatchings", sub_80052F8);
 INCLUDE_ASM("asm/nonmatchings", sub_80053B4);
 INCLUDE_ASM("asm/nonmatchings", sub_80055E8);
-INCLUDE_ASM("asm/nonmatchings", sub_8005B2C);
+u16* sub_8005B2C(s16 x, s16 y)
+{
+    s16 screenX, screenY;
+    s16 tileX, tileY;
+    u16* buf;
+
+    screenX = x - (gUnk_030025B4 & ~0xF);
+
+    screenY = y - (gUnk_030025FC & ~0xF);
+
+    if(screenX < 0 || screenY < 0 || screenX > 240  || screenY > 160)
+    {
+        return 0;
+    }
+
+    tileX = screenX >> 3;
+    tileY = screenY >> 3;
+
+    if(gUnk_03004688 == 0)
+    {
+        return (u16*)0x02004000 + (tileY * 32) + tileX; 
+    }
+    else
+    {
+        return (u16*)0x02004800 + (tileY * 32) + tileX; 
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8005BB4);
 INCLUDE_ASM("asm/nonmatchings", sub_8005C70);
 INCLUDE_ASM("asm/nonmatchings", sub_80064AC);

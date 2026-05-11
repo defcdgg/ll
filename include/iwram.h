@@ -191,7 +191,7 @@ extern u32 gUnk_030025A0;
 extern u8 gUnk_030025A4;
 extern u32 gUnk_030025A8;
 extern u8 gUnk_030025B0;
-extern u16 gUnk_030025B4;
+extern s16 gUnk_030025B4;
 extern u8 gUnk_030025B8;
 extern u16 gUnk_030025C0[8];
 extern u16 gUnk_030025D4;
@@ -200,7 +200,7 @@ extern u16 gUnk_030025E0[8];
 extern u8 gUnk_030025F0;
 extern u8 gUnk_030025F4;
 extern u16 gUnk_030025F8;
-extern u16 gUnk_030025FC;
+extern s16 gUnk_030025FC;
 extern u16 gUnk_03002600;
 extern u8 gUnk_03002604;
 extern u16 gUnk_03002608;
@@ -408,7 +408,7 @@ typedef struct
 // extern Unk_03004670 gUnk_03004670;
 extern u8 gUnk_03004670[];
 extern u16 gUnk_0300467C;
-
+extern u16 gUnk_03004688;
 extern u8 gUnk_0300468C;
 extern u16 gUnk_03004698;
 

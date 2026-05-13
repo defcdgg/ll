@@ -997,8 +997,22 @@ void sub_8020E74(void)
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8020E90);
-INCLUDE_ASM("asm/nonmatchings", sub_8020EAC);
+INCLUDE_ASM("asm/nonmatchings", sub_8020EAC); //Matched
+// extern u8 gUnk_03000748[];
 
+// typedef struct {
+//     u8 pad[0xBE];
+//     u8 field_BE;
+// } Unk;
+
+// u8 sub_8020EAC(Unk* unkStruct) {
+//     u8 result = 0;
+
+//     if (unkStruct->field_BE <= 10) {
+//         result = gUnk_03000748[unkStruct->field_BE ];
+//     }
+//     return result;  
+// }
 INCLUDE_ASM("asm/nonmatchings", sub_8020EC8);
 void sub_8020EEC(u8 value)
 {
@@ -1831,7 +1845,36 @@ u32 sub_8053348(u32 *ptr)
     (*ptr)++;
     return 1;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8053360);
+INCLUDE_ASM("asm/nonmatchings", sub_8053360); //Matched
+// typedef struct ScriptContext{
+//     u8* scriptPtr;
+// }ScriptContext;
+
+// script gJumpTableOffsets
+// extern u16 gUnk_02016000[];
+
+// extern u8 gUnk_02016200[];
+
+// s32 sub_8053360(ScriptContext* ctx) {
+//     u8* ptr;
+//     u8 idx;
+//     u16* ofsPtr;
+
+//     ptr = ctx->scriptPtr;
+
+//     if(gUnk_03002C38 > (ptr[2] + (ptr[3] << 8)))
+//     {
+//         idx = ptr[1];
+//         ofsPtr = gUnk_02016000 + idx;
+//         ctx->scriptPtr = gUnk_02016200 + *ofsPtr;
+//     }
+//     else
+//     {
+//         ctx->scriptPtr = ptr + 4;
+//     }
+//     return 1;
+// }
+
 u32 sub_80533A0(u32 *ptr)
 {
 

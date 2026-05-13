@@ -2632,7 +2632,30 @@ void sub_8004F3C(struct Unk_03003AC0 *arg0)
         node = arg0->field_C;
     } while (node != 0);
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8004F64);
+INCLUDE_ASM("asm/nonmatchings", sub_8004F64); // Matched
+// typedef struct GameOamData1{
+//     u32 attr0;
+//     u32 attr1;
+// }GameOamData1;
+// extern GameOamData1 gUnk_030035C0[128];
+
+// struct Unk_03002C80* sub_8004F64(u16* ptrIndex, struct Unk_03002C80* arg1) {
+
+//     if(arg1->count < 0 )
+//     {
+//         return arg1->next;
+//     }
+
+//     if(*ptrIndex < 128)
+//     {
+//         gUnk_030035C0[*ptrIndex].attr0 = arg1->attr0 + (arg1->attr1 << 16);
+//         gUnk_030035C0[*ptrIndex].attr1 = arg1->attr2;
+
+//         (*ptrIndex)++;
+//     }
+
+//     return arg1->next;
+// }
 
 void sub_8004FA8(u8 arg0, u8 arg1)
 {
@@ -2642,24 +2665,45 @@ void sub_8004FA8(u8 arg0, u8 arg1)
     ptr2E80->field_14 = 0;
     ptr2E80->field_16 = arg1;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8004FD0);
+s32 sub_8004FD0(u8 arg0) {
+    Unk_03002E80* ptr;
+
+    if(arg0 < 0x64)
+    {
+        ptr = &gUnk_03002E80[arg0];
+
+        gUnk_03002C60[ptr->field_16] &= 0x7F;
+
+        if(ptr->field_14 > 0xFE)
+            return 1;
+  
+    }
+    else
+    {
+        ptr = &gUnk_03001EE0[arg0];
+        ptr->field_14 = 0xFF;
+        return 1;  
+    }
+    
+    return 0;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8005020);
 INCLUDE_ASM("asm/nonmatchings", sub_80051D0);
 INCLUDE_ASM("asm/nonmatchings", sub_800526C);
 INCLUDE_ASM("asm/nonmatchings", sub_80052F8);
 INCLUDE_ASM("asm/nonmatchings", sub_80053B4);
 INCLUDE_ASM("asm/nonmatchings", sub_80055E8);
-u16* sub_8005B2C(s16 x, s16 y)
+u16 *sub_8005B2C(s16 x, s16 y)
 {
     s16 screenX, screenY;
     s16 tileX, tileY;
-    u16* buf;
+    u16 *buf;
 
     screenX = x - (gUnk_030025B4 & ~0xF);
 
     screenY = y - (gUnk_030025FC & ~0xF);
 
-    if(screenX < 0 || screenY < 0 || screenX > 240  || screenY > 160)
+    if (screenX < 0 || screenY < 0 || screenX > 240 || screenY > 160)
     {
         return 0;
     }
@@ -2667,13 +2711,13 @@ u16* sub_8005B2C(s16 x, s16 y)
     tileX = screenX >> 3;
     tileY = screenY >> 3;
 
-    if(gUnk_03004688 == 0)
+    if (gUnk_03004688 == 0)
     {
-        return (u16*)0x02004000 + (tileY * 32) + tileX; 
+        return (u16 *)0x02004000 + (tileY * 32) + tileX;
     }
     else
     {
-        return (u16*)0x02004800 + (tileY * 32) + tileX; 
+        return (u16 *)0x02004800 + (tileY * 32) + tileX;
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8005BB4);
@@ -2961,7 +3005,35 @@ u8 sub_8008C14(u8 arg0)
 
 INCLUDE_ASM("asm/nonmatchings", sub_8008C24);
 INCLUDE_ASM("asm/nonmatchings", sub_8008C70);
-INCLUDE_ASM("asm/nonmatchings", sub_8008CC0);
+INCLUDE_ASM("asm/nonmatchings", sub_8008CC0); // Matched
+// extern u8 gUnk_08087658[];
+
+// extern u8 gUnk_030047BC;
+// extern u8 gUnk_03004824;
+// extern u8 gUnk_030047B8;
+
+// void sub_8008CC0(u8 arg0) {
+//     u8 i;
+//     u8 skipLen;
+//     u8* ptr;
+//     ptr = gUnk_08087658;
+//     i = 0;
+//     skipLen = (*ptr << 1);
+//     ptr++;
+
+//     while(i != gUnk_030047BC)
+//     {
+//         ptr += skipLen;
+//         i++;
+//         skipLen = (*ptr << 1);
+//         ptr++;
+//     }
+
+//     ptr = ptr + (arg0 << 1);
+//     gUnk_03004824 = ptr[0];
+//     gUnk_030047B8 = ptr[1];
+    
+// }
 INCLUDE_ASM("asm/nonmatchings", sub_8008D18); // Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8008D78);
 
@@ -3083,7 +3155,20 @@ void sub_8009B64(void)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8009B84);
+u8 *sub_8009B84(u8 arg0, u8 *src)
+{
+    gUnk_03000010[arg0] = src[0];
+    gUnk_03000018[arg0] = src[1];
+    src += 2;
+    gUnk_03000028[arg0] = (*src << 5) + 0x05000002;
+    src++;
+    gUnk_03000014[arg0] = *src;
+    src++;
+    gUnk_03000038[arg0] = src;
+    src += gUnk_03000014[arg0];
+    gUnk_03000020[arg0] = 0;
+    return src;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8009BF0);
 INCLUDE_ASM("asm/nonmatchings", sub_8009C84);
 INCLUDE_ASM("asm/nonmatchings", sub_8009D34);
@@ -3456,7 +3541,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_800E71C); // Matched
 INCLUDE_ASM("asm/nonmatchings", sub_800E7BC);
 INCLUDE_ASM("asm/nonmatchings", sub_800E8F8);
 INCLUDE_ASM("asm/nonmatchings", sub_800EAE4);
-INCLUDE_ASM("asm/nonmatchings", sub_800EB98);
+INCLUDE_ASM("asm/nonmatchings", sub_800EB98); // Matched
 INCLUDE_ASM("asm/nonmatchings", sub_800EC54);
 INCLUDE_ASM("asm/nonmatchings", sub_800F128);
 INCLUDE_ASM("asm/nonmatchings", sub_800F3AC);

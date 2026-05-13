@@ -237,6 +237,13 @@
 #define DmaClear16Defvars(dmaNum, dest, size) DmaClearDefvars(dmaNum, dest, size, 16)
 #define DmaClear32Defvars(dmaNum, dest, size) DmaClearDefvars(dmaNum, dest, size, 32)
 
+#define DmaWait(dmaNum)                                                                                                               \
+    {                                                                                                                                 \
+        vu32 *dmaRegs = (vu32 *)REG_ADDR_DMA##dmaNum;                                                                                 \
+        while (dmaRegs[2] & (DMA_ENABLE << 16))                                                                                       \
+            ;                                                                                                                         \
+    }
+
 #define DmaStop(dmaNum)                                                                                                               \
     {                                                                                                                                 \
         vu16 *dmaRegs = (vu16 *)REG_ADDR_DMA##dmaNum;                                                                                 \

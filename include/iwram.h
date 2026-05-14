@@ -55,15 +55,35 @@ typedef struct
 } Unk_03000048;
 extern Unk_03000048 gUnk_03000048;
 
-typedef struct
-{
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-    u16 field_4;
-    u16 field_6;
-    u8 pad[0x14 - 8];
+typedef struct {
+    /* 0x00 */ u8  statusFlags;  // 状态标志
+    /* 0x01 */ u8  animTimer;    // 动画计时器
+    /* 0x02 */ u8  lerpFrame;    // 移动倒计时/插值帧 (8 -> 0)
+    /* 0x03 */ u8  oamSlotId;    // 关联的渲染层 OAM 索引
+    /* 0x04 */ s16 x;            // 当前实时显示 X 坐标
+    /* 0x06 */ s16 y;            // 当前实时显示 Y 坐标
+    /* 0x08 */ s16 moveStartX;   // 移动起始点 A 坐标 X
+    /* 0x0A */ s16 moveStartY;   // 移动起始点 A 坐标 Y
+    /* 0x0C */ s16 moveEndX;     // 移动目标点 B 坐标 X
+    /* 0x0E */ s16 moveEndY;     // 移动目标点 B 坐标 Y
+    /* 0x10 */ u16 field_10;     // 基础图块起始 ID (BaseTileId)
+    /* 0x12 */ u16 pad;          
+} UISpriteEntity; // Total Size: 0x14 (20 bytes)
+
+
+typedef struct{
+    u8 statusFlags;
+    u8 animTimer;
+    u8 lerpFrame;
+    u8 oamSlotId;
+    s16 x;
+    s16 y;
+    s16 moveStartX;
+    s16 moveStartY;
+    s16 moveEndX;
+    s16 moveEndY;
+    u16 field_10;
+    u16 pad;
 } Unk_03000058;
 extern Unk_03000058 gUnk_03000058[];
 extern Unk_03000058 gUnk_030000BC[];
@@ -196,10 +216,10 @@ typedef struct
     u8 field_1;
     u8 field_2;
     u8 field_3;
-    u8 field_4;
+    u8 facingDir;
     u8 field_5;
-    u16 field_6;
-    u16 field_8;
+    s16 x;
+    s16 y;
     u8 field_A;
     u8 field_B;
     u8 field_C;
@@ -254,7 +274,7 @@ extern u16 gUnk_03002C4C;
 extern u8 gUnk_03002C50;
 extern u8 gUnk_03002C58[8];
 extern u8 gUnk_03002C60[];
-extern struct Unk_03003AC0 *gUnk_03002C80[128];
+// extern struct Unk_03003AC0 *gUnk_03002C80[128];
 
 
 extern Unk_03002E80 gUnk_03002E80[];
@@ -355,33 +375,38 @@ typedef struct
 
 extern Unk_030039C0 gUnk_030039C0[32];
 
+struct SpriteRenderEntry {       //0x03003AC0
+    /* 0x00 */ u8  field_0;     // 优先级/层级状态 priority?
+    /* 0x01 */ u8  animFrame;    // 动画帧序列号
+    /* 0x02 */ u16 attr0;        // GBA OAM Attr0 (Y, Shape, Mode)
+    /* 0x04 */ u16 attr1;        // GBA OAM Attr1 (X, Size, Flip)
+    /* 0x06 */ u16 attr2;        // GBA OAM Attr2 (TileID, Palette, Priority)
+    /* 0x08 */ s16 x;            // 逻辑位置 X
+    /* 0x0A */ s16 y;            // 逻辑位置 Y
+    /* 0x0C */ struct SpriteRenderEntry *subSprite; // 下一个精灵节点的指针
+    /* 0x10 */ u16 field_10;
+    /* 0x12 */ u16 field_12;
+}; // Total Size: 0x14 (20 bytes)
+
+extern struct SpriteRenderEntry* gSpriteRenderSortList[128]; //3002C80
+extern struct SpriteRenderEntry gSpriteRenderEntries[128]; //3003AC0
+
+/*
 struct Unk_03003AC0
 {
     u8 field_0;
-    u8 field_1;
-    u16 field_2;
-    u16 field_4;
-    u16 field_6;
-    u8 pad[4];
+    u8 animFrame;
+    u16 attr0;
+    u16 attr1;
+    u16 attr2;
+    s16 x;
+    s16 y;
     struct Unk_03003AC0 *field_C;
     u16 field_10;
     u16 field_12;
 };
-// typedef struct
-// {
-//     u8 field_0;
-//     u8 field_1;
-//     u16 field_2;
-//     u16 field_4;
-//     u16 field_6;
-//     u8 pad[4];
-//     u32 field_C;
-//     u16 field_10;
-//     u16 field_12;
-// }Unk_03003AC0;
-
 extern struct Unk_03003AC0 gUnk_03003AC0[128];
-
+*/
 extern u8 gUnk_03004540;
 extern u16 gUnk_03004550;
 extern u16 gUnk_03004604;

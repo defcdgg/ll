@@ -327,15 +327,15 @@ void sub_8016628(u8 arg0, u8 arg1)
     p = gUnk_03000058;
     for (i = 0; i < 15; i++)
     {
-        if (p->field_0 != 0 && i != arg0)
+        if (p->statusFlags != 0 && i != arg0)
         {
             if (arg1 != 0)
             {
-                p->field_0 &= 0xBF;
+                p->statusFlags &= 0xBF;
             }
             else
             {
-                p->field_0 |= 0x40;
+                p->statusFlags |= 0x40;
             }
         }
         p++;
@@ -352,8 +352,8 @@ void sub_801667C(void)
 
     for (i = 5; i < 15; i++)
     {
-        if (p->field_0 != 0)
-            p->field_0 |= 0x40;
+        if (p->statusFlags != 0)
+            p->statusFlags |= 0x40;
         p++;
     }
 }
@@ -558,11 +558,11 @@ u16 *sub_8016C2C(u8 x, u8 y)
 
 void sub_8016C44(void)
 {
-    struct Unk_03003AC0 *ptr = &gUnk_03003AC0[112]; // 03004380
+    struct SpriteRenderEntry *ptr = &gSpriteRenderEntries[112]; // 03004380
     gUnk_03000048.field_6 = 0;
     gUnk_03000048.field_4 = 0;
     sub_8004C28(ptr, 1, 0, 0x81E0, 0x21C0);
-    gUnk_03002C80[0] = ptr;
+    gSpriteRenderSortList[0] = ptr;
     sub_800E668(0);
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8016C88);

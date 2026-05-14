@@ -173,7 +173,7 @@ SECTIONS {
         . = 0x00002C50; gUnk_03002C50 = .;
         . = 0x00002C58; gUnk_03002C58 = .;
         . = 0x00002C60; gUnk_03002C60 = .;
-        . = 0x00002C80; gUnk_03002C80 = .;
+        . = 0x00002C80; gSpriteRenderSortList = .;
         . = 0x00002E80; gUnk_03002E80 = .;
         . = 0x00003150; gUnk_03003150 = .;    
         . = 0x00003178; gUnk_03003178 = .;       
@@ -189,7 +189,7 @@ SECTIONS {
         . = 0x000035C0; gUnk_030035C0 = .;
         . = 0x000039C0; gUnk_030039C0 = .;
         
-        . = 0x00003AC0; gUnk_03003AC0 = .;
+        . = 0x00003AC0; gSpriteRenderEntries = .;
         . = 0x00004540; gUnk_03004540 = .;
 
         . = 0x00004550; gUnk_03004550 = .;
@@ -309,6 +309,8 @@ SECTIONS {
         data/sound_data.o(.rodata);
         src/agb_sram.o(.rodata);
         . = ORIGIN(rom) + 0x7E83F0;
+
+        src/global_tables.o(.rodata);
         data/data1.o(.rodata);
 
     } >rom =0xFF

@@ -558,11 +558,11 @@ u16 *sub_8016C2C(u8 x, u8 y)
 
 void sub_8016C44(void)
 {
-    struct SpriteRenderEntry *ptr = &gSpriteRenderEntries[112]; // 03004380
+    struct RenderObject *ptr = &gRenderObjects[112]; // 03004380
     gUnk_03000048.field_6 = 0;
     gUnk_03000048.field_4 = 0;
     sub_8004C28(ptr, 1, 0, 0x81E0, 0x21C0);
-    gSpriteRenderSortList[0] = ptr;
+    gRenderObjectPtrSortList[0] = ptr;
     sub_800E668(0);
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8016C88);
@@ -997,7 +997,7 @@ void sub_8020E74(void)
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8020E90);
-INCLUDE_ASM("asm/nonmatchings", sub_8020EAC); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_8020EAC); // Matched
 // extern u8 gUnk_03000748[];
 
 // typedef struct {
@@ -1011,7 +1011,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8020EAC); //Matched
 //     if (unkStruct->field_BE <= 10) {
 //         result = gUnk_03000748[unkStruct->field_BE ];
 //     }
-//     return result;  
+//     return result;
 // }
 INCLUDE_ASM("asm/nonmatchings", sub_8020EC8);
 void sub_8020EEC(u8 value)
@@ -1845,7 +1845,7 @@ u32 sub_8053348(u32 *ptr)
     (*ptr)++;
     return 1;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8053360); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_8053360); // Matched
 // typedef struct ScriptContext{
 //     u8* scriptPtr;
 // }ScriptContext;

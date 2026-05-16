@@ -55,23 +55,24 @@ typedef struct
 } Unk_03000048;
 extern Unk_03000048 gUnk_03000048;
 
-typedef struct {
-    /* 0x00 */ u8  statusFlags;  // 状态标志
-    /* 0x01 */ u8  animTimer;    // 动画计时器
-    /* 0x02 */ u8  lerpFrame;    // 移动倒计时/插值帧 (8 -> 0)
-    /* 0x03 */ u8  oamSlotId;    // 关联的渲染层 OAM 索引
-    /* 0x04 */ s16 x;            // 当前实时显示 X 坐标
-    /* 0x06 */ s16 y;            // 当前实时显示 Y 坐标
-    /* 0x08 */ s16 moveStartX;   // 移动起始点 A 坐标 X
-    /* 0x0A */ s16 moveStartY;   // 移动起始点 A 坐标 Y
-    /* 0x0C */ s16 moveEndX;     // 移动目标点 B 坐标 X
-    /* 0x0E */ s16 moveEndY;     // 移动目标点 B 坐标 Y
-    /* 0x10 */ u16 field_10;     // 基础图块起始 ID (BaseTileId)
-    /* 0x12 */ u16 pad;          
+typedef struct
+{
+    /* 0x00 */ u8 statusFlags; // 状态标志
+    /* 0x01 */ u8 animTimer; // 动画计时器
+    /* 0x02 */ u8 lerpFrame; // 移动倒计时/插值帧 (8 -> 0)
+    /* 0x03 */ u8 oamSlotId; // 关联的渲染层 OAM 索引
+    /* 0x04 */ s16 x; // 当前实时显示 X 坐标
+    /* 0x06 */ s16 y; // 当前实时显示 Y 坐标
+    /* 0x08 */ s16 moveStartX; // 移动起始点 A 坐标 X
+    /* 0x0A */ s16 moveStartY; // 移动起始点 A 坐标 Y
+    /* 0x0C */ s16 moveEndX; // 移动目标点 B 坐标 X
+    /* 0x0E */ s16 moveEndY; // 移动目标点 B 坐标 Y
+    /* 0x10 */ u16 field_10; // 基础图块起始 ID (BaseTileId)
+    /* 0x12 */ u16 pad;
 } UISpriteEntity; // Total Size: 0x14 (20 bytes)
 
-
-typedef struct{
+typedef struct
+{
     u8 statusFlags;
     u8 animTimer;
     u8 lerpFrame;
@@ -215,9 +216,9 @@ typedef struct
     u8 field_0;
     u8 field_1;
     u8 field_2;
-    u8 field_3;
+    u8 paletteId;
     u8 facingDir;
-    u8 field_5;
+    u8 animTimer;
     s16 x;
     s16 y;
     u8 field_A;
@@ -241,8 +242,6 @@ typedef struct
 } Unk_03002E80;
 
 extern Unk_03002E80 gUnk_03001EE0[];
-
-
 
 extern u8 gUnk_0300259C;
 extern u32 gUnk_030025A0;
@@ -275,7 +274,6 @@ extern u8 gUnk_03002C50;
 extern u8 gUnk_03002C58[8];
 extern u8 gUnk_03002C60[];
 // extern struct Unk_03003AC0 *gUnk_03002C80[128];
-
 
 extern Unk_03002E80 gUnk_03002E80[];
 
@@ -375,21 +373,22 @@ typedef struct
 
 extern Unk_030039C0 gUnk_030039C0[32];
 
-struct SpriteRenderEntry {       //0x03003AC0
-    /* 0x00 */ u8  field_0;     // 优先级/层级状态 priority?
-    /* 0x01 */ u8  animFrame;    // 动画帧序列号
-    /* 0x02 */ u16 attr0;        // GBA OAM Attr0 (Y, Shape, Mode)
-    /* 0x04 */ u16 attr1;        // GBA OAM Attr1 (X, Size, Flip)
-    /* 0x06 */ u16 attr2;        // GBA OAM Attr2 (TileID, Palette, Priority)
-    /* 0x08 */ s16 x;            // 逻辑位置 X
-    /* 0x0A */ s16 y;            // 逻辑位置 Y
-    /* 0x0C */ struct SpriteRenderEntry *subSprite; // 下一个精灵节点的指针
+struct RenderObject
+{ // 0x03003AC0
+    /* 0x00 */ u8 field_0; // 优先级/层级状态 priority?
+    /* 0x01 */ u8 animFrame; // 动画帧序列号
+    /* 0x02 */ u16 attr0; // GBA OAM Attr0 (Y, Shape, Mode)
+    /* 0x04 */ u16 attr1; // GBA OAM Attr1 (X, Size, Flip)
+    /* 0x06 */ u16 attr2; // GBA OAM Attr2 (TileID, Palette, Priority)
+    /* 0x08 */ s16 x; // 逻辑位置 X
+    /* 0x0A */ s16 y; // 逻辑位置 Y
+    /* 0x0C */ struct RenderObject *subSprite; // 下一个精灵节点的指针
     /* 0x10 */ u16 field_10;
     /* 0x12 */ u16 field_12;
 }; // Total Size: 0x14 (20 bytes)
 
-extern struct SpriteRenderEntry* gSpriteRenderSortList[128]; //3002C80
-extern struct SpriteRenderEntry gSpriteRenderEntries[128]; //3003AC0
+extern struct RenderObject *gRenderObjectPtrSortList[128]; // 3002C80
+extern struct RenderObject gRenderObjects[128]; // 3003AC0
 
 /*
 struct Unk_03003AC0
@@ -498,16 +497,35 @@ typedef struct
 {
     u8 field_0;
     u8 field_1;
-    u8 field_2;
+    u8 renderObjIdx;
     u8 field_3;
-    u16 field_4;
-    u16 field_6;
-} Unk_03004890;
+    s16 x;
+    s16 y;
+} ChestObject;
 
-extern Unk_03004890 gUnk_03004890[16];
+extern ChestObject gChestObjects[16];
 
 extern u8 gUnk_03004910;
 extern u8 gUnk_03004920;
+
+typedef struct
+{
+    u8 field_0;
+    u8 field_1;
+    u8 field_2;
+    u8 field_3;
+    u16 animTimer;
+    s16 x;
+    s16 y;
+    s16 z;
+    u16 field_C;
+    u8 field_E;
+    u8 field_F;
+    u8 *dataPtr;
+} StaticMapObject;
+
+extern StaticMapObject gStaticMapObjects[3]; // gUnk_03004930
+
 extern u8 gUnk_03004980[];
 
 // typedef struct{
@@ -648,7 +666,7 @@ typedef struct SaveInfo
     /** 0x15F6 */ u8 field_030025B0; // 1
     /** 0x15F7 */ u8 field_03004A88[6]; // 6
     /** 0x15FD */ u8 field_03004870[32]; // 0x20
-    /** 0x161D */ Unk_03004890 field_03004890[16]; // 0x80 (16 * 8)
+    /** 0x161D */ ChestObject field_03004890[16]; // 0x80 (16 * 8)
     /** 0x169D */ u8 field_03004670[12]; // 0xC
     /** 0x16A9 */ u8 field_030047D0[12]; // 0xC
     /** 0x16B5 */ u8 field_03004850; // 1

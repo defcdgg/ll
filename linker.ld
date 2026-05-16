@@ -173,7 +173,7 @@ SECTIONS {
         . = 0x00002C50; gUnk_03002C50 = .;
         . = 0x00002C58; gUnk_03002C58 = .;
         . = 0x00002C60; gUnk_03002C60 = .;
-        . = 0x00002C80; gSpriteRenderSortList = .;
+        . = 0x00002C80; gRenderObjectPtrSortList = .;
         . = 0x00002E80; gUnk_03002E80 = .;
         . = 0x00003150; gUnk_03003150 = .;    
         . = 0x00003178; gUnk_03003178 = .;       
@@ -189,7 +189,7 @@ SECTIONS {
         . = 0x000035C0; gUnk_030035C0 = .;
         . = 0x000039C0; gUnk_030039C0 = .;
         
-        . = 0x00003AC0; gSpriteRenderEntries = .;
+        . = 0x00003AC0; gRenderObjects = .;
         . = 0x00004540; gUnk_03004540 = .;
 
         . = 0x00004550; gUnk_03004550 = .;
@@ -236,9 +236,11 @@ SECTIONS {
         . = 0x00004854; gUnk_03004854 = .;
         . = 0x00004860; gUnk_03004860 = .;
         . = 0x00004870; gUnk_03004870 = .;
-        . = 0x00004890; gUnk_03004890 = .;
+        . = 0x00004890; gChestObjects = .;
         . = 0x00004910; gUnk_03004910 = .;
         . = 0x00004920; gUnk_03004920 = .;
+        . = 0x00004930; gStaticMapObjects = .;
+        
         . = 0x00004980; gUnk_03004980 = .;
         . = 0x00004A80; gUnk_03004A80 = .;
         . = 0x00004A88; gUnk_03004A88 = .;

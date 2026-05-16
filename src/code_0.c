@@ -825,13 +825,13 @@ void DummyIntr5() { }
 
 // INCLUDE_ASM("asm/nonmatchings", sub_800128C); // Matched
 
-
 // extern void (*const gUnk_087E83F0[])(void);
-void sub_800128C(void) {
+void sub_800128C(void)
+{
     gUnk_03001AC0 = 0;
     sub_8001128();
 
-    while(1)
+    while (1)
     {
         gMainTasks[gUnk_03001AC0]();
         VBlankIntrWait();
@@ -1548,7 +1548,7 @@ void sub_8002154(void)
     u16 i;
     u16 ret0;
     Unk_03002E80 *ptr03002E80;
-    Unk_03004890 *ptr03004890;
+    ChestObject *ptr03004890;
 
     sub_8005C70();
     sub_8008A60();
@@ -1580,8 +1580,8 @@ void sub_8002154(void)
                                 ptr03002E80->field_1);
                     if (ptr03002E80->field_18)
                     {
-                        gSpriteRenderEntries[ptr03002E80->field_18].field_0 = 0;
-                        gSpriteRenderEntries[ptr03002E80->field_18].subSprite = 0;
+                        gRenderObjects[ptr03002E80->field_18].field_0 = 0;
+                        gRenderObjects[ptr03002E80->field_18].subSprite = 0;
                         ptr03002E80->field_18 = 0;
                     }
                     sub_8002380(i);
@@ -1616,12 +1616,11 @@ void sub_8002154(void)
                     sub_800271C(i);
                     if (ptr03002E80->field_18)
                     {
-                        gSpriteRenderEntries[ptr03002E80->field_18].field_0 = 0;
-                        gSpriteRenderEntries[ptr03002E80->field_18].subSprite = 0;
+                        gRenderObjects[ptr03002E80->field_18].field_0 = 0;
+                        gRenderObjects[ptr03002E80->field_18].subSprite = 0;
                         ptr03002E80->field_18 = 0;
                     }
-                    if (sub_800243C(ptr03002E80->x, ptr03002E80->y, ptr03002E80->field_0, ptr03002E80->field_1A,
-                                    ptr03002E80->field_1))
+                    if (sub_800243C(ptr03002E80->x, ptr03002E80->y, ptr03002E80->field_0, ptr03002E80->field_1A, ptr03002E80->field_1))
                     {
                         ptr03002E80->field_12 |= 8;
                     }
@@ -1638,9 +1637,9 @@ void sub_8002154(void)
 
         for (i = 0; i < 16; i++)
         {
-            if (gUnk_03004890[i].field_2)
+            if (gChestObjects[i].renderObjIdx)
             {
-                sub_800243C(gUnk_03004890[i].field_4, gUnk_03004890[i].field_6, gUnk_03004890[i].field_2, 0, 255);
+                sub_800243C(gChestObjects[i].x, gChestObjects[i].y, gChestObjects[i].renderObjIdx, 0, 255);
             }
         }
     }
@@ -1653,7 +1652,7 @@ void sub_8002154(void)
 void sub_8002380(u8 arg0)
 {
     Unk_03002E80 *temp_r4;
-    struct SpriteRenderEntry *temp_r0;
+    struct RenderObject *temp_r0;
     u8 flag;
 
     if ((gUnk_030025A0 & 1) == (arg0 & 1))
@@ -1665,7 +1664,7 @@ void sub_8002380(u8 arg0)
             {
                 temp_r4->field_18 = sub_8004BFC();
             }
-            temp_r0 = &gSpriteRenderEntries[temp_r4->field_18];
+            temp_r0 = &gRenderObjects[temp_r4->field_18];
 
             flag = (temp_r4->field_1 & 1);
 
@@ -1856,8 +1855,8 @@ void sub_8002F6C(void)
     }
 }
 
-
-void sub_8003088(void) {
+void sub_8003088(void)
+{
     sub_800121C();
     sub_8004BE0();
     gUnk_087E83F8[gUnk_03001944]();
@@ -1977,7 +1976,7 @@ void sub_8003264()
     }
 }
 
-//http://localhost/scratch/IeynD
+// http://localhost/scratch/IeynD
 INCLUDE_ASM("asm/nonmatchings", sub_80032BC); // Matched
 
 void sub_8003348(void)
@@ -1986,8 +1985,8 @@ void sub_8003348(void)
     u8 flags;
     s16 i;
     u8 count;
-    struct SpriteRenderEntry *cur;
-    struct SpriteRenderEntry *next;
+    struct RenderObject *cur;
+    struct RenderObject *next;
 
     for (i = 0; i <= 23; i++)
     {
@@ -1999,14 +1998,14 @@ void sub_8003348(void)
 
             if (ptr2E80->field_18 != 0)
             {
-                gSpriteRenderEntries[ptr2E80->field_18].field_0 = 0;
-                gSpriteRenderEntries[ptr2E80->field_18].subSprite = 0;
+                gRenderObjects[ptr2E80->field_18].field_0 = 0;
+                gRenderObjects[ptr2E80->field_18].subSprite = 0;
                 ptr2E80->field_18 = 0;
             }
 
-            count = gSpriteRenderEntries[flags].field_0;
+            count = gRenderObjects[flags].field_0;
             count &= 0x7F;
-            cur = &gSpriteRenderEntries[flags];
+            cur = &gRenderObjects[flags];
 
             while (count != 0)
             {
@@ -2062,18 +2061,18 @@ void sub_80037DC(u8 arg0)
 {
     u8 temp_r3;
     Unk_03002E80 *ptr03002E80;
-    struct SpriteRenderEntry *ptr03003AC0;
+    struct RenderObject *ptr03003AC0;
 
     ptr03002E80 = &gUnk_03002E80[arg0];
 
     temp_r3 = sub_8004BFC();
     if (temp_r3 < 0x70)
     {
-        ptr03003AC0 = &gSpriteRenderEntries[temp_r3];
+        ptr03003AC0 = &gRenderObjects[temp_r3];
         ptr03002E80->field_0 = temp_r3;
         ptr03002E80->field_1 = 2;
         ptr03002E80->field_2 = 5;
-        ptr03002E80->field_3 = 5;
+        ptr03002E80->paletteId = 5;
         ptr03002E80->facingDir = 0;
         ptr03002E80->field_A = 0;
         ptr03002E80->field_B = 0;
@@ -2082,7 +2081,7 @@ void sub_80037DC(u8 arg0)
         ptr03002E80->field_F = 0;
         ptr03002E80->field_13 = 0;
         ptr03002E80->field_24 = 0;
-        ptr03002E80->field_5 = 0;
+        ptr03002E80->animTimer = 0;
         ptr03002E80->field_E = 0;
         ptr03002E80->field_10 = 1;
         ptr03002E80->field_11 = 0;
@@ -2101,13 +2100,13 @@ void sub_800384C(void)
 {
     u8 temp_r1;
     Unk_03003150 *ptr03003150;
-    struct SpriteRenderEntry *ptr03003AC0;
+    struct RenderObject *ptr03003AC0;
 
     ptr03003150 = &gUnk_03003150;
     temp_r1 = sub_8004BFC();
     if (temp_r1 < 0x70)
     {
-        ptr03003AC0 = &gSpriteRenderEntries[temp_r1];
+        ptr03003AC0 = &gRenderObjects[temp_r1];
         ptr03003150->field_0 = temp_r1;
         ptr03003150->field_1 = 2;
         ptr03003150->field_2 = 0xA;
@@ -2352,8 +2351,8 @@ void sub_8004B8C()
 
     for (i = 0; i < 128; i++)
     {
-        gSpriteRenderEntries[i].field_0 = 0;
-        gSpriteRenderEntries[i].subSprite = 0;
+        gRenderObjects[i].field_0 = 0;
+        gRenderObjects[i].subSprite = 0;
     }
 }
 
@@ -2375,7 +2374,7 @@ void sub_8004BE0(void)
     u16 i;
     for (i = 0; i < 128; i++)
     {
-        gSpriteRenderSortList[i] = 0;
+        gRenderObjectPtrSortList[i] = 0;
     }
 }
 
@@ -2385,7 +2384,7 @@ u8 sub_8004BFC(void)
 
     for (i = 2; i < 0x70; i++)
     {
-        if (gSpriteRenderEntries[i].field_0 == 0)
+        if (gRenderObjects[i].field_0 == 0)
         {
             return i;
         }
@@ -2397,7 +2396,7 @@ static inline u8 findEmpty_Inl()
     u16 i;
     for (i = 2; i < 0x70; i++)
     {
-        if (gSpriteRenderEntries[i].field_0 == 0)
+        if (gRenderObjects[i].field_0 == 0)
         {
             return i;
         }
@@ -2405,15 +2404,15 @@ static inline u8 findEmpty_Inl()
     return 0;
 }
 
-struct SpriteRenderEntry *sub_8004C28(struct SpriteRenderEntry *arg0, u8 arg1, u16 arg2, u16 arg3, u16 arg4)
+struct RenderObject *sub_8004C28(struct RenderObject *obj, u8 arg1, u16 arg2, u16 arg3, u16 arg4)
 {
     u8 foundIndex;
 
-    arg0->field_0 = arg1;
-    arg0->attr0 = arg2;
-    arg0->attr1 = arg3;
-    arg0->attr2 = arg4;
-    arg0->animFrame = 0;
+    obj->field_0 = arg1;
+    obj->attr0 = arg2;
+    obj->attr1 = arg3;
+    obj->attr2 = arg4;
+    obj->animFrame = 0;
 
     if ((arg1 & 0x7F) == 1)
         return 0;
@@ -2425,8 +2424,8 @@ struct SpriteRenderEntry *sub_8004C28(struct SpriteRenderEntry *arg0, u8 arg1, u
         return 0;
     }
 
-    arg0->subSprite = &gSpriteRenderEntries[foundIndex];
-    return &gSpriteRenderEntries[foundIndex];
+    obj->subSprite = &gRenderObjects[foundIndex];
+    return &gRenderObjects[foundIndex];
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8004C8C); // Matched
 // extern u8* gUnk_087E8430[];
@@ -2481,7 +2480,7 @@ void sub_8004D20(u8 arg0, u8 arg1, u8 arg2)
     p = &gUnk_03002E80[arg0];
 
     p->field_2 = arg1;
-    p->field_3 = arg2;
+    p->paletteId = arg2;
 
     // gUnk_03002E80[arg0].unk2 = arg1;
     // gUnk_03002E80[arg0].unk3 = arg2;
@@ -2490,12 +2489,12 @@ void sub_8004D20(u8 arg0, u8 arg1, u8 arg2)
 void sub_8004D38(u8 arg0)
 {
     Unk_03002E80 *ptr2E80;
-    struct SpriteRenderEntry *node;
-    struct SpriteRenderEntry *next;
+    struct RenderObject *node;
+    struct RenderObject *next;
 
     ptr2E80 = &gUnk_03002E80[arg0];
 
-    node = &gSpriteRenderEntries[ptr2E80->field_0];
+    node = &gRenderObjects[ptr2E80->field_0];
 
     if (node->field_0 != 0)
     {
@@ -2608,11 +2607,11 @@ s16 sub_8004EDC(Unk_03002E80 *arg0)
     }
     return arg0->x;
 }
-void sub_8004F3C(struct SpriteRenderEntry *arg0)
+void sub_8004F3C(struct RenderObject *arg0)
 {
 
-    struct SpriteRenderEntry *node;
-    struct SpriteRenderEntry *next;
+    struct RenderObject *node;
+    struct RenderObject *next;
 
     if (arg0->field_0 == 0)
         return;
@@ -2667,26 +2666,26 @@ void sub_8004FA8(u8 arg0, u8 arg1)
     ptr2E80->field_14 = 0;
     ptr2E80->field_16 = arg1;
 }
-s32 sub_8004FD0(u8 arg0) {
-    Unk_03002E80* ptr;
+s32 sub_8004FD0(u8 arg0)
+{
+    Unk_03002E80 *ptr;
 
-    if(arg0 < 0x64)
+    if (arg0 < 0x64)
     {
         ptr = &gUnk_03002E80[arg0];
 
         gUnk_03002C60[ptr->field_16] &= 0x7F;
 
-        if(ptr->field_14 > 0xFE)
+        if (ptr->field_14 > 0xFE)
             return 1;
-  
     }
     else
     {
         ptr = &gUnk_03001EE0[arg0];
         ptr->field_14 = 0xFF;
-        return 1;  
+        return 1;
     }
-    
+
     return 0;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8005020);
@@ -2794,9 +2793,9 @@ void sub_8006520(u8 arg0) {
 INCLUDE_ASM("asm/nonmatchings", sub_800661C);
 INCLUDE_ASM("asm/nonmatchings", sub_80071EC);
 INCLUDE_ASM("asm/nonmatchings", sub_800729C); // Matched
-//InitMapSceneSprite
-// void sub_800729C(u8 arg0) {
-//     u16 i;
+// InitMapSceneSprite
+//  void sub_800729C(u8 arg0) {
+//      u16 i;
 
 //     if(gUnk_0300467C & 0x80)
 //         return;
@@ -2809,7 +2808,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_800729C); // Matched
 //     gUnk_030047D0[1] = 11;
 //     sub_8004C8C(1, 11);
 //     sub_8004CB8(1, 11);
-//gMapSceneConfigs
+// gMapSceneConfigs
 //     if(gUnk_08088D80[arg0].field_9 != 0)
 //     {
 // VRAM最多8种不同的精灵模型（会有一些模型没变，但是颜色不一样的npc）
@@ -3036,7 +3035,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8008CC0); // Matched
 //     ptr = ptr + (arg0 << 1);
 //     gUnk_03004824 = ptr[0];
 //     gUnk_030047B8 = ptr[1];
-    
+
 // }
 INCLUDE_ASM("asm/nonmatchings", sub_8008D18); // Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8008D78);
@@ -3055,55 +3054,57 @@ INCLUDE_ASM("asm/nonmatchings", sub_8008DF8);
 INCLUDE_ASM("asm/nonmatchings", sub_8008E44);
 INCLUDE_ASM("asm/nonmatchings", sub_8008E94);
 INCLUDE_ASM("asm/nonmatchings", sub_8008F28);
-void sub_8008FD0(u8 arg0) {
-    struct SpriteRenderEntry* entry;
-    struct SpriteRenderEntry* subEntry;
-    u8 temp_r0;
-    u16 var_r1;
+void sub_8008FD0(u8 arg0)
+{
+    struct RenderObject *obj;
+    struct RenderObject *subObj;
+    u8 objIdx;
+    u16 chestColor;
     u16 attr0;
     u16 attr1;
     u16 attr2;
 
-    temp_r0 = sub_8004BFC();
-    gUnk_03004890[arg0].field_2 = temp_r0;
-    entry = &gSpriteRenderEntries[temp_r0];
+    objIdx = sub_8004BFC();
+    gChestObjects[arg0].renderObjIdx = objIdx;
+    obj = &gRenderObjects[objIdx];
 
-    var_r1 = 0x80 & gUnk_03004890[arg0].field_0 ? 0xF : 0xE;
+    chestColor = 0x80 & gChestObjects[arg0].field_0 ? 0xF : 0xE;
 
-    if ((0x7F & gUnk_03004890[arg0].field_0) == 0) {
+    if ((0x7F & gChestObjects[arg0].field_0) == 0)
+    {
 
         attr0 = 0;
         attr1 = 0x4000;
-        attr2 =  ((var_r1 << 12) | 0x896);
+        attr2 = ((chestColor << 12) | 0x896);
 
-        entry->field_10 = 0;
-        entry->field_12 = 0xF0;
+        obj->field_10 = 0;
+        obj->field_12 = 0xF0;
 
-        sub_8004C28(entry, 1, attr0, attr1,attr2);
+        sub_8004C28(obj, 1, attr0, attr1, attr2);
     }
     else
     {
         attr0 = 0;
         attr1 = 0x4000;
-        attr2 =  ((var_r1 << 12) + 0x89C);
-        entry->field_10 = 0;
-        entry->field_12 = 0xF0;
-        subEntry = sub_8004C28(entry, 2, attr0, attr1, attr2);
+        attr2 = ((chestColor << 12) + 0x89C);
+        obj->field_10 = 0;
+        obj->field_12 = 0xF0;
+        subObj = sub_8004C28(obj, 2, attr0, attr1, attr2);
 
         attr0 = 0x4000;
         attr1 = 0;
-        attr2 =  ((var_r1 << 12 ) | 0x89A);
-        subEntry->field_10 = 0;
-        subEntry->field_12 = 0xE8;
-        sub_8004C28(subEntry, 1, attr0, attr1, attr2);
+        attr2 = ((chestColor << 12) | 0x89A);
+        subObj->field_10 = 0;
+        subObj->field_12 = 0xE8;
+        sub_8004C28(subObj, 1, attr0, attr1, attr2);
     }
-    entry->animFrame = 0;
+    obj->animFrame = 0;
 }
 void sub_800908C(u8 arg0)
 {
     u8 idx;
 
-    if (gUnk_03004890[arg0].field_0 & 1)
+    if (gChestObjects[arg0].field_0 & 1)
     {
         sub_805374C(9, 0, 0);
     }
@@ -3112,13 +3113,13 @@ void sub_800908C(u8 arg0)
         sub_805374C(8, 0, 0);
     }
 
-    gUnk_03004890[arg0].field_0 ^= 1;
+    gChestObjects[arg0].field_0 ^= 1;
 
-    idx = gUnk_03004890[arg0].field_1;
+    idx = gChestObjects[arg0].field_1;
 
     gUnk_03004870[idx >> 3] ^= (1 << (idx & 7));
 
-    sub_8004F3C(&gSpriteRenderEntries[gUnk_03004890[arg0].field_2]);
+    sub_8004F3C(&gRenderObjects[gChestObjects[arg0].renderObjIdx]);
     sub_8008FD0(arg0);
     gUnk_03004860 = arg0;
 }
@@ -3215,11 +3216,20 @@ u8 *sub_8009B84(u8 arg0, u8 *src)
     gUnk_03000020[arg0] = 0;
     return src;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8009BF0);
-INCLUDE_ASM("asm/nonmatchings", sub_8009C84);
+INCLUDE_ASM("asm/nonmatchings", sub_8009BF0); // Matched
+INCLUDE_ASM("asm/nonmatchings", sub_8009C84); // Matched
 INCLUDE_ASM("asm/nonmatchings", sub_8009D34);
-INCLUDE_ASM("asm/nonmatchings", sub_8009E80);
-INCLUDE_ASM("asm/nonmatchings", sub_8009F48);
+INCLUDE_ASM("asm/nonmatchings", sub_8009E80); // Matched
+// INCLUDE_ASM("asm/nonmatchings", sub_8009F48);
+void sub_8009F48(void)
+{
+    s16 i;
+
+    for (i = 0; i < 3; i++)
+    {
+        gStaticMapObjects[i].field_0 = 0;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8009F70);
 INCLUDE_ASM("asm/nonmatchings", sub_800A048);
 u8 sub_800A0E4(u8 arg0)
@@ -3538,7 +3548,7 @@ void sub_800B2D0(void)
 INCLUDE_ASM("asm/nonmatchings", sub_800B314);
 INCLUDE_ASM("asm/nonmatchings", sub_800B374);
 INCLUDE_ASM("asm/nonmatchings", sub_800BEE4);
-INCLUDE_ASM("asm/nonmatchings", sub_800BF5C); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_800BF5C); // Matched
 INCLUDE_ASM("asm/nonmatchings", sub_800BFF8);
 INCLUDE_ASM("asm/nonmatchings", sub_800C0D8);
 INCLUDE_ASM("asm/nonmatchings", sub_800C194);
@@ -3582,11 +3592,11 @@ void sub_800E170(u8 arg0, u8 arg1, u8 arg2)
 
 INCLUDE_ASM("asm/nonmatchings", sub_800E244);
 
-//http://localhost/scratch/E4CZr
+// http://localhost/scratch/E4CZr
 INCLUDE_ASM("asm/nonmatchings", sub_800E668); // Matched
 
 INCLUDE_ASM("asm/nonmatchings", sub_800E71C); // Matched
-INCLUDE_ASM("asm/nonmatchings", sub_800E7BC); //Matched
+INCLUDE_ASM("asm/nonmatchings", sub_800E7BC); // Matched
 INCLUDE_ASM("asm/nonmatchings", sub_800E8F8);
 INCLUDE_ASM("asm/nonmatchings", sub_800EAE4);
 INCLUDE_ASM("asm/nonmatchings", sub_800EB98); // Matched

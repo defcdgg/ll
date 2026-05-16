@@ -1,29 +1,13 @@
 #include "global_tables.h"
 #include "code_0.h"
 
-
 const MainTaskFunc gMainTasks[] = {
     sub_8003088,
     sub_80177AC,
 };
 
-const MainTaskFunc gUnk_087E83F8[] = {
-    sub_8001538,
-    sub_8001D08,
-    sub_8001354,
-    sub_80030B0,
-    sub_8001708,
-    sub_8001828,
-    sub_80018D4,
-    sub_8003114,
-    sub_8001A7C,
-    sub_8003128,
-    sub_8003168,
-    sub_80031E4,
-    sub_8001BD0,
-    sub_80031F8
-};
-
+const MainTaskFunc gUnk_087E83F8[] = {sub_8001538, sub_8001D08, sub_8001354, sub_80030B0, sub_8001708, sub_8001828, sub_80018D4,
+                                      sub_8003114, sub_8001A7C, sub_8003128, sub_8003168, sub_80031E4, sub_8001BD0, sub_80031F8};
 
 // extern u8 gGfx_AlexWalk[];
 // extern u8 gGfx_SpriteSheetWalk_Alex[];
@@ -32,7 +16,6 @@ const MainTaskFunc gUnk_087E83F8[] = {
 // const u8* const gGfxSpriteSheetWalk_PtrTable[] = {
 //     gGfx_SpriteSheetWalk_Alex
 // };
-
 
 // const u8* const gCharaFace_GfxTable[] = {
 //     gGfx_Face_Alex_Normal
@@ -70,4 +53,29 @@ const u8 gUnk_087E94FC[][4] = {
 
 
 const u32 gUnk_087E9818[] = {0x2005840, 0x200586C, 0x2005B00, 0x2005B2C};
+
+// off_87EA33C
+// const u8* const gGfx_StaticMapObject_PtrTable[] = {
+//     gGfx_SpriteSheet_WaterWheel,
+//     gGfx_SpriteSheet_WaterWheel,
+//     gGfx_SpriteSheet_WaterWheel,
+//     gGfx_SpriteSheet_WaterWheel,
+//     gGfx_SpriteSheet_WaterWheel,
+//     gGfx_SpriteSheet_WaterWheel,
+//     gGfx_SpriteSheet_WaterWheel,
+//     gGfx_SpriteSheet_WaterWheel,
+// };
+
+// off_87EA368
+// const u16* const gAnim_StaticMapObject_PtrTable[] = {
+//     gAnim_WaterWheel,
+//     gAnim_WaterWheel,
+//     gAnim_WaterWheel,
+//     gAnim_WaterWheel,
+//     gAnim_WaterWheel,
+//     gAnim_WaterWheel,
+//     gAnim_WaterWheel,
+//     gAnim_WaterWheel,
+// };
+
 */

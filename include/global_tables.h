@@ -11,8 +11,6 @@ typedef void (*UnkFunc)(void);
 
 extern const UnkFunc gUnk_087E83F8[];
 
-
-
-extern const u8* const gGfxSpriteSheetWalk_PtrTable[];
+extern const u8 *const gGfxSpriteSheetWalk_PtrTable[];
 
 #endif

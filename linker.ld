@@ -186,7 +186,7 @@ SECTIONS {
         . = 0x00003380; gUnk_03003380 = .;
         . = 0x000034B0; gUnk_030034B0 = .; 
         . = 0x000034C0; gUnk_030034C0 = .;     
-        . = 0x000035C0; gUnk_030035C0 = .;
+        . = 0x000035C0; gOamBuffer = .;
         . = 0x000039C0; gUnk_030039C0 = .;
         
         . = 0x00003AC0; gRenderObjects = .;

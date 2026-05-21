@@ -1,6 +1,7 @@
 #include "global_tables.h"
 #include "code_0.h"
 
+//87E83F0
 const MainTaskFunc gMainTasks[] = {
     sub_8003088,
     sub_80177AC,

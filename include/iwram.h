@@ -363,7 +363,7 @@ typedef union
     u32 attrs[2];
 
 } GameOamData;
-extern GameOamData gUnk_030035C0[128];
+extern GameOamData gOamBuffer[128];
 
 typedef struct
 {
@@ -382,7 +382,7 @@ struct RenderObject
     /* 0x06 */ u16 attr2; // GBA OAM Attr2 (TileID, Palette, Priority)
     /* 0x08 */ s16 x; // 逻辑位置 X
     /* 0x0A */ s16 y; // 逻辑位置 Y
-    /* 0x0C */ struct RenderObject *subSprite; // 下一个精灵节点的指针
+    /* 0x0C */ struct RenderObject *subObject; // 下一个精灵节点的指针
     /* 0x10 */ u16 field_10;
     /* 0x12 */ u16 field_12;
 }; // Total Size: 0x14 (20 bytes)

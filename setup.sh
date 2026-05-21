@@ -60,7 +60,7 @@ echo "baserom.gba: OK"
 
 # Clean generated files
 echo "Cleaning generated files..."
-rm -rf asm/nonmatchings build
+rm -rf asm/nonmatchings asm/matchings build
 
 # Init submodules
 echo ""
@@ -95,62 +95,7 @@ fi
 build_tool gbafix
 build_tool preproc
 build_tool gbadisasm
-# echo ""
 
-# if [ -f tools/gbafix/gbafix ]; then
-#     echo "gbafix is up-to-date, skip build."
-# else
-#     echo "Building gbafix..."
-#     cd tools/gbafix
-#     make
-#     cd ../..
-
-#     if [ ! -f tools/gbafix/gbafix ]; then
-#         echo "Error: gbafix failed to build."
-#         exit 1
-#     fi
-# fi
-
-# echo ""
-
-# if [ -f tools/preproc/preproc ]; then
-#     echo "preproc is up-to-date, skip build."
-# else
-#     echo "Building preproc..."
-#     cd tools/preproc
-#     make
-#     cd ../..
-
-#     if [ ! -f tools/preproc/preproc ]; then
-#         echo "Error: preproc failed to build."
-#         exit 1
-#     fi
-# fi
-
-# echo ""
-
-# if [ -f tools/gbadisasm/gbadisasm ]; then
-#     echo "gbadisasm is up-to-date, skip build."
-# else
-#     echo "Building gbadisasm..."
-#     cd tools/gbadisasm
-#     make
-#     cd ../..
-
-#     if [ ! -f tools/gbadisasm/gbadisasm ]; then
-#         echo "Error: gbadisasm failed to build."
-#         exit 1
-#     fi
-# fi
-
-# Set up Python venv for Luvdis
-# echo ""
-# echo "Setting up Python environment for Luvdis..."
-# if [ ! -d .venv ]; then
-#     python3 -m venv .venv
-# fi
-# source .venv/bin/activate
-#pip install -q "setuptools<81" click click-default-group tqdm 2>/dev/null
 
 # Generate asm/ from ROM
 echo ""

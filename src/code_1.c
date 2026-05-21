@@ -8,7 +8,9 @@
 #include "sound.h"
 
 INCLUDE_ASM("asm/nonmatchings", sub_8010F10);
-INCLUDE_ASM("asm/nonmatchings", sub_801114C); // Matched
+
+INCLUDE_ASM("asm/matchings", sub_801114C);
+
 INCLUDE_ASM("asm/nonmatchings", sub_8011268);
 INCLUDE_ASM("asm/nonmatchings", sub_80113CC);
 INCLUDE_ASM("asm/nonmatchings", sub_8011454);
@@ -28,11 +30,13 @@ INCLUDE_ASM("asm/nonmatchings", sub_8014488);
 INCLUDE_ASM("asm/nonmatchings", sub_801455C);
 INCLUDE_ASM("asm/nonmatchings", sub_80146A8);
 INCLUDE_ASM("asm/nonmatchings", sub_8014A68);
-INCLUDE_ASM("asm/nonmatchings", sub_801543C); // Matched
+
+INCLUDE_ASM("asm/matchings", sub_801543C);
+
 INCLUDE_ASM("asm/nonmatchings", sub_80154E8);
 INCLUDE_ASM("asm/nonmatchings", sub_8015658);
 
-INCLUDE_ASM("asm/nonmatchings", sub_8015AF0); // Matched
+INCLUDE_ASM("asm/matchings", sub_8015AF0);
 
 void sub_8015B90(void)
 {
@@ -72,7 +76,8 @@ void sub_8015EA0(void)
     sub_8016508(0x18, 0xB);
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8015ED0); // Matched
+INCLUDE_ASM("asm/matchings", sub_8015ED0);
+
 void sub_8015F14(void)
 {
     u8 var_r3;
@@ -112,9 +117,9 @@ void sub_8015FB4(u8 arg0)
 
     ClearBuffer((u16 *)0x02005800, 30, 20);
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8016038); // Matched
-INCLUDE_ASM("asm/nonmatchings", sub_8016068); // Matched
-INCLUDE_ASM("asm/nonmatchings", sub_80160CC); // Matched
+INCLUDE_ASM("asm/matchings", sub_8016038);
+INCLUDE_ASM("asm/matchings", sub_8016068);
+INCLUDE_ASM("asm/matchings", sub_80160CC);
 void sub_80160F4(void)
 {
     DmaCopy32(3, 0x02020000, 0x06013800, 0x800);
@@ -123,8 +128,8 @@ void sub_80160F4(void)
     DmaCopy16(3, 0x080A12D0, 0x05000340, 0x40);
     DmaCopy16(3, 0x0808B7D4, 0x050001C0, 0x40);
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8016178); // Matched
-INCLUDE_ASM("asm/nonmatchings", sub_80161F4); // Matched
+INCLUDE_ASM("asm/matchings", sub_8016178);
+INCLUDE_ASM("asm/matchings", sub_80161F4);
 
 void sub_801624C(s16 arg0, u16 *dest)
 {
@@ -179,7 +184,7 @@ void sub_8016308(u8 arg0, u8 x, u8 y)
     sub_800BFF8(gUnk_03004AC0[arg0].mp, dest, unk);
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8016368); // Matched
+INCLUDE_ASM("asm/matchings", sub_8016368);
 
 void sub_80163CC(u8 *src)
 {
@@ -231,8 +236,8 @@ void sub_8016444(u16 *arg0, u16 arg1, u8 arg2)
 {
     sub_8016368(sub_8016460(arg0, arg1, arg2), 0xC9, 0xB);
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8016460); // Matched
-INCLUDE_ASM("asm/nonmatchings", sub_80164C0); // Matched
+INCLUDE_ASM("asm/matchings", sub_8016460);
+INCLUDE_ASM("asm/matchings", sub_80164C0);
 void sub_80164F8(u16 arg0)
 {
     sub_8016508(arg0, 0xB);
@@ -818,7 +823,8 @@ void sub_801A36C(void)
     REG_BG3HOFS = gUnk_03000500.field_C;
     REG_BG3VOFS = gUnk_03000500.field_E;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_801A3A8); // Matched
+INCLUDE_ASM("asm/matchings", sub_801A3A8);
+
 INCLUDE_ASM("asm/nonmatchings", sub_801A3C4);
 INCLUDE_ASM("asm/nonmatchings", sub_801A5EC);
 INCLUDE_ASM("asm/nonmatchings", sub_801A684);
@@ -827,7 +833,9 @@ INCLUDE_ASM("asm/nonmatchings", sub_801A884);
 INCLUDE_ASM("asm/nonmatchings", sub_801AD0C);
 INCLUDE_ASM("asm/nonmatchings", sub_801B0B8);
 INCLUDE_ASM("asm/nonmatchings", sub_801B570);
-INCLUDE_ASM("asm/nonmatchings", sub_801B688); // Matched
+
+INCLUDE_ASM("asm/matchings", sub_801B688);
+
 INCLUDE_ASM("asm/nonmatchings", sub_801B760);
 INCLUDE_ASM("asm/nonmatchings", sub_801B790);
 INCLUDE_ASM("asm/nonmatchings", sub_801B7B8);
@@ -852,7 +860,7 @@ void sub_801B920(void)
     GameOamData *oamPtr;
     Unk_030034C0 *srcPtr;
 
-    oamPtr = &gUnk_030035C0[0];
+    oamPtr = &gOamBuffer[0];
     srcPtr = gUnk_030034C0;
 
     for (i = 0; i < 32; i++)
@@ -997,7 +1005,9 @@ void sub_8020E74(void)
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8020E90);
-INCLUDE_ASM("asm/nonmatchings", sub_8020EAC); // Matched
+
+INCLUDE_ASM("asm/matchings", sub_8020EAC);
+
 // extern u8 gUnk_03000748[];
 
 // typedef struct {
@@ -1845,7 +1855,7 @@ u32 sub_8053348(u32 *ptr)
     (*ptr)++;
     return 1;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8053360); // Matched
+INCLUDE_ASM("asm/matchings", sub_8053360);
 // typedef struct ScriptContext{
 //     u8* scriptPtr;
 // }ScriptContext;

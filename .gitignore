@@ -4,13 +4,16 @@ build/
 *.elf
 *.map
 
+tools/agbcc/
 
 *.dump
 
 scripts/ida/
-
+scripts/data/
+# scripts/
 
 asm/nonmatchings/
+asm/matchings/
 
 # Generated context (make ctx)
 ctx.c

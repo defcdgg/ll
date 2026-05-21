@@ -4,31 +4,7 @@
 #include "gba/types.h"
 #include "iwram.h"
 
-static inline void ClearBuffer(u16 *buf, u8 w, u8 h)
-{
-    u16 x, y;
-    u16 *temp_buf;
-    for (y = 0; y < h; y++)
-    {
-        temp_buf = buf;
 
-        for (x = 0; x < w; x++)
-        {
-            *buf++ = 0xB001;
-        }
-        buf = temp_buf + 0x20;
-    }
-}
-
-static inline void SetBgUnknown1(u16 *buf, u16 val)
-{
-    *buf = val;
-}
-
-static inline void SetBgUnknown(u16 *buf, u16 val)
-{
-    *buf = val + 0xb240;
-}
 
 extern void sub_8000170();
 
@@ -42,8 +18,8 @@ void sub_8001090();
 void sub_800110C();
 void sub_800124C();
 
-extern void DummyIntr3();
-extern void DummyIntr4();
+void DummyIntr3();
+void DummyIntr4();
 
 void sub_80012B8();
 void sub_8001354();

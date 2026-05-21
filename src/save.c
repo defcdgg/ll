@@ -114,7 +114,7 @@ s32 sub_80109F8(u8 arg0)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8010BEC); // Matched
-INCLUDE_ASM("asm/nonmatchings", sub_8010CCC); // Matched
-INCLUDE_ASM("asm/nonmatchings", sub_8010D80); // Matched
-INCLUDE_ASM("asm/nonmatchings", sub_8010E58); // Matched
+INCLUDE_ASM("asm/matchings", sub_8010BEC);
+INCLUDE_ASM("asm/matchings", sub_8010CCC);
+INCLUDE_ASM("asm/matchings", sub_8010D80);
+INCLUDE_ASM("asm/matchings", sub_8010E58);

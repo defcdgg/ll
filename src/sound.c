@@ -55,7 +55,7 @@ void sub_80533F0(void)
     sub_80534B4();
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_80534B4); // Matched
+INCLUDE_ASM("asm/matchings", sub_80534B4);
 
 // void sub_80534B4(void) {
 //     u8 i;
@@ -186,7 +186,7 @@ u8 sub_8053734(u8 arg0)
     return (gUnk_03000F42 >> arg0) & 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_805374C); // Matched
+INCLUDE_ASM("asm/matchings", sub_805374C);
 // void sub_805374C(u16 arg0, u8 arg1, u8 arg2) {
 
 //     MPlayStart(gMPlayInfos2[arg1], gSfxSongHeaderTable[arg0]);
@@ -199,7 +199,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_805374C); // Matched
 //     gUnk_03000F43 |= arg2 << arg1;
 // }
 
-INCLUDE_ASM("asm/nonmatchings", sub_80537C0); // Matched
+INCLUDE_ASM("asm/matchings", sub_80537C0);
 // void sub_80537C0(u16 arg0, u8 arg1) {
 
 //     MPlayStart(gMPlayInfos2[arg1], gSfxSongHeaderTable[arg0]);
@@ -215,7 +215,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_80537C0); // Matched
 //     m4aMPlayFadeOutTemporarily((struct MusicPlayerInfo* )0x03005AB0, 2);
 // }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8053838); // Matched
+INCLUDE_ASM("asm/matchings", sub_8053838);
 
 // void sub_8053838(u8 arg0) {
 //     m4aMPlayStop(gMPlayInfos2[arg0]);

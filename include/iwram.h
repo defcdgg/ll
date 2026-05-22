@@ -33,6 +33,9 @@ struct Unk_LzData
 extern u16 gUnk_03000000;
 extern u16 gUnk_03000002;
 extern u16 gUnk_03000004;
+extern u8 gUnk_03000008;
+extern u8 gUnk_0300000A[];
+extern u16 gUnk_0300000C;
 extern u8 gUnk_03000010[4];
 extern u8 gUnk_03000014[4];
 extern u8 gUnk_03000018[4];
@@ -187,7 +190,7 @@ extern u8 gUnk_03000F50;
 extern u8 gUnk_030018F0[0x50];
 
 extern s32 gUnk_03001940;
-extern u8 gUnk_03001944;
+extern u8 gMainGameState;
 extern u32 gGameTimer; // 3001948
 extern u32 gUnk_03001950[14];
 extern u16 gUnk_03001988;
@@ -213,7 +216,7 @@ extern u32 gIntrMainBuf[512];
 
 typedef struct
 {
-    u8 field_0;
+    u8 renderObjIdx;
     u8 field_1;
     u8 field_2;
     u8 paletteId;
@@ -232,7 +235,7 @@ typedef struct
     u8 field_12;
     u8 field_13;
     u16 field_14;
-    u8 field_16;
+    u8 vramBufferIdx;
     u8 field_17;
     u8 field_18;
     u8 field_19;
@@ -250,6 +253,7 @@ extern u32 gUnk_030025A8;
 extern u8 gUnk_030025B0;
 extern s16 gUnk_030025B4;
 extern u8 gUnk_030025B8;
+extern u8 gSpriteWidth;
 extern u16 gUnk_030025C0[8];
 extern u16 gUnk_030025D4;
 extern u8 gUnk_030025D8;
@@ -263,6 +267,7 @@ extern u8 gUnk_03002604;
 extern u16 gUnk_03002608;
 extern u8 gUnk_0300260C;
 
+extern u8 gSpriteHeight;
 extern u8 gUnk_03002C34;
 extern u32 gUnk_03002C38;
 extern u16 gUnk_03002C3C;
@@ -310,6 +315,9 @@ typedef struct
 extern Unk_03003150 gUnk_03003150;
 extern Unk_03003150 gUnk_03003178[];
 extern u16 gUnk_03003240;
+
+extern u32 gVramBufferPointers[];
+
 extern u8 gUnk_030032D0;
 extern u16 gUnk_030032D4;
 
@@ -367,14 +375,14 @@ extern GameOamData gOamBuffer[128];
 
 typedef struct
 {
-    u32 field_0;
-    u32 field_4;
+    void* src;
+    void* dest;
 } Unk_030039C0;
 
-extern Unk_030039C0 gUnk_030039C0[32];
+extern Unk_030039C0 gVramTransferQueue[32];
 
 struct RenderObject
-{ // 0x03003AC0
+{ // gRenderObjects
     /* 0x00 */ u8 field_0; // 优先级/层级状态 priority?
     /* 0x01 */ u8 animFrame; // 动画帧序列号
     /* 0x02 */ u16 attr0; // GBA OAM Attr0 (Y, Shape, Mode)

@@ -76,7 +76,7 @@ void sub_8004A94(u8, u32, s8, u8);
 void sub_8004AC0();
 void sub_8004ADC();
 
-void sub_8004B2C(u16, s32, s32, u8);
+void sub_8004B2C(u16, void*, void*, u8);
 void sub_8004B60();
 void sub_8004B8C();
 void sub_8004BBC();

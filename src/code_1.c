@@ -113,7 +113,7 @@ void sub_8015FB4(u8 arg0)
     gUnk_03004D40 = 0x28;
     gUnk_03004DD8 = 0;
     gUnk_03004DC4 = 1;
-    gUnk_03001944 = 0xD;
+    gMainGameState = 0xD;
 
     ClearBuffer((u16 *)0x02005800, 30, 20);
 }

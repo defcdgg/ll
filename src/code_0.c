@@ -62,23 +62,20 @@ const u8 gSpriteTileCountTable[] = {
 };
 
 
-
+//8058834
 const u8 gSpriteDimensionsTable[] = {
     8, 8, 16, 16, 32, 32, 64, 64,  // Shape 0 (Square)
     16, 8, 32, 8, 32, 16, 64, 32,  // Shape 1 (Horizontal)
     8, 16, 8, 32, 16, 32, 32, 64,  // Shape 2 (Vertical)
 
-
     1, 1, 1, 1, 1, 1, 1, 1,
 
-    // 32 - 47 字节：锚点偏移量数据（u8 数组补码形式）
     15, 0, 0, 0, 252, 255, 228, 255,
     15, 0, 0, 0, 0, 0, 240, 255
 };
 
 //8058834
 const s8 gSpriteDimensionsTable[] = {
-    // 0 - 23 字节：[W0, H0, W1, H1...] 像素尺寸数据（保持正数不变）
     8, 8, 16, 16, 32, 32, 64, 64,  // Shape 0 (Square)
     16, 8, 32, 8, 32, 16, 64, 32,  // Shape 1 (Horizontal)
     8, 16, 8, 32, 16, 32, 32, 64,  // Shape 2 (Vertical)
@@ -1589,7 +1586,7 @@ void sub_8002154(void)
 {
     u16 i;
     u16 ret0;
-    Unk_03002E80 *ptr03002E80;
+    CharacterObject *ptr03002E80;
     ChestObject *ptr03004890;
 
     sub_8005C70();
@@ -1693,7 +1690,7 @@ void sub_8002154(void)
 
 void sub_8002380(u8 arg0)
 {
-    Unk_03002E80 *temp_r4;
+    CharacterObject *temp_r4;
     struct RenderObject *temp_r0;
     u8 flag;
 
@@ -1733,7 +1730,7 @@ void sub_8002380(u8 arg0)
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_800243C);
+INCLUDE_ASM("asm/matchings", sub_800243C);
 INCLUDE_ASM("asm/nonmatchings", sub_800271C);
 
 INCLUDE_ASM("asm/nonmatchings", sub_80029D8);
@@ -2023,7 +2020,7 @@ INCLUDE_ASM("asm/matchings", sub_80032BC);
 
 void sub_8003348(void)
 {
-    Unk_03002E80 *ptr2E80;
+    CharacterObject *ptr2E80;
     u8 renderObjIdx;
     s16 i;
     u8 count;
@@ -2066,18 +2063,18 @@ INCLUDE_ASM("asm/nonmatchings", sub_800345C);
 void sub_800375C(u8 arg0)
 {
     u8 temp_r1;
-    Unk_03003150 *ptr3150;
+    CharacterObject *ptr3150;
     ptr3150 = &gUnk_03003178[arg0];
     temp_r1 = sub_8004BFC();
     if (temp_r1 < 0x70)
     {
-        ptr3150->field_0 = 0;
+        ptr3150->renderObjIdx = 0;
         ptr3150->field_1 = 2;
         ptr3150->field_2 = 9;
-        ptr3150->field_3 = 9;
-        ptr3150->field_4 = 0;
-        ptr3150->field_6 = (gUnk_030025B4 + (arg0 * 5 + 5) * 8);
-        ptr3150->field_8 = (gUnk_030025FC + 0x28);
+        ptr3150->paletteId = 9;
+        ptr3150->facingDir = 0;
+        ptr3150->x = (gUnk_030025B4 + (arg0 * 5 + 5) * 8);
+        ptr3150->y = (gUnk_030025FC + 0x28);
         ptr3150->field_A = 0;
         ptr3150->field_B = 0;
         ptr3150->field_C = 0;
@@ -2085,7 +2082,7 @@ void sub_800375C(u8 arg0)
         ptr3150->field_F = 0;
         ptr3150->field_13 = 0x80;
         ptr3150->field_24 = 0;
-        ptr3150->field_5 = 0;
+        ptr3150->animTimer = 0;
         ptr3150->field_E = 0;
         ptr3150->field_10 = 1;
         ptr3150->field_11 = 0;
@@ -2095,14 +2092,14 @@ void sub_800375C(u8 arg0)
         ptr3150->field_18 = 0;
         ptr3150->field_19 = 0;
         ptr3150->field_14 = 0;
-        ptr3150->field_16 = 0xFF;
+        ptr3150->vramBufferIdx = 0xFF;
     }
 }
 
 void sub_80037DC(u8 arg0)
 {
     u8 idx;
-    Unk_03002E80 *ptr03002E80;
+    CharacterObject *ptr03002E80;
     struct RenderObject *renderObj;
 
     ptr03002E80 = &gUnk_03002E80[arg0];
@@ -2141,37 +2138,37 @@ void sub_80037DC(u8 arg0)
 void sub_800384C(void)
 {
     u8 temp_r1;
-    Unk_03003150 *ptr03003150;
+    CharacterObject *ptr3150;
     struct RenderObject *renderObj;
 
-    ptr03003150 = &gUnk_03003150;
+    ptr3150 = &gUnk_03003150;
     temp_r1 = sub_8004BFC();
     if (temp_r1 < 0x70)
     {
         renderObj = &gRenderObjects[temp_r1];
-        ptr03003150->field_0 = temp_r1;
-        ptr03003150->field_1 = 2;
-        ptr03003150->field_2 = 0xA;
-        ptr03003150->field_3 = 0xA;
-        ptr03003150->field_4 = 0;
-        ptr03003150->field_6 = (gUnk_030025F8 + 8);
-        ptr03003150->field_8 = (gUnk_03002C3C + 0xC);
-        ptr03003150->field_A = 0;
-        ptr03003150->field_B = 0;
-        ptr03003150->field_C = 0;
-        ptr03003150->field_D = 0;
-        ptr03003150->field_F = 0;
-        ptr03003150->field_13 = 0x80;
-        ptr03003150->field_24 = 0;
-        ptr03003150->field_5 = 0;
-        ptr03003150->field_E = 0;
-        ptr03003150->field_10 = 1;
-        ptr03003150->field_11 = 0;
-        ptr03003150->field_12 = 0x20;
-        ptr03003150->field_17 = 0;
-        ptr03003150->field_1A = 0;
-        ptr03003150->field_18 = 0;
-        ptr03003150->field_19 = 0;
+        ptr3150->renderObjIdx = temp_r1;
+        ptr3150->field_1 = 2;
+        ptr3150->field_2 = 0xA;
+        ptr3150->paletteId = 0xA;
+        ptr3150->facingDir = 0;
+        ptr3150->x = (gUnk_030025F8 + 8);
+        ptr3150->y = (gUnk_03002C3C + 0xC);
+        ptr3150->field_A = 0;
+        ptr3150->field_B = 0;
+        ptr3150->field_C = 0;
+        ptr3150->field_D = 0;
+        ptr3150->field_F = 0;
+        ptr3150->field_13 = 0x80;
+        ptr3150->field_24 = 0;
+        ptr3150->animTimer = 0;
+        ptr3150->field_E = 0;
+        ptr3150->field_10 = 1;
+        ptr3150->field_11 = 0;
+        ptr3150->field_12 = 0x20;
+        ptr3150->field_17 = 0;
+        ptr3150->field_1A = 0;
+        ptr3150->field_18 = 0;
+        ptr3150->field_19 = 0;
         renderObj->field_0 = 128;
         renderObj->animFrame = 0;
         renderObj->subObject = 0;
@@ -2215,7 +2212,104 @@ INCLUDE_ASM("asm/matchings", sub_80038CC);
 //     gUnk_030032D0 = 0;
 // }
 INCLUDE_ASM("asm/nonmatchings", sub_8003958);
-INCLUDE_ASM("asm/nonmatchings", sub_8003B08);
+void sub_8003B08(u16 arg0) {
+    u8 var_r5;
+    u8* temp_r2;
+    CharacterObject* chara;
+    u8 cmd;
+
+    chara = &gUnk_03002E80[arg0];
+    
+    if(chara->field_24 != 0)
+    {
+        var_r5 = 0;
+        while(var_r5 == 0)
+        {
+            temp_r2 = chara->field_24 + chara->field_17;
+            cmd = *temp_r2++;
+            switch(cmd)
+            {
+                case 0xFE:
+                    chara->field_17 = 0;
+                    break;
+                case 0xFD:
+                    chara->field_12 |= 0x20;
+                    chara->field_12 &= 0x7F;
+                    // chara->field_12 = (chara->field_12 | 0x20) & 0x7F;
+                    chara->field_24 = NULL;
+                    return;
+                case 0xFF:
+                    chara->field_12 &= 0x7B;
+                    chara->field_24 = NULL;
+                    var_r5++;
+                    break;
+                case 3:
+                    chara->field_E = temp_r2[0];
+                    chara->field_17 += 2;
+                    break;
+                case 1:
+                    chara->field_17 += 3;
+                    chara->field_E = temp_r2[0];
+                    chara->facingDir = chara->field_E;
+                    chara->field_F = 0;
+                    chara->field_10 = cmd;
+                    chara->field_11 = temp_r2[1];
+                    var_r5++;
+                    break;
+                    
+                case 2:
+                    chara->field_12 |=  0x10;
+                    chara->field_17 += 4;
+
+                    chara->field_E = *temp_r2++;
+                    chara->field_E &= 7;
+                    
+                    chara->field_F = temp_r2[0];
+                    chara->field_10 = temp_r2[1] + 1;
+                    return;
+                
+                default:
+                    chara->field_17 += 4;
+                    chara->field_E = temp_r2[0] ;
+                    temp_r2++;
+                    chara->field_F = temp_r2[0];
+                    chara->field_10 = temp_r2[1] + 1;
+                    var_r5++;
+                break;
+                    
+            }
+            chara->field_E &= 7;
+            chara->facingDir = chara->field_E;
+        }
+        return;
+    }
+    
+
+    if(gUnk_030025D8 == 0)
+    {
+        switch ((sub_8000FF8() & 7))
+        {
+            case 1:
+            case 4:
+            case 5:
+            case 6:
+                chara->field_11 = 0x10;
+                chara->field_10 = 1;
+                break;
+            case 2:
+                chara->field_E++;
+                break;
+            case 3:
+                chara->field_E--;
+                break;
+            case 7:
+                break;
+        }
+        
+        chara->field_E &= 7;
+        chara->facingDir = chara->field_E;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8003C54);
 INCLUDE_ASM("asm/nonmatchings", sub_8003F40);
 INCLUDE_ASM("asm/nonmatchings", sub_80040E4);
@@ -2257,7 +2351,7 @@ INCLUDE_ASM("asm/matchings", sub_8004980);
 void sub_80049C8(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 {
 
-    Unk_03002E80 *ptr = &gUnk_03002E80[arg0];
+    CharacterObject *ptr = &gUnk_03002E80[arg0];
 
     if (arg1)
     {
@@ -2273,7 +2367,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8004A00);
 // void sub_8004A00(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 // {
 //     s16 val;
-//     Unk_03002E80 *ptr2E80;
+//     CharacterObject *ptr2E80;
 
 //     if (arg2 != 0)
 //     {
@@ -2518,7 +2612,7 @@ INCLUDE_ASM("asm/matchings", sub_8004CE8);
 
 void sub_8004D20(u8 arg0, u8 arg1, u8 arg2)
 {
-    Unk_03002E80 *p;
+    CharacterObject *p;
     p = &gUnk_03002E80[arg0];
 
     p->field_2 = arg1;
@@ -2530,7 +2624,7 @@ void sub_8004D20(u8 arg0, u8 arg1, u8 arg2)
 
 void sub_8004D38(u8 arg0)
 {
-    Unk_03002E80 *ptr2E80;
+    CharacterObject *ptr2E80;
     struct RenderObject *node;
     struct RenderObject *next;
 
@@ -2559,15 +2653,15 @@ void sub_8004D38(u8 arg0)
 
     ptr2E80->renderObjIdx = 0;
 }
-void sub_8004D8C(u8 arg0, u32 arg1)
+void sub_8004D8C(u8 arg0, u8* arg1)
 {
-    Unk_03002E80 *ptr2E80;
+    CharacterObject *ptr2E80;
     ptr2E80 = &gUnk_03002E80[arg0];
     ptr2E80->field_24 = arg1;
 }
 void sub_8004DA4(u8 arg0)
 {
-    Unk_03002E80 *ptr2E80;
+    CharacterObject *ptr2E80;
     ptr2E80 = &gUnk_03002E80[arg0];
     ptr2E80->field_12 |= 0x80;
     ptr2E80->field_12 &= 0xDF;
@@ -2578,7 +2672,7 @@ void sub_8004DA4(u8 arg0)
 s32 sub_8004DD0(void)
 {
     u8 i;
-    Unk_03002E80 *ptr2E80;
+    CharacterObject *ptr2E80;
     ptr2E80 = gUnk_03002E80;
 
     for (i = 0; i < 0x18; i++)
@@ -2616,7 +2710,7 @@ u8 sub_8004E7C(void)
 }
 void sub_8004E88(u8 arg0, s32 arg1, s32 arg2, u8 arg3)
 {
-    Unk_03002E80 *ptr2E80;
+    CharacterObject *ptr2E80;
     ptr2E80 = &gUnk_03002E80[arg0];
 
     ptr2E80->x = arg1 * 8;
@@ -2626,7 +2720,7 @@ void sub_8004E88(u8 arg0, s32 arg1, s32 arg2, u8 arg3)
     ptr2E80->field_E = arg3;
 }
 
-u16 sub_8004EB8(Unk_03002E80 *arg0)
+u16 sub_8004EB8(CharacterObject *arg0)
 {
     if (arg0->field_12 & 1)
     {
@@ -2635,7 +2729,7 @@ u16 sub_8004EB8(Unk_03002E80 *arg0)
 
     return arg0->field_1A;
 }
-s16 sub_8004EDC(Unk_03002E80 *arg0)
+s16 sub_8004EDC(CharacterObject *arg0)
 {
     if (arg0->field_12 & 1)
     {
@@ -2702,7 +2796,7 @@ INCLUDE_ASM("asm/matchings", sub_8004F64);
 
 void sub_8004FA8(u8 arg0, u8 arg1)
 {
-    Unk_03002E80 *ptr2E80;
+    CharacterObject *ptr2E80;
     ptr2E80 = &gUnk_03002E80[arg0];
     ptr2E80->field_1 |= 1;
     ptr2E80->field_14 = 0;
@@ -2710,7 +2804,7 @@ void sub_8004FA8(u8 arg0, u8 arg1)
 }
 s32 sub_8004FD0(u8 arg0)
 {
-    Unk_03002E80 *ptr;
+    CharacterObject *ptr;
 
     if (arg0 < 0x64)
     {
@@ -2873,7 +2967,43 @@ INCLUDE_ASM("asm/matchings", sub_800729C);
 // }
 INCLUDE_ASM("asm/nonmatchings", sub_8007350);
 INCLUDE_ASM("asm/nonmatchings", sub_8007964);
-INCLUDE_ASM("asm/nonmatchings", sub_80079BC);
+u8* sub_80079BC(u16 arg0, u8* arg1) {
+    u32 temp_r0;
+
+    Unk_030046A0* ptr46A0;
+    
+    ptr46A0 = &gUnk_030046A0[arg0];
+
+    ptr46A0->field_0 = (arg1[0] & 1) + 1;
+    ptr46A0->field_3 = arg1[1];
+    arg1+= 2;
+    
+    ptr46A0->field_1 = *arg1;
+    arg1++;
+    
+    ptr46A0->field_2 = *arg1;
+    arg1++;
+
+    ptr46A0->field_6 = *arg1;
+    arg1++;
+    
+    ptr46A0->field_7 = *arg1;
+    arg1++;
+    ptr46A0->field_8 = *arg1;
+    arg1++; 
+    ptr46A0->field_9 = *arg1;
+    arg1++;  
+
+    ptr46A0->field_A = (ptr46A0->field_1 << ptr46A0->field_2) - 2;
+    ptr46A0->field_C = arg1;
+
+    temp_r0 = ptr46A0->field_8 * ptr46A0->field_9 * ptr46A0->field_1;
+    temp_r0 *= 2;
+
+    arg1 += temp_r0;
+
+    return arg1;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8007A1C);
 INCLUDE_ASM("asm/nonmatchings", sub_8007ADC);
 INCLUDE_ASM("asm/nonmatchings", sub_8007BD0);
@@ -3122,8 +3252,48 @@ void sub_8008DD8(void)
     DmaCopy16(3, (void *)0x08087216, (void *)0x05000000, 2);
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8008DF8);
-INCLUDE_ASM("asm/nonmatchings", sub_8008E44);
+void sub_8008DF8(u16 arg0, u8* arg1) {
+    u16 count;
+
+    count = *(u16*)arg1;
+    arg1 += 2;
+
+    while(count != 0)
+    {
+        arg1 = sub_80079BC(arg0, arg1);
+
+        sub_8007A1C(arg0);
+
+        gUnk_030046A0[arg0].field_0 = 0;
+        count--;
+    }
+}
+void sub_8008E44(u8 arg0) {
+    u16* dest;
+    u16 i, j;
+    u16 val;
+
+    dest = (u16* )0x020053A8;
+
+    val = 32;
+    
+    if(arg0 != 0)
+    {
+        val = 0;
+    }
+
+    for(i = 0; i < 4; i++)
+    {
+        for(j = 0; j < 8; j++)
+        {
+            *dest = val + 0xA200;
+            dest++;
+            val++;
+        }
+        dest += 24;
+    }
+    gUnk_03004800[13] = 1;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8008E94);
 INCLUDE_ASM("asm/nonmatchings", sub_8008F28);
 void sub_8008FD0(u8 arg0)

@@ -3,6 +3,8 @@
 
 #include "gba/types.h"
 
+#define NULL 0
+
 typedef struct UnkNode
 {
     u8 key; // offset 0, 用于比较排序
@@ -241,10 +243,10 @@ typedef struct
     u8 field_19;
     s16 field_1A;
     u8 gap1C[8];
-    u32 field_24;
-} Unk_03002E80;
+    u8* field_24;
+} CharacterObject;
 
-extern Unk_03002E80 gUnk_03001EE0[];
+extern CharacterObject gUnk_03001EE0[];
 
 extern u8 gUnk_0300259C;
 extern u32 gUnk_030025A0;
@@ -280,40 +282,14 @@ extern u8 gUnk_03002C58[8];
 extern u8 gUnk_03002C60[];
 // extern struct Unk_03003AC0 *gUnk_03002C80[128];
 
-extern Unk_03002E80 gUnk_03002E80[];
+extern CharacterObject gUnk_03002E80[];
 
-typedef struct
-{
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-    u8 field_4;
-    u8 field_5;
-    u16 field_6;
-    u16 field_8;
-    u8 field_A;
-    u8 field_B;
-    u8 field_C;
-    u8 field_D;
-    u8 field_E;
-    u8 field_F;
-    u8 field_10;
-    u8 field_11;
-    u8 field_12;
-    u8 field_13;
-    u16 field_14;
-    u8 field_16;
-    u8 field_17;
-    u8 field_18;
-    u8 field_19;
-    u16 field_1A;
-    u8 gap1C[8];
-    u32 field_24;
-} Unk_03003150;
 
-extern Unk_03003150 gUnk_03003150;
-extern Unk_03003150 gUnk_03003178[];
+// extern Unk_03003150 gUnk_03003150;
+// extern Unk_03003150 gUnk_03003178[];
+
+extern CharacterObject gUnk_03003150;
+extern CharacterObject gUnk_03003178[];
 extern u16 gUnk_03003240;
 
 extern u32 gVramBufferPointers[];
@@ -466,7 +442,7 @@ typedef struct
     u8 field_8;
     u8 field_9;
     u16 field_A;
-    s32 field_C;
+    u8* field_C;
 } Unk_030046A0;
 
 extern Unk_030046A0 gUnk_030046A0[];
@@ -665,7 +641,7 @@ typedef struct SaveInfo
     /** 0x2A2 */ u8 field_03004980[256]; // 0x100
     /** 0x3A2 */ u8 field_03001C60[64]; // 0x40
     /** 0x3E2 */ u8 field_030018F0[64]; // 0x40
-    /** 0x422 */ Unk_03002E80 field_03002E80[18]; // 0x2D0 (18 * 0x28)
+    /** 0x422 */ CharacterObject field_03002E80[18]; // 0x2D0 (18 * 0x28)
     /** 0x6F2 */ u8 field_0203F000[0xE00]; // 0xE00
     /** 0x14F2 */ u8 field_0203FE00[0x100]; // 0x100
 

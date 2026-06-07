@@ -18,7 +18,7 @@ typedef void (*IntrFunc)(void);
     VCountIntr
 */
 IntrFunc const gIntrTable[] = {
-    sub_8016FC0, sub_800065C, sub_800124C, DummyIntr4, DummyIntr3, DummyIntr3, DummyIntr3,
+    sub_8016FC0, VBlankIntr, sub_800124C, DummyIntr4, DummyIntr3, DummyIntr3, DummyIntr3,
     DummyIntr3,  DummyIntr3,  DummyIntr3,  DummyIntr3, DummyIntr3, DummyIntr3,
 };
 
@@ -43,7 +43,6 @@ u8 const gUnk_08057750[] = {
     0xb2, 0xd0, 0xe6, 0x26, 0xf6, 0xba, 0x0f, 0xc0, 0xc3, 0xd3, 0x0d, 0xd5, 0xd2, 0xda, 0xb7, 0xbc, 0xf4, 0xa3, 0x07, 0xbd, 0xe3, 0xca,
     0xde, 0xd4, 0x2c, 0xcb, 0x6c, 0xf8, 0x10, 0x0b, 0x3e, 0xb4, 0x7a, 0xb5, 0x70, 0xe7, 0xa5, 0xd9, 0xb8, 0xe4, 0x51, 0xe5, 0xe2, 0xb9,
     0x47, 0xbf, 0x46, 0xce, 0xdd, 0xbb, 0xc8, 0x18, 0xb6, 0xeb, 0xb0, 0xf2, 0xcd, 0xf0, 0xff, 0xff, 0xff, 0xff};
-
 
 /*
 //gMoveDirectionLut
@@ -230,7 +229,7 @@ void sub_80005A8(u16 scanline)
 }
 
 // VBlankIntr
-void sub_800065C(void)
+void VBlankIntr(void)
 {
 
     switch (gUnk_0300259C)
@@ -829,20 +828,20 @@ void sub_8001128(void)
 
 void sub_80011F0(void)
 {
-    u16 key;
+    u16 keyInput;
 
-    key = ~REG_KEYINPUT;
-    gUnk_03001CA0 = key & ~gUnk_030019B0;
-    gUnk_030019B0 = key;
+    keyInput = ~REG_KEYINPUT;
+    gNewKeysRaw = keyInput & ~gHeldKeysRaw;
+    gHeldKeysRaw = keyInput;
 }
 
-void sub_800121C(void)
+void ReadKeys(void)
 {
-    u16 key;
+    u16 keyInput;
 
-    key = ~REG_KEYINPUT;
-    gUnk_03001CA0 = key & ~gUnk_030019B0;
-    gUnk_030019B0 = key;
+    keyInput = ~REG_KEYINPUT;
+    gNewKeysRaw = keyInput & ~gHeldKeysRaw;
+    gHeldKeysRaw = keyInput;
 }
 
 void DummyIntr3() { }
@@ -1385,7 +1384,7 @@ void sub_8001D08(void)
     else
     {
         gUnk_030025D8 = 1;
-        if (gUnk_030025F0 && (gUnk_0300465C & 0x80) == 0 && !gUnk_03004840 && (gUnk_03001CA0 & 0x30F) != 0)
+        if (gUnk_030025F0 && (gUnk_0300465C & 0x80) == 0 && !gUnk_03004840 && (gNewKeysRaw & 0x30F) != 0)
         {
             sub_8052728(1);
             gMainGameState = 0xB;
@@ -1394,7 +1393,7 @@ void sub_8001D08(void)
         }
     }
 
-    if ((gUnk_030019B0 & DPAD_ANY) == DPAD_ANY)
+    if ((gHeldKeysRaw & DPAD_ANY) == DPAD_ANY)
     {
         //Reset Game
         sub_8052728(1);
@@ -1409,8 +1408,8 @@ void sub_8001D08(void)
             if (gUnk_03002C50 != 0)
             {
                 gUnk_03002C50--;
-                gUnk_03001CA0 = 0;
-                gUnk_030019B0 = 0;
+                gNewKeysRaw = 0;
+                gHeldKeysRaw = 0;
             }
 
             if (gUnk_03003480 != 0xFF)
@@ -1420,7 +1419,7 @@ void sub_8001D08(void)
             }
             else
             {
-                if (gUnk_03001CA0 & A_BUTTON)
+                if (gNewKeysRaw & A_BUTTON)
                 {
                     val = sub_8003F40();
                     if (val != 0)
@@ -1428,7 +1427,7 @@ void sub_8001D08(void)
                         sub_80526A0(val - 1, 2);
                     }
                 }
-                else if (gUnk_03001CA0 & B_BUTTON)
+                else if (gNewKeysRaw & B_BUTTON)
                 {
                     sub_800ACC8();
                 }
@@ -1453,22 +1452,22 @@ void sub_8001D08(void)
                         return;
                     }
 
-                    if (gUnk_030019B0 & DPAD_UP)
+                    if (gHeldKeysRaw & DPAD_UP)
                     {
                         idx = 1;
                         gUnk_03002E80[0].field_12 |= 0x40;
                     }
-                    else if (gUnk_030019B0 & DPAD_DOWN)
+                    else if (gHeldKeysRaw & DPAD_DOWN)
                     {
                         idx = 2;
                         gUnk_03002E80[0].field_12 |= 0x40;
                     }
-                    if (gUnk_030019B0 & DPAD_LEFT)
+                    if (gHeldKeysRaw & DPAD_LEFT)
                     {
                         idx |= 4;
                         gUnk_03002E80[0].field_12 |= 0x40;
                     }
-                    else if (gUnk_030019B0 & DPAD_RIGHT)
+                    else if (gHeldKeysRaw & DPAD_RIGHT)
                     {
                         idx |= 8;
                         gUnk_03002E80[0].field_12 |= 0x40;
@@ -1659,7 +1658,8 @@ void sub_8002154(void)
                         gRenderObjects[ptr03002E80->field_18].subObject = 0;
                         ptr03002E80->field_18 = 0;
                     }
-                    if (sub_800243C(ptr03002E80->x, ptr03002E80->y, ptr03002E80->renderObjIdx, ptr03002E80->field_1A, ptr03002E80->field_1))
+                    if (sub_800243C(ptr03002E80->x, ptr03002E80->y, ptr03002E80->renderObjIdx, ptr03002E80->field_1A,
+                                    ptr03002E80->field_1))
                     {
                         ptr03002E80->field_12 |= 8;
                     }
@@ -1731,10 +1731,448 @@ void sub_8002380(u8 arg0)
     }
 }
 INCLUDE_ASM("asm/matchings", sub_800243C);
+/*
+
+
+extern u16 gUnk_03004800[];
+
+// extern u16 gUnk_0300484C;
+// extern u16 gUnk_03004648;
+extern s16 gUnk_0300484C;
+extern s16 gUnk_03004648;
+
+
+extern u8 gUnk_030025BC;
+extern u8 gUnk_03002C30;
+
+extern s16 gCameraX; // gUnk_030025B4;
+extern s16 gCameraY; //gUnk_030025FC
+
+extern  u8 arr_gUnk_08058834[];
+extern u8 gUnk_08058834[];
+
+extern struct RenderObject* gUnk_03002C80[128];
+
+u8 sub_800243C(s16 x, s16 y, u8 arg2, s16 z, u8 arg4) {
+    struct RenderObject* obj;
+    u8 num;
+    s16 screenX, screenY;
+    s16 offsetX, offsetY;
+    u8 updateFlag;
+    s16 i;
+    updateFlag = 0;
+    
+    obj = &gRenderObjects[arg2];
+    obj->x = x;
+    obj->y = y;
+
+    num = obj->field_0 & 0x7F;
+
+    if(!(arg4 & 0x81) && (obj->animFrame == 0 || obj->animFrame == 2))
+    {
+        z++;
+    }
+    
+    if (gUnk_03004800[0] & 1) {
+        screenX = x - ((gCameraX & ~0xF) + gUnk_0300484C);
+    } else {
+        screenX = x - gCameraX;
+    }
+    
+    if (gUnk_03004800[0] & 2) 
+    {
+        screenY = y - ((gCameraY & ~0xF) + gUnk_03004648) - 4 - z;
+    } else {
+        screenY = y - gCameraY - 4 - z;
+    }
+
+    while(num != 0)
+    {
+        gUnk_030025BC = gUnk_08058834[ ((obj->attr0 >> 11) & 0x18) + ((obj->attr1 >> 13) & 6)];
+        gUnk_03002C30 = gUnk_08058834[ ((obj->attr0 >> 11) & 0x18) + ((obj->attr1 >> 13) & 6) + 1];
+
+
+        if(obj->field_10 > 256)
+        {
+            offsetX = obj->field_10 - 511;
+        }
+        else
+        {
+            offsetX = obj->field_10;
+        }
+        
+        if(obj->field_12 > 128)
+        {
+            offsetY = obj->field_12 - 255;
+        }
+        else
+        {
+            offsetY = obj->field_12;
+        }
+
+        if((x + gUnk_030025BC + offsetX) >= gCameraX && (x +  offsetX) <= gCameraX + 240
+              && (y + gUnk_03002C30 + offsetY - z - 4) >= gCameraY && (y +  offsetY - z - 4) <= gCameraY + 160)
+        {
+            obj->field_0 &= ~0x80;
+            obj->attr0 = (obj->attr0 & 0xFF00) + ((screenY + offsetY) & 0xFF);
+            obj->attr1 = (obj->attr1 & 0xFE00) + ((screenX + offsetX) & 0x1FF);
+            updateFlag = 1;
+        }
+        else
+        {
+            obj->field_0 |= 0x80;
+        }
+
+
+        obj = obj->subObject;
+        
+        num--;
+    }
+
+    if(updateFlag != 0)
+    {
+        struct RenderObject* r5;
+        struct RenderObject* r1;
+        struct RenderObject* r2;
+        i = 0;
+
+        while(i < 128)
+        {
+            r1 = gUnk_03002C80[i];
+
+            if(r1 == 0)
+            {
+                gUnk_03002C80[i] = &gRenderObjects[arg2];
+                break;
+            }
+
+            if((u16)r1->y < y)
+            {
+                s16 j;
+                r2 = r1;
+                gUnk_03002C80[i] = &gRenderObjects[arg2];
+                // i++;
+
+                j = i + 1; 
+                while(j < 128)
+                {
+                    r1 = gUnk_03002C80[j];
+                    gUnk_03002C80[j] = r2;
+                    r2 = r1;
+                    if(r2 == 0)
+                        break;
+                    j++;
+                }
+                    
+                
+                return 0;
+            }
+        
+            i++;
+        }
+        return 0;
+    }
+    return 1;
+}
+
+*/
 INCLUDE_ASM("asm/nonmatchings", sub_800271C);
+/*
+
+u8 gUnk_0805882C[] = {0, 1, 2, 1, 0, 1, 0, 1};
+u8 gUnk_08058864[] = {2, 3, 3, 3, 0, 1, 1, 1, 1, 2, 2, 2, 3, 0, 0, 0, 0};
+
+
+void sub_800271C(u8 arg0)
+{
+    CharacterObject *chara;
+    struct RenderObject *renderObj;
+    u16 var0;
+    u8 var1;
+    u8 var2;
+    u32 var_r9;
+
+    chara = &gUnk_03002E80[arg0];
+
+    if ((chara->field_1 & 1) == 0)
+    {
+        if(!(chara->field_12 & 4))
+        {
+            if(chara->field_11 == 0)
+            {
+                chara->moveAnimTimer++;
+            }
+        }
+
+        chara->moveAnimTimer &= 0x1F;
+
+        var0 = chara->paletteIdx ;
+        var0 <<= 12;
+
+        renderObj = &gRenderObjects[chara->renderObjIdx];
+
+        if ((chara->field_1 & 0x7C) == 0)
+        {
+            renderObj->animFrame = chara->moveAnimTimer >> 3;
+
+            var_r9 = gUnk_0805882C[renderObj->animFrame] * 6;
+
+            var2 = var1 = gUnk_08058864[chara->facingDir];
+
+            if (var2 == 3)
+            {
+                var1 = 1;
+                renderObj->attr1 |= 0x1000;
+            }
+            else
+            {
+                renderObj->attr1 &= ~0x1000;
+            }
+            renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((var1*18 + var_r9 + chara->field_2 * 72 + 0xA0) & 0x3FF)) | var0;
+
+            renderObj = renderObj->subObject;
+            if(renderObj)
+            {
+                if(var2 == 3)
+                {
+                    renderObj->attr1 |= 0x1000;
+                }
+                else
+                {
+                    renderObj->attr1 &= ~0x1000;
+                }
+                renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((var1*18 + var_r9 + chara->field_2 * 72 + 0xA4) & 0x3FF)) | var0;
+            }
+
+        }
+        else if ((chara->field_1 & 4) == 0)
+        {
+            if ((chara->field_1 & 0x10) == 0)
+            {
+                if ((chara->field_1 & 0x20) )
+                {
+                    if (chara->facingDir != 0)
+                    {
+                        renderObj->attr0 = (renderObj->attr0 & 0xFC00) + ((chara->field_2 * 72 + 0xB0) & 0x3FF);
+                    }
+                    else
+                    {
+                        renderObj->attr0 = (renderObj->attr0 & 0xFC00) + ((chara->field_2 * 72 + 0xC0) & 0x3FF);
+                    }
+
+                    renderObj = renderObj->subObject;
+                    renderObj->attr2 = (renderObj->attr2 & 0xFC00) + ((chara->field_2 * 72 + 0xA0) & 0x3FF);
+                }
+            }
+            else
+            {
+                renderObj->animFrame = chara->moveAnimTimer >> 3;
+                var1 = gUnk_08058864[chara->facingDir];
+                
+                if (var1 == 1)
+                {
+                    renderObj->attr1 |= 0x1000;
+                }
+                else
+                {
+                    renderObj->attr1 &= ~0x1000;
+                }
+            renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((chara->field_2 * 72 + 0xA0) & 0x3FF)) | var0;
+            }
+        }
+        else if ((chara->field_1 & 8) == 0)
+        {
+            
+            renderObj->animFrame = 0;
+            var2 =(chara->moveAnimTimer >> 3) & 3;
+            var1 = gUnk_08058864[chara->facingDir + 8];
+            
+            if (var1 & 1)
+            {
+                var_r9 = 0x20;
+            }
+            else
+            {
+                var_r9 = gUnk_0805882C[var2 + 4] << 4;
+            }
+
+            if (var1 & 2)
+            {
+                renderObj->attr1 |= 0x1000;
+            }
+            else
+            {
+                renderObj->attr1 &= ~0x1000;
+            }
+
+            renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((chara->field_2 * 72 +var_r9 + 0xA0) & 0x3FF)) | var0;
+        }
+        else
+        {
+            renderObj->animFrame = 0;
+            var2 = (chara->moveAnimTimer >> 3) & 3;
+            var_r9 = gUnk_0805882C[var2] * 16;
+            renderObj->attr1 &= ~0x1000;
+            renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((chara->field_2 * 72 +var_r9 + 0xA0) & 0x3FF)) | var0;
+        }
+        return;
+    }
+
+    sub_80029D8(arg0);
+}
+
+
+*/
 
 INCLUDE_ASM("asm/nonmatchings", sub_80029D8);
-INCLUDE_ASM("asm/nonmatchings", sub_8002B54);
+
+
+INCLUDE_ASM("asm/matchings", sub_8002B54);
+
+/*
+extern u8 gUnk_03003490[];
+extern s8 gUnk_0805887C[];
+
+extern u32 gVramBufferPointers[];
+extern s8 gUnk_08058834[];
+
+extern u8 gSpriteWidth;
+extern u8 gSpriteHeight;
+
+const u8 gSpriteTileCount[4][4] = {
+    // Size:   0,  1,  2,  3
+    [0] = {    1,  4, 16, 64 }, // Shape 0: Square (8x8, 16x16, 32x32, 64x64)
+    [1] = {    2,  4,  8, 32 }, // Shape 1: Horizontal (16x8, 32x8, 32x16, 64x32)
+    [2] = {    2,  4,  8, 32 }, // Shape 2: Vertical (8x16, 8x32, 16x32, 32x64)
+    [3] = {   99, 99, 99, 99 }  // Shape 3: Prohibited/Invalid
+};
+
+// 命名为：Sprite占用Tile数量查找表
+const u8 gSpriteTileCountTable[] = {
+    1, 4, 16, 64,  // Square: 8x8, 16x16, 32x32, 64x64
+    2, 4,  8, 32,  // Horizontal: 16x8, 32x8, 32x16, 64x32
+    2, 4,  8, 32,  // Vertical: 8x16, 8x32, 16x32, 32x64
+    99, 99, 99, 99 // Invalid/Prohibited Shape
+};
+
+
+const u8 gSpriteDimensionsTable[] = {
+    8, 8, 16, 16, 32, 32, 64, 64, // Shape 0: Square
+    16, 8, 32, 8, 32, 16, 64, 32, // Shape 1: Horizontal
+    8, 16, 8, 32, 16, 32, 32, 64, // Shape 2: Vertical
+    0, 0, 0, 0, 0, 0, 0, 0        // Shape 3: Invalid
+};
+
+void sub_8004B2C(u16 id, void* src, void* dest, u8 arg3);
+
+
+//00 00   idx
+//02 00   num
+
+//DF 80 F4 81 00 00 DF 80 04 40 08 00
+//SpriteOamAttr[num]
+
+void sub_8002B54(u8 arg0, u8 *arg1) {
+    Unk_03002E80 *ptr2E80;
+    struct RenderObject *renderObj;
+    struct RenderObject *subObj;
+
+    u16 vramOffset;
+    u8 oamDataOffset;
+    u16 val_r8;
+    u8 num;
+    u8* oamDataPtr;
+
+    u8 tileCount;
+    u16 dmaSlotId;
+    u8* src;
+    u8* dest;
+
+    u8 val_r4_1;
+
+    u16 attr0;
+    u16 attr1;
+    u16 attr2;
+    s16 x;
+    
+    ptr2E80 = &gUnk_03002E80[arg0];
+
+    if(arg0 <= 0x12)
+    {
+        vramOffset = 0x800;
+        if (gMainGameState == 0xB) 
+        {
+            vramOffset = 0x400;
+        }
+    }
+    else
+    {
+        vramOffset = 0;
+    }
+
+    oamDataOffset = arg1[0] * 6 + 4;
+    num = arg1[2];
+
+    ptr2E80->renderObjIdx = sub_8004BFC();
+    renderObj = &gRenderObjects[ptr2E80->renderObjIdx];
+
+    val_r8 = gUnk_03003490[ptr2E80->field_16] * 72 + 160;
+
+    oamDataPtr = &arg1[oamDataOffset];
+
+    while(num != 0)
+    {
+
+        tileCount = gSpriteTileCountTable[(oamDataPtr[1] >> 6) * 4 + (oamDataPtr[3] >> 6)];
+
+        val_r4_1 = oamDataPtr[4];
+        dmaSlotId = sub_8004A44();
+        
+        src = (u8*) gVramBufferPointers[ptr2E80->field_16] + (val_r4_1 << 5);
+        dest = (u8*)0x06010000 + (val_r8 << 5);
+        sub_8004B2C(dmaSlotId, src, dest, tileCount);
+
+        attr0 = oamDataPtr[0] | (oamDataPtr[1] << 8);
+
+        if ((gUnk_03002C60[ptr2E80->field_16] & 0x40) != 0) 
+        {
+            attr1 = (oamDataPtr[2] + (oamDataPtr[3] << 8)) | 0x1000;
+        }
+        else
+        {
+            attr1 = (oamDataPtr[2] + (oamDataPtr[3] << 8));
+            renderObj->field_10 = attr1 & 0x1FF;
+        }
+        renderObj->field_12 = attr0 & 0xFF;
+
+        attr2 = ((oamDataPtr[5] << 8) & ~0xFFF) + (vramOffset +(gUnk_03003490[ptr2E80->field_16] << 12) +  val_r8);
+
+        subObj = sub_8004C28(renderObj, num, attr0, attr1, attr2);
+        
+        if ((gUnk_03002C60[ptr2E80->field_16] & 0x40) != 0) 
+        {
+
+            gSpriteWidth = gSpriteDimensionsTable[ ((renderObj->attr0 >> 11) & 0x18) + ((renderObj->attr1 >> 13) & 6)];
+
+            gSpriteHeight = gSpriteDimensionsTable[ ((renderObj->attr0 >> 11) & 0x18) + ((renderObj->attr1 >> 13) & 6) + 1];
+
+            x = (~(attr1 & 0x1FF) - gSpriteWidth) & 0x1FF;
+            renderObj->field_10 = x;
+        }
+        if (renderObj->field_10 > 0xFF)
+        {
+            renderObj->field_10--;
+        }
+        renderObj = subObj;
+
+        oamDataPtr += 6;
+        val_r8 += tileCount;
+
+        num--;
+    }
+}
+
+*/
 
 // UpdateEncounter
 u8 sub_8002D54(void)
@@ -1744,7 +2182,7 @@ u8 sub_8002D54(void)
     if (gUnk_03004820 == 0)
         return 0;
 
-    if (gUnk_030019B0 & DPAD_ANY)
+    if (gHeldKeysRaw & DPAD_ANY)
     {
         if (sub_8001030(0xBB) == 0)
         {
@@ -1857,7 +2295,7 @@ extern u8 tileset_2_08057EEC[];
 extern u8 tileset_3_080583C4[];
 #define GET_PLTT(n)    ((n) + 0)
 #define GET_TILEMAP(n) ((n) + 32)
-// INCLUDE_ASM("asm/nonmatchings", sub_8002F6C); //Matched
+// INCLUDE_ASM("asm/matchings", sub_8002F6C);
 
 void sub_8002F6C(void)
 {
@@ -1896,7 +2334,7 @@ void sub_8002F6C(void)
 
 void sub_8003088(void)
 {
-    sub_800121C();
+    ReadKeys();
     sub_8004BE0();
     gUnk_087E83F8[gMainGameState]();
 }
@@ -1929,7 +2367,7 @@ void sub_8003128(void)
 {
     if (!(0x80 & gUnk_0300465C) && (gUnk_03004840 == 0))
     {
-        sub_8008254(gUnk_03001CA0);
+        sub_8008254(gNewKeysRaw);
     }
     sub_80081C0();
     sub_800445C();
@@ -2015,8 +2453,54 @@ void sub_8003264()
     }
 }
 
-// http://localhost/scratch/IeynD
 INCLUDE_ASM("asm/matchings", sub_80032BC);
+
+/*
+extern struct RenderObject* gUnk_03002C80[128];
+
+struct RenderObject* sub_8004F64(u16*, struct RenderObject*) ;
+
+void sub_80032BC(void) {
+    u16 i;
+    struct RenderObject* ptr03002C80;
+    u8 val;
+    u16 index;
+
+    index = 0;
+
+    for(i = 0; i < 128; i++)
+    {
+        ptr03002C80 = gUnk_03002C80[i];
+        if(ptr03002C80 == 0)
+            continue;
+
+        val = ptr03002C80->field_0 & 0x7F;
+        if(val)
+        {
+            while(val--)
+            {
+                if(val == 0xFF)
+                    break;
+                ptr03002C80 = sub_8004F64(&index, ptr03002C80);
+                if (ptr03002C80 == 0)
+                    break;
+            }
+        }
+
+        if(index > 0x7F)
+            return;
+    }
+
+    while(index < 128)
+    {
+        gOamBuffer[index].attrs[0] = 0xA0;
+        gOamBuffer[index].attrs[1] = 0;
+        index++;
+    }
+
+}
+
+*/
 
 void sub_8003348(void)
 {
@@ -2092,7 +2576,7 @@ void sub_800375C(u8 arg0)
         ptr3150->field_18 = 0;
         ptr3150->field_19 = 0;
         ptr3150->field_14 = 0;
-        ptr3150->vramBufferIdx = 0xFF;
+        ptr3150->animIdx = 0xFF;
     }
 }
 
@@ -2212,22 +2696,23 @@ INCLUDE_ASM("asm/matchings", sub_80038CC);
 //     gUnk_030032D0 = 0;
 // }
 INCLUDE_ASM("asm/nonmatchings", sub_8003958);
-void sub_8003B08(u16 arg0) {
+void sub_8003B08(u16 arg0)
+{
     u8 var_r5;
-    u8* temp_r2;
-    CharacterObject* chara;
+    u8 *temp_r2;
+    CharacterObject *chara;
     u8 cmd;
 
     chara = &gUnk_03002E80[arg0];
-    
-    if(chara->field_24 != 0)
+
+    if (chara->field_24 != 0)
     {
         var_r5 = 0;
-        while(var_r5 == 0)
+        while (var_r5 == 0)
         {
             temp_r2 = chara->field_24 + chara->field_17;
             cmd = *temp_r2++;
-            switch(cmd)
+            switch (cmd)
             {
                 case 0xFE:
                     chara->field_17 = 0;
@@ -2256,36 +2741,34 @@ void sub_8003B08(u16 arg0) {
                     chara->field_11 = temp_r2[1];
                     var_r5++;
                     break;
-                    
+
                 case 2:
-                    chara->field_12 |=  0x10;
+                    chara->field_12 |= 0x10;
                     chara->field_17 += 4;
 
                     chara->field_E = *temp_r2++;
                     chara->field_E &= 7;
-                    
+
                     chara->field_F = temp_r2[0];
                     chara->field_10 = temp_r2[1] + 1;
                     return;
-                
+
                 default:
                     chara->field_17 += 4;
-                    chara->field_E = temp_r2[0] ;
+                    chara->field_E = temp_r2[0];
                     temp_r2++;
                     chara->field_F = temp_r2[0];
                     chara->field_10 = temp_r2[1] + 1;
                     var_r5++;
-                break;
-                    
+                    break;
             }
             chara->field_E &= 7;
             chara->facingDir = chara->field_E;
         }
         return;
     }
-    
 
-    if(gUnk_030025D8 == 0)
+    if (gUnk_030025D8 == 0)
     {
         switch ((sub_8000FF8() & 7))
         {
@@ -2305,7 +2788,7 @@ void sub_8003B08(u16 arg0) {
             case 7:
                 break;
         }
-        
+
         chara->field_E &= 7;
         chara->facingDir = chara->field_E;
     }
@@ -2313,10 +2796,100 @@ void sub_8003B08(u16 arg0) {
 INCLUDE_ASM("asm/nonmatchings", sub_8003C54);
 INCLUDE_ASM("asm/nonmatchings", sub_8003F40);
 INCLUDE_ASM("asm/nonmatchings", sub_80040E4);
-INCLUDE_ASM("asm/nonmatchings", sub_8004358);
-INCLUDE_ASM("asm/nonmatchings", sub_80043D4);
-INCLUDE_ASM("asm/nonmatchings", sub_800445C);
-INCLUDE_ASM("asm/nonmatchings", sub_80046DC);
+INCLUDE_ASM("asm/matchings", sub_8004358);
+
+// void sub_8004358(void) {
+//     u16 i;
+
+//     if(!(gUnk_03002C44 & 1))
+//     {
+//         for(i = 0; i < 8; i++)
+//         {
+//             gUnk_030025C0[i] = gUnk_03002E80[0].x;
+//             gUnk_030025E0[i] = gUnk_03002E80[0].y;
+//             gUnk_03002C58[i] = gUnk_03002E80[0].facingDir & 7;
+//         }
+
+//         gUnk_03002E80[1].x = gUnk_03002E80[0].x;
+//         gUnk_03002E80[1].y = gUnk_03002E80[0].y;
+//         gUnk_03002E80[1].facingDir = gUnk_03002E80[0].facingDir & 7;
+//     }
+// }
+
+INCLUDE_ASM("asm/matchings", sub_80043D4);
+
+// void sub_80043D4(void) {
+//     u16 i;
+
+//     for(i = 0; i < 8; i++)
+//     {
+//         gUnk_030025C0[i] = gUnk_03002E80[0].x;
+//         gUnk_030025E0[i] = gUnk_03002E80[0].y;
+//         gUnk_03002C58[i] = gUnk_03002E80[0].facingDir;
+//     }
+
+//     gUnk_03002E80[1].x = gUnk_030025C0[7];
+//     gUnk_03002E80[1].y = gUnk_030025E0[7];
+//     gUnk_03002E80[1].facingDir = gUnk_03002C58[7];
+//     gUnk_03002C44 &= 0x80;
+// }
+INCLUDE_ASM("asm/matchings", sub_800445C);
+
+INCLUDE_ASM("asm/matchings", sub_80046DC);
+/*
+
+typedef struct{
+    u16 field_0;
+    u16 field_2;
+    u8 field_4;
+    u8 field_5;
+    u16 field_6;
+}Unk_0805888C;
+
+extern Unk_0805888C gUnk_0805888C[];
+extern u32 gUnk_087E860C[];
+extern u8 gUnk_0838EEF4[];
+
+extern u8* gUnk_087E8D84[];
+
+extern u32 gUnk_030044C0[];
+extern u32 gUnk_03003250[];
+extern u8 gUnk_03002C60[];
+extern u8 gUnk_03003490[];
+extern u8* gUnk_030032E0[];
+
+#define VRAM_BASE  ((u8*)0x02020000)
+#define VRAM_STRIDE 0x1000
+
+void sub_80046DC(u16 arg0, u8 arg1, u8 arg2) {
+    u8 a;
+    u8 b;
+
+    gUnk_030044C0[arg1] = gUnk_087E860C[gUnk_0805888C[arg0].field_0];
+    gUnk_03003250[arg1] = (u32)(VRAM_BASE + arg1 * VRAM_STRIDE);
+
+    if(arg2 > 99)
+    {
+        a = 0x40;
+        b = arg2 - 100;
+    }
+    else
+    {
+        a = 0;
+        b = arg2;
+    }
+
+    gUnk_03002C60[arg1] = a | gUnk_0805888C[arg0].field_5;
+    gUnk_03003490[arg1] = b;
+
+    gUnk_030032E0[arg1] = &gUnk_0838EEF4[gUnk_0805888C[arg0].field_4 * 32];
+    LZ77UnCompWram(gUnk_087E8D84[gUnk_0805888C[arg0].field_2], (u32)(VRAM_BASE + arg1 * VRAM_STRIDE));
+
+}
+
+
+*/
+
 INCLUDE_ASM("asm/nonmatchings", sub_800478C);
 
 INCLUDE_ASM("asm/matchings", sub_8004980);
@@ -2363,7 +2936,7 @@ void sub_80049C8(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8004A00);
+INCLUDE_ASM("asm/matchings", sub_8004A00);
 // void sub_8004A00(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 // {
 //     s16 val;
@@ -2458,7 +3031,7 @@ void sub_8004ADC(void)
     }
 }
 
-void sub_8004B2C(u16 arg0, void* arg1, void* arg2, u8 arg3)
+void sub_8004B2C(u16 arg0, void *arg1, void *arg2, u8 arg3)
 {
 
     if (arg0 < 32)
@@ -2653,7 +3226,7 @@ void sub_8004D38(u8 arg0)
 
     ptr2E80->renderObjIdx = 0;
 }
-void sub_8004D8C(u8 arg0, u8* arg1)
+void sub_8004D8C(u8 arg0, u8 *arg1)
 {
     CharacterObject *ptr2E80;
     ptr2E80 = &gUnk_03002E80[arg0];
@@ -2800,7 +3373,7 @@ void sub_8004FA8(u8 arg0, u8 arg1)
     ptr2E80 = &gUnk_03002E80[arg0];
     ptr2E80->field_1 |= 1;
     ptr2E80->field_14 = 0;
-    ptr2E80->vramBufferIdx = arg1;
+    ptr2E80->animIdx = arg1;
 }
 s32 sub_8004FD0(u8 arg0)
 {
@@ -2810,7 +3383,7 @@ s32 sub_8004FD0(u8 arg0)
     {
         ptr = &gUnk_03002E80[arg0];
 
-        gUnk_03002C60[ptr->vramBufferIdx] &= 0x7F;
+        gUnk_03002C60[ptr->animIdx] &= 0x7F;
 
         if (ptr->field_14 > 0xFE)
             return 1;
@@ -2966,33 +3539,71 @@ INCLUDE_ASM("asm/matchings", sub_800729C);
 //     }
 // }
 INCLUDE_ASM("asm/nonmatchings", sub_8007350);
-INCLUDE_ASM("asm/nonmatchings", sub_8007964);
-u8* sub_80079BC(u16 arg0, u8* arg1) {
+u8 *sub_8007964(u16 arg0, u8 *arg1)
+{
     u32 temp_r0;
 
-    Unk_030046A0* ptr46A0;
-    
+    Unk_030046A0 *ptr46A0;
+
     ptr46A0 = &gUnk_030046A0[arg0];
 
     ptr46A0->field_0 = (arg1[0] & 1) + 1;
     ptr46A0->field_3 = arg1[1];
-    arg1+= 2;
-    
+    arg1 += 2;
+
     ptr46A0->field_1 = *arg1;
     arg1++;
-    
+
     ptr46A0->field_2 = *arg1;
     arg1++;
 
     ptr46A0->field_6 = *arg1;
     arg1++;
-    
+
     ptr46A0->field_7 = *arg1;
     arg1++;
     ptr46A0->field_8 = *arg1;
-    arg1++; 
+    arg1++;
     ptr46A0->field_9 = *arg1;
-    arg1++;  
+    arg1++;
+
+    ptr46A0->field_A = 0;
+    ptr46A0->field_C = arg1;
+
+    temp_r0 = ptr46A0->field_8 * ptr46A0->field_9 * ptr46A0->field_1;
+    temp_r0 *= 2;
+
+    arg1 += temp_r0;
+
+    return arg1;
+}
+u8 *sub_80079BC(u16 arg0, u8 *arg1)
+{
+    u32 temp_r0;
+
+    Unk_030046A0 *ptr46A0;
+
+    ptr46A0 = &gUnk_030046A0[arg0];
+
+    ptr46A0->field_0 = (arg1[0] & 1) + 1;
+    ptr46A0->field_3 = arg1[1];
+    arg1 += 2;
+
+    ptr46A0->field_1 = *arg1;
+    arg1++;
+
+    ptr46A0->field_2 = *arg1;
+    arg1++;
+
+    ptr46A0->field_6 = *arg1;
+    arg1++;
+
+    ptr46A0->field_7 = *arg1;
+    arg1++;
+    ptr46A0->field_8 = *arg1;
+    arg1++;
+    ptr46A0->field_9 = *arg1;
+    arg1++;
 
     ptr46A0->field_A = (ptr46A0->field_1 << ptr46A0->field_2) - 2;
     ptr46A0->field_C = arg1;
@@ -3076,21 +3687,22 @@ void sub_8007D5C(u8 arg0) {
 */
 INCLUDE_ASM("asm/nonmatchings", sub_8007FB8);
 INCLUDE_ASM("asm/nonmatchings", sub_8008124);
-void sub_80081C0(void) {
-    
-    if(gUnk_0300000A[1] != 0)
+void sub_80081C0(void)
+{
+
+    if (gUnk_0300000A[1] != 0)
     {
         sub_800243C(0xb0, 0x18, gUnk_0300000A[1], 0, 1);
         sub_800243C(0xD0, 0x30, gUnk_0300000A[0], 0, 1);
         return;
     }
 
-    if(gUnk_0300000A[0] != 0)
+    if (gUnk_0300000A[0] != 0)
     {
-        if(gUnk_03000008 == 0)
+        if (gUnk_03000008 == 0)
         {
             gUnk_0300000C++;
-            if(gUnk_0300000C == 0xC0)
+            if (gUnk_0300000C == 0xC0)
             {
                 gUnk_03000008 = 1;
             }
@@ -3098,12 +3710,12 @@ void sub_80081C0(void) {
         else
         {
             gUnk_0300000C--;
-            if(gUnk_0300000C == 0)
+            if (gUnk_0300000C == 0)
             {
                 gUnk_03000008 = 0;
             }
         }
-        
+
         sub_800243C(0x68, 0x30, gUnk_0300000A[0], (gUnk_0300000C >> 6) + 0x10, 1);
     }
 }
@@ -3111,8 +3723,39 @@ INCLUDE_ASM("asm/nonmatchings", sub_8008254);
 INCLUDE_ASM("asm/nonmatchings", sub_8008620);
 INCLUDE_ASM("asm/nonmatchings", sub_80086FC);
 INCLUDE_ASM("asm/nonmatchings", sub_8008788);
-INCLUDE_ASM("asm/nonmatchings", sub_80088B4);
-INCLUDE_ASM("asm/nonmatchings", sub_80088F4);
+
+
+void sub_80088B4(u16 arg0, s16 arg1, s16 arg2) {
+    gUnk_03004834 = arg2;
+    gUnk_030047F0 = arg1;
+
+    if( arg1 < 0)
+    {
+        gUnk_030047A8 = 0x1B0;
+    }
+    else
+    {
+        gUnk_030047A8 = 0;
+    }
+
+    gUnk_0300465C = arg0;
+}
+
+void sub_80088F4(void) {
+    if ((u32) *(u16* )0x0300467C <= 0xFCU) {
+        *(s32* )0x03004620 = 0x02006000;
+        *(s32* )0x0300482C = 0x02001000;
+        *(s32* )0x03004690 = 0x02001800;
+        *(s32* )0x030047E8 = 0x02001C00;
+        sub_80052F8();
+        *(s32* )0x03004620 = 0x0200E000;
+        *(s32* )0x0300482C = 0x02003000;
+        *(s32* )0x03004690 = 0x02003800;
+        *(s32* )0x030047E8 = 0x02003C00;
+        sub_80052F8();
+    }
+}
+
 INCLUDE_ASM("asm/nonmatchings", sub_8008978);
 void sub_80089E0(u16 arg0)
 {
@@ -3176,7 +3819,34 @@ void sub_8008A80(u8 arg0)
 
     nullsub_5();
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8008B14);
+INCLUDE_ASM("asm/matchings", sub_8008B14);
+/*
+typedef struct{
+    u8 field_0;
+    u8 field_1;
+    u8 field_2;
+    u8 field_3;
+}Unk_08089BC4;
+extern Unk_08089BC4 gUnk_08089BC4[];
+
+extern u16 gUnk_03004650; // 0x03004650
+extern u16 gUnk_0300464C; // 0x0300464C
+extern u16 gUnk_030047C4; // 0x030047C4
+extern u16 gUnk_030047EC; // 0x030047EC
+
+void sub_8008B14(u16 arg0) {
+
+    gUnk_03004650 = gUnk_08089BC4[arg0].field_0 << 6;
+
+    gUnk_0300464C = gUnk_08089BC4[arg0].field_1 << 6;
+
+    gUnk_030047C4 = gUnk_03004650 + (gUnk_08089BC4[arg0].field_2 << 6);
+
+    gUnk_030047EC = gUnk_0300464C + (gUnk_08089BC4[arg0].field_3 << 6);
+}
+
+
+*/
 void sub_8008B5C(void)
 {
     // gUnk_03004670.field_0 = gUnk_03004AA0[0];
@@ -3191,7 +3861,31 @@ void sub_8008B5C(void)
     sub_8004C8C(1, 0xBU);
     sub_8004CB8(1, 0xBU);
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8008BA4);
+INCLUDE_ASM("asm/matchings", sub_8008BA4);
+/*
+extern u8* gUnk_087EA1A0[];
+
+void sub_8008BA4(u8 arg0, u8 arg1) {
+    u16 count;
+    u16 end_limit;
+    u8* src;
+    u16 i;
+
+    src = gUnk_087EA1A0[arg0];
+    count = *(u16*)src;
+
+    end_limit = count + arg1;
+    src = src + 2;
+    i = arg1;
+
+    while(i < end_limit)
+    {
+        src = sub_8007964(i, src);
+        i++;
+    }
+}
+
+*/
 
 void sub_8008BE4(u8 arg0)
 {
@@ -3208,8 +3902,42 @@ u8 sub_8008C14(u8 arg0)
     return gUnk_030046A0[arg0].field_0;
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8008C24);
-INCLUDE_ASM("asm/nonmatchings", sub_8008C70);
+void sub_8008C24(u8 arg0) {
+
+    if(!(gUnk_0300467C & 0x80))
+    {
+        if(gUnk_03004670[arg0] != 0xFF)
+        {
+            sub_8004C8C(arg0, gUnk_03004670[arg0]);
+        }
+
+        if(gUnk_030047D0[arg0] != 0xFF)
+        {
+            sub_8004CB8(arg0, gUnk_030047D0[arg0]);
+        }
+    }
+}
+
+void sub_8008C70(void) {
+    u8 i;
+
+    for(i = 0; i < 12; i++)
+    {
+        if(!(gUnk_0300467C & 0x80))
+        {
+            if(gUnk_03004670[i] != 0xFF)
+            {
+                sub_8004C8C(i, gUnk_03004670[i]);
+            }
+            if(gUnk_030047D0[i] != 0xFF)
+            {
+                sub_8004CB8(i, gUnk_030047D0[i]);
+            }
+        }
+    }
+
+}
+
 INCLUDE_ASM("asm/matchings", sub_8008CC0);
 // extern u8 gUnk_08087658[];
 
@@ -3252,13 +3980,14 @@ void sub_8008DD8(void)
     DmaCopy16(3, (void *)0x08087216, (void *)0x05000000, 2);
 }
 
-void sub_8008DF8(u16 arg0, u8* arg1) {
+void sub_8008DF8(u16 arg0, u8 *arg1)
+{
     u16 count;
 
-    count = *(u16*)arg1;
+    count = *(u16 *)arg1;
     arg1 += 2;
 
-    while(count != 0)
+    while (count != 0)
     {
         arg1 = sub_80079BC(arg0, arg1);
 
@@ -3268,23 +3997,24 @@ void sub_8008DF8(u16 arg0, u8* arg1) {
         count--;
     }
 }
-void sub_8008E44(u8 arg0) {
-    u16* dest;
+void sub_8008E44(u8 arg0)
+{
+    u16 *dest;
     u16 i, j;
     u16 val;
 
-    dest = (u16* )0x020053A8;
+    dest = (u16 *)0x020053A8;
 
     val = 32;
-    
-    if(arg0 != 0)
+
+    if (arg0 != 0)
     {
         val = 0;
     }
 
-    for(i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
     {
-        for(j = 0; j < 8; j++)
+        for (j = 0; j < 8; j++)
         {
             *dest = val + 0xA200;
             dest++;
@@ -3531,7 +4261,34 @@ INCLUDE_ASM("asm/nonmatchings", sub_800A1B4);
 INCLUDE_ASM("asm/nonmatchings", sub_800A3C8);
 INCLUDE_ASM("asm/nonmatchings", sub_800A534);
 INCLUDE_ASM("asm/nonmatchings", sub_800A664);
-INCLUDE_ASM("asm/nonmatchings", sub_800A79C);
+
+void sub_800A79C(u8 arg0)
+{
+    Unk_03004AC0 *chara;
+
+    if (arg0 != 0)
+        arg0--;
+    chara = &gUnk_03004AC0[arg0];
+
+    chara->equip_atc = gUnk_03004A90 ;
+    chara->equip_def = gUnk_03004AA8 ;
+    chara->equip_agl = gUnk_03004AB0;
+    chara->equip_men = gUnk_03004A98;
+    chara->equip_res = gUnk_03004A94;
+    chara->equip_noa = gUnk_03004AB4;
+    chara->equip_luc = gUnk_03004AB8;
+
+    chara->equip_atc += gUnk_03004AAC;
+    chara->equip_def += gUnk_03004A80;
+
+    chara->atc = chara->base_atc + chara->equip_atc;
+    chara->def = chara->base_def + chara->equip_def;
+    chara->agl = chara->base_agl + chara->equip_agl;
+    chara->men = chara->base_men + chara->equip_men;
+    chara->res = chara->base_res + chara->equip_res;
+    chara->noa = chara->base_noa + chara->equip_noa;
+    chara->luc = chara->base_luc + chara->equip_luc;
+}
 INCLUDE_ASM("asm/matchings", sub_800A86C);
 // u8 sub_800A86C(s32 value) {
 //     s32 ret;
@@ -3787,7 +4544,26 @@ void sub_800B2D0(void)
         gUnk_03000188[i] = 0;
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_800B314);
+void sub_800B314(void)
+{
+    u8 i;
+
+    if (gUnk_03000185 == 0)
+        return;
+
+    if (gUnk_03000184 == 4) {
+        sub_80165B8();
+        for (i = 0; i < 5; i++) {
+            if (gUnk_03004AA0[i] != 0xFF) {
+                u8 y = i * 5 + 5;
+                sub_80161F4(gUnk_03004AA0[i], y, 5);
+                sub_8016260(gUnk_03004AA0[i], y, 6);
+            }
+        }
+    }
+
+    gUnk_03000185 = 0;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_800B374);
 INCLUDE_ASM("asm/nonmatchings", sub_800BEE4);
 INCLUDE_ASM("asm/matchings", sub_800BF5C);

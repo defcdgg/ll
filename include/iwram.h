@@ -94,6 +94,8 @@ typedef struct
 extern Unk_03000058 gUnk_03000058[];
 extern Unk_03000058 gUnk_030000BC[];
 
+extern u8 gUnk_03000184;
+extern u8 gUnk_03000185;
 extern u8 gUnk_03000186;
 extern u8 gUnk_03000187;
 extern u8 gUnk_03000188[];
@@ -199,7 +201,7 @@ extern u16 gUnk_03001988;
 
 extern struct LzContext gLzContext; // 3001990
 
-extern u16 gUnk_030019B0;
+extern u16 gHeldKeysRaw;
 
 extern u8 gUnk_030019C0[];
 
@@ -210,7 +212,7 @@ extern u8 gUnk_03001B54;
 extern u8 gUnk_03001B60[];
 
 extern u8 gUnk_03001C60[0x40];
-extern u16 gUnk_03001CA0;
+extern u16 gNewKeysRaw;
 extern u32 gUnk_03001CB0;
 
 extern u32 gUnk_03001D30;
@@ -237,13 +239,13 @@ typedef struct
     u8 field_12;
     u8 field_13;
     u16 field_14;
-    u8 vramBufferIdx;
+    u8 animIdx;
     u8 field_17;
     u8 field_18;
     u8 field_19;
     s16 field_1A;
     u8 gap1C[8];
-    u8* field_24;
+    u8 *field_24;
 } CharacterObject;
 
 extern CharacterObject gUnk_03001EE0[];
@@ -274,7 +276,7 @@ extern u8 gUnk_03002C34;
 extern u32 gUnk_03002C38;
 extern u16 gUnk_03002C3C;
 extern s16 gUnk_03002C40;
-extern u8 gUnk_03002C44;
+extern s8 gUnk_03002C44;
 extern u8 gUnk_03002C48;
 extern u16 gUnk_03002C4C;
 extern u8 gUnk_03002C50;
@@ -283,7 +285,6 @@ extern u8 gUnk_03002C60[];
 // extern struct Unk_03003AC0 *gUnk_03002C80[128];
 
 extern CharacterObject gUnk_03002E80[];
-
 
 // extern Unk_03003150 gUnk_03003150;
 // extern Unk_03003150 gUnk_03003178[];
@@ -351,8 +352,8 @@ extern GameOamData gOamBuffer[128];
 
 typedef struct
 {
-    void* src;
-    void* dest;
+    void *src;
+    void *dest;
 } Unk_030039C0;
 
 extern Unk_030039C0 gVramTransferQueue[32];
@@ -442,12 +443,13 @@ typedef struct
     u8 field_8;
     u8 field_9;
     u16 field_A;
-    u8* field_C;
+    u8 *field_C;
 } Unk_030046A0;
 
 extern Unk_030046A0 gUnk_030046A0[];
 
 extern u8 gUnk_030047A4;
+extern u16 gUnk_030047A8;
 extern u16 gUnk_030047B0;
 extern u8 gUnk_030047B4;
 extern u8 gUnk_030047B8;
@@ -460,12 +462,18 @@ extern u8 gUnk_030047D0[];
 
 extern u8 gUnk_030047E4;
 extern u16 gUnk_030047EC;
+extern u16 gUnk_030047F0;
+
+
 
 extern u16 gUnk_03004800[];
 extern u8 gUnk_03004820;
 extern u8 gUnk_03004824;
 
 extern u16 gUnk_03004828;
+
+extern u16 gUnk_03004834;
+
 extern u8 gUnk_0300483C;
 
 extern u8 gUnk_03004840;

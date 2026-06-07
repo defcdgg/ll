@@ -67,9 +67,7 @@ ASFLAGS  := -mcpu=arm7tdmi -mthumb-interwork  -I sound
 CPPFLAGS := -nostdinc -I tools/agbcc/include -iquote include
 CC1FLAGS := -mthumb-interwork -Wimplicit -Wparentheses -O2 -fhex-asm -fprologue-bugfix
 
-DECOMP_TOML := klonoa-eod-decomp.toml
 LDSCRIPT    := linker.ld
-LDSCRIPT_IN := ldscript.in.txt
 
 # LIBS := tools/agbcc/lib/libgcc.a tools/agbcc/lib/libc.a
 LIBPATH := -L $(ROOT_DIR)/tools/agbcc/lib

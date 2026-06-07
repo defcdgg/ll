@@ -1561,7 +1561,22 @@ u16 sub_8052574(void)
 INCLUDE_ASM("asm/nonmatchings", sub_8052580);
 INCLUDE_ASM("asm/nonmatchings", sub_80525E8);
 INCLUDE_ASM("asm/nonmatchings", sub_80526A0);
-INCLUDE_ASM("asm/nonmatchings", sub_8052728);
+
+void sub_8052728(u8 arg0) {
+
+    switch (arg0) {
+        default:
+        case 1:
+            *(u32*)0x03000E6C = 0x02016200;
+            *(u16* )0x03000E70 &= ~1;
+            break;
+        case 3:
+            *(u16* )0x03000E70 &= ~1;
+            break;
+    }
+}
+
+
 INCLUDE_ASM("asm/nonmatchings", sub_8052758);
 INCLUDE_ASM("asm/nonmatchings", sub_8052780);
 INCLUDE_ASM("asm/nonmatchings", sub_80527AC);

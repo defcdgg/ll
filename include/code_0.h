@@ -4,11 +4,9 @@
 #include "gba/types.h"
 #include "iwram.h"
 
-
-
 extern void sub_8000170();
 
-void sub_800065C();
+void VBlankIntr(void);
 
 u8 sub_8000FF8();
 
@@ -17,7 +15,7 @@ void sub_8001014();
 void sub_8001090();
 void sub_800110C();
 void sub_800124C();
-
+void nullsub_5();
 void DummyIntr3();
 void DummyIntr4();
 
@@ -76,7 +74,7 @@ void sub_8004A94(u8, u32, s8, u8);
 void sub_8004AC0();
 void sub_8004ADC();
 
-void sub_8004B2C(u16, void*, void*, u8);
+void sub_8004B2C(u16, void *, void *, u8);
 void sub_8004B60();
 void sub_8004B8C();
 void sub_8004BBC();
@@ -88,7 +86,7 @@ void sub_8004CB8(u8, u16);
 void sub_8004CE8(s8);
 void sub_8004D20(u8, u8, u8);
 void sub_8004D38(u8);
-void sub_8004D8C(u8, u8*);
+void sub_8004D8C(u8, u8 *);
 void sub_8004DA4(u8);
 s32 sub_8004DD0();
 void sub_8004E04();
@@ -117,8 +115,8 @@ void sub_800661C(u8);
 void sub_80071EC();
 void sub_800729C(u8);
 void sub_8007350();
-void sub_8007964();
-u8* sub_80079BC(u16, u8*);
+u8 *sub_8007964(u16, u8 *);
+u8 *sub_80079BC(u16, u8 *);
 void sub_8007A1C(s16);
 s32 sub_8007ADC(s16, s16);
 void sub_8007BD0();
@@ -130,7 +128,7 @@ void sub_8008254(u16);
 void sub_8008620();
 void sub_80086FC();
 void sub_8008788();
-void sub_80088B4();
+void sub_80088B4(u16,s16,s16);
 void sub_80088F4();
 void sub_8008978();
 void sub_80089E0(u16);
@@ -143,14 +141,14 @@ void sub_8008BA4();
 void sub_8008BE4(u8);
 void sub_8008BFC(u8);
 u8 sub_8008C14(u8);
-void sub_8008C24();
+void sub_8008C24(u8);
 void sub_8008C70();
 void sub_8008CC0(u8);
 void sub_8008D18();
 u16 sub_8008D78();
 void sub_8008DCC(u8);
 void sub_8008DD8();
-void sub_8008DF8(u16, u8*);
+void sub_8008DF8(u16, u8 *);
 void sub_8008E44(u8);
 void sub_8008E94();
 void sub_8008F28(u8);

@@ -1,10 +1,10 @@
 #include "global_tables.h"
 #include "code_0.h"
 
-//87E83F0
+// 87E83F0
 const MainTaskFunc gMainTasks[] = {
-    sub_8003088,
-    sub_80177AC,
+    sub_8003088,        //Game Task
+    sub_80177AC,        //Battle Task
 };
 
 const MainTaskFunc gUnk_087E83F8[] = {sub_8001538, sub_8001D08, sub_8001354, sub_80030B0, sub_8001708, sub_8001828, sub_80018D4,

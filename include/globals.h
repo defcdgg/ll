@@ -6,8 +6,4 @@
 #include "iwram.h"
 #include "inline_funcs.h"
 
-
-
-
-
 #endif /* GUARD_GLOBALS_H */

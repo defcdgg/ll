@@ -30,12 +30,9 @@ static inline void SetBgUnknown(u16 *buf, u16 val)
     *buf = val + 0xb240;
 }
 
-
 static inline void CpuCopy(void *src, void *dst, u32 size)
 {
     CpuFastCopy(src, dst, size);
 }
 
 #endif // INLINE_FUNCS_H
-
-

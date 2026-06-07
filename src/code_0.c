@@ -3242,7 +3242,7 @@ void sub_8004DA4(u8 arg0)
     ptr2E80->field_17 = 0;
     ptr2E80->field_11 = 0;
 }
-s32 sub_8004DD0(void)
+u8 sub_8004DD0(void)
 {
     u8 i;
     CharacterObject *ptr2E80;
@@ -4497,7 +4497,19 @@ u8 sub_800AB3C(void)
     }
     return 0;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_800AB7C);
+void sub_800AB7C(u8 arg0)
+{
+    Unk_03004AC0* actor;
+    if (arg0 <= 1) {
+        actor = &gUnk_03004AC0[0];
+        sub_800A048(actor->skills, actor->lv, arg0);
+
+        if (actor->field_unk[2] == 1 && (u8)(actor->field_unk[3] - 5) <= 3) {
+            actor->field_unk[2] = 0;
+            actor->field_unk[3] = 0;
+        }
+    }
+}
 void sub_800ABBC(void)
 {
     gUnk_03004A90 = 0;
@@ -4568,7 +4580,37 @@ INCLUDE_ASM("asm/nonmatchings", sub_800B374);
 INCLUDE_ASM("asm/nonmatchings", sub_800BEE4);
 INCLUDE_ASM("asm/matchings", sub_800BF5C);
 INCLUDE_ASM("asm/nonmatchings", sub_800BFF8);
-INCLUDE_ASM("asm/nonmatchings", sub_800C0D8);
+
+void sub_800C0D8(void)
+{
+    u16 i;
+    u16 attr0;
+    u16 attr1;
+    u16 attr2;
+    struct RenderObject *obj = (struct RenderObject *)0x03004380;
+
+    attr0 = gUnk_03000048.field_6;
+    attr1 = ((gUnk_03000048.field_4 - 0x20) & 0x1FF) ;
+    attr1 += 0x8000;
+    attr2 = 0x21C0;
+    sub_8004C28(obj, 1, attr0, attr1, attr2);
+    
+    gRenderObjectPtrSortList[0] = obj;
+    
+    sub_80046DC(0x4C, 0, 9);
+
+    for (i = 0; i < 5; i++) {
+        obj++;
+        if (gUnk_03004AA0[i] != 0xFF) 
+        {
+            attr1 = 0x8028 + ((i * 5) << 3);
+            attr2 = ((i + 3) << 12) + ((i * 3 * 16 + 0x200) & 0x3FF);
+            sub_8004C28(obj, 1,  8, attr1, attr2);
+            gRenderObjectPtrSortList[i + 1] = obj;
+        }
+        sub_800375C(i);
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_800C194);
 INCLUDE_ASM("asm/nonmatchings", sub_800C2F8);
 

@@ -123,9 +123,13 @@ extern u16 gUnk_03000330[];
 extern u32 gUnk_03000340;
 typedef struct
 {
-    u8 padding0[12];
-    u8 field_C;
-    u8 padding1[7];
+    u8 padding0[8];
+    u8 field_8;
+    u8 field_9;
+    u8 field_A;
+    u8 field_B;
+    u16 field_C;
+    u8 padding1[6];
 } Unk_03000348;
 extern Unk_03000348 gUnk_03000348[];
 
@@ -173,11 +177,17 @@ extern u8 gUnk_030008F2;
 extern u8 gUnk_030008F3;
 extern u16 gUnk_03000906;
 extern u8 gUnk_03000910;
+extern u8 gUnk_03000911;
 extern u8 gUnk_03000948;
+extern u8 gUnk_0300097E;
+
+extern u32 gUnk_030009D0;
+extern u8 gUnk_03000AD8;
+extern u8 gUnk_03000ADD;
 extern u16 gUnk_03000ADE;
 extern u16 gUnk_03000AE0;
 extern u16 gUnk_03000AE2;
-
+extern u8 gUnk_03000D38[];
 extern u8 gUnk_03000DDE;
 extern u8 gUnk_03000E04;
 extern u16 gUnk_03000E70;

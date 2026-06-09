@@ -104,10 +104,6 @@ $(ELF): $(OBJS) $(LDSCRIPT)
 $(ROM): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 
-# Generate ldscript.txt by prepending symbol aliases from the TOML [renames] section
-# $(LDSCRIPT): $(LDSCRIPT_IN) $(DECOMP_TOML)
-# 	@python3 scripts/generate_ldscript.py $(DECOMP_TOML) $(LDSCRIPT_IN) $(LDSCRIPT)
-
 ### RECIPES ###
 
 # Assemble standalone .s files (crt0, libgcc, rom_header)
@@ -126,8 +122,8 @@ $(C_BUILDDIR)/agb_sram.o: CC1FLAGS := -mthumb-interwork -Wimplicit -Wparentheses
 $(C_BUILDDIR)/%.o: $(C_SUBDIR)/%.c
 	@echo "$(CC1) <flags> -o $@ $<"
 	@$(CPP) $(CPPFLAGS) $< -o $(C_BUILDDIR)/$*.i
-# 	@$(PREPROC) $(C_BUILDDIR)/$*.i | $(CC1) $(CFLAGS) -o $(C_BUILDDIR)/$*.s
-	@$(CC1) $(CC1FLAGS) -o $(C_BUILDDIR)/$*.s $(C_BUILDDIR)/$*.i
+	@$(PREPROC) $(C_BUILDDIR)/$*.i | $(CC1) $(CC1FLAGS) -o $(C_BUILDDIR)/$*.s
+# 	@$(CC1) $(CC1FLAGS) -o $(C_BUILDDIR)/$*.s $(C_BUILDDIR)/$*.i
 	@printf ".text\n\t.align\t2, 0\n" >> $(C_BUILDDIR)/$*.s
 	@$(AS) $(ASFLAGS) -o $@ $(C_BUILDDIR)/$*.s
 

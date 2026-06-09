@@ -44,6 +44,9 @@ u8 const gUnk_08057750[] = {
     0xde, 0xd4, 0x2c, 0xcb, 0x6c, 0xf8, 0x10, 0x0b, 0x3e, 0xb4, 0x7a, 0xb5, 0x70, 0xe7, 0xa5, 0xd9, 0xb8, 0xe4, 0x51, 0xe5, 0xe2, 0xb9,
     0x47, 0xbf, 0x46, 0xce, 0xdd, 0xbb, 0xc8, 0x18, 0xb6, 0xeb, 0xb0, 0xf2, 0xcd, 0xf0, 0xff, 0xff, 0xff, 0xff};
 
+
+// u8 const gUnk_0805881C[] = INCBIN_U8("data/raw_data/gUnk_0805881C.bin");
+
 /*
 //gMoveDirectionLut
 u8 const gUnk_0805881C[] ={0, 1, 5, 0, 7, 8, 6,
@@ -1357,6 +1360,8 @@ void sub_8001BD0(void)
     sub_8002154();
 }
 
+
+
 INCLUDE_ASM("asm/matchings", sub_8001D08);
 /*
 extern u8 gUnk_0805881C[];
@@ -2288,11 +2293,17 @@ void sub_8002DDC(void)
     }
 }
 
-extern u8 pltt_08057854[];
-extern u8 tilemap_08057874[];
-extern u8 tileset_1_08057A80[];
-extern u8 tileset_2_08057EEC[];
-extern u8 tileset_3_080583C4[];
+const u8 pltt_08057854[] = INCBIN_U8("data/lunar_logo/pltt.gbapal");
+const u8 tilemap_08057874[] = INCBIN_U8("data/lunar_logo/tilemap.bin.lz");
+const u8 tileset_1_08057A80[] = INCBIN_U8("data/lunar_logo/tileset_1.4bpp.lz");
+const u8 tileset_2_08057EEC[] = INCBIN_U8("data/lunar_logo/tileset_2.4bpp.lz");
+const u8 tileset_3_080583C4[] = INCBIN_U8("data/lunar_logo/tileset_3.4bpp.lz");
+
+// extern u8 pltt_08057854[];
+// extern u8 tilemap_08057874[];
+// extern u8 tileset_1_08057A80[];
+// extern u8 tileset_2_08057EEC[];
+// extern u8 tileset_3_080583C4[];
 #define GET_PLTT(n)    ((n) + 0)
 #define GET_TILEMAP(n) ((n) + 32)
 // INCLUDE_ASM("asm/matchings", sub_8002F6C);
@@ -2668,12 +2679,12 @@ INCLUDE_ASM("asm/matchings", sub_80038CC);
 // extern u8 gUnk_080B9DFC[][32];
 // extern u8 gUnk_030034B0;
 
-// static inline void CopySprite(u8 id1, u16 idx)
+// static inline void Inl_LoadSpriteSheetGfx(u8 id1, u16 idx)
 // {
 //     u8* dst = (void*)0x06011400 + id1 * 0x900;
 //     LZ77UnCompVram(gUnk_087E8430[idx],   dst);
 // }
-// static inline void CopySpritePal(u8 id1, u16 idx)
+// static inline void Inl_LoadSpriteSheetPal(u8 id1, u16 idx)
 // {
 //     u8* src;
 //     u8* dst;
@@ -2682,16 +2693,17 @@ INCLUDE_ASM("asm/matchings", sub_80038CC);
 //     DmaCopy16(3, src , dst ,0x20);
 // }
 
+// LoadSpriteSheetAndPal
 // void sub_80038CC(void) {
 
 //     if (1 & gUnk_030032D0)
 //     {
 //         // CopySprite((void*)0x06011400 + gUnk_03004540 * 0x900,gUnk_030032D4);
-//         CopySprite(gUnk_03004540, gUnk_030032D4);
+//         Inl_LoadSpriteSheetGfx(gUnk_03004540, gUnk_030032D4);
 //     }
 //     if (2 & gUnk_030032D0)
 //     {
-//         CopySpritePal(gUnk_030034B0, gUnk_03003240);
+//         Inl_LoadSpriteSheetPal(gUnk_030034B0, gUnk_03003240);
 //     }
 //     gUnk_030032D0 = 0;
 // }
@@ -2720,7 +2732,6 @@ void sub_8003B08(u16 arg0)
                 case 0xFD:
                     chara->field_12 |= 0x20;
                     chara->field_12 &= 0x7F;
-                    // chara->field_12 = (chara->field_12 | 0x20) & 0x7F;
                     chara->field_24 = NULL;
                     return;
                 case 0xFF:

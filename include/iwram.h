@@ -134,6 +134,13 @@ typedef struct
 extern Unk_03000348 gUnk_03000348[];
 
 extern u16 gUnk_03000384;
+extern u16 gUnk_03000386;
+
+
+extern u8 gUnk_030004D4;
+extern u8 gUnk_030004D5;
+extern u8 gUnk_030004D6;
+extern u8 gUnk_030004D7;
 
 extern u8 gUnk_030004F8;
 
@@ -152,6 +159,9 @@ extern Unk_03000500 gUnk_03000500;
 extern u16 gUnk_03000510;
 extern u8 gUnk_03000512;
 extern u8 gUnk_03000514;
+
+extern u8 gUnk_03000518[0x80];
+extern u8 gUnk_03000598[0x80];
 
 extern u32 gUnk_0300062C;
 extern u8 gUnk_03000630;

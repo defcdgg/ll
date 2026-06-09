@@ -10,6 +10,7 @@ tools/agbcc/
 
 scripts/ida/
 scripts/data/
+data/raw_data
 # scripts/
 
 asm/nonmatchings/

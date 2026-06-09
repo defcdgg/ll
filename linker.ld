@@ -67,12 +67,19 @@ SECTIONS {
         . = 0x00000330; gUnk_03000330 = .;
         . = 0x00000340; gUnk_03000340 = .;
         . = 0x00000348; gUnk_03000348 = .;
-        . = 0x00000384; gUnk_03000384 = .;      
+        . = 0x00000384; gUnk_03000384 = .;   
+        . = 0x00000386; gUnk_03000386 = .;
+        . = 0x000004D4; gUnk_030004D4 = .;
+        . = 0x000004D5; gUnk_030004D5 = .;
+        . = 0x000004D6; gUnk_030004D6 = .;
+        . = 0x000004D7; gUnk_030004D7 = .; 
         . = 0x000004F8; gUnk_030004F8 = .;  
         . = 0x00000500; gUnk_03000500 = .;
         . = 0x00000510; gUnk_03000510 = .;
         . = 0x00000512; gUnk_03000512 = .;
         . = 0x00000514; gUnk_03000514 = .;
+        . = 0x00000518; gUnk_03000518 = .;
+        . = 0x00000598; gUnk_03000598 = .;
         . = 0x0000062C; gUnk_0300062C = .;
         . = 0x00000630; gUnk_03000630 = .;
         . = 0x00000718; gUnk_03000718 = .;
@@ -321,7 +328,7 @@ SECTIONS {
 
     .rodata ALIGN(4) : SUBALIGN(4) {
         src/code_0.o(.rodata);
-        data/lunar_logo.o(.rodata);
+        /*data/lunar_logo.o(.rodata);*/
         data/data.o(.rodata);
         src/m4a_tables.o(.rodata);
         data/sound_data.o(.rodata);

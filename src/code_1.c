@@ -1,6 +1,7 @@
 #include "code_0.h"
 #include "gba/defines.h"
 #include "gba/gba.h"
+#include "gba/macro.h"
 #include "globals.h"
 #include "include_asm.h"
 #include "iwram.h"
@@ -635,7 +636,17 @@ void sub_80170BC(void)
         gUnk_03004DF0[6] = 1;
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_80170D0);
+void sub_80170D0(void)
+{
+    REG_IME = 0;
+    REG_IE &= 0xFF3F;
+    REG_IME = 1;
+
+    REG_SIOCNT = 0x2003;
+    REG_TM3CNT = 0xBFC0;
+    REG_IF = 0xC0;
+    gUnk_03004DF0[6] = 0;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8017120);
 INCLUDE_ASM("asm/nonmatchings", sub_80171E4);
 INCLUDE_ASM("asm/nonmatchings", sub_8017588);
@@ -840,12 +851,57 @@ void sub_801A154(u16 mask)
 {
     gUnk_03000384 &= ~mask;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_801A168);
+void sub_801A168(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
+{
+    gUnk_03000384 &= 0xFFF0;
+    gUnk_03000384 |= 1;
+    gUnk_03000384 |= 0x2000;
+    if (gUnk_03000384 & 0x1000)
+        gUnk_03000384 &= ~0x1000;
+
+    gUnk_03000386 = 0;
+
+    gUnk_030004D4 = arg0;
+    gUnk_030004D5 = arg1;
+    gUnk_030004D6 = arg2;
+    gUnk_030004D7 = arg3;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_801A1DC);
 
-INCLUDE_ASM("asm/nonmatchings", sub_801A218);
-INCLUDE_ASM("asm/nonmatchings", sub_801A270);
+void sub_801A218(void)
+{
+    REG_DISPCNT &= 0xDFFF;
+    REG_BLDY = 0;
+    REG_BLDCNT = 0;
+
+    gUnk_03000384 &= 0xFFF0;
+    gUnk_03000384 &= 0xEFFF;
+    
+    if (gUnk_03000384 & 0x4000)
+    {
+        gUnk_03000384 &= 0xBFFF;
+    }
+
+    *(u8 *)0x030004D7 = 0;
+}
+
+void sub_801A270(void)
+{
+    DmaFill16(3, 100, (void*)0x020362C0, 0x800);
+    DmaWait(3);
+}
+
 INCLUDE_ASM("asm/nonmatchings", sub_801A2AC);
+// void sub_801A2AC(u16 arg0, u8 arg1, u8 arg2)
+// {
+//     REG_BLDCNT = arg0;
+//     REG_BLDALPHA = arg1 | (arg2 << 8);
+
+//     if (((arg0 >> 6) & 2) == 2)
+//     {
+//         REG_BLDY = arg1;
+//     }
+// }
 INCLUDE_ASM("asm/nonmatchings", sub_801A2EC);
 void sub_801A324(void)
 {
@@ -898,7 +954,14 @@ INCLUDE_ASM("asm/matchings", sub_801B688);
 
 INCLUDE_ASM("asm/nonmatchings", sub_801B760);
 INCLUDE_ASM("asm/nonmatchings", sub_801B790);
-INCLUDE_ASM("asm/nonmatchings", sub_801B7B8);
+void sub_801B7B8(void)
+{
+    DmaFill32(3, 0, gUnk_03000518, 0x80);
+    DmaWait(3);
+
+    DmaFill32(3, 0, gUnk_03000598, 0x80);
+    DmaWait(3);
+}
 INCLUDE_ASM("asm/nonmatchings", sub_801B81C);
 INCLUDE_ASM("asm/nonmatchings", sub_801B878);
 INCLUDE_ASM("asm/nonmatchings", sub_801B8AC);
@@ -1675,6 +1738,11 @@ INCLUDE_ASM("asm/nonmatchings", sub_804C364);
 INCLUDE_ASM("asm/nonmatchings", sub_804C3A4);
 INCLUDE_ASM("asm/nonmatchings", sub_804C3E4);
 INCLUDE_ASM("asm/nonmatchings", sub_804C420);
+// void sub_804C420(u8 arg0) {
+//     DmaCopy16(3, (void*)0x02036AC0 + (arg0 << 5), (void*)0x05000200 + (arg0 << 5), 16);
+//     DmaWait(3);
+// }
+
 INCLUDE_ASM("asm/nonmatchings", sub_804C45C);
 INCLUDE_ASM("asm/nonmatchings", sub_804C4D8);
 u16 sub_804C53C(void)

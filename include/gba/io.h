@@ -724,6 +724,7 @@
 #define KEY_OR_INTR                       0x0000
 #define KEY_AND_INTR                      0x8000
 #define DPAD_ANY                          0x00F0
+#define ABXY_BUTTONS                      0x000F
 #define JOY_EXCL_DPAD                     0x030F
 #define NUM_KEYS                          0x000A
 

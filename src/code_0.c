@@ -10,6 +10,9 @@
 
 extern void IntrMain();
 
+const u8 gUnk_0805881C[];
+const u8 gUnk_08058834[];
+
 typedef void (*IntrFunc)(void);
 /*
     MultiSioIntr
@@ -19,7 +22,7 @@ typedef void (*IntrFunc)(void);
 */
 IntrFunc const gIntrTable[] = {
     sub_8016FC0, VBlankIntr, sub_800124C, DummyIntr4, DummyIntr3, DummyIntr3, DummyIntr3,
-    DummyIntr3,  DummyIntr3,  DummyIntr3,  DummyIntr3, DummyIntr3, DummyIntr3,
+    DummyIntr3,  DummyIntr3, DummyIntr3,  DummyIntr3, DummyIntr3, DummyIntr3,
 };
 
 u8 const gUnk_080576D0[] = {
@@ -45,49 +48,6 @@ u8 const gUnk_08057750[] = {
     0x47, 0xbf, 0x46, 0xce, 0xdd, 0xbb, 0xc8, 0x18, 0xb6, 0xeb, 0xb0, 0xf2, 0xcd, 0xf0, 0xff, 0xff, 0xff, 0xff};
 
 
-// u8 const gUnk_0805881C[] = INCBIN_U8("data/raw_data/gUnk_0805881C.bin");
-
-/*
-//gMoveDirectionLut
-u8 const gUnk_0805881C[] ={0, 1, 5, 0, 7, 8, 6,
-      0, 3, 2, 4, 0, 0, 0, 0, 0};
-
-
-
-
-      //gUnk_0805887C
-const u8 gSpriteTileCountTable[] = {
-    1, 4, 16, 64,  // Square: 8x8, 16x16, 32x32, 64x64
-    2, 4,  8, 32,  // Horizontal: 16x8, 32x8, 32x16, 64x32
-    2, 4,  8, 32,  // Vertical: 8x16, 8x32, 16x32, 32x64
-    99, 99, 99, 99 // Invalid/Prohibited Shape
-};
-
-
-//8058834
-const u8 gSpriteDimensionsTable[] = {
-    8, 8, 16, 16, 32, 32, 64, 64,  // Shape 0 (Square)
-    16, 8, 32, 8, 32, 16, 64, 32,  // Shape 1 (Horizontal)
-    8, 16, 8, 32, 16, 32, 32, 64,  // Shape 2 (Vertical)
-
-    1, 1, 1, 1, 1, 1, 1, 1,
-
-    15, 0, 0, 0, 252, 255, 228, 255,
-    15, 0, 0, 0, 0, 0, 240, 255
-};
-
-//8058834
-const s8 gSpriteDimensionsTable[] = {
-    8, 8, 16, 16, 32, 32, 64, 64,  // Shape 0 (Square)
-    16, 8, 32, 8, 32, 16, 64, 32,  // Shape 1 (Horizontal)
-    8, 16, 8, 32, 16, 32, 32, 64,  // Shape 2 (Vertical)
-
-    1, 1, 1, 1, 1, 1, 1, 1,
-
-    15, 0, 0, 0, -4, -1, -28, -1,
-    15, 0, 0, 0, 0, 0, -16, -1
-};
-*/
 void sub_80002A0(void)
 {
     u16 val;
@@ -128,14 +88,14 @@ void sub_80002A0(void)
             break;
     }
 
-    REG_BG2HOFS = gUnk_03004848;
-    REG_BG2VOFS = gUnk_03004828;
-    REG_BG3HOFS = gUnk_0300484C;
-    REG_BG3VOFS = gUnk_03004648;
+    REG_BG2HOFS = gBG2ScrollX;
+    REG_BG2VOFS = gBG2ScrollY;
+    REG_BG3HOFS = gBG3ScrollX;
+    REG_BG3VOFS = gBG3ScrollY;
 
     DmaCopy16(3, gOamBuffer, OAM, OAM_SIZE);
 
-    sub_8002F6C();
+    sub_8002F6C(); // Show Lunar Logo
     sub_8008D18();
 
     if (gUnk_03002604 == 0)
@@ -151,8 +111,8 @@ void sub_80002A0(void)
         gUnk_03004800[13] = 0U;
     }
 
-    REG_BLDCNT = gUnk_03004658;
-    if (gUnk_03004658 & 0x80)
+    REG_BLDCNT = gBlendControl;
+    if (gBlendControl & 0x80)
     {
         REG_BLDY = gUnk_03004550;
     }
@@ -164,7 +124,7 @@ void sub_80002A0(void)
     sub_8005020();
     sub_80038CC();
 
-    switch (gUnk_03004610)
+    switch (gHBlankEffectMode)
     {
         case 0:
         default:
@@ -198,7 +158,7 @@ void sub_80004F8(void)
 
     DmaCopy16(3, gOamBuffer, OAM, 0x400);
 
-    REG_BLDCNT = gUnk_03004658;
+    REG_BLDCNT = gBlendControl;
     REG_BLDALPHA = gUnk_03004550;
 
     DmaCopy16(3, VRAM_BUF_2005800, 0x0600F800, 0x800);
@@ -211,7 +171,7 @@ void sub_80004F8(void)
 
 void sub_80005A8(u16 scanline)
 {
-    switch (gUnk_03004610)
+    switch (gHBlankEffectMode)
     {
         case 1:
         case 2:
@@ -260,7 +220,7 @@ void VBlankIntr(void)
             REG_BG3HOFS = 4;
             REG_BG3VOFS = 0;
 
-            REG_BLDCNT = gUnk_03004658;
+            REG_BLDCNT = gBlendControl;
             REG_BLDALPHA = gUnk_03004550;
 
             DmaCopy16(3, gOamBuffer, OAM, 0x400);
@@ -289,7 +249,7 @@ void VBlankIntr(void)
             REG_BG2VOFS = 0;
             REG_BG3HOFS = 0;
             REG_BG3VOFS = 0;
-            REG_BLDCNT = gUnk_03004658;
+            REG_BLDCNT = gBlendControl;
             REG_BLDALPHA = gUnk_03004550;
 
             // CpuFastCopy(gUnk_02005800, 0x0600F800, 0x800);
@@ -319,8 +279,8 @@ void VBlankIntr(void)
             sub_8008E94();
             sub_805008C();
 
-            REG_BLDCNT = gUnk_03004658;
-            if (gUnk_03004658 & 0x80)
+            REG_BLDCNT = gBlendControl;
+            if (gBlendControl & 0x80)
             {
                 REG_BLDY = gUnk_03004550;
             }
@@ -867,6 +827,8 @@ void DummyIntr4() { }
 
 void DummyIntr5() { }
 
+
+//AgbMain
 void sub_800128C(void)
 {
     gUnk_03001AC0 = 0;
@@ -894,7 +856,7 @@ void sub_80012B8(void)
     REG_BG2VOFS = 0;
     REG_BG3HOFS = 0;
     REG_BG3VOFS = 0;
-    REG_BLDCNT = gUnk_03004658;
+    REG_BLDCNT = gBlendControl;
     REG_BLDALPHA = gUnk_03004550;
 
     CpuFastSet(VRAM_BUF_2005800, (void *)0x0600F800, 0x200);
@@ -904,7 +866,7 @@ void sub_80012B8(void)
         gUnk_03004DC0 = 0;
     }
 }
-
+//切换场景加载
 void sub_8001354(void)
 {
     u16 i;
@@ -915,7 +877,7 @@ void sub_8001354(void)
     temp_r6 = gUnk_0300259C;
     gUnk_0300259C = 0;
     temp_r7 = gUnk_03004608;
-    gUnk_03004610 = 0;
+    gHBlankEffectMode = 0;
     sub_8009A5C();
     gUnk_030025F8 = gUnk_0300468C * 8;
     gUnk_03002C3C = gUnk_03004638 * 8;
@@ -1000,6 +962,7 @@ void sub_8001354(void)
     }
 }
 
+//New Game
 void sub_8001538(void)
 {
     u8 i;
@@ -1023,18 +986,18 @@ void sub_8001538(void)
     gUnk_03004638 = 0;
     gUnk_030047A4 = 0;
     gUnk_03004614 = 0;
-    gUnk_03004AA0[0] = 0;
-    gUnk_03004AA0[1] |= 0xFF;
-    gUnk_03004AA0[2] |= 0xFF;
-    gUnk_03004AA0[3] |= 0xFF;
-    gUnk_03004AA0[4] |= 0xFF;
-    gUnk_03004AA0[5] |= 0xFF;
-    gUnk_03004A88[0] = 0;
-    gUnk_03004A88[1] |= 0xFF;
-    gUnk_03004A88[2] |= 0xFF;
-    gUnk_03004A88[3] |= 0xFF;
-    gUnk_03004A88[4] |= 0xFF;
-    gUnk_03004A88[5] |= 0xFF;
+    gPartyMemberIds[0] = 0;
+    gPartyMemberIds[1] |= 0xFF;
+    gPartyMemberIds[2] |= 0xFF;
+    gPartyMemberIds[3] |= 0xFF;
+    gPartyMemberIds[4] |= 0xFF;
+    gPartyMemberIds[5] |= 0xFF;
+    gBattleFormationIds[0] = 0;
+    gBattleFormationIds[1] |= 0xFF;
+    gBattleFormationIds[2] |= 0xFF;
+    gBattleFormationIds[3] |= 0xFF;
+    gBattleFormationIds[4] |= 0xFF;
+    gBattleFormationIds[5] |= 0xFF;
 
     sub_800A924();
 
@@ -1044,8 +1007,8 @@ void sub_8001538(void)
         sub_800A79C(i);
     }
 
-    gUnk_03004980[0xDD] = 2;
-    gUnk_03002C38 = 0x12C;
+    gInventory[0xDD] = 2;
+    gSilverAmount = 300;
     gGameTimer = 0;
     gUnk_030025F8 = 0x60;
     gUnk_03002C3C = 0x50;
@@ -1328,7 +1291,7 @@ void sub_8001BD0(void)
     gUnk_03004854 = 0;
     gUnk_030025F4 = 0xFF;
 
-    DmaCopy16(3, (void *)0x0203F000, gRenderObjects, 0xA00);
+    DmaCopy16(3, (void *)0x0203F000, gSpriteNodePool, 0xA00);
     DmaCopy16(3, (void *)0x0203FE00, (void *)0x030034C0, 0x100);
 
     sub_800445C();
@@ -1361,18 +1324,13 @@ void sub_8001BD0(void)
 }
 
 
-
-INCLUDE_ASM("asm/matchings", sub_8001D08);
-/*
-extern u8 gUnk_0805881C[];
-
 void sub_8001D08(void)
 {
-    u8 val;
-    u8 idx;
+    u8 eventId;
+    u8 moveFlags;
     u8 moveSpeed;
 
-    idx = 0;
+    moveFlags = 0;
 
     gUnk_03002E80[0].field_12 &= ~0x40;
 
@@ -1398,7 +1356,7 @@ void sub_8001D08(void)
         }
     }
 
-    if ((gHeldKeysRaw & DPAD_ANY) == DPAD_ANY)
+    if ((gHeldKeysRaw & ABXY_BUTTONS) == ABXY_BUTTONS)
     {
         //Reset Game
         sub_8052728(1);
@@ -1426,10 +1384,10 @@ void sub_8001D08(void)
             {
                 if (gNewKeysRaw & A_BUTTON)
                 {
-                    val = sub_8003F40();
-                    if (val != 0)
+                    eventId = sub_8003F40();
+                    if (eventId != 0)
                     {
-                        sub_80526A0(val - 1, 2);
+                        sub_80526A0(eventId - 1, 2);
                     }
                 }
                 else if (gNewKeysRaw & B_BUTTON)
@@ -1459,28 +1417,28 @@ void sub_8001D08(void)
 
                     if (gHeldKeysRaw & DPAD_UP)
                     {
-                        idx = 1;
+                        moveFlags = 1;
                         gUnk_03002E80[0].field_12 |= 0x40;
                     }
                     else if (gHeldKeysRaw & DPAD_DOWN)
                     {
-                        idx = 2;
+                        moveFlags = 2;
                         gUnk_03002E80[0].field_12 |= 0x40;
                     }
                     if (gHeldKeysRaw & DPAD_LEFT)
                     {
-                        idx |= 4;
+                        moveFlags |= 4;
                         gUnk_03002E80[0].field_12 |= 0x40;
                     }
                     else if (gHeldKeysRaw & DPAD_RIGHT)
                     {
-                        idx |= 8;
+                        moveFlags |= 8;
                         gUnk_03002E80[0].field_12 |= 0x40;
                     }
 
-                    if (gUnk_0805881C[idx])
+                    if (gUnk_0805881C[moveFlags])
                     {
-                        gUnk_030025B0 = gUnk_0805881C[idx] - 1;
+                        gUnk_030025B0 = gUnk_0805881C[moveFlags] - 1;
                         moveSpeed = 2;
                     }
                     else
@@ -1585,7 +1543,7 @@ void sub_8001D08(void)
     sub_8002DDC();
     sub_8002154();
 }
-*/
+
 void sub_8002154(void)
 {
     u16 i;
@@ -1606,7 +1564,7 @@ void sub_8002154(void)
             do
             // for(; i < 19; i++)
             {
-                if (ptr03002E80->renderObjIdx && (ptr03002E80->field_1 & 1) != 0)
+                if (ptr03002E80->sprNodeIdx && (ptr03002E80->field_1 & 1) != 0)
                 {
                     ret0 = sub_8003C54(i);
                     if (ret0 == 1 && ptr03002E80->field_24)
@@ -1619,12 +1577,12 @@ void sub_8002154(void)
                         sub_8003B08(i);
                     }
                     sub_800271C(i);
-                    sub_800243C(sub_8004EDC(ptr03002E80), ptr03002E80->y, ptr03002E80->renderObjIdx, sub_8004EB8(ptr03002E80),
+                    sub_800243C(sub_8004EDC(ptr03002E80), ptr03002E80->y, ptr03002E80->sprNodeIdx, sub_8004EB8(ptr03002E80),
                                 ptr03002E80->field_1);
                     if (ptr03002E80->field_18)
                     {
-                        gRenderObjects[ptr03002E80->field_18].field_0 = 0;
-                        gRenderObjects[ptr03002E80->field_18].subObject = 0;
+                        gSpriteNodePool[ptr03002E80->field_18].flags = 0;
+                        gSpriteNodePool[ptr03002E80->field_18].next = 0;
                         ptr03002E80->field_18 = 0;
                     }
                     sub_8002380(i);
@@ -1641,7 +1599,7 @@ void sub_8002154(void)
             do
             // for( ; i < 19; i++)
             {
-                if (ptr03002E80->renderObjIdx)
+                if (ptr03002E80->sprNodeIdx)
                 {
                     if (!gUnk_03004D4C && (!gUnk_0300260C || gUnk_0300260C == 9) && (ptr03002E80->field_12 & 0x88) != 8)
                     {
@@ -1659,11 +1617,11 @@ void sub_8002154(void)
                     sub_800271C(i);
                     if (ptr03002E80->field_18)
                     {
-                        gRenderObjects[ptr03002E80->field_18].field_0 = 0;
-                        gRenderObjects[ptr03002E80->field_18].subObject = 0;
+                        gSpriteNodePool[ptr03002E80->field_18].flags = 0;
+                        gSpriteNodePool[ptr03002E80->field_18].next = 0;
                         ptr03002E80->field_18 = 0;
                     }
-                    if (sub_800243C(ptr03002E80->x, ptr03002E80->y, ptr03002E80->renderObjIdx, ptr03002E80->field_1A,
+                    if (sub_800243C(ptr03002E80->x, ptr03002E80->y, ptr03002E80->sprNodeIdx, ptr03002E80->field_1A,
                                     ptr03002E80->field_1))
                     {
                         ptr03002E80->field_12 |= 8;
@@ -1681,9 +1639,9 @@ void sub_8002154(void)
 
         for (i = 0; i < 16; i++)
         {
-            if (gChestObjects[i].renderObjIdx)
+            if (gChestObjects[i].sprNodeIdx)
             {
-                sub_800243C(gChestObjects[i].x, gChestObjects[i].y, gChestObjects[i].renderObjIdx, 0, 255);
+                sub_800243C(gChestObjects[i].x, gChestObjects[i].y, gChestObjects[i].sprNodeIdx, 0, 255);
             }
         }
     }
@@ -1693,161 +1651,141 @@ void sub_8002154(void)
     sub_80091C4();
 }
 
-void sub_8002380(u8 arg0)
+void sub_8002380(u8 charaId)
 {
-    CharacterObject *temp_r4;
-    struct RenderObject *temp_r0;
-    u8 flag;
+    CharacterObject *charaObj;
+    SpriteNode *sprNode;
 
-    if ((gUnk_030025A0 & 1) == (arg0 & 1))
+    if ((gUnk_030025A0 & 1) == (charaId & 1))
     {
-        temp_r4 = &gUnk_03002E80[arg0];
-        if (!(temp_r4->field_1 & 2))
+        charaObj = &gUnk_03002E80[charaId];
+        if (!(charaObj->field_1 & 2))
         {
-            if (temp_r4->field_18 == 0)
+            if (charaObj->field_18 == 0)
             {
-                temp_r4->field_18 = sub_8004BFC();
+                charaObj->field_18 = sub_8004BFC();
             }
-            temp_r0 = &gRenderObjects[temp_r4->field_18];
+            sprNode = &gSpriteNodePool[charaObj->field_18];
 
-            flag = (temp_r4->field_1 & 1);
-
-            if (flag != 0)
+            if ((charaObj->field_1 & 1) != 0)
             {
-                temp_r0->attr0 = 0x4000;
-                temp_r0->attr1 = 0x4000;
-                temp_r0->attr2 = 0x892;
-                temp_r0->field_10 = 0x1F4;
-                temp_r0->field_12 = 0xFC;
+                sprNode->attr0 = 0x4000;
+                sprNode->attr1 = 0x4000;
+                sprNode->attr2 = 0x892;
+                sprNode->tileOffsetX = 0x1F4;
+                sprNode->tileOffsetY = 0xFC;
             }
             else
             {
-                temp_r0->attr0 = 0x4000;
-                temp_r0->attr1 = flag;
-                temp_r0->attr2 = 0x892;
-                temp_r0->field_10 = flag;
-                temp_r0->field_12 = 0xFA;
+                sprNode->attr0 = 0x4000;
+                sprNode->attr1 = 0;
+                sprNode->attr2 = 0x892;
+                sprNode->tileOffsetX = 0;
+                sprNode->tileOffsetY = 0xFA;
             }
-            temp_r0->field_0 = 1;
-            temp_r0->animFrame = 0;
+            sprNode->flags = 1;
+            sprNode->animStep = 0;
 
-            sub_800243C(sub_8004EDC(temp_r4), temp_r4->y - 0xA0, temp_r4->field_18, -0xA0, 0xFE);
+            sub_800243C(sub_8004EDC(charaObj), charaObj->y - 0xA0, charaObj->field_18, -0xA0, 0xFE);
         }
     }
 }
 INCLUDE_ASM("asm/matchings", sub_800243C);
+
 /*
-
-
-extern u16 gUnk_03004800[];
-
-// extern u16 gUnk_0300484C;
-// extern u16 gUnk_03004648;
-extern s16 gUnk_0300484C;
-extern s16 gUnk_03004648;
-
-
-extern u8 gUnk_030025BC;
-extern u8 gUnk_03002C30;
-
-extern s16 gCameraX; // gUnk_030025B4;
-extern s16 gCameraY; //gUnk_030025FC
-
-extern  u8 arr_gUnk_08058834[];
-extern u8 gUnk_08058834[];
-
-extern struct RenderObject* gUnk_03002C80[128];
-
-u8 sub_800243C(s16 x, s16 y, u8 arg2, s16 z, u8 arg4) {
-    struct RenderObject* obj;
-    u8 num;
+u8 sub_800243C(s16 x, s16 y, u8 sprNodeIdx, s16 z, u8 arg4)
+{
+    SpriteNode* sprNode;
+    u8 count;
+    
     s16 screenX, screenY;
     s16 offsetX, offsetY;
-    u8 updateFlag;
+    u8 flag;
     s16 i;
-    updateFlag = 0;
-    
-    obj = &gRenderObjects[arg2];
-    obj->x = x;
-    obj->y = y;
 
-    num = obj->field_0 & 0x7F;
+    flag = 0;
 
-    if(!(arg4 & 0x81) && (obj->animFrame == 0 || obj->animFrame == 2))
+    sprNode = &gSpriteNodePool[sprNodeIdx];
+    sprNode->x = x;
+    sprNode->y = y;
+
+    count = sprNode->flags & 0x7F;
+
+    if(!(arg4 & 0x81) && (sprNode->animStep == 0 || sprNode->animStep == 2))
     {
         z++;
     }
-    
+
     if (gUnk_03004800[0] & 1) {
-        screenX = x - ((gCameraX & ~0xF) + gUnk_0300484C);
+        screenX = x - ((gUnk_030025B4 & ~0xF) + gBG3ScrollX);
     } else {
-        screenX = x - gCameraX;
+        screenX = x - gUnk_030025B4;
     }
     
     if (gUnk_03004800[0] & 2) 
     {
-        screenY = y - ((gCameraY & ~0xF) + gUnk_03004648) - 4 - z;
+        screenY = y - ((gUnk_030025FC & ~0xF) + gBG3ScrollY) - 4 - z;
     } else {
-        screenY = y - gCameraY - 4 - z;
+        screenY = y - gUnk_030025FC - 4 - z;
     }
 
-    while(num != 0)
+    while(count != 0)
     {
-        gUnk_030025BC = gUnk_08058834[ ((obj->attr0 >> 11) & 0x18) + ((obj->attr1 >> 13) & 6)];
-        gUnk_03002C30 = gUnk_08058834[ ((obj->attr0 >> 11) & 0x18) + ((obj->attr1 >> 13) & 6) + 1];
+        gUnk_030025BC = gUnk_08058834[ ((sprNode->attr0 >> 11) & 0x18) + ((sprNode->attr1 >> 13) & 6)];
+        gUnk_03002C30 = gUnk_08058834[ ((sprNode->attr0 >> 11) & 0x18) + ((sprNode->attr1 >> 13) & 6) + 1];
 
 
-        if(obj->field_10 > 256)
+        if(sprNode->tileOffsetX > 256)
         {
-            offsetX = obj->field_10 - 511;
+            offsetX = sprNode->tileOffsetX - 511;
         }
         else
         {
-            offsetX = obj->field_10;
+            offsetX = sprNode->tileOffsetX;
         }
-        
-        if(obj->field_12 > 128)
+
+        if(sprNode->tileOffsetY > 128)
         {
-            offsetY = obj->field_12 - 255;
+            offsetY = sprNode->tileOffsetY - 255;
         }
         else
         {
-            offsetY = obj->field_12;
+            offsetY = sprNode->tileOffsetY;
         }
 
-        if((x + gUnk_030025BC + offsetX) >= gCameraX && (x +  offsetX) <= gCameraX + 240
-              && (y + gUnk_03002C30 + offsetY - z - 4) >= gCameraY && (y +  offsetY - z - 4) <= gCameraY + 160)
+        if((x + gUnk_030025BC + offsetX) >= gUnk_030025B4 && (x +  offsetX) <= gUnk_030025B4 + 240
+              && (y + gUnk_03002C30 + offsetY - z - 4) >= gUnk_030025FC && (y +  offsetY - z - 4) <= gUnk_030025FC + 160)
         {
-            obj->field_0 &= ~0x80;
-            obj->attr0 = (obj->attr0 & 0xFF00) + ((screenY + offsetY) & 0xFF);
-            obj->attr1 = (obj->attr1 & 0xFE00) + ((screenX + offsetX) & 0x1FF);
-            updateFlag = 1;
+            sprNode->flags &= ~0x80;
+            sprNode->attr0 = (sprNode->attr0 & 0xFF00) + ((screenY + offsetY) & 0xFF);
+            sprNode->attr1 = (sprNode->attr1 & 0xFE00) + ((screenX + offsetX) & 0x1FF);
+            flag = 1;
         }
         else
         {
-            obj->field_0 |= 0x80;
+            sprNode->flags |= 0x80;
         }
 
 
-        obj = obj->subObject;
-        
-        num--;
+        sprNode = sprNode->next;
+
+        count--;
     }
 
-    if(updateFlag != 0)
+       if(flag != 0)
     {
-        struct RenderObject* r5;
-        struct RenderObject* r1;
-        struct RenderObject* r2;
+        SpriteNode* r5;
+        SpriteNode* r1;
+        SpriteNode* r2;
         i = 0;
 
         while(i < 128)
         {
-            r1 = gUnk_03002C80[i];
+            r1 = gSpriteRenderQueue[i];
 
             if(r1 == 0)
             {
-                gUnk_03002C80[i] = &gRenderObjects[arg2];
+                gSpriteRenderQueue[i] = &gSpriteNodePool[sprNodeIdx];
                 break;
             }
 
@@ -1855,170 +1793,309 @@ u8 sub_800243C(s16 x, s16 y, u8 arg2, s16 z, u8 arg4) {
             {
                 s16 j;
                 r2 = r1;
-                gUnk_03002C80[i] = &gRenderObjects[arg2];
+                gSpriteRenderQueue[i] = &gSpriteNodePool[sprNodeIdx];
                 // i++;
 
-                j = i + 1; 
+                j = i + 1;
                 while(j < 128)
                 {
-                    r1 = gUnk_03002C80[j];
-                    gUnk_03002C80[j] = r2;
+                    r1 = gSpriteRenderQueue[j];
+                    gSpriteRenderQueue[j] = r2;
                     r2 = r1;
                     if(r2 == 0)
                         break;
                     j++;
                 }
-                    
-                
+
+
                 return 0;
             }
-        
+
             i++;
         }
         return 0;
     }
     return 1;
 }
-
 */
-INCLUDE_ASM("asm/nonmatchings", sub_800271C);
+
 /*
 
-u8 gUnk_0805882C[] = {0, 1, 2, 1, 0, 1, 0, 1};
-u8 gUnk_08058864[] = {2, 3, 3, 3, 0, 1, 1, 1, 1, 2, 2, 2, 3, 0, 0, 0, 0};
+u8 sub_800243C(s16 x, s16 y, u8 arg2, s16 z, u8 arg4) {
+    SpriteNode* sprNode;
+    u8 num;
+    s16 screenX, screenY;
+    s16 offsetX, offsetY;
+    u8 updateFlag;
+    s16 i;
+    s16 j;
+    updateFlag = 0;
+
+    sprNode = &gSpriteNodePool[arg2];
+    sprNode->x = x;
+    sprNode->y = y;
+
+    num = sprNode->flags & 0x7F;
+
+    if(!(arg4 & 0x81) && (sprNode->animStep == 0 || sprNode->animStep == 2))
+    {
+        z++;
+    }
+
+    if (gUnk_03004800[0] & 1) {
+        screenX = x - ((gUnk_030025B4 & ~0xF) + gBG3ScrollX);
+    } else {
+        screenX = x - gUnk_030025B4;
+    }
+
+    if (gUnk_03004800[0] & 2)
+    {
+        screenY = y - ((gUnk_030025FC & ~0xF) + gBG3ScrollY) - 4 - z;
+    } else {
+        screenY = y - gUnk_030025FC - 4 - z;
+    }
+
+    while(num != 0)
+    {
+        gUnk_030025BC = gUnk_08058834[ ((sprNode->attr0 >> 11) & 0x18) + ((sprNode->attr1 >> 13) & 6)];
+        gUnk_03002C30 = gUnk_08058834[ ((sprNode->attr0 >> 11) & 0x18) + ((sprNode->attr1 >> 13) & 6) + 1];
+
+
+        if(sprNode->tileOffsetX > 256)
+        {
+            offsetX = sprNode->tileOffsetX - 511;
+        }
+        else
+        {
+            offsetX = sprNode->tileOffsetX;
+        }
+
+        if(sprNode->tileOffsetY > 128)
+        {
+            offsetY = sprNode->tileOffsetY - 255;
+        }
+        else
+        {
+            offsetY = sprNode->tileOffsetY;
+        }
+
+        if((x + gUnk_030025BC + offsetX) >= gUnk_030025B4 && (x +  offsetX) <= gUnk_030025B4 + 240
+              && (y + gUnk_03002C30 + offsetY - z - 4) >= gUnk_030025FC && (y +  offsetY - z - 4) <= gUnk_030025FC + 160)
+        {
+            sprNode->flags &= ~0x80;
+            sprNode->attr0 = (sprNode->attr0 & 0xFF00) + ((screenY + offsetY) & 0xFF);
+            sprNode->attr1 = (sprNode->attr1 & 0xFE00) + ((screenX + offsetX) & 0x1FF);
+            updateFlag = 1;
+        }
+        else
+        {
+            sprNode->flags |= 0x80;
+        }
+
+
+        sprNode = sprNode->next;
+
+        num--;
+    }
+
+    if(updateFlag != 0)
+    {
+        struct SpriteNode* r1;
+        struct SpriteNode* r2;
+        i = 0;
+
+        while(i < 128)
+        {
+            r1 = gSpriteRenderQueue[i];
+
+            if(r1 == 0)
+            {
+                gSpriteRenderQueue[i] = &gSpriteNodePool[arg2];
+                break;
+            }
+
+            if((u16)r1->y < y)
+            {
+                r2 = r1;
+                gSpriteRenderQueue[i] = &gSpriteNodePool[arg2];
+                // i++;
+
+                j = (u16)(i + 1);
+                while(j < 128)
+                {
+                    r1 = gSpriteRenderQueue[j];
+                    gSpriteRenderQueue[j] = r2;
+                    r2 = r1;
+                    if(r2 == 0)
+                        break;
+                    j++;
+                }
+
+
+                return 0;
+            }
+
+            i++;
+        }
+        return 0;
+    }
+    return 1;
+}
+*/
+
+INCLUDE_ASM("asm/matchings", sub_800271C);
+/*
+
+//这些数据在原始rom rodata中的位置是在 tileset_3_080583C4 后面
+u8 gWalkAnimFrameMapping[] = {0, 1, 2, 1, 0, 1, 0, 1};
+u8 gWalkDirectionMapping[] = {2, 3, 3, 3, 0, 1, 1, 1, 1, 2, 2, 2, 3, 0, 0, 0, 0};
+
+
+
+extern SpriteNode gSpriteNodePool[128];
+
+extern SpriteNode* gSpriteRenderQueue[128];
+
+extern CharacterObject gCharacterObjects[];
 
 
 void sub_800271C(u8 arg0)
 {
-    CharacterObject *chara;
-    struct RenderObject *renderObj;
-    u16 var0;
-    u8 var1;
-    u8 var2;
-    u32 var_r9;
+    CharacterObject *charaObj;
+    SpriteNode* sprNode;
+    u16 paletteBits;
+    u8 directionIndex;
+    u8 temp_r7;
+    u32 currentFrameTileOffset;
 
-    chara = &gUnk_03002E80[arg0];
+    charaObj = &gCharacterObjects[arg0];
 
-    if ((chara->field_1 & 1) == 0)
+    if ((charaObj->field_1 & 1) == 0)
     {
-        if(!(chara->field_12 & 4))
+        if(!(charaObj->field_12 & 4))
         {
-            if(chara->field_11 == 0)
+            if(charaObj->field_11 == 0)
             {
-                chara->moveAnimTimer++;
+                charaObj->walkAnimCounter++;
             }
         }
 
-        chara->moveAnimTimer &= 0x1F;
+        charaObj->walkAnimCounter &= 0x1F;
 
-        var0 = chara->paletteIdx ;
-        var0 <<= 12;
+        paletteBits = charaObj->paletteIdx ;
+        paletteBits <<= 12;
 
-        renderObj = &gRenderObjects[chara->renderObjIdx];
-
-        if ((chara->field_1 & 0x7C) == 0)
+        sprNode = &gSpriteNodePool[charaObj->sprNodeIdx];
+        
+        if ((charaObj->field_1 & 0x7C) == 0)
         {
-            renderObj->animFrame = chara->moveAnimTimer >> 3;
+            sprNode->animStep = charaObj->walkAnimCounter >> 3;
 
-            var_r9 = gUnk_0805882C[renderObj->animFrame] * 6;
+            currentFrameTileOffset = gWalkAnimFrameMapping[sprNode->animStep] * 6;
 
-            var2 = var1 = gUnk_08058864[chara->facingDir];
+            directionIndex = gWalkDirectionMapping[charaObj->facing];
+            temp_r7 = directionIndex;
 
-            if (var2 == 3)
+            if (temp_r7 == 3)
             {
-                var1 = 1;
-                renderObj->attr1 |= 0x1000;
+                directionIndex = 1;
+                sprNode->attr1 |= 0x1000;
             }
             else
             {
-                renderObj->attr1 &= ~0x1000;
+                sprNode->attr1 &= ~0x1000;
             }
-            renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((var1*18 + var_r9 + chara->field_2 * 72 + 0xA0) & 0x3FF)) | var0;
+            sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((directionIndex*18 + currentFrameTileOffset + charaObj->vramSlotIdx * 72 + 0xA0) & 0x3FF)) | paletteBits;
 
-            renderObj = renderObj->subObject;
-            if(renderObj)
+            sprNode = sprNode->next;
+            if(sprNode)
             {
-                if(var2 == 3)
+                if(temp_r7 == 3)
                 {
-                    renderObj->attr1 |= 0x1000;
+                    sprNode->attr1 |= 0x1000;
                 }
                 else
                 {
-                    renderObj->attr1 &= ~0x1000;
+                    sprNode->attr1 &= ~0x1000;
                 }
-                renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((var1*18 + var_r9 + chara->field_2 * 72 + 0xA4) & 0x3FF)) | var0;
+                sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((directionIndex*18 + currentFrameTileOffset + charaObj->vramSlotIdx * 72 + 0xA4) & 0x3FF)) | paletteBits;
             }
 
         }
-        else if ((chara->field_1 & 4) == 0)
+        else if ((charaObj->field_1 & 4) == 0)
         {
-            if ((chara->field_1 & 0x10) == 0)
+            if ((charaObj->field_1 & 0x10) == 0)
             {
-                if ((chara->field_1 & 0x20) )
+                if ((charaObj->field_1 & 0x20) )
                 {
-                    if (chara->facingDir != 0)
+                    if (charaObj->facing != 0)
                     {
-                        renderObj->attr0 = (renderObj->attr0 & 0xFC00) + ((chara->field_2 * 72 + 0xB0) & 0x3FF);
+                        sprNode->attr2 = (sprNode->attr2 & 0xFC00) + ((charaObj->vramSlotIdx * 72 + 0xB0) & 0x3FF);
                     }
                     else
                     {
-                        renderObj->attr0 = (renderObj->attr0 & 0xFC00) + ((chara->field_2 * 72 + 0xC0) & 0x3FF);
+                        sprNode->attr2 = (sprNode->attr2 & 0xFC00) + ((charaObj->vramSlotIdx * 72 + 0xC0) & 0x3FF);
                     }
 
-                    renderObj = renderObj->subObject;
-                    renderObj->attr2 = (renderObj->attr2 & 0xFC00) + ((chara->field_2 * 72 + 0xA0) & 0x3FF);
+                    sprNode = sprNode->next;
+                    sprNode->attr2 = (sprNode->attr2 & 0xFC00) + ((charaObj->vramSlotIdx * 72 + 0xA0) & 0x3FF);
                 }
             }
             else
             {
-                renderObj->animFrame = chara->moveAnimTimer >> 3;
-                var1 = gUnk_08058864[chara->facingDir];
+                sprNode->animStep = charaObj->walkAnimCounter >> 3;
+                directionIndex = gWalkDirectionMapping[charaObj->facing];
                 
-                if (var1 == 1)
+                if (directionIndex == 1)
                 {
-                    renderObj->attr1 |= 0x1000;
+                    sprNode->attr1 |= 0x1000;
                 }
                 else
                 {
-                    renderObj->attr1 &= ~0x1000;
+                    sprNode->attr1 &= ~0x1000;
                 }
-            renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((chara->field_2 * 72 + 0xA0) & 0x3FF)) | var0;
+            sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((charaObj->vramSlotIdx * 72 + 0xA0) & 0x3FF)) | paletteBits;
             }
         }
-        else if ((chara->field_1 & 8) == 0)
+        else 
         {
-            
-            renderObj->animFrame = 0;
-            var2 =(chara->moveAnimTimer >> 3) & 3;
-            var1 = gUnk_08058864[chara->facingDir + 8];
-            
-            if (var1 & 1)
+            if ((charaObj->field_1 & 8) == 0)
             {
-                var_r9 = 0x20;
+            
+                sprNode->animStep = 0;
+                temp_r7 =(charaObj->walkAnimCounter >> 3) & 3;
+
+                directionIndex = gWalkDirectionMapping[charaObj->facing + 8];
+                
+                if (directionIndex & 1)
+                {
+                    currentFrameTileOffset = 0x20;
+                }
+                else
+                {
+                    currentFrameTileOffset = gWalkAnimFrameMapping[temp_r7 + 4] << 4;
+                }
+     
+                if (directionIndex & 2)
+                {
+                    sprNode->attr1 |= 0x1000;
+                }
+                else
+                {
+                    sprNode->attr1 &= ~0x1000;
+                }
+
+            // sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((chara->field_2 * 72 +currentFrameTileOffset + 0xA0) & 0x3FF)) | paletteBits;
             }
             else
             {
-                var_r9 = gUnk_0805882C[var2 + 4] << 4;
+                sprNode->animStep = 0;
+                temp_r7 = (charaObj->walkAnimCounter >> 3) & 3;
+                currentFrameTileOffset = gWalkAnimFrameMapping[temp_r7] * 16;
+                sprNode->attr1 &= ~0x1000;
             }
+            sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((charaObj->vramSlotIdx * 72 +currentFrameTileOffset + 0xA0) & 0x3FF)) | paletteBits;
 
-            if (var1 & 2)
-            {
-                renderObj->attr1 |= 0x1000;
-            }
-            else
-            {
-                renderObj->attr1 &= ~0x1000;
-            }
-
-            renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((chara->field_2 * 72 +var_r9 + 0xA0) & 0x3FF)) | var0;
-        }
-        else
-        {
-            renderObj->animFrame = 0;
-            var2 = (chara->moveAnimTimer >> 3) & 3;
-            var_r9 = gUnk_0805882C[var2] * 16;
-            renderObj->attr1 &= ~0x1000;
-            renderObj->attr2 = ((renderObj->attr2 & 0xC00) | ((chara->field_2 * 72 +var_r9 + 0xA0) & 0x3FF)) | var0;
         }
         return;
     }
@@ -2026,11 +2103,125 @@ void sub_800271C(u8 arg0)
     sub_80029D8(arg0);
 }
 
+asm(".align 2,0");
 
 */
 
-INCLUDE_ASM("asm/nonmatchings", sub_80029D8);
+INCLUDE_ASM("asm/matchings", sub_80029D8);
 
+/*
+
+
+extern u8* gUnk_030032E0[];
+extern u8 gUnk_03003490[];
+extern u8 gUnk_03002C60[];
+
+extern u8* gUnk_030044C0[];
+
+u8 sub_8004A6C();
+
+void sub_8002B54(u8 arg0, u8 *arg1);
+
+void sub_8004A94(u8 , void* , u8 , u8 );
+
+
+void sub_80029D8(u8 arg0) {
+    CharacterObject* chara;
+    u8* animDataPtr;
+    u8* frameDataPtr;
+    u16 offset;
+
+    chara = &gUnk_03002E80[arg0];
+
+    if(chara->currAnimIdx == 0xFF)
+        
+        return;
+
+    animDataPtr = gUnk_030044C0[chara->currAnimIdx];
+
+    if(chara->animFrameTimer == 0xFF)
+        return;
+
+    // offset = animDataPtr[2] + (animDataPtr[3] << 8);
+
+    frameDataPtr = animDataPtr +  (animDataPtr[2] + (animDataPtr[3] << 8));
+
+    
+    if(chara->animFrameTimer == 0)
+    {
+        if( animDataPtr[6] + (animDataPtr[7] << 8) == 2)
+        {
+            sub_8004A94(sub_8004A6C(), gUnk_030032E0[chara->currAnimIdx], gUnk_03003490[chara->currAnimIdx] + 16, 2);
+        }
+        else
+        {
+            sub_8004A94(sub_8004A6C(), gUnk_030032E0[chara->currAnimIdx], gUnk_03003490[chara->currAnimIdx] + 16, 0);
+
+        }
+        frameDataPtr += 8;
+
+        offset = (frameDataPtr[0] + (frameDataPtr[1] << 8)) << 1;
+        // unkPtr = &animDataPtr[offset];
+
+        sub_8002B54(arg0, (animDataPtr + animDataPtr[offset + 8] + (animDataPtr[offset + 9]<<8)) + 4);
+        chara->animFrameTimer++;
+    }
+    else
+    {
+        u16 time = frameDataPtr[2] + (frameDataPtr[3] << 8);
+        u16 count = frameDataPtr[6] + (frameDataPtr[7] << 8);
+
+        frameDataPtr += 8;
+
+        if(chara->animFrameTimer >= time)
+        {
+            if((gUnk_03002C60[chara->currAnimIdx] & 0x80) == 0)
+            {
+                chara->animFrameTimer = 0xFF;
+                return;
+            }
+            else
+            {
+                chara->animFrameTimer = 0;
+            }
+        }
+        
+        while(count != 0)
+        {
+            if(chara->animFrameTimer == frameDataPtr[2] + (frameDataPtr[3] << 8) || chara->animFrameTimer == 0)
+            {
+                sub_8004F3C(&gRenderObjects[chara->sprNodeIdx]);
+                if(chara->animFrameTimer == 0)
+                {
+                    offset = (frameDataPtr[0] + (frameDataPtr[1] << 8)) << 1;
+                }
+                else
+                {
+                    offset = (frameDataPtr[4] + (frameDataPtr[5] << 8)) << 1;
+                }
+                // offset = offset << 1;
+                // unkPtr = animDataPtr + offset;
+                // unkPtr = animDataPtr + unkPtr[8] + (unkPtr[9] << 8);
+                
+                sub_8002B54(arg0, (animDataPtr + animDataPtr[offset+8] + (animDataPtr[offset+9]<<8)) + 4);
+                // sub_8002B54(arg0,  unkPtr + 4);
+                break;
+
+            }
+            frameDataPtr+=4;
+            count--;
+        }
+        
+
+        if(chara->animFrameTimer != 0xFF)
+        {
+            chara->animFrameTimer++;
+        }
+        
+    }
+    
+}
+*/
 
 INCLUDE_ASM("asm/matchings", sub_8002B54);
 
@@ -2079,8 +2270,8 @@ void sub_8004B2C(u16 id, void* src, void* dest, u8 arg3);
 
 void sub_8002B54(u8 arg0, u8 *arg1) {
     Unk_03002E80 *ptr2E80;
-    struct RenderObject *renderObj;
-    struct RenderObject *subObj;
+    struct SpriteNode *renderObj;
+    struct SpriteNode *subObj;
 
     u16 vramOffset;
     u8 oamDataOffset;
@@ -2099,13 +2290,13 @@ void sub_8002B54(u8 arg0, u8 *arg1) {
     u16 attr1;
     u16 attr2;
     s16 x;
-    
+
     ptr2E80 = &gUnk_03002E80[arg0];
 
     if(arg0 <= 0x12)
     {
         vramOffset = 0x800;
-        if (gMainGameState == 0xB) 
+        if (gMainGameState == 0xB)
         {
             vramOffset = 0x400;
         }
@@ -2118,8 +2309,8 @@ void sub_8002B54(u8 arg0, u8 *arg1) {
     oamDataOffset = arg1[0] * 6 + 4;
     num = arg1[2];
 
-    ptr2E80->renderObjIdx = sub_8004BFC();
-    renderObj = &gRenderObjects[ptr2E80->renderObjIdx];
+    ptr2E80->sprNodeIdx = sub_8004BFC();
+    renderObj = &gSpriteNodePool[ptr2E80->sprNodeIdx];
 
     val_r8 = gUnk_03003490[ptr2E80->field_16] * 72 + 160;
 
@@ -2132,14 +2323,14 @@ void sub_8002B54(u8 arg0, u8 *arg1) {
 
         val_r4_1 = oamDataPtr[4];
         dmaSlotId = sub_8004A44();
-        
+
         src = (u8*) gVramBufferPointers[ptr2E80->field_16] + (val_r4_1 << 5);
         dest = (u8*)0x06010000 + (val_r8 << 5);
         sub_8004B2C(dmaSlotId, src, dest, tileCount);
 
         attr0 = oamDataPtr[0] | (oamDataPtr[1] << 8);
 
-        if ((gUnk_03002C60[ptr2E80->field_16] & 0x40) != 0) 
+        if ((gUnk_03002C60[ptr2E80->field_16] & 0x40) != 0)
         {
             attr1 = (oamDataPtr[2] + (oamDataPtr[3] << 8)) | 0x1000;
         }
@@ -2153,8 +2344,8 @@ void sub_8002B54(u8 arg0, u8 *arg1) {
         attr2 = ((oamDataPtr[5] << 8) & ~0xFFF) + (vramOffset +(gUnk_03003490[ptr2E80->field_16] << 12) +  val_r8);
 
         subObj = sub_8004C28(renderObj, num, attr0, attr1, attr2);
-        
-        if ((gUnk_03002C60[ptr2E80->field_16] & 0x40) != 0) 
+
+        if ((gUnk_03002C60[ptr2E80->field_16] & 0x40) != 0)
         {
 
             gSpriteWidth = gSpriteDimensionsTable[ ((renderObj->attr0 >> 11) & 0x18) + ((renderObj->attr1 >> 13) & 6)];
@@ -2232,7 +2423,7 @@ void sub_8002DDC(void)
     {
         case 1:
             REG_DISPCNT &= 0xFEFF;
-            gUnk_03004658 = 0x1E41;
+            gBlendControl = 0x1E41;
             gUnk_03004550 = 0xF00;
             gUnk_03000004 = 0;
             return;
@@ -2333,7 +2524,7 @@ void sub_8002F6C(void)
             break;
         case 10:
             REG_DISPCNT &= 0xFEFF;
-            gUnk_03004658 = 0x1C12;
+            gBlendControl = 0x1C12;
             gUnk_03004550 = 0xC07;
             CpuFill16(0, (void *)0x0600F800, 0x800);
 
@@ -2343,6 +2534,27 @@ void sub_8002F6C(void)
     }
 }
 
+
+const u8 gUnk_0805881C[] ={0, 1, 5, 0, 7, 8, 6,
+      0, 3, 2, 4, 0, 0, 0, 0, 0};
+
+const u8 gUnk_0805882C[] ={0,1,2,1, 0,1,0,1};
+
+const u8 gUnk_08058834[] = {
+    8, 8, 16, 16, 32, 32, 64, 64,
+    16, 8, 32, 8, 32, 16, 64, 32,
+    8, 16, 8, 32, 16, 32, 32, 64,
+
+    1, 1, 1, 1, 1, 1, 1, 1,
+
+    15, 0, 0, 0, 252, 255, 228, 255,
+    15, 0, 0, 0, 0, 0, 240, 255
+};
+
+const u8 gUnk_08058864[] = {2, 3, 3, 3, 0, 1, 1, 1, 1, 2, 2, 2, 3, 0, 0, 0, 0,1, 1, 1, 1, 0, 0, 0};
+
+const u8 gUnk_0805887C[] = {1, 4, 0x10, 0x40, 2, 4, 8, 0x20, 2, 4, 8, 0x20, 0x63, 0x63, 0x63, 0x63};
+
 void sub_8003088(void)
 {
     ReadKeys();
@@ -2350,6 +2562,7 @@ void sub_8003088(void)
     gUnk_087E83F8[gMainGameState]();
 }
 
+//地图场景切换，加载数据精灵
 void sub_80030B0()
 {
     if (gUnk_03004840 == 0 && gUnk_03002600 == 1)
@@ -2464,36 +2677,29 @@ void sub_8003264()
     }
 }
 
-INCLUDE_ASM("asm/matchings", sub_80032BC);
-
-/*
-extern struct RenderObject* gUnk_03002C80[128];
-
-struct RenderObject* sub_8004F64(u16*, struct RenderObject*) ;
-
 void sub_80032BC(void) {
     u16 i;
-    struct RenderObject* ptr03002C80;
-    u8 val;
+    SpriteNode* sprNode;
+    u8 count;
     u16 index;
 
     index = 0;
 
     for(i = 0; i < 128; i++)
     {
-        ptr03002C80 = gUnk_03002C80[i];
-        if(ptr03002C80 == 0)
+        sprNode = gSpriteRenderQueue[i];
+        if(sprNode == NULL)
             continue;
 
-        val = ptr03002C80->field_0 & 0x7F;
-        if(val)
+        count = sprNode->flags & 0x7F;
+        if(count)
         {
-            while(val--)
+            while(count--)
             {
-                if(val == 0xFF)
+                if(count == 0xFF)
                     break;
-                ptr03002C80 = sub_8004F64(&index, ptr03002C80);
-                if (ptr03002C80 == 0)
+                sprNode = sub_8004F64(&index, sprNode);
+                if (sprNode == NULL)
                     break;
             }
         }
@@ -2511,50 +2717,248 @@ void sub_80032BC(void) {
 
 }
 
-*/
-
 void sub_8003348(void)
 {
-    CharacterObject *ptr2E80;
-    u8 renderObjIdx;
+    CharacterObject *charaObj;
+    u8 sprNodeIdx;
     s16 i;
     u8 count;
-    struct RenderObject *cur;
-    struct RenderObject *next;
+    struct SpriteNode *current;
+    struct SpriteNode *next;
 
     for (i = 0; i <= 23; i++)
     {
-        ptr2E80 = &gUnk_03002E80[i];
-        renderObjIdx = ptr2E80->renderObjIdx;
+        charaObj = &gUnk_03002E80[i];
+        sprNodeIdx = charaObj->sprNodeIdx;
 
-        if (renderObjIdx != 0)
+        if (sprNodeIdx != 0)
         {
 
-            if (ptr2E80->field_18 != 0)
+            if (charaObj->field_18 != 0)
             {
-                gRenderObjects[ptr2E80->field_18].field_0 = 0;
-                gRenderObjects[ptr2E80->field_18].subObject = 0;
-                ptr2E80->field_18 = 0;
+                gSpriteNodePool[charaObj->field_18].flags = 0;
+                gSpriteNodePool[charaObj->field_18].next = 0;
+                charaObj->field_18 = 0;
             }
 
-            count = gRenderObjects[renderObjIdx].field_0;
+            count = gSpriteNodePool[sprNodeIdx].flags;
             count &= 0x7F;
-            cur = &gRenderObjects[renderObjIdx];
+            current = &gSpriteNodePool[sprNodeIdx];
 
             while (count != 0)
             {
-                cur->field_0 = 0;
-                next = cur->subObject;
-                cur->subObject = 0;
-                cur = next;
+                current->flags = 0;
+                next = current->next;
+                current->next = 0;
+                current = next;
                 count--;
             }
         }
-        gUnk_03002E80[i].renderObjIdx = 0;
+        gUnk_03002E80[i].sprNodeIdx = 0;
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_80033E8);
-INCLUDE_ASM("asm/nonmatchings", sub_800345C);
+INCLUDE_ASM("asm/matchings", sub_80033E8);
+/*
+typedef struct {
+  u8 field_0;
+  u8 field_1;
+  u8 field_2;
+  u8 field_3;
+  u8 field_4;
+  u8 field_5;
+  u8 field_6;
+  u8 field_7;
+  u8 field_8;
+  u8 field_9;
+  u8 field_A;
+  u8 field_B;
+  u16 field_C;
+  u16 field_E;
+  u16 field_10;
+  u16 field_12;
+}Unk_08088D80;
+
+extern u8 gUnk_08091948[];
+
+extern Unk_08088D80 gUnk_08088D80[];
+
+typedef struct {
+    u16 field_0;
+    u8 pad[16 - 2];
+}Unk_087EA394;
+extern Unk_087EA394* gUnk_087EA394[];
+
+void sub_800345C(u8, void*);
+
+
+void sub_80033E8(u8 arg0) {
+    Unk_087EA394* ptr2;
+    u16 i;
+    u16 temp_r0;
+    u32 temp_r3;
+
+    if (gUnk_0300467C & 0x80) 
+        return;
+
+    i = temp_r3 = gUnk_08088D80[arg0].field_9;
+    if (i == 0)
+        return;
+
+    temp_r0 = (i - 1) * 18;
+    arg0 = gUnk_08091948[temp_r0];
+
+    ptr2 = gUnk_087EA394[temp_r3 - 1];
+              
+
+    for ( i = 2; i < arg0 + 2; i++)
+    {
+        sub_800345C(i, ptr2++);
+    }
+}
+*/
+INCLUDE_ASM("asm/matchings", sub_800345C);
+/*
+typedef struct{
+    u8 field_0;
+    u8 field_1;
+    u8 field_2;
+    u8 field_3;
+    u8 field_4;
+    u8 field_5;
+    u8 field_6;
+    u8 field_7;
+    u8 field_8;
+    u8 field_9;
+    u8 field_A;
+    u8 field_B;
+    u8* field_C;
+}UnkStruct;
+void sub_800345C(u8 arg0, UnkStruct* arg1) {
+    CharacterObject *chara;
+    struct SpriteNode* renderObj;
+    struct SpriteNode* subRenderObj;
+    u8 idx;
+    u16 attr0, attr1, attr2;
+
+    chara = &gUnk_03002E80[arg0];
+    idx = sub_8004BFC();
+
+    if(idx > 0x6F)
+        return;
+
+    renderObj = &gRenderObjects[idx];
+    chara->sprNodeIdx = idx;
+    chara->fields_1.all_fields = arg1->field_0;
+    chara->field_2 = arg1->field_1;
+    chara->paletteId = arg1->field_2;
+
+    chara->facingDir = arg1->field_3;
+    chara->x = arg1->field_4 << 3;
+    chara->y = (arg1->field_5 + 1) << 3;
+    chara->field_A = arg1->field_6;
+    chara->field_B = arg1->field_7;
+    chara->field_C = arg1->field_8;
+    chara->field_D = arg1->field_9;
+    chara->field_F = arg1->field_A;
+    chara->field_13 = arg1->field_B;
+    chara->field_24 = arg1->field_C;
+    chara->animTimer = 0;
+    chara->field_E = chara->facingDir;
+    chara->field_10 = 1;
+    chara->field_11 = 0;
+    chara->field_12 = 0;
+    chara->field_17 = 0;
+    chara->field_1A = 0;
+    chara->field_18 = 0;
+    chara->field_19 = 0;
+    chara->field_14 = 0;
+    chara->animIdx = 0xFF;
+
+    if(chara->fields_1.stru.bit0 == 0)
+    {
+        if(chara->fields_1.stru.bit2)
+        {
+            attr0 = 0;
+            attr1 = 0x8000;
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xA0) & 0x3FF);
+            renderObj->field_10 = 0x1F8;
+            renderObj->field_12 = 0xE0;
+            sub_8004C28(renderObj, 1, attr0, attr1, attr2);
+        }
+        else if(chara->fields_1.stru.bit4)
+        {
+            attr0 = 0x4000;
+            attr1 = 0xC000;
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xA0) & 0x3FF);
+            renderObj->field_10 = 0x1E8;
+            renderObj->field_12 = 0xF8;
+            sub_8004C28(renderObj, 1, attr0, attr1, attr2);
+        }
+        else if(chara->fields_1.stru.bit5)
+        {
+            attr1 = 0x8000;
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xB0) & 0x3FF);
+            renderObj->field_10 = 0x1F8;
+            renderObj->field_12 = 0xE8;
+            subRenderObj = sub_8004C28(renderObj, 2, 0, attr1, attr2);
+            
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xA0) & 0x3FF);
+            subRenderObj->field_10 = 0x1F8;
+            subRenderObj->field_12 = 0xC8;
+
+            sub_8004C28(subRenderObj, 1, 0, attr1, attr2);    
+    
+        }
+        else if(chara->fields_1.stru.bit6)
+        {
+            attr1 = 0x8000;
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xA0) & 0x3FF);
+            renderObj->field_10 = 0x1F8;
+            renderObj->field_12 = 0xEE;
+            subRenderObj = sub_8004C28(renderObj, 3, 0, attr1, attr2);
+            
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xB0) & 0x3FF);
+            subRenderObj->field_10 = 0x18;
+            subRenderObj->field_12 = 0xEE;
+            subRenderObj = sub_8004C28(subRenderObj, 2, 0, attr1, attr2);
+
+            attr0 = 0x8000;
+            attr1 = 0x8000;
+
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xC0) & 0x3FF);
+            subRenderObj->field_10 = 0x38;
+            subRenderObj->field_12 = 0xEE;
+            sub_8004C28(subRenderObj, 1, attr0, attr1, attr2);
+        }
+        else
+        {
+            attr1 = 0x4000;
+          
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xA0) & 0x3FF);
+            renderObj->field_10 = 0;
+            renderObj->field_12 = 0xE8;
+
+            subRenderObj = sub_8004C28(renderObj, 2, 0, attr1, attr2);
+
+            attr0 = 0x4000;
+
+            attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xA4) & 0x3FF);
+            subRenderObj->field_10 = 0;
+            subRenderObj->field_12 = 0xF8;
+            // attr1 = 0;
+            subRenderObj = sub_8004C28(subRenderObj, 1, attr0, 0, attr2);
+        }
+    }
+    else
+    {
+        renderObj->field_0 = 0x81;
+        renderObj->subObject = NULL;
+    }
+    renderObj->animFrame = 0;
+}
+
+
+*/
 void sub_800375C(u8 arg0)
 {
     u8 temp_r1;
@@ -2563,7 +2967,7 @@ void sub_800375C(u8 arg0)
     temp_r1 = sub_8004BFC();
     if (temp_r1 < 0x70)
     {
-        ptr3150->renderObjIdx = 0;
+        ptr3150->sprNodeIdx = 0;
         ptr3150->field_1 = 2;
         ptr3150->field_2 = 9;
         ptr3150->paletteId = 9;
@@ -2594,39 +2998,40 @@ void sub_800375C(u8 arg0)
 void sub_80037DC(u8 arg0)
 {
     u8 idx;
-    CharacterObject *ptr03002E80;
-    struct RenderObject *renderObj;
+    CharacterObject *charaObj;
+    SpriteNode *sprNode;
 
-    ptr03002E80 = &gUnk_03002E80[arg0];
+    charaObj = &gUnk_03002E80[arg0];
 
     idx = sub_8004BFC();
     if (idx < 0x70)
     {
-        renderObj = &gRenderObjects[idx];
-        ptr03002E80->renderObjIdx = idx;
-        ptr03002E80->field_1 = 2;
-        ptr03002E80->field_2 = 5;
-        ptr03002E80->paletteId = 5;
-        ptr03002E80->facingDir = 0;
-        ptr03002E80->field_A = 0;
-        ptr03002E80->field_B = 0;
-        ptr03002E80->field_C = 0;
-        ptr03002E80->field_D = 0;
-        ptr03002E80->field_F = 0;
-        ptr03002E80->field_13 = 0;
-        ptr03002E80->field_24 = 0;
-        ptr03002E80->animTimer = 0;
-        ptr03002E80->field_E = 0;
-        ptr03002E80->field_10 = 1;
-        ptr03002E80->field_11 = 0;
-        ptr03002E80->field_12 = 32;
-        ptr03002E80->field_17 = 0;
-        ptr03002E80->field_1A = 0;
-        ptr03002E80->field_18 = 0;
-        ptr03002E80->field_19 = 0;
-        renderObj->field_0 = 0;
-        renderObj->animFrame = 0;
-        renderObj->subObject = 0;
+        sprNode = &gSpriteNodePool[idx];
+        charaObj->sprNodeIdx = idx;
+        charaObj->field_1 = 2;
+        charaObj->field_2 = 5;
+        charaObj->paletteId = 5;
+        charaObj->facingDir = 0;
+        charaObj->field_A = 0;
+        charaObj->field_B = 0;
+        charaObj->field_C = 0;
+        charaObj->field_D = 0;
+        charaObj->field_F = 0;
+        charaObj->field_13 = 0;
+        charaObj->field_24 = 0;
+        charaObj->animTimer = 0;
+        charaObj->field_E = 0;
+        charaObj->field_10 = 1;
+        charaObj->field_11 = 0;
+        charaObj->field_12 = 32;
+        charaObj->field_17 = 0;
+        charaObj->field_1A = 0;
+        charaObj->field_18 = 0;
+        charaObj->field_19 = 0;
+
+        sprNode->flags = 0;
+        sprNode->animStep = 0;
+        sprNode->next = 0;
     }
 }
 
@@ -2634,14 +3039,14 @@ void sub_800384C(void)
 {
     u8 temp_r1;
     CharacterObject *ptr3150;
-    struct RenderObject *renderObj;
+    struct SpriteNode *sprNode;
 
     ptr3150 = &gUnk_03003150;
     temp_r1 = sub_8004BFC();
     if (temp_r1 < 0x70)
     {
-        renderObj = &gRenderObjects[temp_r1];
-        ptr3150->renderObjIdx = temp_r1;
+        sprNode = &gSpriteNodePool[temp_r1];
+        ptr3150->sprNodeIdx = temp_r1;
         ptr3150->field_1 = 2;
         ptr3150->field_2 = 0xA;
         ptr3150->paletteId = 0xA;
@@ -2664,49 +3069,53 @@ void sub_800384C(void)
         ptr3150->field_1A = 0;
         ptr3150->field_18 = 0;
         ptr3150->field_19 = 0;
-        renderObj->field_0 = 128;
-        renderObj->animFrame = 0;
-        renderObj->subObject = 0;
+
+        sprNode->flags = 128;
+        sprNode->animStep = 0;
+        sprNode->next = 0;
     }
 }
 INCLUDE_ASM("asm/matchings", sub_80038CC);
 
-// extern u8* gUnk_087E8430[];
-// extern u16 gUnk_030032D4;
-// extern u8 gUnk_03004540;
-// extern u16 gUnk_03003240;
+/*
+extern u8* gUnk_087E8430[];
+extern u16 gUnk_030032D4;
+extern u8 gUnk_03004540;
+extern u16 gUnk_03003240;
 
-// extern u8 gUnk_080B9DFC[][32];
-// extern u8 gUnk_030034B0;
+extern u8 gUnk_080B9DFC[][32];
+extern u8 gUnk_030034B0;
 
-// static inline void Inl_LoadSpriteSheetGfx(u8 id1, u16 idx)
-// {
-//     u8* dst = (void*)0x06011400 + id1 * 0x900;
-//     LZ77UnCompVram(gUnk_087E8430[idx],   dst);
-// }
-// static inline void Inl_LoadSpriteSheetPal(u8 id1, u16 idx)
-// {
-//     u8* src;
-//     u8* dst;
-//     src = gUnk_080B9DFC[idx];
-//     dst = (void*)0x05000200 + id1 * 32;
-//     DmaCopy16(3, src , dst ,0x20);
-// }
+static inline void Inl_LoadSpriteSheetGfx(u8 id1, u16 idx)
+{
+    u8* dst = (void*)0x06011400 + id1 * 0x900;
+    LZ77UnCompVram(gUnk_087E8430[idx],   dst);
+}
+static inline void Inl_LoadSpriteSheetPal(u8 id1, u16 idx)
+{
+    u8* src;
+    u8* dst;
+    src = gUnk_080B9DFC[idx];
+    dst = (void*)0x05000200 + id1 * 32;
+    DmaCopy16(3, src , dst ,0x20);
+}
 
 // LoadSpriteSheetAndPal
-// void sub_80038CC(void) {
+void sub_80038CC(void) {
 
-//     if (1 & gUnk_030032D0)
-//     {
-//         // CopySprite((void*)0x06011400 + gUnk_03004540 * 0x900,gUnk_030032D4);
-//         Inl_LoadSpriteSheetGfx(gUnk_03004540, gUnk_030032D4);
-//     }
-//     if (2 & gUnk_030032D0)
-//     {
-//         Inl_LoadSpriteSheetPal(gUnk_030034B0, gUnk_03003240);
-//     }
-//     gUnk_030032D0 = 0;
-// }
+    if (1 & gUnk_030032D0)
+    {
+        // CopySprite((void*)0x06011400 + gUnk_03004540 * 0x900,gUnk_030032D4);
+        Inl_LoadSpriteSheetGfx(gUnk_03004540, gUnk_030032D4);
+    }
+    if (2 & gUnk_030032D0)
+    {
+        Inl_LoadSpriteSheetPal(gUnk_030034B0, gUnk_03003240);
+    }
+    gUnk_030032D0 = 0;
+}
+    */
+
 INCLUDE_ASM("asm/nonmatchings", sub_8003958);
 void sub_8003B08(u16 arg0)
 {
@@ -2805,48 +3214,686 @@ void sub_8003B08(u16 arg0)
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8003C54);
-INCLUDE_ASM("asm/nonmatchings", sub_8003F40);
+INCLUDE_ASM("asm/matchings", sub_8003F40);
 INCLUDE_ASM("asm/nonmatchings", sub_80040E4);
-INCLUDE_ASM("asm/matchings", sub_8004358);
+// INCLUDE_ASM("asm/matchings", sub_8004358);
 
-// void sub_8004358(void) {
-//     u16 i;
+void sub_8004358(void) {
+    u16 i;
 
-//     if(!(gUnk_03002C44 & 1))
-//     {
-//         for(i = 0; i < 8; i++)
-//         {
-//             gUnk_030025C0[i] = gUnk_03002E80[0].x;
-//             gUnk_030025E0[i] = gUnk_03002E80[0].y;
-//             gUnk_03002C58[i] = gUnk_03002E80[0].facingDir & 7;
-//         }
+    if(!(gUnk_03002C44 & 1))
+    {
+        for(i = 0; i < 8; i++)
+        {
+            gUnk_030025C0[i] = gUnk_03002E80[0].x;
+            gUnk_030025E0[i] = gUnk_03002E80[0].y;
+            gUnk_03002C58[i] = gUnk_03002E80[0].facingDir & 7;
+        }
 
-//         gUnk_03002E80[1].x = gUnk_03002E80[0].x;
-//         gUnk_03002E80[1].y = gUnk_03002E80[0].y;
-//         gUnk_03002E80[1].facingDir = gUnk_03002E80[0].facingDir & 7;
-//     }
-// }
+        gUnk_03002E80[1].x = gUnk_03002E80[0].x;
+        gUnk_03002E80[1].y = gUnk_03002E80[0].y;
+        gUnk_03002E80[1].facingDir = gUnk_03002E80[0].facingDir & 7;
+    }
+}
 
-INCLUDE_ASM("asm/matchings", sub_80043D4);
+// INCLUDE_ASM("asm/matchings", sub_80043D4);
 
-// void sub_80043D4(void) {
-//     u16 i;
+void sub_80043D4(void) {
+    u16 i;
 
-//     for(i = 0; i < 8; i++)
-//     {
-//         gUnk_030025C0[i] = gUnk_03002E80[0].x;
-//         gUnk_030025E0[i] = gUnk_03002E80[0].y;
-//         gUnk_03002C58[i] = gUnk_03002E80[0].facingDir;
-//     }
+    for(i = 0; i < 8; i++)
+    {
+        gUnk_030025C0[i] = gUnk_03002E80[0].x;
+        gUnk_030025E0[i] = gUnk_03002E80[0].y;
+        gUnk_03002C58[i] = gUnk_03002E80[0].facingDir;
+    }
 
-//     gUnk_03002E80[1].x = gUnk_030025C0[7];
-//     gUnk_03002E80[1].y = gUnk_030025E0[7];
-//     gUnk_03002E80[1].facingDir = gUnk_03002C58[7];
-//     gUnk_03002C44 &= 0x80;
-// }
+    gUnk_03002E80[1].x = gUnk_030025C0[7];
+    gUnk_03002E80[1].y = gUnk_030025E0[7];
+    gUnk_03002E80[1].facingDir = gUnk_03002C58[7];
+    gUnk_03002C44 &= 0x80;
+}
 INCLUDE_ASM("asm/matchings", sub_800445C);
+/*
+void sub_800445C(void) {
+    CharacterObject* chara;
+    u16 i;
 
-INCLUDE_ASM("asm/matchings", sub_80046DC);
+    u8 a;
+    chara = &gUnk_03002E80[0];
+    if(chara->sprNodeIdx != 0)
+    {
+        a = (chara->field_12 & 0x80);
+        if(a != 0)
+        {
+            if(sub_8003C54(0) < 2)
+            {
+                sub_8003B08(0);
+            }
+
+            for(i = 7; i > 0; i--)
+            {
+                gUnk_030025C0[i] = gUnk_030025C0[i - 1];
+                gUnk_030025E0[i] = gUnk_030025E0[i - 1];
+                gUnk_03002C58[i] = gUnk_03002C58[i - 1];
+            }
+
+            gUnk_030025C0[0] = chara->x;
+            gUnk_030025E0[0] = chara->y;
+            gUnk_03002C58[0] = chara->facingDir & 7;
+
+            gUnk_030025B0 = chara->facingDir;
+            gUnk_030025F8 = chara->x;
+            gUnk_03002C3C = chara->y - 8;
+
+        }
+
+        else
+        {
+            if((u8)(gUnk_0300260C - 6) < 2 || gUnk_0300260C == 9 || gUnk_0300260C == 10)
+                return;
+
+            if(chara->field_12 & 0x40)
+            {
+                chara->field_11 = 0 ;
+
+                for(i = 7; i > 0; i--)
+                {
+                    gUnk_030025C0[i] = gUnk_030025C0[i - 1];
+                    gUnk_030025E0[i] = gUnk_030025E0[i - 1];
+                    gUnk_03002C58[i] = gUnk_03002C58[i - 1];
+                }
+                gUnk_030025C0[0] = chara->x;
+                gUnk_030025E0[0] = chara->y;
+                gUnk_03002C58[0] = chara->facingDir & 7;
+
+            }
+            else
+            {
+                chara->field_11 = 1;
+            }
+            chara->facingDir = gUnk_030025B0;
+            chara->x = gUnk_030025F8;
+            chara->y = gUnk_03002C3C + 8;
+
+        }
+
+        if((chara->field_1 & 1) == 0)
+        {
+            sub_800271C(0);
+            sub_800243C(chara->x, chara->y, chara->sprNodeIdx, chara->field_1A, chara->field_1 );
+            if(chara->field_18 != 0)
+            {
+                gSpriteNodePool[chara->field_18].field_0 = 0;
+                gSpriteNodePool[chara->field_18].subObject = 0;
+                chara->field_18 = 0;
+            }
+
+            sub_8002380(0);
+        }
+    }
+
+    chara++;
+    if(chara->sprNodeIdx != 0)
+    {
+        if((gUnk_03002C44 & 1) == 0)
+        {
+            if((u8)( gUnk_0300260C - 6) < 2 || gUnk_0300260C == 9 || gUnk_0300260C == 10)
+                return;
+            {
+                chara->facingDir = gUnk_03002C58[7];
+                chara->x = gUnk_030025C0[7];
+                chara->y = gUnk_030025E0[7];
+            }
+
+        }
+        else
+        {
+            if(chara->field_12 & 0x80 && sub_8003C54(1) < 2)
+            {
+                sub_8003B08(1);
+            }
+        }
+
+        if((chara->field_1 & 1) == 0)
+        {
+            sub_800271C(1);
+            sub_800243C(chara->x, chara->y, chara->sprNodeIdx, chara->field_1A, chara->field_1 );
+            if(chara->field_18 != 0)
+            {
+                gSpriteNodePool[chara->field_18].field_0 = 0;
+                gSpriteNodePool[chara->field_18].subObject = 0;
+                chara->field_18 = 0;
+            }
+
+            sub_8002380(1);
+        }
+    }
+
+
+}
+*/
+// INCLUDE_ASM("asm/matchings", sub_80046DC);
+
+
+typedef struct{
+    u16 scriptIdx;
+    u16 gfxIdx;
+    u8 palIdx;
+    u8 field_5;
+    u16 field_6;
+}CutsceneAnimConfig;
+
+const CutsceneAnimConfig gCutsceneAnimConfigTable[] = {
+{0, 0, 0, 0x80, 0},
+{1, 1, 1, 0x80, 0},
+{2, 2, 2, 0x80, 0},
+{3, 3, 8, 0, 0},
+{4, 4, 3, 0x80, 0},
+{5, 5, 0, 0x80, 0},
+{6, 6, 0, 0x80, 0},
+{7, 7, 0, 0, 0},
+{8, 8, 2, 0x80, 0},
+{9, 9, 1, 0x80, 0},
+{0xA, 0xA, 1, 0x80, 0},
+{0xB, 0xB, 1, 0, 0},
+{0xC, 0xC, 1, 0, 0},
+{0xD, 0xD, 0, 0, 0},
+{0xE, 0xE, 0, 0, 0},
+{0xF, 0xF, 2, 0, 0},
+{0x10, 0x10, 1, 0, 0},
+{0x11, 0x11, 1, 0, 0},
+{0x12, 0x12, 1, 0, 0},
+{0x13, 0x13, 1, 0, 0},
+{0x14, 0x14, 2, 0x80, 0},
+{0x15, 0x15, 1, 0x80, 0},
+{0x16, 0x16, 1, 0, 0},
+{0x17, 0x17, 1, 0x80, 0},
+{0x18, 0x18, 0, 0x80, 0},
+{0x19, 0x19, 0, 0x80, 0},
+{0x1A, 0x1A, 1, 0x80, 0},
+{0x1B, 0x1B, 4, 0x80, 0},
+{0x1C, 0x1C, 4, 0, 0},
+{0x1D, 0x1D, 4, 0, 0},
+{0x1E, 0x1E, 0, 0, 0},
+{0x1F, 0x1F, 1, 0, 0},
+{0x20, 0x20, 0, 0, 0},
+{0x21, 0x21, 1, 0, 0},
+{0x22, 0x22, 2, 0, 0},
+{0x23, 0x23, 3, 0x80, 0},
+{0x24, 0x24, 0xE, 0x80, 0},
+{0x25, 0x25, 0xE, 0, 0},
+{0x26, 0x26, 3, 0x80, 0},
+{0x27, 0x27, 0, 0x80, 0},
+{0x28, 0x28, 1, 0x80, 0},
+{0x29, 0x29, 0, 0x80, 0},
+{0x2A, 0x2A, 0, 0, 0},
+{3, 3, 9, 0, 0},
+{0x2B, 0x2B, 1, 0, 0},
+{0x2C, 0x2C, 0, 0, 0},
+{0x2D, 0x2D, 0xA, 0, 0},
+{0x2E, 0x2E, 0xA, 0, 0},
+{0x2F, 0x2F, 0xA, 0, 0},
+{0x30, 0x30, 0xA, 0, 0},
+{0x31, 0x31, 0xA, 0, 0},
+{0x32, 0x32, 0xA, 0x80, 0},
+{0x33, 0x33, 4, 0x80, 0},
+{0x34, 0x34, 4, 0, 0},
+{0x35, 0x35, 5, 0x80, 0},
+{0x36, 0x36, 5, 0, 0},
+{0x37, 0x37, 6, 0x80, 0},
+{0x38, 0x38, 6, 0, 0},
+{0x39, 0x39, 7, 0x80, 0},
+{0x3A, 0x3A, 7, 0, 0},
+{0x3B, 0x3B, 0xB, 0, 0},
+{0x3B, 0x3B, 0xC, 0, 0},
+{0x3C, 0x3C, 0xF, 0, 0},
+{0x3D, 0x3D, 0xF, 0, 0},
+{0x3E, 0x3E, 0x10, 0x80, 0},
+{0x3F, 0x3F, 0x11, 0, 0},
+{0x40, 0x40, 0x11, 0, 0},
+{0x41, 0x41, 4, 0x80, 0},
+{0x42, 0x42, 4, 0x80, 0},
+{0x43, 0x43, 4, 0x80, 0},
+{0x44, 0x44, 4, 0, 0},
+{0x45, 0x45, 4, 0x80, 0},
+{0x46, 0x46, 4, 0, 0},
+{0x47, 0x47, 4, 0, 0},
+{0x48, 0x48, 0xD, 0x80, 0},
+{0x49, 0x49, 0xD, 0x80, 0},
+{0x4A, 0x4A, 0x12, 0, 0},
+{0x4B, 0x4B, 0x13, 0, 0},
+{0x4C, 0x4C, 0x14, 0, 0},
+{0x4D, 0x4D, 0x14, 0, 0},
+{0x4E, 0x4E, 0x14, 0, 0},
+{0x4F, 0x4F, 0x14, 0, 0},
+{0x50, 0x50, 0x15, 0x80, 0},
+{0x51, 0x51, 0x16, 0, 0},
+{0x52, 0x52, 4, 0x80, 0},
+{0x53, 0x53, 0, 0x80, 0},
+{0x54, 0x54, 2, 0x80, 0},
+{0x55, 0x55, 0, 0x80, 0},
+{0x56, 0x56, 1, 0x80, 0},
+{0x57, 0x57, 2, 0x80, 0},
+{0x58, 0x58, 4, 0x80, 0},
+{0x59, 0x59, 0, 0x80, 0},
+{0x5A, 0x5A, 4, 0x80, 0},
+{0x5B, 0x5B, 0x17, 0, 0},
+{0x5C, 0x5C, 0x17, 0, 0},
+{0x5D, 0x5D, 1, 0, 0},
+{0x5E, 0x5E, 0x17, 0x80, 0},
+{0x5F, 0x5F, 0, 0, 0},
+{0x60, 0x60, 0, 0x80, 0},
+{0x61, 0x61, 0x18, 0x80, 0},
+{0x62, 0x62, 0x18, 0, 0},
+{0x63, 0x63, 0x18, 0, 0},
+{0x64, 0x64, 0x18, 0, 0},
+{0x65, 0x65, 0x18, 0, 0},
+{0x66, 0x66, 0x19, 0x80, 0},
+{0x67, 0x67, 0x19, 0, 0},
+{0x68, 0x68, 2, 0x80, 0},
+{0x69, 0x69, 2, 0, 0},
+{0x6A, 0x6A, 0x1A, 0x80, 0},
+{0x6B, 0x6B, 0x1A, 0, 0},
+{0x6C, 0x6C, 2, 0, 0},
+{0x6D, 0x6D, 0x1A, 0, 0},
+{0x6E, 0x6E, 0x1E, 0x80, 0},
+{0x6F, 0x6F, 0x1E, 0x80, 0},
+{0x70, 0x70, 0x1E, 0, 0},
+{0x71, 0x71, 0x1E, 0, 0},
+{0x72, 0x72, 0x1E, 0, 0},
+{0x73, 0x73, 1, 0, 0},
+{0x74, 0x74, 1, 0, 0},
+{0x75, 0x75, 1, 0, 0},
+{0x76, 0x76, 0x25, 0, 0},
+{0x77, 0x77, 0x25, 0, 0},
+{0x78, 0x78, 0x25, 0, 0},
+{0x79, 0x79, 0x25, 0, 0},
+{0x7A, 0x7A, 0x1C, 0x80, 0},
+{0x7B, 0x7B, 0x1C, 0, 0},
+{0x7C, 0x7C, 0x1C, 0, 0},
+{0x7D, 0x7D, 0x1C, 0, 0},
+{0x7E, 0x7E, 0x1C, 0, 0},
+{0x7F, 0x7F, 0x1C, 0, 0},
+{0x80, 0x80, 0x1C, 0, 0},
+{0x81, 0x81, 0x1C, 0x80, 0},
+{0x82, 0x82, 0x1F, 0, 0},
+{0x83, 0x83, 0x23, 0x80, 0},
+{0x84, 0x84, 0x1F, 0, 0},
+{0x85, 0x85, 0x1F, 0x80, 0},
+{0x86, 0x86, 0x1F, 0, 0},
+{0x87, 0x87, 0x1F, 0x80, 0},
+{0x88, 0x88, 0x24, 0x80, 0},
+{0x89, 0x89, 0x24, 0, 0},
+{0x8A, 0x8A, 1, 0x80, 0},
+{0x8B, 0x8B, 1, 0x80, 0},
+{0x8C, 0x8C, 1, 0, 0},
+{0x8D, 0x8D, 0x1F, 0x80, 0},
+{0x8E, 0x8E, 0x1F, 0, 0},
+{0x8F, 0x8F, 0x1F, 0, 0},
+{0x90, 0x90, 0, 0, 0},
+{0x91, 0x91, 0, 0, 0},
+{0x92, 0x92, 0, 0, 0},
+{0x93, 0x93, 0, 0, 0},
+{0x94, 0x94, 0x17, 0, 0},
+{0x95, 0x95, 0x17, 0, 0},
+{0x96, 0x96, 0x26, 0, 0},
+{0x97, 0x97, 0x27, 0, 0},
+{0x98, 0x98, 0x28, 0, 0},
+{0x99, 0x99, 0x29, 0, 0},
+{0x9A, 0x9A, 0x2A, 0, 0},
+{0x9B, 0x9B, 0x2B, 0x80, 0},
+{0x9C, 0x9C, 0x2B, 0, 0},
+{0x9D, 0x9D, 0x2B, 0x80, 0},
+{0x9E, 0x9E, 0x2C, 0x80, 0},
+{0x9F, 0x9F, 6, 0, 0},
+{0xA0, 0xA0, 6, 0x80, 0},
+{0xA1, 0xA1, 6, 0, 0},
+{0xA2, 0xA2, 6, 0, 0},
+{0xA3, 0xA3, 0x2D, 0, 0},
+{0xA4, 0xA4, 0x2D, 0, 0},
+{0xA5, 0xA5, 0x2D, 0, 0},
+{0xA6, 0xA6, 0x2D, 0, 0},
+{0xA7, 0xA7, 0x2D, 0, 0},
+{0xA8, 0xA8, 7, 0, 0},
+{0xA9, 0xA9, 7, 0, 0},
+{0xAA, 0xAA, 7, 0, 0},
+{0xAB, 0xAB, 7, 0, 0},
+{0xAC, 0xAC, 0x20, 0, 0},
+{0xAD, 0xAD, 0x20, 0, 0},
+{0xAE, 0xAE, 0x20, 0x80, 0},
+{0xAF, 0xAF, 0x20, 0, 0},
+{0xB0, 0xB0, 0x20, 0, 0},
+{0xB1, 0xB1, 0x2E, 0x80, 0},
+{0xB2, 0xB2, 0x2E, 0, 0},
+{0xB3, 0xB3, 0x2E, 0, 0},
+{0xB4, 0xB4, 0, 0, 0},
+{0xB5, 0xB5, 0, 0x80, 0},
+{0xB6, 0xB6, 0, 0x80, 0},
+{0xB7, 0xB7, 0, 0, 0},
+{0xB8, 0xB8, 0x17, 0x80, 0},
+{0xB9, 0xB9, 0x17, 0, 0},
+{0xBA, 0xBA, 0x17, 0x80, 0},
+{0xBB, 0xBB, 0x17, 0, 0},
+{0xBC, 0xBC, 7, 0, 0},
+{0xBD, 0xBD, 7, 0x80, 0},
+{0xBE, 0xBE, 7, 0x80, 0},
+{0xBF, 0xBF, 6, 0x80, 0},
+{0xC0, 0xC0, 7, 0, 0},
+{0xC1, 0xC1, 6, 0, 0},
+{0xC2, 0xC2, 0, 0x80, 0},
+{0xC3, 0xC3, 0, 0x80, 0},
+{0xC4, 0xC4, 1, 0x80, 0},
+{0xC5, 0xC5, 1, 0x80, 0},
+{0xC6, 0xC6, 4, 0x80, 0},
+{0xC7, 0xC7, 4, 0x80, 0},
+{0xC8, 0xC8, 5, 0x80, 0},
+{0xC9, 0xC9, 5, 0x80, 0},
+{0xCA, 0xCA, 6, 0x80, 0},
+{0xCB, 0xCB, 6, 0x80, 0},
+{0xCC, 0xCC, 7, 0x80, 0},
+{0xCD, 0xCD, 7, 0x80, 0},
+{0xCE, 0xCE, 0x31, 0x80, 0},
+{0xCF, 0xCF, 0x31, 0x80, 0},
+{0xD0, 0xD0, 5, 0x80, 0},
+{0xD1, 0xD1, 5, 0, 0},
+{0xD2, 0xD2, 4, 0x80, 0},
+{0xD3, 0xD3, 4, 0, 0},
+{0xD4, 0xD4, 5, 0, 0},
+{0xD5, 0xD5, 5, 0x80, 0},
+{0xD6, 0xD6, 4, 0x80, 0},
+{0xD7, 0xD7, 4, 0x80, 0},
+{0xD8, 0xD8, 5, 0x80, 0},
+{0xD9, 0xD9, 7, 0x80, 0},
+{0xDA, 0xDA, 6, 0x80, 0},
+{0xDB, 0xDB, 0x2F, 0, 0},
+{0xDC, 0xDC, 0x22, 0, 0},
+{0xDD, 0xDD, 0x22, 0, 0},
+{0xDE, 0xDE, 0x22, 0, 0},
+{0xDF, 0xDF, 0x22, 0, 0},
+{0xE0, 0xE0, 5, 0x80, 0},
+{0xE1, 0xE1, 5, 0, 0},
+{0xE2, 0xE2, 4, 0x80, 0},
+{0xE3, 0xE3, 0x20, 0, 0},
+{0xE4, 0xE4, 0x2E, 0, 0},
+{0xE5, 0xE5, 0x23, 0, 0},
+{0xE6, 0xE6, 0x2E, 0, 0},
+{0xE7, 0xE7, 0x20, 0, 0},
+{0xE8, 0xE8, 0x20, 0, 0},
+{0xE9, 0xE9, 6, 0, 0},
+{0xEA, 0xEA, 0x32, 0, 0},
+{0xEB, 0xEB, 0x32, 0, 0},
+{0xEC, 0xEC, 0x32, 0, 0},
+{0xED, 0xED, 0x32, 0, 0},
+{0xEE, 0xEE, 0x32, 0x80, 0},
+{0xEF, 0xEF, 0x32, 0, 0},
+{0xF0, 0xF0, 6, 0, 0},
+{0xF1, 0xF1, 6, 0, 0},
+{0xF2, 0xF2, 0x20, 0, 0},
+{0xF3, 0xF3, 0x20, 0x80, 0},
+{0xF4, 0xF4, 0x20, 0x80, 0},
+{0xF5, 0xF5, 0x23, 0x80, 0},
+{0xF6, 0xF6, 0x23, 0x80, 0},
+{0xF7, 0xF7, 0x23, 0x80, 0},
+{0xF8, 0xF8, 0x23, 0x80, 0},
+{0xF9, 0xF9, 0x23, 0, 0},
+{0xFA, 0xFA, 0x23, 0, 0},
+{0xFB, 0xFB, 0x23, 0x80, 0},
+{0xFC, 0xFC, 0x30, 0, 0},
+{0xFD, 0xFD, 0x30, 0x80, 0},
+{0xFE, 0xFE, 0x30, 0, 0},
+{0xFF, 0xFF, 0x30, 0, 0},
+{0x100, 0x100, 0x30, 0x80, 0},
+{0x101, 0x101, 0x30, 0, 0},
+{0x102, 0x102, 0x33, 0, 0},
+{0x103, 0x103, 0x33, 0x80, 0},
+{0x104, 0x104, 0x33, 0, 0},
+{0x105, 0x105, 0x33, 0, 0},
+{0x106, 0x106, 0x33, 0x80, 0},
+{0x107, 0x107, 0x31, 0x80, 0},
+{0x108, 0x108, 0x31, 0, 0},
+{0x109, 0x109, 0x31, 0x80, 0},
+{0x10A, 0x10A, 0, 0x80, 0},
+{0x10B, 0x10B, 0, 0x80, 0},
+{0x10C, 0x10C, 0, 0, 0},
+{0x10D, 0x10D, 0, 0, 0},
+{0x10E, 0x10E, 6, 0, 0},
+{0x10F, 0x10F, 6, 0, 0},
+{0x110, 0x110, 6, 0, 0},
+{0x111, 0x111, 6, 0, 0},
+{0x112, 0x112, 6, 0, 0},
+{0x113, 0x113, 0, 0x80, 0},
+{0x114, 0x114, 4, 0, 0},
+{0x115, 0x115, 5, 0, 0},
+{0x116, 0x116, 3, 0, 0},
+{0x117, 0x117, 7, 0, 0},
+{0x118, 0x118, 7, 0x80, 0},
+{0x119, 0x119, 7, 0x80, 0},
+{0x11A, 0x11A, 7, 0x80, 0},
+{0x11B, 0x11B, 0x31, 0x80, 0},
+{0x11C, 0x11C, 0x31, 0x80, 0},
+{0x11D, 0x11D, 0x31, 0, 0},
+{0x11E, 0x11E, 0x31, 0, 0},
+{0x11F, 0x11F, 0x31, 0, 0},
+{0x120, 0x120, 0x31, 0, 0},
+{0x121, 0x121, 0x31, 0x80, 0},
+{0x122, 0x122, 0x31, 0, 0},
+{0x123, 0x123, 0x31, 0, 0},
+{0x124, 0x124, 0x31, 0, 0},
+{0x125, 0x125, 0x31, 0x80, 0},
+{0x126, 0x126, 0x31, 0, 0},
+{0x127, 0x127, 0x31, 0x80, 0},
+{0x128, 0x128, 0x31, 0, 0},
+{0x129, 0x129, 0x31, 0, 0},
+{0x12A, 0x12A, 0x31, 0, 0},
+{0x12B, 0x12B, 0x31, 0, 0},
+{0x12C, 0x12C, 0x31, 0, 0},
+{0x12D, 0x12D, 0, 0, 0},
+{0x12E, 0x12E, 0x31, 0, 0},
+{0x12F, 0x12F, 0, 0, 0},
+{0x130, 0x130, 0, 0x80, 0},
+{0x131, 0x131, 0x34, 0x80, 0},
+{0x132, 0x132, 0x34, 0x80, 0},
+{0x133, 0x133, 0x34, 0, 0},
+{0x134, 0x134, 0x34, 0x80, 0},
+{0x135, 0x135, 0x34, 0, 0},
+{0x136, 0x136, 0x35, 0, 0},
+{0x137, 0x137, 0, 0x80, 0},
+{0x138, 0x138, 0x36, 0x80, 0},
+{0x139, 0x139, 0x36, 0, 0},
+{0x13A, 0x13A, 0, 0, 0},
+{0x13B, 0x13B, 0x35, 0x80, 0},
+{0x13C, 0x13C, 0x31, 0x80, 0},
+{0x13D, 0x13D, 6, 0x80, 0},
+{0x13E, 0x13E, 7, 0x80, 0},
+{0x13F, 0x13F, 4, 0x80, 0},
+{0x140, 0x140, 4, 0x80, 0},
+{0x141, 0x141, 4, 0, 0},
+{0x142, 0x142, 4, 0x80, 0},
+{0x143, 0x143, 4, 0, 0},
+{0x144, 0x144, 4, 0, 0},
+{0x145, 0x145, 4, 0, 0},
+{0x146, 0x146, 4, 0, 0},
+{0x147, 0x147, 4, 0, 0},
+{0x148, 0x148, 4, 0x80, 0},
+{0x149, 0x149, 4, 0, 0},
+{0x14A, 0x14A, 4, 0, 0},
+{0x14B, 0x14B, 5, 0, 0},
+{0x14C, 0x14C, 5, 0, 0},
+{0x14D, 0x14D, 5, 0x80, 0},
+{0x14E, 0x14E, 0, 0, 0},
+{0x14F, 0x14F, 0, 0, 0},
+{0x150, 0x150, 0, 0, 0},
+{0x151, 0x151, 0, 0, 0},
+{0x152, 0x152, 0, 0x80, 0},
+{0x153, 0x153, 0x17, 0, 0},
+{0x154, 0x154, 0x17, 0x80, 0},
+{0x155, 0x155, 0x37, 0, 0},
+{0x156, 0x156, 0x37, 0, 0},
+{0x157, 0x157, 0x37, 0x80, 0},
+{0x158, 0x158, 0x37, 0, 0},
+{0x159, 0x159, 0x37, 0x80, 0},
+{0x15A, 0x15A, 0x35, 0, 0},
+{0x15B, 0x15B, 0x35, 0, 0},
+{0x15C, 0x15C, 5, 0, 0},
+{0x15D, 0x15D, 5, 0, 0},
+{0x15E, 0x15E, 5, 0, 0},
+{0x15F, 0x15F, 5, 0x80, 0},
+{0x160, 0x160, 5, 0, 0},
+{0x161, 0x161, 5, 0, 0},
+{0x162, 0x162, 5, 0, 0},
+{0x163, 0x163, 5, 0x80, 0},
+{0x164, 0x164, 5, 0, 0},
+{0x165, 0x165, 5, 0x80, 0},
+{0x166, 0x166, 0x21, 0, 0},
+{0x167, 0x167, 0x21, 0, 0},
+{0x168, 0x168, 0x21, 0x80, 0},
+{0x169, 0x169, 0x21, 0x80, 0},
+{0x16A, 0x16A, 0x38, 0, 0},
+{0x16B, 0x16B, 0x38, 0x80, 0},
+{0x16C, 0x16C, 0x38, 0, 0},
+{0x16D, 0x16D, 0x31, 0, 0},
+{0x16E, 0x16E, 6, 0, 0},
+{0x16F, 0x16F, 4, 0, 0},
+{0x170, 0x170, 7, 0, 0},
+{0x171, 0x171, 7, 0, 0},
+{0x172, 0x172, 6, 0, 0},
+{0x173, 0x173, 4, 0, 0},
+{0x174, 0x174, 4, 0, 0},
+{0x175, 0x175, 4, 0x80, 0},
+{0x176, 0x176, 4, 0x80, 0},
+{0x177, 0x177, 4, 0, 0},
+{0x178, 0x178, 0x1B, 0x80, 0},
+{0x179, 0x179, 0x1B, 0, 0},
+{0x17A, 0x17A, 7, 0x80, 0},
+{0x17B, 0x17B, 0x30, 0x80, 0},
+{0x17C, 0x17C, 1, 0x80, 0},
+{0x17D, 0x17D, 1, 0x80, 0},
+{0x17E, 0x17E, 1, 0, 0},
+{0x17F, 0x17F, 1, 0x80, 0},
+{0x180, 0x180, 0x39, 0x80, 0},
+{0x181, 0x181, 0x39, 0x80, 0},
+{0x182, 0x182, 0x39, 0x80, 0},
+{0x183, 0x183, 0x39, 0x80, 0},
+{0x184, 0x184, 0x39, 0x80, 0},
+{0x185, 0x185, 0x39, 0, 0},
+{0x186, 0x186, 0x39, 0x80, 0},
+{0x187, 0x187, 0x39, 0x80, 0},
+{0x188, 0x188, 0x39, 0x80, 0},
+{0x189, 0x189, 0x39, 0, 0},
+{0x18A, 0x18A, 0x39, 0x80, 0},
+{0x18B, 0x18B, 0x39, 0, 0},
+{0x18C, 0x18C, 0x39, 0, 0},
+{0x18D, 0x18D, 0x39, 0, 0},
+{0x18E, 0x18E, 0x39, 0x80, 0},
+{0x18F, 0x18F, 0x39, 0, 0},
+{0x190, 0x190, 0x39, 0, 0},
+{0x191, 0x191, 0x39, 0, 0},
+{0x192, 0x192, 0x39, 0, 0},
+{0x193, 0x193, 0x39, 0, 0},
+{0x194, 0x194, 0x34, 0x80, 0},
+{0x195, 0x195, 0x34, 0, 0},
+{0x196, 0x196, 0x34, 0x80, 0},
+{0x197, 0x197, 0x34, 0, 0},
+{0x198, 0x198, 0x34, 0x80, 0},
+{0x199, 0x199, 0x31, 0, 0},
+{0x19A, 0x19A, 1, 0, 0},
+{0x19B, 0x19B, 0x34, 0, 0},
+{0x19C, 0x19C, 0x24, 0, 0},
+{0x19D, 0x19D, 0x1D, 0, 0},
+{0x19E, 0x19E, 0x1D, 0, 0},
+{0x19F, 0x19F, 1, 0x80, 0},
+{0x1A0, 0x1A0, 0x3B, 0, 0},
+{0x1A1, 0x1A1, 4, 0, 0},
+{0x1A2, 0x1A2, 4, 0x80, 0},
+{0x1A3, 0x1A3, 0x3C, 0, 0},
+{0x1A4, 0x1A4, 0x21, 0, 0},
+{0x1A5, 0x1A5, 4, 0, 0},
+{0x1A6, 0x1A6, 0x31, 0, 0},
+{0x1A7, 0x1A7, 0x31, 0, 0},
+{0x1A8, 0x1A8, 6, 0, 0},
+{0x1A9, 0x1A9, 8, 0, 0},
+{0x136, 0x136, 0x3A, 0, 0},
+{0x1AA, 0x1AA, 0, 0x80, 0},
+{0x1AB, 0x1AB, 0x31, 0, 0},
+{0x1AC, 0x1AC, 0x31, 0x80, 0},
+{0x1AD, 0x1AD, 1, 0x80, 0},
+{0x1AE, 0x1AE, 1, 0, 0},
+{0x1AF, 0x1AF, 0x1B, 0, 0},
+{0x1B0, 0x1B0, 0x1B, 0, 0},
+{0x1B1, 0x1B1, 0x1B, 0, 0},
+{0x1B2, 0x1B2, 0x1B, 0, 0},
+{0x1B3, 0x1B3, 0x1B, 0x80, 0},
+{0x1B4, 0x1B4, 0x37, 0x80, 0},
+{0x1B5, 0x1B5, 0x37, 0, 0},
+{0x1B6, 0x1B6, 0x38, 0, 0},
+{0x1B7, 0x1B7, 0x38, 0x80, 0},
+{0x1B8, 0x1B8, 0x21, 0x80, 0},
+{0x1B9, 0x1B9, 0x1D, 0, 0},
+{0x1BA, 0x1BA, 0x34, 0, 0},
+{0x1BB, 0x1BB, 0x34, 0x80, 0},
+{0x1BC, 0x1BC, 0x1D, 0, 0},
+{0x1BD, 0x1BD, 7, 0x80, 0},
+{0x1BE, 0x1BE, 6, 0x80, 0},
+{0x1BF, 0x1BF, 0, 0x80, 0},
+{0x1C0, 0x1C0, 0, 0x80, 0},
+{0x1C1, 0x1C1, 0x20, 0, 0},
+{0x1C2, 0x1C2, 0x3D, 0, 0},
+{0x1C3, 0x1C3, 0x3D, 0, 0},
+{0x1C4, 0x1C4, 0, 0, 0},
+{0x1C5, 0x1C5, 0x1B, 0, 0},
+{0x1C6, 0x1C6, 0x31, 0x80, 0},
+{0x1C7, 0x1C7, 6, 0x80, 0},
+{0x1C8, 0x1C8, 4, 0x80, 0},
+{0x1C9, 0x1C9, 0x1D, 0x80, 0},
+{0x1CA, 0x1CA, 0x3E, 0, 0},
+{0x1CB, 0x1CB, 6, 0, 0},
+{0x1CC, 0x1CC, 7, 0, 0},
+{0x1CD, 0x1CD, 5, 0, 0},
+{0x1CE, 0x1CE, 0x31, 0, 0},
+{0x1CF, 0x1CF, 3, 0x80, 0},
+{0x1D0, 0x1D0, 0x3A, 0x80, 0},
+{0x1D1, 0x1D1, 1, 0x80, 0},
+{0x1D2, 0x1D2, 1, 0x80, 0},
+{0x1D3, 0x1D3, 1, 0x80, 0},
+{0x1D4, 0x1D4, 0, 0x80, 0},
+{0x1D5, 0x1D5, 0, 0x80, 0},
+{0x1D6, 0x1D6, 0, 0x80, 0},
+{0x1D7, 0x1D7, 3, 0, 0},
+{0x1D8, 0x1D8, 7, 0, 0},
+{0x1D9, 0x1D9, 7, 0x80, 0},
+{0x1DA, 0x1DA, 7, 0, 0},
+{0x1DB, 0x1DB, 7, 0, 0},
+{0x1DC, 0x1DC, 7, 0, 0},
+{0x1DD, 0x1DD, 0, 0, 0},
+};
+
+extern u8 gUnk_0838EEF4[];
+
+#define CUTSCENE_ANIM_BASE  ((u8*)0x02020000)
+void sub_80046DC(u16 arg0, u8 arg1, u8 arg2) {
+        u8 a;
+    u8 b;
+
+    gUnk_030044C0[arg1] = gUnk_087E860C[gCutsceneAnimConfigTable[arg0].scriptIdx];
+    gVramBufferPointers[arg1] = (u32)(CUTSCENE_ANIM_BASE + arg1 * 0x1000);
+
+    if(arg2 > 99)
+    {
+        a = 0x40;
+        b = arg2 - 100;
+    }
+    else
+    {
+        a = 0;
+        b = arg2;
+    }
+    gUnk_03002C60[arg1] = a | gCutsceneAnimConfigTable[arg0].field_5;
+    gUnk_03003490[arg1] = b;
+    gUnk_030032E0[arg1] = &gUnk_0838EEF4[gCutsceneAnimConfigTable[arg0].palIdx * 32];
+    LZ77UnCompWram((void*)gUnk_087E8D84[gCutsceneAnimConfigTable[arg0].gfxIdx], (void*)(CUTSCENE_ANIM_BASE + arg1 * 0x1000));
+}
+
 /*
 
 typedef struct{
@@ -2903,34 +3950,23 @@ void sub_80046DC(u16 arg0, u8 arg1, u8 arg2) {
 
 INCLUDE_ASM("asm/nonmatchings", sub_800478C);
 
-INCLUDE_ASM("asm/matchings", sub_8004980);
-// typedef struct{
-//     u8 unk0;
-//     u8 unk1;
-//     u8 unk2;
-//     u8 unk3;
-// }Unk_087E94FC;
 
-// extern u8 gUnk_03003480;
-// extern u8 gUnk_03004618;
-// extern u16 gUnk_030047B0;
-// extern Unk_087E94FC gUnk_087E94FC[];
+void sub_8004980(void) {
+    u8 i;
 
-// void sub_8004980(void) {
-//     u8 i;
+    gUnk_03003480 = 0xFF;
 
-//     gUnk_03003480 = 0xFF;
+    for(i = 0; i < 22; i++)
+    {
+        if(gUnk_087E94FC[i].field_0 == gUnk_030047B0)
+        {
+            gUnk_03004618 = i + 1;
+            return;
+        }
+    }
+    gUnk_03004618 = 0;
 
-//     for(i = 0; i < 22; i++)
-//     {
-//         if(gUnk_087E94FC[i].unk0 == gUnk_030047B0)
-//         {
-//             gUnk_03004618 = i + 1;
-//             return;
-//         }
-//     }
-//     gUnk_03004618 = 0;
-// }
+}
 
 void sub_80049C8(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 {
@@ -3071,8 +4107,8 @@ void sub_8004B8C()
 
     for (i = 0; i < 128; i++)
     {
-        gRenderObjects[i].field_0 = 0;
-        gRenderObjects[i].subObject = 0;
+        gSpriteNodePool[i].flags = 0;
+        gSpriteNodePool[i].next = 0;
     }
 }
 
@@ -3094,7 +4130,7 @@ void sub_8004BE0(void)
     u16 i;
     for (i = 0; i < 128; i++)
     {
-        gRenderObjectPtrSortList[i] = 0;
+        gSpriteRenderQueue[i] = 0;
     }
 }
 
@@ -3104,7 +4140,7 @@ u8 sub_8004BFC(void)
 
     for (i = 2; i < 0x70; i++)
     {
-        if (gRenderObjects[i].field_0 == 0)
+        if (gSpriteNodePool[i].flags == 0)
         {
             return i;
         }
@@ -3116,7 +4152,7 @@ static inline u8 findEmpty_Inl()
     u16 i;
     for (i = 2; i < 0x70; i++)
     {
-        if (gRenderObjects[i].field_0 == 0)
+        if (gSpriteNodePool[i].flags == 0)
         {
             return i;
         }
@@ -3124,15 +4160,15 @@ static inline u8 findEmpty_Inl()
     return 0;
 }
 
-struct RenderObject *sub_8004C28(struct RenderObject *obj, u8 arg1, u16 arg2, u16 arg3, u16 arg4)
+SpriteNode *sub_8004C28(SpriteNode *sprNode, u8 arg1, u16 arg2, u16 arg3, u16 arg4)
 {
     u8 foundIndex;
 
-    obj->field_0 = arg1;
-    obj->attr0 = arg2;
-    obj->attr1 = arg3;
-    obj->attr2 = arg4;
-    obj->animFrame = 0;
+    sprNode->flags = arg1;
+    sprNode->attr0 = arg2;
+    sprNode->attr1 = arg3;
+    sprNode->attr2 = arg4;
+    sprNode->animStep = 0;
 
     if ((arg1 & 0x7F) == 1)
         return 0;
@@ -3144,8 +4180,8 @@ struct RenderObject *sub_8004C28(struct RenderObject *obj, u8 arg1, u16 arg2, u1
         return 0;
     }
 
-    obj->subObject = &gRenderObjects[foundIndex];
-    return &gRenderObjects[foundIndex];
+    sprNode->next = &gSpriteNodePool[foundIndex];
+    return &gSpriteNodePool[foundIndex];
 }
 INCLUDE_ASM("asm/matchings", sub_8004C8C);
 // extern u8* gUnk_087E8430[];
@@ -3209,33 +4245,33 @@ void sub_8004D20(u8 arg0, u8 arg1, u8 arg2)
 void sub_8004D38(u8 arg0)
 {
     CharacterObject *ptr2E80;
-    struct RenderObject *node;
-    struct RenderObject *next;
+    struct SpriteNode *node;
+    struct SpriteNode *next;
 
     ptr2E80 = &gUnk_03002E80[arg0];
 
-    node = &gRenderObjects[ptr2E80->renderObjIdx];
+    node = &gSpriteNodePool[ptr2E80->sprNodeIdx];
 
-    if (node->field_0 != 0)
+    if (node->flags != 0)
     {
-        node->field_0 = 0;
+        node->flags = 0;
 
-        next = node->subObject;
+        next = node->next;
         if (next != 0)
         {
             do
             {
-                node->subObject = 0;
+                node->next = 0;
                 node = next;
-                if (node->field_0 == 0)
+                if (node->flags == 0)
                     break;
-                node->field_0 = 0;
-                next = node->subObject;
+                node->flags = 0;
+                next = node->next;
             } while (next != 0);
         }
     }
 
-    ptr2E80->renderObjIdx = 0;
+    ptr2E80->sprNodeIdx = 0;
 }
 void sub_8004D8C(u8 arg0, u8 *arg1)
 {
@@ -3261,7 +4297,7 @@ u8 sub_8004DD0(void)
 
     for (i = 0; i < 0x18; i++)
     {
-        if (ptr2E80->renderObjIdx != 0 && ptr2E80->field_12 & 0x80)
+        if (ptr2E80->sprNodeIdx != 0 && ptr2E80->field_12 & 0x80)
             return 1;
         ptr2E80++;
     }
@@ -3327,30 +4363,30 @@ s16 sub_8004EDC(CharacterObject *arg0)
     }
     return arg0->x;
 }
-void sub_8004F3C(struct RenderObject *arg0)
+void sub_8004F3C(struct SpriteNode *arg0)
 {
 
-    struct RenderObject *node;
-    struct RenderObject *next;
+    struct SpriteNode *node;
+    struct SpriteNode *next;
 
-    if (arg0->field_0 == 0)
+    if (arg0->flags == 0)
         return;
 
-    arg0->field_0 = 0;
+    arg0->flags = 0;
 
-    node = arg0->subObject;
+    node = arg0->next;
 
     if (node == 0)
         return;
 
     do
     {
-        arg0->subObject = 0;
+        arg0->next = 0;
         arg0 = node;
-        if (node->field_0 == 0)
+        if (node->flags == 0)
             break;
-        node->field_0 = 0;
-        node = arg0->subObject;
+        node->flags = 0;
+        node = arg0->next;
     } while (node != 0);
 }
 INCLUDE_ASM("asm/matchings", sub_8004F64);
@@ -3408,1343 +4444,5 @@ s32 sub_8004FD0(u8 arg0)
 
     return 0;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8005020);
-INCLUDE_ASM("asm/nonmatchings", sub_80051D0);
-INCLUDE_ASM("asm/nonmatchings", sub_800526C);
-INCLUDE_ASM("asm/nonmatchings", sub_80052F8);
-INCLUDE_ASM("asm/nonmatchings", sub_80053B4);
-INCLUDE_ASM("asm/nonmatchings", sub_80055E8);
-u16 *sub_8005B2C(s16 x, s16 y)
-{
-    s16 screenX, screenY;
-    s16 tileX, tileY;
-    u16 *buf;
 
-    screenX = x - (gUnk_030025B4 & ~0xF);
 
-    screenY = y - (gUnk_030025FC & ~0xF);
-
-    if (screenX < 0 || screenY < 0 || screenX > 240 || screenY > 160)
-    {
-        return 0;
-    }
-
-    tileX = screenX >> 3;
-    tileY = screenY >> 3;
-
-    if (gUnk_03004688 == 0)
-    {
-        return (u16 *)0x02004000 + (tileY * 32) + tileX;
-    }
-    else
-    {
-        return (u16 *)0x02004800 + (tileY * 32) + tileX;
-    }
-}
-INCLUDE_ASM("asm/nonmatchings", sub_8005BB4);
-INCLUDE_ASM("asm/nonmatchings", sub_8005C70);
-INCLUDE_ASM("asm/nonmatchings", sub_80064AC);
-INCLUDE_ASM("asm/matchings", sub_8006520);
-/*
-typedef struct {
-  u8 field_0;
-  u8 field_1;
-  u8 field_2;
-  u8 field_3;
-  u8 field_4;
-  u8 field_5;
-  u8 field_6;
-  u8 field_7;
-  u8 field_8;
-  u8 field_9;
-  u8 field_A;
-  u8 field_B;
-  u16 field_C;
-  u16 field_E;
-  u16 field_10;
-  u16 field_12;
-}Unk_08088D80;
-
-extern Unk_08088D80 gUnk_08088D80[];
-extern u8* gUnk_087EA020[];
-extern u8 gUnk_082893EC[][0x140];
-
-extern u8* gUnk_087E9AA0[];
-
-void sub_8006520(u8 arg0) {
-    u8 idx;
-    u16 i;
-
-    VBlankIntrWait();
-    sub_80533F0();
-    idx = gUnk_08088D80[arg0].field_10;
-    i = 0;
-    while(gUnk_087E9AA0[idx] != 0)
-    {
-        LZ77UnCompWram(gUnk_087E9AA0[idx], (void*)0x02020000 + (i<<12));
-        VBlankIntrWait();
-        sub_80533F0();
-
-        idx++;
-        i++;
-        if(i > 4)
-            break;
-
-    }
-
-    DmaCopy32(3, 0x02020000, 0x06000000, 0x4A60);
-
-    VBlankIntrWait();
-    sub_80533F0();
-
-    DmaCopy16(3, &gUnk_082893EC[gUnk_08088D80[arg0].field_12], 0x05000000, 0x140);
-
-    sub_8008DD8();
-
-    DmaCopy16(3, gUnk_087EA020[gUnk_08088D80[arg0].field_E], 0x02005000, 0x280*2);
-
-    DmaCopy16(3, 0x02005000, 0x0600F000, 0x800);
-
-    VBlankIntrWait();
-    sub_80533F0();
-}
-    */
-
-INCLUDE_ASM("asm/nonmatchings", sub_800661C);
-INCLUDE_ASM("asm/nonmatchings", sub_80071EC);
-INCLUDE_ASM("asm/matchings", sub_800729C);
-// InitMapSceneSprite
-//  void sub_800729C(u8 arg0) {
-//      u16 i;
-
-//     if(gUnk_0300467C & 0x80)
-//         return;
-
-//     gUnk_03004670[0] = gUnk_03004AA0[0];
-//     gUnk_030047D0[0] = gUnk_03004AA0[0];
-//     sub_8004C8C(0, gUnk_03004AA0[0]);
-//     sub_8004CB8(0, gUnk_03004AA0[0]);
-//     gUnk_03004670[1] = 11;
-//     gUnk_030047D0[1] = 11;
-//     sub_8004C8C(1, 11);
-//     sub_8004CB8(1, 11);
-// gMapSceneConfigs
-//     if(gUnk_08088D80[arg0].field_9 != 0)
-//     {
-// VRAM最多8种不同的精灵模型（会有一些模型没变，但是颜色不一样的npc）
-//         for(i = 0; i < 8; i++)
-//         {
-//             if(gUnk_03004670[i + 2] != 0xFF)
-//             {
-//                 sub_8004C8C(i + 2, gUnk_03004670[i + 2]);
-//             }
-//         }
-
-//         for(i = 0; i < 8; i++)
-//         {
-//             if(gUnk_030047D0[i + 2] != 0xFF)
-//             {
-//                 sub_8004CB8(i + 2, gUnk_030047D0[i + 2]);
-//             }
-//         }
-//     }
-// }
-INCLUDE_ASM("asm/nonmatchings", sub_8007350);
-u8 *sub_8007964(u16 arg0, u8 *arg1)
-{
-    u32 temp_r0;
-
-    Unk_030046A0 *ptr46A0;
-
-    ptr46A0 = &gUnk_030046A0[arg0];
-
-    ptr46A0->field_0 = (arg1[0] & 1) + 1;
-    ptr46A0->field_3 = arg1[1];
-    arg1 += 2;
-
-    ptr46A0->field_1 = *arg1;
-    arg1++;
-
-    ptr46A0->field_2 = *arg1;
-    arg1++;
-
-    ptr46A0->field_6 = *arg1;
-    arg1++;
-
-    ptr46A0->field_7 = *arg1;
-    arg1++;
-    ptr46A0->field_8 = *arg1;
-    arg1++;
-    ptr46A0->field_9 = *arg1;
-    arg1++;
-
-    ptr46A0->field_A = 0;
-    ptr46A0->field_C = arg1;
-
-    temp_r0 = ptr46A0->field_8 * ptr46A0->field_9 * ptr46A0->field_1;
-    temp_r0 *= 2;
-
-    arg1 += temp_r0;
-
-    return arg1;
-}
-u8 *sub_80079BC(u16 arg0, u8 *arg1)
-{
-    u32 temp_r0;
-
-    Unk_030046A0 *ptr46A0;
-
-    ptr46A0 = &gUnk_030046A0[arg0];
-
-    ptr46A0->field_0 = (arg1[0] & 1) + 1;
-    ptr46A0->field_3 = arg1[1];
-    arg1 += 2;
-
-    ptr46A0->field_1 = *arg1;
-    arg1++;
-
-    ptr46A0->field_2 = *arg1;
-    arg1++;
-
-    ptr46A0->field_6 = *arg1;
-    arg1++;
-
-    ptr46A0->field_7 = *arg1;
-    arg1++;
-    ptr46A0->field_8 = *arg1;
-    arg1++;
-    ptr46A0->field_9 = *arg1;
-    arg1++;
-
-    ptr46A0->field_A = (ptr46A0->field_1 << ptr46A0->field_2) - 2;
-    ptr46A0->field_C = arg1;
-
-    temp_r0 = ptr46A0->field_8 * ptr46A0->field_9 * ptr46A0->field_1;
-    temp_r0 *= 2;
-
-    arg1 += temp_r0;
-
-    return arg1;
-}
-INCLUDE_ASM("asm/nonmatchings", sub_8007A1C);
-INCLUDE_ASM("asm/nonmatchings", sub_8007ADC);
-INCLUDE_ASM("asm/nonmatchings", sub_8007BD0);
-INCLUDE_ASM("asm/matchings", sub_8007D5C);
-/*
-extern u8* gUnk_087EA0FC[];
-extern u8* gUnk_087EA110[];
-extern u8* gUnk_087EA124[];
-extern u8* gUnk_087E96B4[];
-
-extern u8 gUnk_0300469C;
-extern u8 gUnk_030047E0;
-extern u8 gUnk_030047B4;
-
-void sub_8007D5C(u8 arg0) {
-    u16* dest;
-    u16 i;
-
-    gUnk_0300259C = 3;
-    HuffUnComp(gUnk_087EA0FC[arg0], (void* )0x02020000);
-    LZ77UnCompVram((void* )0x02020000, (void* )0x06000000);
-    LZ77UnCompVram(gUnk_087EA110[arg0], (void* )0x0600E000);
-    DmaCopy16(3, gUnk_087EA124[arg0], PLTT, 0x80 * 2);
-    LZ77UnCompVram((void* )0x0809CB90, (void* )0x06008000);
-    nullsub_5();
-    LZ77UnCompVram((void* )0x0809D198, (void* )0x06009000);
-    nullsub_5();
-    LZ77UnCompVram((void* )0x0809D718, (void* )0x0600A000);
-    nullsub_5();
-    LZ77UnCompVram((void* )0x0809DCE8, (void* )0x0600B000);
-    nullsub_5();
-    DmaCopy16(3,0x0809C834, 0x05000160, 0x30 * 2);
-    nullsub_5();
-    LZ77UnCompVram((void* )0x08095A1C, (void* )0x0600D000);
-    LZ77UnCompVram((void* )0x08095C94, (void* )0x0600D400);
-    LZ77UnCompVram((void* )0x08095F14, (void* )0x0600D800);
-    LZ77UnCompVram((void* )0x0809619C, (void* )0x0600DC00);
-
-    DmaCopy16(3,0x08087216, PLTT, 2);
-
-    REG_DISPCNT = (REG_DISPCNT & 0xE000) | 0x1560;
-    REG_BG2CNT = 0x3C02;
-    REG_BG3CNT = 0x3D01;
-    REG_BG0CNT = 0x3F08;
-
-    gUnk_03004658 = 0x1E41;
-    gUnk_03004550 = 0x1F00;
-
-    DmaCopy16(3,0x08393288, 0x0600C000, 0x200);
-    DmaCopy16(3,0x08393688, 0x05000140, 0x20);
-
-    sub_80064AC(0);
-    DmaCopy16(3,0x02005000, 0x0600F000, 0x800);
-
-
-    dest = (u16* )0x02005800;
-    for(i = 0; i < 0x800; i++)
-    {
-        *dest++ = 0;
-    }
-
-    sub_80163CC(  gUnk_087E96B4[gUnk_030047B4] );
-    gUnk_03004610 = 1;
-    REG_BG1CNT = 0x1E0F;
-    REG_DISPCNT |= 0x200;
-    sub_8000C98(1);
-    sub_8007FB8(arg0);
-    gUnk_0300469C = gUnk_030047E0;
-}
-*/
-INCLUDE_ASM("asm/nonmatchings", sub_8007FB8);
-INCLUDE_ASM("asm/nonmatchings", sub_8008124);
-void sub_80081C0(void)
-{
-
-    if (gUnk_0300000A[1] != 0)
-    {
-        sub_800243C(0xb0, 0x18, gUnk_0300000A[1], 0, 1);
-        sub_800243C(0xD0, 0x30, gUnk_0300000A[0], 0, 1);
-        return;
-    }
-
-    if (gUnk_0300000A[0] != 0)
-    {
-        if (gUnk_03000008 == 0)
-        {
-            gUnk_0300000C++;
-            if (gUnk_0300000C == 0xC0)
-            {
-                gUnk_03000008 = 1;
-            }
-        }
-        else
-        {
-            gUnk_0300000C--;
-            if (gUnk_0300000C == 0)
-            {
-                gUnk_03000008 = 0;
-            }
-        }
-
-        sub_800243C(0x68, 0x30, gUnk_0300000A[0], (gUnk_0300000C >> 6) + 0x10, 1);
-    }
-}
-INCLUDE_ASM("asm/nonmatchings", sub_8008254);
-INCLUDE_ASM("asm/nonmatchings", sub_8008620);
-INCLUDE_ASM("asm/nonmatchings", sub_80086FC);
-INCLUDE_ASM("asm/nonmatchings", sub_8008788);
-
-
-void sub_80088B4(u16 arg0, s16 arg1, s16 arg2) {
-    gUnk_03004834 = arg2;
-    gUnk_030047F0 = arg1;
-
-    if( arg1 < 0)
-    {
-        gUnk_030047A8 = 0x1B0;
-    }
-    else
-    {
-        gUnk_030047A8 = 0;
-    }
-
-    gUnk_0300465C = arg0;
-}
-
-void sub_80088F4(void) {
-    if ((u32) *(u16* )0x0300467C <= 0xFCU) {
-        *(s32* )0x03004620 = 0x02006000;
-        *(s32* )0x0300482C = 0x02001000;
-        *(s32* )0x03004690 = 0x02001800;
-        *(s32* )0x030047E8 = 0x02001C00;
-        sub_80052F8();
-        *(s32* )0x03004620 = 0x0200E000;
-        *(s32* )0x0300482C = 0x02003000;
-        *(s32* )0x03004690 = 0x02003800;
-        *(s32* )0x030047E8 = 0x02003C00;
-        sub_80052F8();
-    }
-}
-
-INCLUDE_ASM("asm/nonmatchings", sub_8008978);
-void sub_80089E0(u16 arg0)
-{
-
-    switch (arg0)
-    {
-        case 1:
-            gUnk_03004604 = 0;
-            REG_WIN0H = DISPLAY_WIDTH;
-            REG_WIN0V = DISPLAY_HEIGHT;
-            REG_WININ = 0x3F;
-            REG_WINOUT = 0;
-            break;
-        case 0:
-            gUnk_03004604 = DISPLAY_WIDTH;
-            break;
-        default:
-            sub_8009428(arg0 - 3);
-            break;
-    }
-
-    gUnk_03004840 = arg0;
-}
-
-void sub_8008A3C(void)
-{
-    s16 i;
-
-    for (i = 0; i < 16; i++)
-    {
-        gUnk_030046A0[i].field_0 = 0;
-    }
-}
-
-void sub_8008A60(void)
-{
-    s16 i;
-
-    for (i = 0; i < 16; i++)
-    {
-        sub_8007A1C(i);
-    }
-}
-void sub_8008A80(u8 arg0)
-{
-    if (arg0 == 0)
-    {
-        LZ77UnCompVram((void *)0x0809C8B4, (void *)0x0600C800);
-        nullsub_5();
-    }
-    LZ77UnCompVram((void *)0x0809CB90, (void *)0x06008000);
-    nullsub_5();
-    LZ77UnCompVram((void *)0x0809D198, (void *)0x06009000);
-    nullsub_5();
-    LZ77UnCompVram((void *)0x0809D718, (void *)0x0600A000);
-    nullsub_5();
-    LZ77UnCompVram((void *)0x0809DCE8, (void *)0x0600B000);
-    nullsub_5();
-
-    DmaCopy16(3, 0x0809C834, 0x05000160, 0x60);
-
-    nullsub_5();
-}
-INCLUDE_ASM("asm/matchings", sub_8008B14);
-/*
-typedef struct{
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-}Unk_08089BC4;
-extern Unk_08089BC4 gUnk_08089BC4[];
-
-extern u16 gUnk_03004650; // 0x03004650
-extern u16 gUnk_0300464C; // 0x0300464C
-extern u16 gUnk_030047C4; // 0x030047C4
-extern u16 gUnk_030047EC; // 0x030047EC
-
-void sub_8008B14(u16 arg0) {
-
-    gUnk_03004650 = gUnk_08089BC4[arg0].field_0 << 6;
-
-    gUnk_0300464C = gUnk_08089BC4[arg0].field_1 << 6;
-
-    gUnk_030047C4 = gUnk_03004650 + (gUnk_08089BC4[arg0].field_2 << 6);
-
-    gUnk_030047EC = gUnk_0300464C + (gUnk_08089BC4[arg0].field_3 << 6);
-}
-
-
-*/
-void sub_8008B5C(void)
-{
-    // gUnk_03004670.field_0 = gUnk_03004AA0[0];
-    gUnk_03004670[0] = gUnk_03004AA0[0];
-    gUnk_030047D0[0] = gUnk_03004AA0[0];
-
-    sub_8004C8C(0, gUnk_03004AA0[0]);
-    sub_8004CB8(0, gUnk_03004AA0[0]);
-    // gUnk_03004670.field_1 = 11;
-    gUnk_03004670[1] = 11;
-    gUnk_030047D0[1] = 11;
-    sub_8004C8C(1, 0xBU);
-    sub_8004CB8(1, 0xBU);
-}
-INCLUDE_ASM("asm/matchings", sub_8008BA4);
-/*
-extern u8* gUnk_087EA1A0[];
-
-void sub_8008BA4(u8 arg0, u8 arg1) {
-    u16 count;
-    u16 end_limit;
-    u8* src;
-    u16 i;
-
-    src = gUnk_087EA1A0[arg0];
-    count = *(u16*)src;
-
-    end_limit = count + arg1;
-    src = src + 2;
-    i = arg1;
-
-    while(i < end_limit)
-    {
-        src = sub_8007964(i, src);
-        i++;
-    }
-}
-
-*/
-
-void sub_8008BE4(u8 arg0)
-{
-    gUnk_030046A0[arg0].field_3 |= 2;
-}
-
-void sub_8008BFC(u8 arg0)
-{
-    gUnk_030046A0[arg0].field_3 &= 0xFD;
-}
-
-u8 sub_8008C14(u8 arg0)
-{
-    return gUnk_030046A0[arg0].field_0;
-}
-
-void sub_8008C24(u8 arg0) {
-
-    if(!(gUnk_0300467C & 0x80))
-    {
-        if(gUnk_03004670[arg0] != 0xFF)
-        {
-            sub_8004C8C(arg0, gUnk_03004670[arg0]);
-        }
-
-        if(gUnk_030047D0[arg0] != 0xFF)
-        {
-            sub_8004CB8(arg0, gUnk_030047D0[arg0]);
-        }
-    }
-}
-
-void sub_8008C70(void) {
-    u8 i;
-
-    for(i = 0; i < 12; i++)
-    {
-        if(!(gUnk_0300467C & 0x80))
-        {
-            if(gUnk_03004670[i] != 0xFF)
-            {
-                sub_8004C8C(i, gUnk_03004670[i]);
-            }
-            if(gUnk_030047D0[i] != 0xFF)
-            {
-                sub_8004CB8(i, gUnk_030047D0[i]);
-            }
-        }
-    }
-
-}
-
-INCLUDE_ASM("asm/matchings", sub_8008CC0);
-// extern u8 gUnk_08087658[];
-
-// extern u8 gUnk_030047BC;
-// extern u8 gUnk_03004824;
-// extern u8 gUnk_030047B8;
-
-// void sub_8008CC0(u8 arg0) {
-//     u8 i;
-//     u8 skipLen;
-//     u8* ptr;
-//     ptr = gUnk_08087658;
-//     i = 0;
-//     skipLen = (*ptr << 1);
-//     ptr++;
-
-//     while(i != gUnk_030047BC)
-//     {
-//         ptr += skipLen;
-//         i++;
-//         skipLen = (*ptr << 1);
-//         ptr++;
-//     }
-
-//     ptr = ptr + (arg0 << 1);
-//     gUnk_03004824 = ptr[0];
-//     gUnk_030047B8 = ptr[1];
-
-// }
-INCLUDE_ASM("asm/matchings", sub_8008D18);
-INCLUDE_ASM("asm/nonmatchings", sub_8008D78);
-
-void sub_8008DCC(u8 arg0)
-{
-    gUnk_03004850 = arg0;
-}
-
-void sub_8008DD8(void)
-{
-    DmaCopy16(3, (void *)0x08087216, (void *)0x05000000, 2);
-}
-
-void sub_8008DF8(u16 arg0, u8 *arg1)
-{
-    u16 count;
-
-    count = *(u16 *)arg1;
-    arg1 += 2;
-
-    while (count != 0)
-    {
-        arg1 = sub_80079BC(arg0, arg1);
-
-        sub_8007A1C(arg0);
-
-        gUnk_030046A0[arg0].field_0 = 0;
-        count--;
-    }
-}
-void sub_8008E44(u8 arg0)
-{
-    u16 *dest;
-    u16 i, j;
-    u16 val;
-
-    dest = (u16 *)0x020053A8;
-
-    val = 32;
-
-    if (arg0 != 0)
-    {
-        val = 0;
-    }
-
-    for (i = 0; i < 4; i++)
-    {
-        for (j = 0; j < 8; j++)
-        {
-            *dest = val + 0xA200;
-            dest++;
-            val++;
-        }
-        dest += 24;
-    }
-    gUnk_03004800[13] = 1;
-}
-INCLUDE_ASM("asm/nonmatchings", sub_8008E94);
-INCLUDE_ASM("asm/nonmatchings", sub_8008F28);
-void sub_8008FD0(u8 arg0)
-{
-    struct RenderObject *obj;
-    struct RenderObject *subObj;
-    u8 objIdx;
-    u16 chestColor;
-    u16 attr0;
-    u16 attr1;
-    u16 attr2;
-
-    objIdx = sub_8004BFC();
-    gChestObjects[arg0].renderObjIdx = objIdx;
-    obj = &gRenderObjects[objIdx];
-
-    chestColor = 0x80 & gChestObjects[arg0].field_0 ? 0xF : 0xE;
-
-    if ((0x7F & gChestObjects[arg0].field_0) == 0)
-    {
-
-        attr0 = 0;
-        attr1 = 0x4000;
-        attr2 = ((chestColor << 12) | 0x896);
-
-        obj->field_10 = 0;
-        obj->field_12 = 0xF0;
-
-        sub_8004C28(obj, 1, attr0, attr1, attr2);
-    }
-    else
-    {
-        attr0 = 0;
-        attr1 = 0x4000;
-        attr2 = ((chestColor << 12) + 0x89C);
-        obj->field_10 = 0;
-        obj->field_12 = 0xF0;
-        subObj = sub_8004C28(obj, 2, attr0, attr1, attr2);
-
-        attr0 = 0x4000;
-        attr1 = 0;
-        attr2 = ((chestColor << 12) | 0x89A);
-        subObj->field_10 = 0;
-        subObj->field_12 = 0xE8;
-        sub_8004C28(subObj, 1, attr0, attr1, attr2);
-    }
-    obj->animFrame = 0;
-}
-void sub_800908C(u8 arg0)
-{
-    u8 idx;
-
-    if (gChestObjects[arg0].field_0 & 1)
-    {
-        sub_805374C(9, 0, 0);
-    }
-    else
-    {
-        sub_805374C(8, 0, 0);
-    }
-
-    gChestObjects[arg0].field_0 ^= 1;
-
-    idx = gChestObjects[arg0].field_1;
-
-    gUnk_03004870[idx >> 3] ^= (1 << (idx & 7));
-
-    sub_8004F3C(&gRenderObjects[gChestObjects[arg0].renderObjIdx]);
-    sub_8008FD0(arg0);
-    gUnk_03004860 = arg0;
-}
-
-void sub_8009114(void)
-{
-    if (!(0x80 & gUnk_0300467C))
-    {
-        nullsub_5();
-        DmaCopy16(3, 0x08088C40, 0x060112C0, 0xA0 * 2);
-        DmaCopy16(3, 0x08088C00, 0x050003C0, 0x20 * 2);
-    }
-}
-void sub_8009168()
-{
-    u8 i = 0;
-    // do{gUnk_03004870[i++] = 0;}while(i < 0x20);
-    while (i < 0x20)
-    {
-        gUnk_03004870[i++] = 0;
-    }
-}
-void sub_8009184(u8 arg0)
-{
-    gUnk_03004870[arg0 >> 3] ^= (1 << (arg0 & 7));
-}
-u8 sub_80091A4(u8 arg0)
-{
-    u8 val;
-    val = gUnk_03004870[(arg0 >> 3) & 0x1F];
-    return (val >> (arg0 & 7)) & 1;
-}
-INCLUDE_ASM("asm/nonmatchings", sub_80091C4);
-INCLUDE_ASM("asm/nonmatchings", sub_8009370);
-INCLUDE_ASM("asm/nonmatchings", sub_8009428);
-INCLUDE_ASM("asm/nonmatchings", sub_80094FC);
-INCLUDE_ASM("asm/nonmatchings", sub_8009600);
-void sub_8009A5C(void)
-{
-    s16 i;
-
-    for (i = 0; i < 4; i++)
-    {
-        gUnk_03000010[i] = 0;
-    }
-}
-INCLUDE_ASM("asm/nonmatchings", sub_8009A7C);
-INCLUDE_ASM("asm/nonmatchings", sub_8009AC4);
-void sub_8009B04(u8 arg0)
-{
-    gUnk_03000010[arg0] &= 0xFB;
-}
-void sub_8009B1C(u8 arg0)
-{
-    gUnk_03000010[arg0] |= 4;
-}
-
-u8 sub_8009B34(u8 arg0)
-{
-    return gUnk_03000010[arg0];
-}
-
-void sub_8009B44(void)
-{
-    DmaCopy16(3, PLTT, 0x0203EA00, PLTT_SIZE);
-}
-
-void sub_8009B64(void)
-{
-    u16 i;
-    u16 *dst;
-    i = 0x200;
-    dst = (u16 *)0x05000000;
-
-    while (i > 0)
-    {
-        *dst = 0x7FFF;
-        dst++;
-        i--;
-    }
-}
-
-u8 *sub_8009B84(u8 arg0, u8 *src)
-{
-    gUnk_03000010[arg0] = src[0];
-    gUnk_03000018[arg0] = src[1];
-    src += 2;
-    gUnk_03000028[arg0] = (*src << 5) + 0x05000002;
-    src++;
-    gUnk_03000014[arg0] = *src;
-    src++;
-    gUnk_03000038[arg0] = src;
-    src += gUnk_03000014[arg0];
-    gUnk_03000020[arg0] = 0;
-    return src;
-}
-INCLUDE_ASM("asm/matchings", sub_8009BF0);
-INCLUDE_ASM("asm/matchings", sub_8009C84);
-INCLUDE_ASM("asm/matchings", sub_8009D34);
-INCLUDE_ASM("asm/matchings", sub_8009E80);
-
-void sub_8009F48(void)
-{
-    s16 i;
-
-    for (i = 0; i < 3; i++)
-    {
-        gStaticMapObjects[i].field_0 = 0;
-    }
-}
-INCLUDE_ASM("asm/nonmatchings", sub_8009F70);
-INCLUDE_ASM("asm/nonmatchings", sub_800A048);
-u8 sub_800A0E4(u8 arg0)
-{
-    u8 var_r2;
-    Unk_03004AC0 *ptr;
-
-    if (arg0 != 0)
-    {
-        arg0 -= 1;
-    }
-
-    ptr = &gUnk_03004AC0[arg0];
-    switch (arg0)
-    {
-        case 0:
-            if (ptr->equip_slot1 == 0x15)
-            {
-                if (ptr->equip_slot5 == 0xCB || ptr->equip_slot6 == 0xCB)
-                {
-                    return 0x38;
-                }
-            }
-            return 0x31;
-        case 1:
-            return 0x32;
-        case 2:
-            if (ptr->equip_slot5 == 0xBF || ptr->equip_slot6 == 0xBF)
-            {
-                return 0x39;
-            }
-            return 0x33;
-        case 3:
-
-            if (ptr->equip_slot5 == 0xBF || ptr->equip_slot6 == 0xBF)
-            {
-                return 0x3A;
-            }
-            return 0x34;
-        case 4:
-            if (ptr->equip_slot1 == 0x3B)
-            {
-                return 0x3B;
-            }
-            return 0x35;
-        case 5:
-            if (ptr->equip_slot1 == 0x3C)
-            {
-                return 0x3C;
-            }
-            return 0x36;
-        default:
-            return 0xFF;
-    }
-}
-INCLUDE_ASM("asm/nonmatchings", sub_800A1B4);
-INCLUDE_ASM("asm/nonmatchings", sub_800A3C8);
-INCLUDE_ASM("asm/nonmatchings", sub_800A534);
-INCLUDE_ASM("asm/nonmatchings", sub_800A664);
-
-void sub_800A79C(u8 arg0)
-{
-    Unk_03004AC0 *chara;
-
-    if (arg0 != 0)
-        arg0--;
-    chara = &gUnk_03004AC0[arg0];
-
-    chara->equip_atc = gUnk_03004A90 ;
-    chara->equip_def = gUnk_03004AA8 ;
-    chara->equip_agl = gUnk_03004AB0;
-    chara->equip_men = gUnk_03004A98;
-    chara->equip_res = gUnk_03004A94;
-    chara->equip_noa = gUnk_03004AB4;
-    chara->equip_luc = gUnk_03004AB8;
-
-    chara->equip_atc += gUnk_03004AAC;
-    chara->equip_def += gUnk_03004A80;
-
-    chara->atc = chara->base_atc + chara->equip_atc;
-    chara->def = chara->base_def + chara->equip_def;
-    chara->agl = chara->base_agl + chara->equip_agl;
-    chara->men = chara->base_men + chara->equip_men;
-    chara->res = chara->base_res + chara->equip_res;
-    chara->noa = chara->base_noa + chara->equip_noa;
-    chara->luc = chara->base_luc + chara->equip_luc;
-}
-INCLUDE_ASM("asm/matchings", sub_800A86C);
-// u8 sub_800A86C(s32 value) {
-//     s32 ret;
-//     u8 i;
-
-//     if (value > 9999999) {
-//         value = 9999999;
-//     }
-
-//     i = 0;
-//     while(value >= 0)
-//     {
-//         value -= gUnk_08092248[i];
-//         i++;
-//     }
-
-//     return i - 1;
-// }
-INCLUDE_ASM("asm/matchings", sub_800A8A0);
-INCLUDE_ASM("asm/nonmatchings", sub_800A8D0);
-
-void sub_800A924(void)
-{
-    u8 i;
-
-    for (i = 1; i < 11; i++)
-    {
-        sub_800A1B4(i);
-    }
-
-    for (i = 1; i < 255; i++)
-    {
-        gUnk_03004980[i] = 0;
-    }
-}
-INCLUDE_ASM("asm/matchings", sub_800A958);
-// extern u8 gUnk_08093418[];
-
-// u8 sub_800A958(u8 arg0) {
-//     return gUnk_08093418[(arg0 - 1) * 5 + 4];
-// }
-INCLUDE_ASM("asm/matchings", sub_800A970);
-INCLUDE_ASM("asm/matchings", sub_800A978);
-void sub_800A980(void)
-{
-    u8 i;
-    u8 charaId;
-    Unk_03004AC0 *ptr;
-
-    for (i = 0; i < 6; i++)
-    {
-        charaId = gUnk_03004AA0[i];
-        if (charaId == 0xFF)
-            continue;
-        if (charaId != 0)
-            charaId--;
-
-        ptr = &gUnk_03004AC0[charaId];
-        ptr->hp = ptr->max_hp;
-        ptr->mp = ptr->max_mp;
-    }
-}
-INCLUDE_ASM("asm/matchings", sub_800A9C0);
-/*
-void sub_800A9C0(u8 arg0, u8 newEquip, u8 equipSlotId) {
-    u8 oldEquip;
-    u8 var_r0;
-    u8* equipSlot;
-
-    Unk_03004AC0* chara;
-
-    var_r0 = arg0;
-    if (arg0 != 0) {
-        var_r0 = arg0 - 1;
-    }
-
-    chara = &gUnk_03004AC0[var_r0];
-
-    switch (equipSlotId)
-    {
-        case 1: equipSlot = &chara->equip_slot2; break;
-        case 2: equipSlot = &chara->equip_slot3; break;
-        case 3: equipSlot = &chara->equip_slot4; break;
-        case 4: equipSlot = &chara->equip_slot5; break;
-        case 5: equipSlot = &chara->equip_slot6; break;
-        default: equipSlot = &chara->equip_slot1; break;
-    }
-    oldEquip = *equipSlot;
-    *equipSlot = newEquip;
-
-     if (oldEquip != 0) {
-        if (gUnk_03004980[oldEquip] <= 0x62)
-        {
-            sub_800AA60(oldEquip, 1);
-        }
-    }
-
-    sub_800A664(arg0);
-    sub_800A79C(arg0);
-}
-*/
-
-void sub_800AA60(u8 arg0, u8 count)
-{
-    s32 cnt;
-
-    cnt = gUnk_03004980[arg0] + count;
-    if (cnt > 99)
-    {
-        gUnk_03004980[arg0] = 99;
-    }
-    else
-    {
-        gUnk_03004980[arg0] = cnt;
-    }
-}
-
-void sub_800AA84(u8 arg0, u8 count)
-{
-    s32 cnt;
-
-    cnt = gUnk_03004980[arg0] - count;
-    if (cnt < 0)
-    {
-        gUnk_03004980[arg0] = 0;
-    }
-    else
-    {
-        gUnk_03004980[arg0] = cnt;
-    }
-}
-
-void sub_800AAA4(s32 arg0)
-{
-    gUnk_03002C38 += arg0;
-
-    if (gUnk_03002C38 > 999999)
-    {
-        gUnk_03002C38 = 999999;
-    }
-}
-void sub_800AAC0(s32 arg0)
-{
-    gUnk_03002C38 -= arg0;
-
-    if (gUnk_03002C38 > 999999)
-    {
-        gUnk_03002C38 = 0;
-    }
-}
-INCLUDE_ASM("asm/matchings", sub_800AADC);
-// typedef struct
-// {
-//     u32 field_0;
-//     u8 field_4;
-//     u8 field_5;
-//     u16 field_6;
-//     u32 field_8;
-// }Unk;
-// extern u8 unk87EA580[];
-// s32 sub_800AADC(u8 arg0) {
-//     return unk87EA580[arg0 * 12 + 4] & 0xF;
-// }
-INCLUDE_ASM("asm/matchings", sub_800AAF8);
-// typedef struct
-// {
-//     u8 field_0;
-//     u8 field_1;
-//     u8 field_2;
-//     u8 field_3;
-//     u8 field_4;
-//     u8 field_5;
-//     u16 field_6;
-//     u32 field_8;
-// }Unk;
-// extern u8 unk87EA580[];
-// u16 sub_800AAF8(u8 arg0) {
-//     return unk87EA580[arg0 * 12] + (unk87EA580[arg0 * 12 + 1] << 8) ;
-// }
-INCLUDE_ASM("asm/matchings", sub_800AB18);
-// extern u8 unk87EA580[];
-
-// u16 sub_800AB18(u8 arg0) {
-//     return unk87EA580[arg0 * 12 + 2] + (unk87EA580[arg0 * 12 + 3] << 8) ;
-// }
-
-u8 sub_800AB3C(void)
-{
-
-    u16 i;
-    u8 charaId;
-    Unk_03004AC0 *ptr;
-
-    for (i = 0; i < 5; i++)
-    {
-        charaId = gUnk_03004AA0[i];
-        if (charaId == 0xFF)
-            continue;
-        if (charaId != 0)
-            charaId--;
-
-        ptr = &gUnk_03004AC0[charaId];
-
-        if (ptr->equip_slot1 != 0)
-            return 1;
-    }
-    return 0;
-}
-void sub_800AB7C(u8 arg0)
-{
-    Unk_03004AC0* actor;
-    if (arg0 <= 1) {
-        actor = &gUnk_03004AC0[0];
-        sub_800A048(actor->skills, actor->lv, arg0);
-
-        if (actor->field_unk[2] == 1 && (u8)(actor->field_unk[3] - 5) <= 3) {
-            actor->field_unk[2] = 0;
-            actor->field_unk[3] = 0;
-        }
-    }
-}
-void sub_800ABBC(void)
-{
-    gUnk_03004A90 = 0;
-    gUnk_03004AA8 = 0;
-    gUnk_03004AB0 = 0;
-    gUnk_03004A98 = 0;
-    gUnk_03004A94 = 0;
-    gUnk_03004AB4 = 0;
-    gUnk_03004AB8 = 0;
-    gUnk_03004AAC = 0;
-    gUnk_03004A80 = 0;
-}
-INCLUDE_ASM("asm/nonmatchings", sub_800AC08);
-void sub_800ACA4(u8 arg0)
-{
-    Unk_03004AC0 *ptr;
-
-    if (arg0 != 0)
-    {
-        arg0--;
-    }
-
-    ptr = &gUnk_03004AC0[arg0];
-    ptr->hp = ptr->max_hp;
-    ptr->mp = ptr->max_mp;
-}
-INCLUDE_ASM("asm/nonmatchings", sub_800ACC8);
-INCLUDE_ASM("asm/nonmatchings", sub_800B14C);
-void sub_800B2D0(void)
-{
-    u8 i;
-    gUnk_03000186 = 0;
-    gUnk_03000187 = 0;
-
-    gUnk_03000048.field_0 = 1;
-    gUnk_03000048.field_1 = 0;
-    gUnk_03000048.field_2 = 0;
-    gUnk_03000048.field_3 = 0;
-    gUnk_03000048.field_4 = 0x18;
-    gUnk_03000048.field_6 = 8;
-
-    for (i = 0; i < 16; i++)
-    {
-        gUnk_03000188[i] = 0;
-    }
-}
-void sub_800B314(void)
-{
-    u8 i;
-
-    if (gUnk_03000185 == 0)
-        return;
-
-    if (gUnk_03000184 == 4) {
-        sub_80165B8();
-        for (i = 0; i < 5; i++) {
-            if (gUnk_03004AA0[i] != 0xFF) {
-                u8 y = i * 5 + 5;
-                sub_80161F4(gUnk_03004AA0[i], y, 5);
-                sub_8016260(gUnk_03004AA0[i], y, 6);
-            }
-        }
-    }
-
-    gUnk_03000185 = 0;
-}
-INCLUDE_ASM("asm/nonmatchings", sub_800B374);
-INCLUDE_ASM("asm/nonmatchings", sub_800BEE4);
-INCLUDE_ASM("asm/matchings", sub_800BF5C);
-INCLUDE_ASM("asm/nonmatchings", sub_800BFF8);
-
-void sub_800C0D8(void)
-{
-    u16 i;
-    u16 attr0;
-    u16 attr1;
-    u16 attr2;
-    struct RenderObject *obj = (struct RenderObject *)0x03004380;
-
-    attr0 = gUnk_03000048.field_6;
-    attr1 = ((gUnk_03000048.field_4 - 0x20) & 0x1FF) ;
-    attr1 += 0x8000;
-    attr2 = 0x21C0;
-    sub_8004C28(obj, 1, attr0, attr1, attr2);
-    
-    gRenderObjectPtrSortList[0] = obj;
-    
-    sub_80046DC(0x4C, 0, 9);
-
-    for (i = 0; i < 5; i++) {
-        obj++;
-        if (gUnk_03004AA0[i] != 0xFF) 
-        {
-            attr1 = 0x8028 + ((i * 5) << 3);
-            attr2 = ((i + 3) << 12) + ((i * 3 * 16 + 0x200) & 0x3FF);
-            sub_8004C28(obj, 1,  8, attr1, attr2);
-            gRenderObjectPtrSortList[i + 1] = obj;
-        }
-        sub_800375C(i);
-    }
-}
-INCLUDE_ASM("asm/nonmatchings", sub_800C194);
-INCLUDE_ASM("asm/nonmatchings", sub_800C2F8);
-
-void sub_800E170(u8 arg0, u8 arg1, u8 arg2)
-{
-
-    switch (arg0)
-    {
-        case 0:
-            gUnk_03000058[arg2].x = arg2 * 0x28 + 0x48;
-            gUnk_03000058[arg2].y = 8;
-            break;
-        case 1:
-            gUnk_03000058[arg2].x = 0x28;
-            gUnk_03000058[arg2].y = 8;
-
-            break;
-        case 2:
-            gUnk_03000058[arg2].x = 0x30;
-            gUnk_03000058[arg2].y = 16;
-            break;
-    }
-    switch (arg1)
-    {
-        case 2:
-            gUnk_03000058[arg2].statusFlags &= 0xBF;
-            gUnk_03000058[arg2].statusFlags &= 0xFE;
-            break;
-        case 1:
-            gUnk_03000058[arg2].statusFlags &= 0xBF;
-            gUnk_03000058[arg2].statusFlags |= 1;
-            break;
-        case 0:
-            gUnk_03000058[arg2].statusFlags |= 0x40;
-            gUnk_03000058[arg2].statusFlags &= 0xFE;
-            break;
-    }
-}
-
-INCLUDE_ASM("asm/nonmatchings", sub_800E244);
-
-// http://localhost/scratch/E4CZr
-INCLUDE_ASM("asm/matchings", sub_800E668);
-
-INCLUDE_ASM("asm/matchings", sub_800E71C);
-INCLUDE_ASM("asm/matchings", sub_800E7BC);
-INCLUDE_ASM("asm/nonmatchings", sub_800E8F8);
-INCLUDE_ASM("asm/nonmatchings", sub_800EAE4);
-
-INCLUDE_ASM("asm/matchings", sub_800EB98);
-
-INCLUDE_ASM("asm/nonmatchings", sub_800EC54);
-INCLUDE_ASM("asm/nonmatchings", sub_800F128);
-INCLUDE_ASM("asm/nonmatchings", sub_800F3AC);
-
-INCLUDE_ASM("asm/matchings", sub_800F4A8);
-
-INCLUDE_ASM("asm/nonmatchings", sub_800F670);
-INCLUDE_ASM("asm/nonmatchings", sub_800F70C);
-INCLUDE_ASM("asm/nonmatchings", sub_800FA24);
-INCLUDE_ASM("asm/nonmatchings", sub_800FB2C);
-INCLUDE_ASM("asm/nonmatchings", sub_800FDEC);
-INCLUDE_ASM("asm/nonmatchings", sub_800FF10);
-INCLUDE_ASM("asm/nonmatchings", sub_8010170);
-u8 sub_801026C(u8 arg0, u8 arg1)
-{
-
-    Unk_03004AC0 *ptr4AC0;
-    u8 val;
-
-    if (arg0 != 0)
-        arg0--;
-
-    ptr4AC0 = &gUnk_03004AC0[arg0];
-
-    val = sub_800A958(arg1);
-
-    if (ptr4AC0->equip_slot5 == 0xAF)
-    {
-        val >>= 1;
-        if (val == 0)
-            val = 1;
-        return val;
-    }
-
-    if (ptr4AC0->equip_slot6 == 0xAF)
-    {
-        val >>= 1;
-        if (val == 0)
-            val = 1;
-        return val;
-    }
-
-    if (ptr4AC0->equip_slot2 == 0x63)
-    {
-        if (val > 2)
-            val -= 2;
-        else
-            val = 1;
-    }
-
-    if (ptr4AC0->equip_slot3 == 0x83)
-    {
-        if (val > 2)
-            val -= 2;
-        else
-            val = 1;
-    }
-
-    if (ptr4AC0->equip_slot3 == 0x84)
-    {
-        if (val > 2)
-            val -= 2;
-        else
-            val = 1;
-    }
-
-    return val;
-}
-
-INCLUDE_ASM("asm/nonmatchings", sub_8010300);
-INCLUDE_ASM("asm/nonmatchings", sub_8010434);
-INCLUDE_ASM("asm/nonmatchings", sub_80104F8);
-INCLUDE_ASM("asm/nonmatchings", sub_8010624);
-INCLUDE_ASM("asm/nonmatchings", sub_8010770);
-INCLUDE_ASM("asm/nonmatchings", sub_8010978);

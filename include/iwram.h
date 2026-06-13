@@ -136,7 +136,6 @@ extern Unk_03000348 gUnk_03000348[];
 extern u16 gUnk_03000384;
 extern u16 gUnk_03000386;
 
-
 extern u8 gUnk_030004D4;
 extern u8 gUnk_030004D5;
 extern u8 gUnk_030004D6;
@@ -240,7 +239,7 @@ extern u32 gIntrMainBuf[512];
 
 typedef struct
 {
-    u8 renderObjIdx;
+    u8 sprNodeIdx;
     u8 field_1;
     u8 field_2;
     u8 paletteId;
@@ -277,6 +276,7 @@ extern u32 gUnk_030025A8;
 extern u8 gUnk_030025B0;
 extern s16 gUnk_030025B4;
 extern u8 gUnk_030025B8;
+extern u8 gUnk_030025BC;
 extern u8 gSpriteWidth;
 extern u16 gUnk_030025C0[8];
 extern u16 gUnk_030025D4;
@@ -292,11 +292,12 @@ extern u16 gUnk_03002608;
 extern u8 gUnk_0300260C;
 
 extern u8 gSpriteHeight;
+extern u8 gUnk_03002C30;
 extern u8 gUnk_03002C34;
-extern u32 gUnk_03002C38;
+extern u32 gSilverAmount;
 extern u16 gUnk_03002C3C;
 extern s16 gUnk_03002C40;
-extern s8 gUnk_03002C44;
+extern u8 gUnk_03002C44;
 extern u8 gUnk_03002C48;
 extern u16 gUnk_03002C4C;
 extern u8 gUnk_03002C50;
@@ -317,6 +318,7 @@ extern u32 gVramBufferPointers[];
 
 extern u8 gUnk_030032D0;
 extern u16 gUnk_030032D4;
+extern u8* gUnk_030032E0[];
 
 extern u8 gUnk_03003360[32];
 
@@ -331,6 +333,7 @@ typedef struct
 extern Unk_03003380 gUnk_03003380[32];
 
 extern u8 gUnk_03003480;
+extern u8 gUnk_03003490[];
 extern u8 gUnk_030034B0;
 
 typedef struct
@@ -378,22 +381,43 @@ typedef struct
 
 extern Unk_030039C0 gVramTransferQueue[32];
 
-struct RenderObject
-{ // gRenderObjects
-    /* 0x00 */ u8 field_0; // 优先级/层级状态 priority?
-    /* 0x01 */ u8 animFrame; // 动画帧序列号
-    /* 0x02 */ u16 attr0; // GBA OAM Attr0 (Y, Shape, Mode)
-    /* 0x04 */ u16 attr1; // GBA OAM Attr1 (X, Size, Flip)
-    /* 0x06 */ u16 attr2; // GBA OAM Attr2 (TileID, Palette, Priority)
-    /* 0x08 */ s16 x; // 逻辑位置 X
-    /* 0x0A */ s16 y; // 逻辑位置 Y
-    /* 0x0C */ struct RenderObject *subObject; // 下一个精灵节点的指针
-    /* 0x10 */ u16 field_10;
-    /* 0x12 */ u16 field_12;
-}; // Total Size: 0x14 (20 bytes)
+typedef struct SpriteNode
+{
+    /* 0x00 */ u8 flags; ///< Flags: bit 0=active, bits 1-7=chain count
+    /* 0x01 */ u8 animStep;
 
-extern struct RenderObject *gRenderObjectPtrSortList[128]; // 3002C80
-extern struct RenderObject gRenderObjects[128]; // 3003AC0
+    /* 0x02 */ u16 attr0; ///< GBA OAM Attribute 0 (Y pos, shape, mode, affine flags)
+                          ///< Bits 0-7: Y coordinate
+                          ///< Bits 8-9: Affine mode
+                          ///< Bits 10-11: OBJ mode (normal/transparent/window)
+                          ///< Bit 12: Mosaic enable
+                          ///< Bit 13: Color mode (0=16 color, 1=256 color)
+                          ///< Bits 14-15: Shape (square/horizontal/vertical)
+
+    /* 0x04 */ u16 attr1; ///< GBA OAM Attribute 1 (X pos, size, flip, affine param)
+                          ///< Bits 0-8: X coordinate
+                          ///< Bits 9-11: Affine parameter number (lower 3 bits)
+                          ///< Bit 12: Horizontal flip
+                          ///< Bit 13: Vertical flip
+                          ///< Bits 14-15: Size (depends on shape)
+
+    /* 0x06 */ u16 attr2; ///< GBA OAM Attribute 2 (tile ID, palette, priority)
+                          ///< Bits 0-9: Character/tile number
+                          ///< Bits 10-11: Display priority
+                          ///< Bits 12-15: Palette number
+
+    /* 0x08 */ s16 x; ///< Logical/screen X position (before OAM conversion)
+    /* 0x0A */ s16 y; ///< Logical/screen Y position (before OAM conversion)
+
+    /* 0x0C */ struct SpriteNode *next; ///< Pointer to next sprite in chain (multi-tile sprites)
+
+    /* 0x10 */ u16 tileOffsetX; ///< Tile offset X for multi-tile sprites
+    /* 0x12 */ u16 tileOffsetY; ///< Tile offset Y for multi-tile sprites
+
+} SpriteNode; // Size: 0x14 (20 bytes)
+
+extern struct SpriteNode *gSpriteRenderQueue[128]; // 3002C80
+extern struct SpriteNode gSpriteNodePool[128]; // 3003AC0
 
 /*
 struct Unk_03003AC0
@@ -411,13 +435,17 @@ struct Unk_03003AC0
 };
 extern struct Unk_03003AC0 gUnk_03003AC0[128];
 */
+
+extern u32 gUnk_030044C0[];
+
 extern u8 gUnk_03004540;
 extern u16 gUnk_03004550;
 extern u16 gUnk_03004604;
 extern u8 gUnk_03004608;
 extern u8 gUnk_0300460C;
-extern u16 gUnk_03004610;
+extern u16 gHBlankEffectMode;
 extern u16 gUnk_03004614;
+extern u8 gUnk_03004618;
 
 typedef struct
 {
@@ -430,11 +458,12 @@ extern u8 *gUnk_0300462C;
 extern u8 gUnk_03004634;
 extern u8 gUnk_03004638;
 
-extern u16 gUnk_03004648;
+extern u16 gBG3ScrollY;
 extern u16 gUnk_0300464C;
 extern u16 gUnk_03004650;
-extern u16 gUnk_03004658;
+extern u16 gBlendControl;
 extern u16 gUnk_0300465C;
+extern u16 gUnk_03004660;
 extern u8 gUnk_0300466C;
 
 typedef struct
@@ -446,8 +475,10 @@ typedef struct
 // extern Unk_03004670 gUnk_03004670;
 extern u8 gUnk_03004670[];
 extern u16 gUnk_0300467C;
+extern u16 gUnk_03004684;
 extern u16 gUnk_03004688;
 extern u8 gUnk_0300468C;
+extern u16 *gUnk_03004694;
 extern u16 gUnk_03004698;
 
 typedef struct
@@ -469,7 +500,8 @@ typedef struct
 extern Unk_030046A0 gUnk_030046A0[];
 
 extern u8 gUnk_030047A4;
-extern u16 gUnk_030047A8;
+extern s16 gUnk_030047A8;
+extern u16 gUnk_030047AC;
 extern u16 gUnk_030047B0;
 extern u8 gUnk_030047B4;
 extern u8 gUnk_030047B8;
@@ -477,29 +509,30 @@ extern u8 gUnk_030047BC;
 
 extern u16 gUnk_030047C0;
 extern u16 gUnk_030047C4;
+extern u16 gUnk_030047C8;
+extern u8 *gUnk_030047CC;
 // extern Unk_03004670 gUnk_030047D0;
 extern u8 gUnk_030047D0[];
 
 extern u8 gUnk_030047E4;
 extern u16 gUnk_030047EC;
-extern u16 gUnk_030047F0;
-
-
+extern s16 gUnk_030047F0;
 
 extern u16 gUnk_03004800[];
 extern u8 gUnk_03004820;
 extern u8 gUnk_03004824;
 
-extern u16 gUnk_03004828;
+extern u16 gBG2ScrollY;
 
-extern u16 gUnk_03004834;
+extern s16 gUnk_03004834;
 
 extern u8 gUnk_0300483C;
 
 extern u8 gUnk_03004840;
 
-extern u16 gUnk_03004848;
-extern u16 gUnk_0300484C;
+extern u16 gBG2ScrollX;
+extern u16 gBG3ScrollX;
+
 extern u8 gUnk_03004850;
 extern u8 gUnk_03004854;
 extern u8 gUnk_03004860;
@@ -509,7 +542,7 @@ typedef struct
 {
     u8 field_0;
     u8 field_1;
-    u8 renderObjIdx;
+    u8 sprNodeIdx;
     u8 field_3;
     s16 x;
     s16 y;
@@ -538,25 +571,15 @@ typedef struct
 
 extern StaticMapObject gStaticMapObjects[3]; // gUnk_03004930
 
-extern u8 gUnk_03004980[];
+extern u8 gInventory[];
 
-// typedef struct{
-//     u8 field_0;
-//     u8 field_1;
-//     u8 field_2;
-//     u8 field_3;
-//     u8 field_4;
-//     u8 field_5;
-// }Unk_03004AA0;
 
-// extern Unk_03004AA0 gUnk_03004AA0;
-// extern Unk_03004AA0 gUnk_03004A88;
 extern u8 gUnk_03004A80;
-extern u8 gUnk_03004A88[];
+extern u8 gBattleFormationIds[];
 extern u8 gUnk_03004A90;
 extern u8 gUnk_03004A94;
 extern u8 gUnk_03004A98;
-extern u8 gUnk_03004AA0[];
+extern u8 gPartyMemberIds[];
 extern u8 gUnk_03004AA8;
 extern u8 gUnk_03004AAC;
 extern u8 gUnk_03004AB0;
@@ -608,9 +631,9 @@ typedef struct
 
     /** 0x38 */ u32 exp;
     /** 0x3C */ u32 next_exp;
-} Unk_03004AC0;
+} PlayerStats;
 
-extern Unk_03004AC0 gUnk_03004AC0[];
+extern PlayerStats gUnk_03004AC0[];
 
 extern u8 gUnk_03004D44;
 
@@ -657,13 +680,13 @@ typedef struct SaveInfo
 {
     /** 0x00 */ char str[12]; // 12
     /** 0x0C */ u32 gameTimer; // 4
-    /** 0x10 */ u32 field_03002C38; // 4
+    /** 0x10 */ u32 silverAmount; // 4
     /** 0x14 */ u8 field_030047E4; // 1
     /** 0x15 */ u8 field_0300468C; // 1
     /** 0x16 */ u8 field_03004638; // 1
     /** 0x17 */ u8 field_030047A4; // 1
     /** 0x18 */ u16 field_03004614; // 2
-    /** 0x1A */ Unk_03004AC0 field_03004AC0[10]; // 0x280 (10 * 0x40)
+    /** 0x1A */ PlayerStats field_03004AC0[10]; // 0x280 (10 * 0x40)
     /** 0x29A */ u16 field_03004624; // 2
     /** 0x29C */ u8 field_03004AA0[6]; // 6
     /** 0x2A2 */ u8 field_03004980[256]; // 0x100

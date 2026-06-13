@@ -5,4 +5,4 @@
 
 
 gUnk_087E83F0: @ 087E83F0
-	.incbin "baserom.gba", 0x7E8430, 0x800000 - 0x7E8430
+	.incbin "baserom.gba", 0x7E9554, 0x800000 - 0x7E9554

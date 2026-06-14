@@ -772,7 +772,12 @@
   {
     "name": "unk_8087216",
     "address": "0x08087216",
-    "size": 38
+    "size": 6
+  },
+  {
+    "name": "unk_808721C",
+    "address": "0x0808721C",
+    "size": 32
   },
   {
     "name": "unk_808723C",

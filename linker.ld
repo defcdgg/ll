@@ -344,15 +344,14 @@ SECTIONS {
     }
 
     .rodata ALIGN(4) : SUBALIGN(4) {
-        src/code_0.o(.rodata);
-        /*data/lunar_logo.o(.rodata);*/
+        src/data_805769C.o(.rodata);
         data/data.o(.rodata);
         src/m4a_tables.o(.rodata);
         data/sound_data.o(.rodata);
         src/agb_sram.o(.rodata);
         . = ORIGIN(rom) + 0x7E83F0;
 
-        src/global_tables.o(.rodata);
+        src/data_87E83F0.o(.rodata);
         data/data1.o(.rodata);
 
     } >rom =0xFF

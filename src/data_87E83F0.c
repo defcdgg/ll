@@ -1,4 +1,4 @@
-#include "global_tables.h"
+#include "data_87E83F0.h"
 #include "code_0.h"
 
 // 87E83F0
@@ -649,7 +649,7 @@ const CutsceneAnimConfig* gCutsceneAnimConfigTable[] = {
 (CutsceneAnimConfig*)0x838EE94,
 (CutsceneAnimConfig*)0x838EEC8,
 };
-*/
+
 // extern u8 gGfx_AlexWalk[];
 // extern u8 gGfx_SpriteSheetWalk_Alex[];
 // extern u8 gGfx_Face_Alex_Normal[];
@@ -662,7 +662,7 @@ const CutsceneAnimConfig* gCutsceneAnimConfigTable[] = {
 //     gGfx_Face_Alex_Normal
 // };
 
-/*
+
 
 const u8 gUnk_087E94FC[][4] = {
     { 0x01, 0x23, 0x43, 0x55 },  // 087E94FC
@@ -723,7 +723,7 @@ const u32 gUnk_087E9818[] = {0x2005840, 0x200586C, 0x2005B00, 0x2005B2C};
 
 // u8 const gUnk_0805881C[] = INCBIN_U8("data/raw_data/gUnk_0805881C.bin");
 
-/*
+
 //gMoveDirectionLut
 u8 const gUnk_0805881C[] ={0, 1, 5, 0, 7, 8, 6,
       0, 3, 2, 4, 0, 0, 0, 0, 0};
@@ -764,4 +764,4 @@ const s8 gSpriteDimensionsTable[] = {
     15, 0, 0, 0, 0, 0, -16, -1
 };
 */
-*/
+

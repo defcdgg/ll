@@ -1,5 +1,5 @@
-#ifndef _GLOBAL_TABLES_H
-#define _GLOBAL_TABLES_H
+#ifndef _DATA_87E83F0_H
+#define _DATA_87E83F0_H
 
 #include "gba/types.h"
 

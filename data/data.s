@@ -13,8 +13,8 @@
 @gUnk_08059794: @ 0805881C
 @	.incbin "baserom.gba", 0x59794, 0x6AF214 - 0x59794
 
-gUnk_08059794:
-	.incbin "baserom.gba", 0x59794, 0x38EEF4 - 0x59794
+rom_data:
+	.incbin "baserom.gba", 0x8760C, 0x38EEF4 - 0x8760C
 
 	.global gUnk_0838EEF4
 gUnk_0838EEF4:

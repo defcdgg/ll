@@ -11,10 +11,6 @@
 
 extern void IntrMain();
 
-const u8 gUnk_0805881C[];
-const u8 gUnk_08058834[];
-
-
 
 
 void sub_80002A0(void)

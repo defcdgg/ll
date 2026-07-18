@@ -164,6 +164,8 @@ extern u8 gUnk_03000598[0x80];
 
 extern u32 gUnk_0300062C;
 extern u8 gUnk_03000630;
+extern u8* gUnk_030006F8[];
+extern u8 gUnk_03000714;
 extern u32 gUnk_03000718;
 extern u8 gUnk_0300071C;
 extern u32 gUnk_03000730;
@@ -198,7 +200,9 @@ extern u16 gUnk_03000AE0;
 extern u16 gUnk_03000AE2;
 extern u8 gUnk_03000D38[];
 extern u8 gUnk_03000DDE;
+extern u32 gUnk_03000DF0[];
 extern u8 gUnk_03000E04;
+extern u8 gUnk_03000E05;
 extern u16 gUnk_03000E70;
 extern u16 gUnk_03000F38;
 extern u16 gUnk_03000F3A;

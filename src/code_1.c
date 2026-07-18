@@ -22,7 +22,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8013870);
 INCLUDE_ASM("asm/nonmatchings", sub_8013934);
 INCLUDE_ASM("asm/nonmatchings", sub_8013B0C);
 INCLUDE_ASM("asm/nonmatchings", sub_8013C00);
-INCLUDE_ASM("asm/nonmatchings", sub_8013F3C);
+INCLUDE_ASM("asm/matchings", sub_8013F3C);
 INCLUDE_ASM("asm/nonmatchings", sub_8013FE8);
 INCLUDE_ASM("asm/nonmatchings", sub_8014084);
 INCLUDE_ASM("asm/nonmatchings", sub_80140D0);
@@ -659,7 +659,7 @@ void sub_8017600(u32 *arg0, u32 *arg1, u32 arg2, u32 arg3)
     gUnk_03004F80.field_A = 0;
     gUnk_03004F80.field_C = arg3;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_801761C);
+INCLUDE_ASM("asm/matchings", sub_801761C);
 INCLUDE_ASM("asm/nonmatchings", sub_8017640);
 INCLUDE_ASM("asm/nonmatchings", sub_801768C);
 INCLUDE_ASM("asm/nonmatchings", sub_80177AC);
@@ -672,7 +672,7 @@ void sub_8018744(void)
 {
     gUnk_03000316 = 10;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8018750);
+INCLUDE_ASM("asm/matchings", sub_8018750);
 
 u32 sub_801878C(void)
 {
@@ -866,7 +866,17 @@ void sub_801A168(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
     gUnk_030004D6 = arg2;
     gUnk_030004D7 = arg3;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_801A1DC);
+void sub_801A1DC(void)
+{
+    gUnk_03000384 &= 0xFFF0;
+    gUnk_03000384 &= 0xEFFF;
+    if (gUnk_03000384 & 0x4000)
+    {
+        gUnk_03000384 &= 0xBFFF;
+    }
+
+    gUnk_030004D7 = 0;
+}
 
 void sub_801A218(void)
 {
@@ -902,7 +912,16 @@ INCLUDE_ASM("asm/nonmatchings", sub_801A2AC);
 //         REG_BLDY = arg1;
 //     }
 // }
-INCLUDE_ASM("asm/nonmatchings", sub_801A2EC);
+INCLUDE_ASM("asm/matchings", sub_801A2EC);
+// extern u8* gUnk_087EBDF0[];
+// void sub_801A2EC(void)
+// {
+//     if (gUnk_030004F8 <= 3)
+//     {
+//         LZ77UnCompVram(gUnk_087EBDF0[gUnk_030004F8], (void *)(0x06008000 + gUnk_030004F8 * 0x1000));
+//         gUnk_030004F8++;
+//     }
+// }
 void sub_801A324(void)
 {
     gUnk_030004F8 = 0;
@@ -952,8 +971,20 @@ INCLUDE_ASM("asm/nonmatchings", sub_801B570);
 
 INCLUDE_ASM("asm/matchings", sub_801B688);
 
-INCLUDE_ASM("asm/nonmatchings", sub_801B760);
-INCLUDE_ASM("asm/nonmatchings", sub_801B790);
+void sub_801B760(u16 arg0)
+{
+    if (sub_801B790(arg0) != 0)
+    {
+        return;
+    }
+    gUnk_03000518[arg0/8] |= (1 << (arg0 % 8));
+}
+
+u8 sub_801B790(u16 arg0)
+{
+    if ((gUnk_03000518[arg0 / 8] >> (arg0 % 8 )) & 1) return 1;
+    return 0;
+}
 void sub_801B7B8(void)
 {
     DmaFill32(3, 0, gUnk_03000518, 0x80);
@@ -1076,7 +1107,7 @@ void sub_80207A4(void)
     gUnk_03000630--;
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_80207B4);
+INCLUDE_ASM("asm/matchings", sub_80207B4);
 // u8 sub_80207B4(void *arg0)
 // {
 //     if ((sub_80187B4() & 0x20))
@@ -1090,10 +1121,10 @@ INCLUDE_ASM("asm/nonmatchings", sub_80207B4);
 INCLUDE_ASM("asm/nonmatchings", sub_80207DC);
 INCLUDE_ASM("asm/nonmatchings", sub_8020840);
 INCLUDE_ASM("asm/nonmatchings", sub_80208A4);
-INCLUDE_ASM("asm/nonmatchings", sub_8020914);
+INCLUDE_ASM("asm/matchings", sub_8020914);
 INCLUDE_ASM("asm/nonmatchings", sub_802093C);
 INCLUDE_ASM("asm/nonmatchings", sub_8020974);
-INCLUDE_ASM("asm/nonmatchings", sub_80209C8);
+INCLUDE_ASM("asm/matchings", sub_80209C8);
 // void sub_80209C8(u8 *arg0)
 // {
 //     u16 *ptr;
@@ -1112,7 +1143,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_80209C8);
 //     }
 // }
 
-INCLUDE_ASM("asm/nonmatchings", sub_80209EC);
+INCLUDE_ASM("asm/matchings", sub_80209EC);
 INCLUDE_ASM("asm/nonmatchings", sub_8020A0C);
 INCLUDE_ASM("asm/nonmatchings", sub_8020A7C);
 INCLUDE_ASM("asm/nonmatchings", sub_8020AB0);
@@ -1123,7 +1154,7 @@ u32 sub_8020B48(void)
     return gUnk_03000718;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8020B54);
-INCLUDE_ASM("asm/nonmatchings", sub_8020B90);
+INCLUDE_ASM("asm/matchings", sub_8020B90);
 INCLUDE_ASM("asm/nonmatchings", sub_8020BC0);
 INCLUDE_ASM("asm/nonmatchings", sub_8020BF0);
 INCLUDE_ASM("asm/nonmatchings", sub_8020C2C);
@@ -1198,7 +1229,14 @@ void sub_8020EEC(u8 value)
 INCLUDE_ASM("asm/nonmatchings", sub_8020F08);
 INCLUDE_ASM("asm/nonmatchings", sub_8020F4C);
 INCLUDE_ASM("asm/nonmatchings", sub_8020FB8);
-INCLUDE_ASM("asm/nonmatchings", sub_802103C);
+void sub_802103C(u8 *arg0, u8 arg1, u16 arg2)
+{
+    u16 *ptr;
+
+    ptr = (u16 *)(arg0 + 0xB0);
+    *ptr = (*ptr & 0xFF0F) | 0x60 | arg2;
+    arg0[0xBD] = arg1;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8021064);
 INCLUDE_ASM("asm/nonmatchings", sub_80210C0);
 
@@ -1517,7 +1555,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8048310);
 INCLUDE_ASM("asm/nonmatchings", sub_8048458);
 INCLUDE_ASM("asm/nonmatchings", sub_80485A4);
 INCLUDE_ASM("asm/nonmatchings", sub_8048690);
-INCLUDE_ASM("asm/nonmatchings", sub_8048764);
+INCLUDE_ASM("asm/matchings", sub_8048764);
 
 // typedef struct {
 //     u8 padding0[153];  // 0x00 ~ 0x98 填充
@@ -1547,17 +1585,17 @@ u8 sub_804877C(u8 arg0)
 
     return gUnk_03004AC0[index].lv;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_80487A4);
+INCLUDE_ASM("asm/matchings", sub_80487A4);
 INCLUDE_ASM("asm/nonmatchings", sub_80487CC);
 INCLUDE_ASM("asm/nonmatchings", sub_8048818);
 INCLUDE_ASM("asm/nonmatchings", sub_8048868);
 INCLUDE_ASM("asm/nonmatchings", sub_80488CC);
 INCLUDE_ASM("asm/nonmatchings", sub_8048934);
-INCLUDE_ASM("asm/nonmatchings", sub_8048984);
-INCLUDE_ASM("asm/nonmatchings", sub_80489A4);
+INCLUDE_ASM("asm/matchings", sub_8048984);
+INCLUDE_ASM("asm/matchings", sub_80489A4);
 INCLUDE_ASM("asm/nonmatchings", sub_80489C8);
 INCLUDE_ASM("asm/nonmatchings", sub_80489E8);
-INCLUDE_ASM("asm/nonmatchings", sub_8048A68);
+INCLUDE_ASM("asm/matchings", sub_8048A68);
 INCLUDE_ASM("asm/nonmatchings", sub_8048A88);
 INCLUDE_ASM("asm/nonmatchings", sub_8048ACC);
 void sub_8048B30(u8 param1, u8 param2, u16 param3)
@@ -1579,14 +1617,61 @@ INCLUDE_ASM("asm/nonmatchings", sub_8048B88);
 //     return 0;
 
 // }
-INCLUDE_ASM("asm/nonmatchings", sub_8048BAC);
+INCLUDE_ASM("asm/matchings", sub_8048BAC);
+// typedef struct {
+//     u16 unk_0;
+//     u8 value;
+//     u8 unk_3;
+// } Unk_0839CC4C;
+
+// extern Unk_0839CC4C gUnk_0839CC4C[];
+
+// u8 sub_8048BAC(u8 *arg0)
+// {
+//     if (arg0[0xBE] <= 10)
+//     {
+//         return gUnk_0839CC4C[arg0[0x8D]].value;
+//     }
+//     return 0;
+
+// }
 INCLUDE_ASM("asm/nonmatchings", sub_8048BD0);
 INCLUDE_ASM("asm/nonmatchings", sub_8048C30);
 INCLUDE_ASM("asm/nonmatchings", sub_8048C80);
 INCLUDE_ASM("asm/nonmatchings", sub_8048CEC);
-INCLUDE_ASM("asm/nonmatchings", sub_8048D40);
-INCLUDE_ASM("asm/nonmatchings", sub_8048D64);
-INCLUDE_ASM("asm/nonmatchings", sub_8048D84);
+INCLUDE_ASM("asm/matchings", sub_8048D40);
+// typedef struct {
+//     char gap1[0x7e];
+//     u16 a,b,c,d,e;
+//     char gap2[54];
+//     u8 check_val;
+// } MyStruct;
+
+// void sub_8048D40(MyStruct *ptr)
+// {
+//     if (ptr->check_val <= 10)
+//     {
+//         ptr->a = 0;
+//         ptr->b = 0;
+//         ptr->c = 0;
+//         ptr->d = 0;
+//         ptr->e = 0;
+//     }
+// }
+INCLUDE_ASM("asm/matchings", sub_8048D64);
+// u16 sub_8048D64(u8 *arg0, u16 arg1)
+// {
+//     s32 diff;
+
+//     diff = *(u16 *)(arg0 + 0x6E) - *(u16 *)(arg0 + 0x6C);
+//     if (diff < arg1)
+//     {
+//         return diff;
+//     }
+
+//     return arg1;
+// }
+INCLUDE_ASM("asm/matchings", sub_8048D84);
 INCLUDE_ASM("asm/nonmatchings", sub_8048DA4);
 INCLUDE_ASM("asm/nonmatchings", sub_8048F0C);
 INCLUDE_ASM("asm/nonmatchings", sub_8048FB8);
@@ -1603,13 +1688,33 @@ INCLUDE_ASM("asm/nonmatchings", sub_8049DF8);
 INCLUDE_ASM("asm/nonmatchings", sub_804A148);
 INCLUDE_ASM("asm/nonmatchings", sub_804A368);
 INCLUDE_ASM("asm/nonmatchings", sub_804AA2C);
-INCLUDE_ASM("asm/nonmatchings", sub_804AB10);
+INCLUDE_ASM("asm/matchings", sub_804AB10);
 INCLUDE_ASM("asm/nonmatchings", sub_804AB40);
-INCLUDE_ASM("asm/nonmatchings", sub_804ABD0);
+INCLUDE_ASM("asm/matchings", sub_804ABD0);
+// void sub_804ABD0(void) {
+//     u8 i;
+//     u16 *ptr;
+
+//     ptr = (u16 *)0x02035B04;
+//     for (i = 0; i <= 0x19; i++)
+//     {
+//         ptr[i] = 0xB001;
+//         ptr[i + 0x20] = 0xB001;
+//     }
+// }
 INCLUDE_ASM("asm/nonmatchings", sub_804ABF8);
 INCLUDE_ASM("asm/nonmatchings", sub_804AC60);
 INCLUDE_ASM("asm/nonmatchings", sub_804ACC0);
-INCLUDE_ASM("asm/nonmatchings", sub_804AD24);
+void sub_804AD24(u8 *arg0)
+{
+    u8 value;
+
+    gUnk_03000911 = (gUnk_03000911 + 1) % 16;
+
+    value = gUnk_03000911 / 8;
+
+    *(u16 *)(arg0 + 0xB6) = 0xB1BE + value;
+}
 void sub_804AD54(u16 *ptr)
 {
     *(ptr + 0x5B) = 0xB000;
@@ -1841,7 +1946,22 @@ INCLUDE_ASM("asm/nonmatchings", sub_804EF00);
 INCLUDE_ASM("asm/nonmatchings", sub_804EF50);
 INCLUDE_ASM("asm/nonmatchings", sub_804EF90);
 INCLUDE_ASM("asm/nonmatchings", sub_804EFDC);
-INCLUDE_ASM("asm/nonmatchings", sub_804F050);
+INCLUDE_ASM("asm/matchings", sub_804F050);
+/*
+extern u8 gUnk_0839CFAA[];
+u8 sub_804F050(u8 arg0)
+{
+    u8 i;
+
+    for (i = 0; i < 16; i++)
+    {
+        if(arg0 == gUnk_0839CFAA[i])
+            break;
+    }
+    
+    return i;
+}
+    */
 void sub_804F07C(void)
 {
     gUnk_03000DDE = 0;
@@ -1850,12 +1970,24 @@ INCLUDE_ASM("asm/nonmatchings", sub_804F088);
 INCLUDE_ASM("asm/nonmatchings", sub_804F0B8);
 INCLUDE_ASM("asm/nonmatchings", sub_804F10C);
 INCLUDE_ASM("asm/nonmatchings", sub_804F17C);
-INCLUDE_ASM("asm/nonmatchings", sub_804F210);
+// INCLUDE_ASM("asm/nonmatchings", sub_804F210);
+void sub_804F210(void)
+{
+    u8 i;
+
+    for (i = 0; i <= 4; i++)
+    {
+        gUnk_03000DF0[i] = 0;
+    }
+
+    gUnk_03000E04 = 0;
+    gUnk_03000E05 = 0;
+}
 u8 sub_804F244()
 {
     return gUnk_03000E04;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_804F250);
+INCLUDE_ASM("asm/matchings", sub_804F250);
 INCLUDE_ASM("asm/nonmatchings", sub_804F280);
 INCLUDE_ASM("asm/nonmatchings", sub_804F64C);
 INCLUDE_ASM("asm/nonmatchings", sub_804F768);
@@ -1905,7 +2037,7 @@ void sub_8052728(u8 arg0)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8052758);
+INCLUDE_ASM("asm/matchings", sub_8052758);
 // void sub_8052758(u16 arg0)
 // {
 //     if (arg0 != 0)
@@ -1923,7 +2055,7 @@ u16 sub_80527F4(u32 *arg0)
     return *(u16 *)0x03000F24;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8052808);
-INCLUDE_ASM("asm/nonmatchings", sub_8052858);
+INCLUDE_ASM("asm/matchings", sub_8052858);
 INCLUDE_ASM("asm/nonmatchings", sub_8052878);
 void nullsub_7() { }
 INCLUDE_ASM("asm/nonmatchings", sub_80528C8);
@@ -2013,7 +2145,7 @@ u32 sub_8052ACC(u32 *ptr)
     return 0;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8052AE8);
-INCLUDE_ASM("asm/nonmatchings", sub_8052B34);
+INCLUDE_ASM("asm/matchings", sub_8052B34);
 u32 sub_8052B80(u32 *ptr)
 {
     if (sub_8004DD0() == 0)
@@ -2129,7 +2261,19 @@ u32 sub_8052E9C(u32 *ptr)
     return 0;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8052EC0);
-INCLUDE_ASM("asm/nonmatchings", sub_8052F20);
+u32 sub_8052F20(u32 *ptr)
+{
+    u8 *data;
+
+    data = (u8 *)*ptr;
+    if (sub_8004FD0(data[1]) != 0)
+    {
+        *ptr += 2;
+        return 1;
+       
+    }
+    return 0;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8052F44);
 u32 sub_8052FAC(u32 *ptr)
 {

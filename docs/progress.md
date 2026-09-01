@@ -1723,3 +1723,23 @@ fncheck OK (64B, 3 池重定位已施加, 0 bl 槽)。全 ROM SHA1 绿。
 **破法**: 目标基址在分支块**首行**加载 = 只有"真 extern 结构体数组"声明才触发该调度。但 `gUnk_0839CC4C` 已被 `sub_8048B88` 以 `u8[]` 占用 (改声明会破坏已匹配函数), 故按 §7 起**同址别名** `gUnk_0839CC4C_entries` (linker.ld SECTIONS 外 `= 0x0839CC4C`) + `extern Unk_0839CC4C gUnk_0839CC4C_entries[]`, 用 `gUnk_0839CC4C_entries[arg0[0x8D]].value` 一次命中。→ 已固化 RULES 109。
 
 fncheck OK (36B, 1 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
+
+## 2026-09-02 code_8044394.c "fake-matched" 批量真 C 化 (9/10, sub_80462E4 挂起)
+
+把 11 个 `INCLUDE_ASM("asm/matchings", ...)` (status=1 但无真身) 逐个真 C 化。qwen 占了 sub_8048BAC 跳过;
+其余 10 个: 9 个成功 fncheck, sub_80462E4 评估后挂起。
+
+**成功 9 个** (均 fncheck OK + 全 ROM SHA1 绿):
+- sub_80444E8 / 8D40 / 8D64 / 8D84 / AB10 / ABD0 / EEC4 / EF00 / F088。
+- 新登记符号: IWRAM gUnk_03000949/970/97B/97D (linker.ld + 本文件局部 extern + 200B obj struct),
+  EWRAM gUnk_02035B04 (linker.ld + ewram.h); sub_804E0E4/E2AC 原型 void→u8(非void, 否则 return 不过编译)。
+- **两个非平凡坑**:
+  1. sub_8048D40: 清零 obj+0x7E..0x86 五个 u16。`*ptr++=0`×5 与 `ptr[i]=0`×5 都会让 egcs 把
+     "移动指针" 分到 r1、"常量0" 分到 r0 (与目标 r0=ptr/r1=0 相反, 差 12B); 只有写 5 条
+     `*(u16*)(arg0+0x7E/0x80/...)=0` (各自常量偏移) 才让 egcs 强度削减成目标形状。→ 用 bytecmp 隔离试出。
+  2. sub_804AB10: obj struct 必须**恰好 200 字节** (remaining[146]) 才产出 `muls r0,#0xc8`;
+     候选原写 remaining[143]=197B → 索引步长错。
+
+**挂起 sub_80462E4** (231 指令, 见 functions.tsv note): obj 池筛选器。首版候选 (permuter/sub_80462E4/v1.c)
+差 320/456B —— 寄存器分配 (r8/sb/sl 三连) 与循环 peel 全不同。且它现由 asm/matchings 保字节绿,
+真 C 若用 r8/sb/sl 有坑1 (GCC2 泄漏破同 TU 其他函数) 风险。判定为需专项逐块攻, 不在本次批量内强推。

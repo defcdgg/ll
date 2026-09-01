@@ -765,7 +765,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x08046060	sub_8046060	
 0	thumb	code_8044394	0x0804612c	sub_804612C	
 0	thumb	code_8044394	0x0804621c	sub_804621C	
-1	thumb	code_8044394	0x080462e4	sub_80462E4	
+1	thumb	code_8044394	0x080462e4	sub_80462E4	⏸真C待攻(现 INCLUDE_ASM matchings 保 status=1 字节绿): 231指令+r8/sb/sl三连(坑1:合并真C恐泄漏破同TU)+栈buf[12]+3调用(GetObjPool/sub_8045F10/sub_801F884); 语义=obj池按 sub_8045F10==2 收集索引到buf, 再按 sub_801F884(arg0) 的 nibble 过滤写回 arg1; 候选 permuter/sub_80462E4/v1.c 差320/456B(寄存器分配/循环peel全不同); 需专项逐块攻
 0	thumb	code_8044394	0x08046480	sub_8046480	
 0	thumb	code_8044394	0x08046558	sub_8046558	
 0	thumb	code_8044394	0x0804666c	sub_804666C	

@@ -18,3 +18,7 @@ Makefile text eol=lf
 *.inc linguist-language=Assembly
 data/** linguist-language=data
 tools/** linguist-vendored
+tools/** -text
+
+# 台账: 一行=一函数 (addr 主键), 并发只改自己那行 -> union 自动合
+functions.tsv text eol=lf merge=union

@@ -85,7 +85,7 @@ CONTEXT_FLAGS := -DM2C -DPLATFORM_GBA=1 -Dsize_t=int
 
 ### TARGETS ###
 
-.PHONY: all rom compare clean tidy format check_format ctx
+.PHONY: all rom compare clean tidy format check_format ctx code.s asm verify remaining
 
 $(shell mkdir -p $(ASM_BUILDDIR) $(C_BUILDDIR) $(DATA_BUILDDIR))
 
@@ -118,6 +118,17 @@ $(C_BUILDDIR)/m4a.o: CC1FLAGS := -mthumb-interwork -Wimplicit -Wparentheses -Wer
 $(C_BUILDDIR)/agb_sram.o: CC1 := $(TOOLS_DIR)/agbcc/bin/old_agbcc
 $(C_BUILDDIR)/agb_sram.o: CC1FLAGS := -mthumb-interwork -Wimplicit -Wparentheses -Werror -O1 -g
 
+# INCLUDE_ASM 展开成汇编期的 `.include "asm/<dir>/<func>.s"`, make 看不到这层依赖。
+# 不补就会踩到: 改 ll.cfg 函数名 + 重生成 code.s + split_asm 后, 引用该函数的
+# 其它 TU 的 .o **不会重编**, 链接期报 undefined reference 旧名 (已实际踩到)。
+# 在解析期用 grep 把依赖补上; 用 $(wildcard) 过滤, 避开注释里那些已不存在的 .s。
+define ADD_ASM_DEPS
+$(C_BUILDDIR)/$(1).o: $$(filter $$(wildcard $(ASM_SUBDIR)/*/*.s),\
+  $$(shell grep -oE 'INCLUDE_ASM\("$(ASM_SUBDIR)/[a-z]+", *[A-Za-z0-9_]+\)' $(C_SUBDIR)/$(1).c 2>/dev/null \
+    | sed -E 's|INCLUDE_ASM\("$(ASM_SUBDIR)/([a-z]+)", *([A-Za-z0-9_]+)\)|$(ASM_SUBDIR)/\1/\2.s|'))
+endef
+$(foreach c,$(notdir $(basename $(C_SRCS))),$(eval $(call ADD_ASM_DEPS,$c)))
+
 # Compile C files (with INCLUDE_ASM support)
 $(C_BUILDDIR)/%.o: $(C_SUBDIR)/%.c
 	@echo "$(CC1) <flags> -o $@ $<"
@@ -146,6 +157,26 @@ ctx.c: $(C_HEADERS)
 	@echo "Generated ctx.c ($$(wc -l < ctx.c) lines)"
 
 ctx: ctx.c
+
+# ==== 重构 R5: 工作流目标 ====
+# 重出反汇编 (gbadisasm, 改名管线第 2 步)
+code.s:
+	tools/gbadisasm/gbadisasm baserom.gba -c ll.cfg > code.s
+
+# 从 TSV+ll.cfg+code.s 增量重建 asm/ (内容不变不 touch)
+asm:
+	python3 scripts/gen_asm.py
+
+# 全量终验: make + SHA1 + audit + status=1 全量字节核验
+verify:
+	timeout 900 make > /dev/null 2>&1 && sha1sum -c ll.sha1
+	python3 scripts/audit.py
+	python3 scripts/verify_all.py
+
+# 剩余报表: 还剩哪些未匹配 (TU=xxx 过滤)
+remaining:
+	python3 scripts/remaining.py
+
 
 format:
 	$(FORMAT) -i -style=file $(FORMAT_SRCS)

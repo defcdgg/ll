@@ -1,0 +1,105 @@
+diff --git a/gcc/local-alloc.c b/gcc/local-alloc.c
+index d4b45f0..933b2b7 100755
+--- a/gcc/local-alloc.c
++++ b/gcc/local-alloc.c
+@@ -250,6 +250,7 @@ static int qty_sugg_compare    	(int, int);
+ static int qty_sugg_compare_1	(const void *, const void *);
+ static int qty_compare    	(int, int);
+ static int qty_compare_1	(const void *, const void *);
++static void dump_qty_table	(int, int *);
+ static int combine_regs		(rtx, rtx, int, int, rtx, int);
+ static int reg_meets_class_p	(int, enum reg_class);
+ static void update_qty_class	(int, int);
+@@ -1405,6 +1406,12 @@ block_alloc (b)
+ 	}
+     }
+ 
++  /* Diagnostic only: dump the qty priority table while qty_order and the
++     qty_* arrays (both alloca'd) are still live.  Pure read, no state
++     change -- see dump_qty_table.  */
++
++  dump_qty_table (b, qty_order);
++
+   /* Now propagate the register assignments
+      to the pseudo regs belonging to the qtys.  */
+ 
+@@ -1443,6 +1450,79 @@ qty_compare (q1, q2)
+   return QTY_CMP_PRI (q2) - QTY_CMP_PRI (q1);
+ }
+ 
++/* AGBCC QTY DUMP PATCH (diagnostic, not upstream).
++
++   Print the local-alloc quantity table for one basic block, in the exact
++   order qsort left it -- i.e. the order find_free_reg will hand out
++   registers.  Enabled only when AGBCC_QTY_DUMP is set in the environment;
++   its value is the output path ("-" or "1" means stderr).
++
++   This runs at the end of block_alloc, after both qsort calls and after
++   every find_free_reg, so all values are final.  It only reads the qty_*
++   arrays and qty_order -- it assigns nothing, calls no allocator, and
++   touches no RTL, so it cannot change code generation.  It must live here
++   rather than in dump_local_alloc because the qty_* arrays and qty_order
++   are alloca'd in local_alloc/block_alloc and are dangling by the time
++   toplev.c calls the -dl dump.
++
++   PRI is QTY_CMP_PRI(q) verbatim -- the sort key from qty_compare_1:
++     pri = floor_log2(n_refs) * n_refs * size / (death - birth) * 10000
++   Ties in PRI are broken by lower qty number (qty_compare_1 returns
++   q1 - q2).  SUGG is nonzero when the qty had a suggested hard register
++   and so was allocated in the earlier pass, bypassing the PRI order.  */
++
++static void
++dump_qty_table (b, qty_order)
++     int b;
++     int *qty_order;
++{
++  static int checked = 0;
++  static FILE *f = NULL;
++  int i, q, r;
++
++  if (! checked)
++    {
++      char *path = getenv ("AGBCC_QTY_DUMP");
++
++      checked = 1;
++      if (path != NULL && *path != '\0')
++	{
++	  if (path[0] == '-' || (path[0] == '1' && path[1] == '\0'))
++	    f = stderr;
++	  else
++	    f = fopen (path, "w");
++	}
++    }
++
++  if (f == NULL)
++    return;
++
++  fprintf (f, "\n;; qty table: %s block %d (%d qtys)\n",
++	   current_function_name ? current_function_name : "<unknown>",
++	   b, next_qty);
++  fprintf (f,
++	   ";; ord  qty  refs birth death life size    pri sugg csug xcall reg pseudos\n");
++
++  for (i = 0; i < next_qty; i++)
++    {
++      q = qty_order[i];
++
++      fprintf (f, ";; %3d  %3d  %4d %5d %5d %4d %4d %6d %4d %4d %5d %3d ",
++	       i, q, qty_n_refs[q], qty_birth[q], qty_death[q],
++	       qty_death[q] - qty_birth[q], qty_size[q],
++	       qty_death[q] != qty_birth[q] ? QTY_CMP_PRI (q) : -1,
++	       (int) qty_phys_num_sugg[q], (int) qty_phys_num_copy_sugg[q],
++	       qty_n_calls_crossed[q], qty_phys_reg[q]);
++
++      for (r = qty_first_reg[q]; r >= 0; r = reg_next_in_qty[r])
++	fprintf (f, "%d ", r);
++
++      fprintf (f, "\n");
++    }
++
++  fflush (f);
++}
++
+ static int
+ qty_compare_1 (q1p, q2p)
+      const void * q1p;

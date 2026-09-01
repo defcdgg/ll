@@ -321,7 +321,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08016628	MenuUi_SetExclusive	
 1	thumb	code_8010F10	0x0801667c	MenuUi_HideAll	
 1	thumb	code_8010F10	0x080166a4	Text_DrawChar	
-0	thumb	code_8010F10	0x080166fc	sub_80166FC	
+1	thumb	code_8010F10	0x080166fc	sub_80166FC	✅ 2026-09-02 opencode: 渲染字符表gUnk_08095828[charId-1]到tilemap 0x02005800; (u8)(charId-1)必须显式u8强转否则-1被fold; dest=x*2+base+y*64顺序定r1/r0分配; 循环逐字Text_PutGlyph上限8; fncheck OK
 1	thumb	code_8010F10	0x08016758	sub_8016758	
 1	thumb	code_8010F10	0x080167d4	MenuUi_MoveCursor	
 1	thumb	code_8010F10	0x080167f8	Party_SlotOfMember	

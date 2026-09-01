@@ -1530,3 +1530,19 @@ permuter 探索出: 把常量 0 存入独立变量 `zero = 0;`, 让指针经 `&g
 3. 字路径直接用参数 dst/src 做指针 (不引入 d/s), 复用 prologue 的 r4=src。
 
 fncheck OK (76 bytes, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_80166FC` 匹配 (字符表渲染到 tilemap, code_8010F10)
+
+92 字节: 把 `gUnk_08095828[charId-1]` 的字符串逐字渲染到 tilemap `0x02005800 + y*64 + x*2`,
+最多 8 字符, 遇 0 终止; charId==0xFF 直接返回。
+
+**卡点与解法 (新规律 105)**:
+1. 首版 `gUnk_08095828[charId - 1]` (charId 为 u8 形参) 被编译器常数折叠, 生成 `lsls r1,r0,#3`
+   (没有 subs r0,#1), 整体错位 67 字节。显式 `(u8)(charId - 1)` 后得到目标的
+   `subs r0,#1; lsls r0,r0,#24; lsrs r0,r0,#21` 三步截断序列 ✓。
+2. `dest = x*2 + 0x02005800 + y*64` (x*2 最前) 才生成目标的 `lsls r1,r5,#1` (x*2→r1) 先、
+   `lsls r0,r2,#6` (y*64) 后; 写成 `0x02005800 + y*64 + x*2` 则镜像 11 字节差。
+3. 原型从 K&R `void sub_80166FC();` 改为全原型 `(u8,u8,u8,u8)` — 调用方 sub_800B374 未匹配,
+   INCLUDE_ASM 不受影响, 安全。
+
+fncheck OK (92 bytes, 1 bl 槽忽略)。全 ROM SHA1 绿。

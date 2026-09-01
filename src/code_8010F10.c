@@ -934,7 +934,27 @@ void Text_DrawChar(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_80166FC);
+void sub_80166FC(u8 charId, u8 x, u8 y, u8 palette)
+{
+    u8 j;
+    u8 charCode;
+    u8 *src;
+    u16 *dest;
+
+    if (charId == 0xFF)
+        return;
+
+    src = gUnk_08095828[(u8)(charId - 1)];
+    dest = (u16 *)(x * 2 + 0x02005800 + y * 64);
+
+    for (j = 0; j < 8; j++)
+    {
+        charCode = *src++;
+        if (charCode == 0)
+            break;
+        Text_PutGlyph(dest++, charCode, palette);
+    }
+}
 void sub_8016758(u8 x, u8 y, u8 kind)
 {
     int xOffset;

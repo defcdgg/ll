@@ -1709,3 +1709,17 @@ fncheck OK (64B, 3 池重定位已施加, 0 bl 槽)。全 ROM SHA1 绿。
 100 字节: 与 sub_80207DC 完全同构，仅第一/二档分派的 r1 常量不同 (0xA/5 vs 0/0)。
 结构同 sub_80207DC: `obj[0xBE]` 不落局部变量、三处条件直接写（落局部则 ldrb 进 r1 差 2 字节）。
 首试字节级命中。fncheck OK (100B, 3 bl 槽忽略); 全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_8048BAC` 匹配 (对象 kind 参数表 value 取值, code_8044394)
+
+36 字节: `obj[0xBE] <= 10 ? gUnk_0839CC4C_entries[obj[0x8D]].value : 0` —— 与 `sub_8048B88`
+同族 (同表同守卫, 888 读字节 +0, BAC 读字节 +2 = struct 的 `value`)。表 = 4B 项 `{u16 unk_0; u8 value; u8 unk_3}`。
+
+**死路 (连 FAIL 3 次, 全因基址池加载位置/寄存器错配)**:
+1. `gUnk_0839CC4C[arg0[0x8D]*4 + 2]` (u8 视图): GCC2 把 `+2` 折进下标 → `lsls; adds r0,#2; adds r0,r0,r1; ldrb [r0]`, 目标要 `adds r0,r0,r1; ldrb [r0,#2]`。
+2. `ptr = gUnk_0839CC4C + arg0[0x8D]*4; return ptr[2];` (局部): displacement 对了但基址**晚加载** (算完下标才 `ldr r1,=表`), arg0 落 r1 (目标 r2)。
+3. `((Unk_0839CC4C *)gUnk_0839CC4C)[arg0[0x8D]].value` (cast): 同 2, cast 让 GCC2 先算下标 → base-late。
+
+**破法**: 目标基址在分支块**首行**加载 = 只有"真 extern 结构体数组"声明才触发该调度。但 `gUnk_0839CC4C` 已被 `sub_8048B88` 以 `u8[]` 占用 (改声明会破坏已匹配函数), 故按 §7 起**同址别名** `gUnk_0839CC4C_entries` (linker.ld SECTIONS 外 `= 0x0839CC4C`) + `extern Unk_0839CC4C gUnk_0839CC4C_entries[]`, 用 `gUnk_0839CC4C_entries[arg0[0x8D]].value` 一次命中。→ 已固化 RULES 109。
+
+fncheck OK (36B, 1 池重定位, 0 bl 槽)。全 ROM SHA1 绿。

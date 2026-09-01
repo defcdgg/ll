@@ -815,7 +815,7 @@ void sub_8048ACC(u8 *, u8, u8);
 void sub_8048B30(u8, u8, u16);
 void sub_8048B5C(u8 *, u8);
 u8 sub_8048B88(u8 *);
-void sub_8048BAC();
+u8 sub_8048BAC(u8 *);
 void sub_8048BD0(u8 *);
 u8 sub_8048C30(u8 *);
 void sub_8048C80();

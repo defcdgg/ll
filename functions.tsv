@@ -807,7 +807,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x08048b30	sub_8048B30	
 1	thumb	code_8044394	0x08048b5c	sub_8048B5C	✅ 2026-09-02 qwen: obj[0x91]==0xB3||obj[0x92]==0xB3 ? *(u16*)(obj+0x88)=0x20 : =arg1 (0xB3=空槽哨兵); fncheck OK 42B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x08048b88	sub_8048B88	
-1	thumb	code_8044394	0x08048bac	sub_8048BAC	
+1	thumb	code_8044394	0x08048bac	sub_8048BAC	✅ 2026-09-02 qwen: obj[0xBE]<=10? gUnk_0839CC4C_entries[obj[0x8D]].value:0 (4B表{u16,u8 value@2,u8}, 家族同 sub_8048B88 读+0); 结构体数组视图需别名符号 gUnk_0839CC4C_entries@0x0839CC4C (u8[] 视图被 sub_8048B88 占用; 直址 cast 致 base-late 寄存器错配, 唯全局 struct[] 声明才 base-early); fncheck OK 36B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x08048bd0	sub_8048BD0	
 0	thumb	code_8044394	0x08048c30	sub_8048C30	
 0	thumb	code_8044394	0x08048c80	sub_8048C80	

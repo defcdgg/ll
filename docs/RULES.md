@@ -687,7 +687,12 @@
      ③ peel 是编译器自动做的, **不要**手写 `if(x==t[0])return 0;` 再进循环去"复刻"它, 直接写朴素 for+break 即命中。
      **变体 (案例 `sub_804EF90`)**: 界是变量 (`i < gUnk_03000DDC`) 时, peel 出的首块仍先 `ldrb count; cmp i,#0; bhs ret`, 循环体每轮**重读** count (全局不缓存); 带 `ret` 累加器 (默认 0xFF, 命中 `ret=i`) 时返回值走 r5 而非直接 r1, 但 peel/bhi 骨架不变。
      ⚠ 表若是已登记的结构体数组 (如 iwram.h `Unk_03000DEntry gUnk_03000D88[]`), **直接复用该类型**, 别在函数里再 `typedef`+`extern` 一份同名/同址符号 —— 与头文件声明冲突编译即红; 4 字节元素 → 索引算术是 `lsls r0,r2,#2`。
-     关联: 规则 99 (数据表保持 1-D extern)。
+      关联: 规则 99 (数据表保持 1-D extern)。
+109. **同一 ROM 表需要"第二种类型视图"时, 用同址别名符号声明, 绝不用 cast**（案例 `sub_8048BAC`）。
+      表已按 `u8[]` 登记且被别的**已匹配**函数占用 (如 `gUnk_0839CC4C` 被 `sub_8048B88` 以 `gUnk_0839CC4C[i*4]` 用), 而本函数需要 `struct[]` 视图 (字段偏移当 ldrb displacement、且基址在分支内**早加载**) 时:
+      写 `((Struct *)gArr)[i].field` → GCC2 **先算下标再取基址** → 基址晚加载进 r1、arg0 挤进 r1、`adds r0,#2` 折进下标, 三处全错 (实测连 FAIL 3 次: 直址下标 `gArr[i*4+2]` 把 +2 折进 index; 局部 `p=gArr+i*4;p[2]` 与 cast 都 base-late)。
+      **正解**: linker.ld 的 SECTIONS **外**加同址别名 `gUnk_0839CC4C_entries = 0x0839CC4C;` + 本 TU `extern Struct gUnk_0839CC4C_entries[];`, 用**真 extern 结构体数组** `gUnk_0839CC4C_entries[i].field` 索引 → 基址在块首 `ldr r1,=addr`、arg0 落 r2、`.field` 折成 `ldrb [r0,#off]`, 一次命中。
+      关联: 规则 15 (基址池加载位置↔tbl 局部)、规则 108② (真 extern 数组 vs 强转宏换寄存器)、§7 别名符号 (同址多视图)。
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 

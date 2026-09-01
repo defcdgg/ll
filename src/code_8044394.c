@@ -588,24 +588,22 @@ u8 sub_8048B88(u8 *arg0)
     }
     return 0;
 }
-INCLUDE_ASM("asm/matchings", sub_8048BAC);
-// typedef struct {
-//     u16 unk_0;
-//     u8 value;
-//     u8 unk_3;
-// } Unk_0839CC4C;
+typedef struct {
+    u16 unk_0;
+    u8 value;
+    u8 unk_3;
+} Unk_0839CC4C;
 
-// extern Unk_0839CC4C gUnk_0839CC4C[];
+extern Unk_0839CC4C gUnk_0839CC4C_entries[];
 
-// u8 sub_8048BAC(u8 *arg0)
-// {
-//     if (arg0[0xBE] <= 10)
-//     {
-//         return gUnk_0839CC4C[arg0[0x8D]].value;
-//     }
-//     return 0;
-
-// }
+u8 sub_8048BAC(u8 *arg0)
+{
+    if (arg0[0xBE] <= 10)
+    {
+        return gUnk_0839CC4C_entries[arg0[0x8D]].value;
+    }
+    return 0;
+}
 void sub_8048BD0(u8 *arg0)
 {
     switch (arg0[0xBE])

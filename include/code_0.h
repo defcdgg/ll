@@ -510,7 +510,7 @@ u8 sub_8020798();
 void sub_80207A4();
 u8 sub_80207B4(void *);
 void sub_80207DC(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35);
-void sub_8020840();
+void sub_8020840(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35);
 void sub_80208A4();
 void sub_8020914();
 void sub_802093C(u8 *);

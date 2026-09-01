@@ -399,9 +399,29 @@ void sub_80207DC(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
         sub_801CE80(obj, 0, f2a, f35, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8020840);
+/* 场景对象按 field_BE 分派 (sub_80207DC 的变体): ≤0xA → sub_801CBA4(…, 0xA, …),
+ * ≤0x70 → sub_801CA08(…, 5, …), 其余 (field_BE-0x71 ≤ 0x8D) → sub_801CE80(…, 0, …)。 */
+void sub_8020840(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
+{
+    if (obj[0xBE] <= 0xA)
+        sub_801CBA4(obj, 0xA, f2a, f35, 0);
+    else if (obj[0xBE] <= 0x70)
+        sub_801CA08(obj, 5, f2a, f35, 0);
+    else if ((u8)(obj[0xBE] - 0x71) <= 0x8D)
+        sub_801CE80(obj, 0, f2a, f35, 0);
+}
+
 INCLUDE_ASM("asm/nonmatchings", sub_80208A4);
 INCLUDE_ASM("asm/matchings", sub_8020914);
+/*
+void sub_8020914(u8 *arg0)
+{
+    if (arg0[0xBE] <= 10)
+    {
+        sub_801CBA4(arg0, 3, *(u16 *)(arg0 + 0x2A), arg0[0x35], 0);
+    }
+}
+*/
 void sub_802093C(u8 *arg0)
 {
     u8 *ptr;

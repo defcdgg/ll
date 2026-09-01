@@ -1703,3 +1703,9 @@ fncheck OK (100B, 3 bl 槽忽略)。全 ROM SHA1 绿。
    `typedef UnkStruct`/`extern UnkStruct gUnk_03000D88[]` (同 sub_804EF90 坑, 已记规则 108 变体)。
 
 fncheck OK (64B, 3 池重定位已施加, 0 bl 槽)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_8020840` 匹配 (sub_80207DC 孪生变体, code_801A3C4)
+
+100 字节: 与 sub_80207DC 完全同构，仅第一/二档分派的 r1 常量不同 (0xA/5 vs 0/0)。
+结构同 sub_80207DC: `obj[0xBE]` 不落局部变量、三处条件直接写（落局部则 ldrb 进 r1 差 2 字节）。
+首试字节级命中。fncheck OK (100B, 3 bl 槽忽略); 全 ROM SHA1 绿。

@@ -1523,9 +1523,9 @@ permuter 探索出: 把常量 0 存入独立变量 `zero = 0;`, 让指针经 `&g
 `0x08088C00` 只有 `LoadDigitFontObjTiles`（0x08009114）一处直接引用。函数在
 `gObjGraphicsSetId` bit7 清零时通过 DMA3 将该地址的 0x40 字节复制到 `0x050003C0`，
 对应 OBJ 调色板槽 14/15；同一函数随后从 `0x08088C40` 搬运 0x140 字节数字图块到槽 150。
-数据已定义为 `gDigitFontObjPalettes[2][16]`，每项为 BGR555 半字，保留原始 64 字节布局。
-`LoadDigitFontObjTiles` 已是合适语义名，无需进一步改名；连续 blob 起点相应后移至
-`0x08088C40`，后续数据地址保持不变。
+`0x08088C00` 已定义为 `gDigitFontObjPalettes[2][16]`（BGR555 半字），`0x08088C40`
+已定义为 `gDigitFontObjTiles[0x140]`（10 个 4bpp 数字字形 tile）。`LoadDigitFontObjTiles`
+已是合适语义名，无需进一步改名；连续 blob 起点相应后移至 `0x08088D80`，场景描述符地址保持不变。
 
 ## 2026-09-02 `sub_8017640` 匹配 (memcpy 对齐双路径, code_8010F10)
 
@@ -1599,3 +1599,19 @@ C 结构 (中间变量拆分 + 保持窄类型不落局部) 改变的, 值得先
 - **shadow 指针先声明** → prologue `ldr r5,=0x02027000` 排第一 (目标顺序: shadow→r5, offset→r4, i→r3)。
 
 bytecmp OK (88B 全等); fncheck OK; 全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_80188BC` 匹配 (按键轮询+前沿检测, code_8010F10)
+
+108 字节: s8 倒计时 `gUnk_03000316`(减 1 后若仍 >0 走 clear 清空两缓冲, 否则读取按键),
+尾调 `sub_80182A8(gUnk_03000310, gGstate330)`。0x03000310 新建符号 `gUnk_03000310`(当前按键 u16),
+gGstate312 = 新按下按键(keys & ~old), 对齐 gGstate330 传参。
+
+**卡点与解法 (新规律 107)**:
+1. 减 1 后再按 s8 比较, 直接写 `if ((s8)gUnk_03000316 > 0)` 被 GCC2 复用寄存器 (lsls r0,r0,#24);
+   插入中间变量 `tmp = gUnk_03000316; if ((s8)tmp > 0)` 强制重读内存 (movs r0,#0; ldrsb r0,[r1,r0]) ✓。
+2. 块布局用 readkeys/clear/tail 三标签 goto: `if <=0 goto readkeys; dec; if >0 goto clear;` +
+   readkeys 带 `goto tail`, clear fall-through —— 匹配目标基本块顺序。
+3. 赋值顺序: `gGstate312 = keys & ~gUnk_03000310; gUnk_03000310 = keys;`(先写新按键) 决定
+   ldr r4=0x03000312 在 ldr r2=0x03000310 之前, 池条目随之排列 ✓。
+
+fncheck OK (108 bytes, 1 bl 槽忽略)。全 ROM SHA1 绿。

@@ -1551,7 +1551,28 @@ void sub_801889C(void)
         sub_804AE2C();
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_80188BC);
+void sub_80188BC(void)
+{
+    u16 keys;
+    u16 tmp;
+
+    if ((s8)gUnk_03000316 <= 0)
+        goto readkeys;
+    gUnk_03000316--;
+    tmp = gUnk_03000316;
+    if ((s8)tmp > 0)
+        goto clear;
+readkeys:
+    keys = (u16)~REG_KEYINPUT;
+    gGstate312 = keys & ~gUnk_03000310;
+    gUnk_03000310 = keys;
+    goto tail;
+clear:
+    gGstate312 = 0;
+    gUnk_03000310 = 0;
+tail:
+    sub_80182A8(gUnk_03000310, gGstate330);
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8018928);
 INCLUDE_ASM("asm/nonmatchings", sub_8018A58);
 INCLUDE_ASM("asm/nonmatchings", sub_8018BF8);

@@ -43,6 +43,7 @@ gUnk_0839CC4C = 0x0839CC4C;
 gUnk_0839CE38 = 0x0839CE38;
 gUnk_0839CEFC = 0x0839CEFC;
 gUnk_08393B28 = 0x08393B28;
+gUnk_0839D5BC = 0x0839D5BC;
 gUnk_03000730_arr = 0x03000730;
 gUnk_087ED6A8 = 0x087ED6A8;
 gUnk_0861AAA4 = 0x0861AAA4;
@@ -129,6 +130,7 @@ SECTIONS {
         . = 0x00000227; gSkillMenuPage = .;
         . = 0x0000022B; gUnk_0300022B = .;
         . = 0x00000248; gUnk_03000248 = .;
+        . = 0x00000310; gUnk_03000310 = .;
         . = 0x00000312; gGstate312 = .;
 
         . = 0x00000314; gGstate314 = .;
@@ -548,6 +550,7 @@ gBgPalBackdropWhite = 0x08087216;
 gUiSpritesAuxDesc = 0x087EB2C4;
 gIntroBgTiles = 0x087E9828;
 gIntroBgMaps = 0x087E98C0;
+gMenuEntityPaletteTable = 0x0808A234; /* 124 OBJ palettes, 0x20 bytes each; DMA skips entry[0] */
 
 /* s32 返回类型别名 (sub_8009D34 需要无截断的返回值读取, 见 code_8005020.c) */
 Sprite_EnqueueRender_S32 = Sprite_EnqueueRender;

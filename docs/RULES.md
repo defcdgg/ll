@@ -665,6 +665,17 @@
        存在与类型决定, 不是铁板一块。打 agbcc global.c 转储补丁 (路径 a) 是最后手段。
      关联: 规则 29 (字面池重定位)、规则 76/87/88 (寄存器 home 与 qty)、规则 104 (拷贝族 home)。
 
+107. **s32/u16 减 1 后再按 s8 比较时, 若直接 `if ((s8)g > 0)` 编译器复用寄存器移位 (lsls rX,rX,#24) 而非重读内存 (movs+r0,ldrsb)**（案例 `sub_80188BC`）。
+     目标序列: `subs r0,r2,#1; strb r0,[r1]; movs r0,#0; ldrsb r0,[r1,r0]; cmp r0,#0; bgt clear`
+     —— 减后**重读内存**取带符号字节。直接写 `gUnk_03000316--; if ((s8)gUnk_03000316 > 0)`
+     会被 GCC2 改成 `lsls r0,r0,#24; cmp r0,#0` (复用寄存器, 差 4 字节); 插入中间变量
+     `tmp = gUnk_03000316; if ((s8)tmp > 0)` 后强制重读, 逐字节命中。
+     **推论**: 想让减/改后的全局值被"当作新读"产出 ldrsb/ldrsh 序列, 就经一个局部变量中转,
+     阻断寄存器数据流的 reuse; 这也是可控 "home 互换" 的一招。
+     另本案用 **readkeys/clear/tail 三标签 goto** 强制块布局: 目标 `ble readkeys` + `bgt clear`
+     决定基本块顺序 (readkeys 带 `b tail`, clear fall-through), 直接 C 平铺两分支会生成额外一跳。
+     关联: 规则 104 (home 由声明形式决定)、规则 103 (调度槽位)。
+
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 
 agbcc (egcs 1.1 系) 自带 RTL 转储开关, 对定位寄存器 home 问题极其有用:

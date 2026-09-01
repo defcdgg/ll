@@ -102,6 +102,7 @@ extern u8 gPartyMenuIdx;
 extern u8 gSkillMenuPage;
 extern u8 gUnk_0300022B;
 extern u32 gUnk_03000248;
+extern u16 gUnk_03000310;
 extern u16 gGstate312;
 extern u16 gGstate314;
 extern u8 gUnk_03000316;
@@ -693,7 +694,7 @@ typedef struct
 
 extern Unk_030046A0 gUnk_030046A0[];
 
-/* 当前地图的区域头表指针 (sub_800661C 从 0x087EBB20[mapIdx] 装载):
+/* 当前地图的区域头表指针 (MapScene_Load 从 0x087EBB20[mapIdx] 装载):
  * {u32 cells; u32 type0..type4} — cells: {u8 count, {u8 xTile, u8 yTile, u8 type, u8 entryIdx}[count]}
  * typeN: MapZone_Trigger 各动作的记录表 (type0/1 记录 8B, type2 4B, type3 2B, type4 4B) */
 extern u32 *gMapZoneHeader;

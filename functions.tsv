@@ -385,7 +385,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08018874	GetBuf_37410	
 1	thumb	code_8010F10	0x0801887c	sub_801887C	
 1	thumb	code_8010F10	0x0801889c	sub_801889C	
-0	thumb	code_8010F10	0x080188bc	sub_80188BC	
+1	thumb	code_8010F10	0x080188bc	sub_80188BC	✅ 2026-09-02 opencode: 按键轮询+前沿检测; s8倒计时(减后经临时变量重读内存才生成ldrsb); readkeys/clear/tail三标签goto控布局; 新符号gUnk_03000310=当前按键缓冲; fncheck OK
 0	thumb	code_8010F10	0x08018928	sub_8018928	
 0	thumb	code_8010F10	0x08018a58	sub_8018A58	
 0	thumb	code_8010F10	0x08018bf8	sub_8018BF8	

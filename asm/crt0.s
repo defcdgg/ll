@@ -21,7 +21,7 @@ _080000C0:
 	ldr r1, _08000250 @ =0x03007FFC
 	add r0, pc, #0x18 @ =IntrMain
 	str r0, [r1]
-	ldr r1, _08000254 @ =sub_800128C
+	ldr r1, _08000254 @ =AgbMain
 	mov lr, pc
 	bx r1
 
@@ -128,7 +128,7 @@ _080001EC:
 	bx lr
 	.align 2, 0
 _08000250: .4byte 0x03007FFC
-_08000254: .4byte sub_800128C
+_08000254: .4byte AgbMain
 _08000258: .4byte 0x0805769C
 _0800025C: .4byte 0x0805769C
 

@@ -21,72 +21,72 @@
 //     &gMPlayInfo_4
 // };
 
-void sub_80533F0(void)
+void SoundMain_Frame(void)
 {
     u16 volume;
-    if (gUnk_03000F38 & 2)
+    if (gSoundTaskFlags & 2)
     {
-        volume = sub_801768C(gUnk_03000F3E, 0x100, gUnk_03000F40, gUnk_03000F41, 0);
-        sub_805369C(volume);
-        if (gUnk_03000F41 < gUnk_03000F40)
+        volume = sub_801768C(gFadeFromVolume, 0x100, gFadeDuration, gFadeCounter, 0);
+        Bgm_SetVolume(volume);
+        if (gFadeCounter < gFadeDuration)
         {
-            gUnk_03000F41++;
+            gFadeCounter++;
         }
         else
         {
-            gUnk_03000F38 &= ~2;
+            gSoundTaskFlags &= ~2;
         }
     }
-    else if (gUnk_03000F38 & 4)
+    else if (gSoundTaskFlags & 4)
     {
-        volume = sub_801768C(gUnk_03000F3E, -gUnk_03000F3E, gUnk_03000F40, gUnk_03000F41, 0);
-        sub_805369C(volume);
-        if (gUnk_03000F41 < gUnk_03000F40)
+        volume = sub_801768C(gFadeFromVolume, -gFadeFromVolume, gFadeDuration, gFadeCounter, 0);
+        Bgm_SetVolume(volume);
+        if (gFadeCounter < gFadeDuration)
         {
-            gUnk_03000F41++;
+            gFadeCounter++;
         }
         else
         {
-            gUnk_03000F38 &= ~4;
+            gSoundTaskFlags &= ~4;
         }
     }
 
     m4aSoundMain();
-    sub_80534B4();
+    SoundTracks_Frame();
 }
 
-INCLUDE_ASM("asm/matchings", sub_80534B4);
+INCLUDE_ASM("asm/matchings", SoundTracks_Frame);
 
-// void sub_80534B4(void) {
+// void SoundTracks_Frame(void) {
 //     u8 i;
 //     u16 songNum;
 
 //     for(i = 0; i <= 3; i++)
 //     {
-//         if((gUnk_03000F42 >> i) & 1)
+//         if((gSfxTrackActiveBits >> i) & 1)
 //         {
 //             if((u16)gMPlayInfos2[i]->status == 0)
 //             {
-//                 gUnk_03000F42 &= ~(1 << (i));
+//                 gSfxTrackActiveBits &= ~(1 << (i));
 
-//                 if((gUnk_03000F43 >> i) & 1)
+//                 if((gSfxTrackLoopBits >> i) & 1)
 //                 {
-//                     songNum = gUnk_03000F48[i];
+//                     songNum = gSfxTrackSongIds[i];
 //                     MPlayStart(gMPlayInfos2[i], gSongHeaderTable[songNum]);
-//                     gUnk_03000F42 |= (1 << (i));
-//                     gUnk_03000F48[i] = songNum;
+//                     gSfxTrackActiveBits |= (1 << (i));
+//                     gSfxTrackSongIds[i] = songNum;
 
-//                     if((gUnk_03000F43 >> i) & 1)
+//                     if((gSfxTrackLoopBits >> i) & 1)
 //                     {
-//                         gUnk_03000F43 &= ~(1 << i);
+//                         gSfxTrackLoopBits &= ~(1 << i);
 //                     }
-//                     gUnk_03000F43 |= (1 << i);
+//                     gSfxTrackLoopBits |= (1 << i);
 //                 }
 
-//                 if((gUnk_03000F50 >> i) & 1)
+//                 if((gSfxTrackFadeBits >> i) & 1)
 //                 {
 //                     m4aMPlayFadeIn((struct MusicPlayerInfo* )0x03005AB0, 2);
-//                     gUnk_03000F50 &= ~(1 << (i));
+//                     gSfxTrackFadeBits &= ~(1 << (i));
 //                 }
 //             }
 //         }
@@ -95,61 +95,61 @@ INCLUDE_ASM("asm/matchings", sub_80534B4);
 
 // }
 
-void sub_805359C()
+void Sound_Init()
 {
     m4aSoundInit();
-    gUnk_03000F38 = 0;
-    gUnk_03000F3A = 0;
-    gUnk_03000F3C = 0x100;
-    gUnk_03000F40 = 0;
-    gUnk_03000F42 = 0;
-    gUnk_03000F43 = 0;
-    gUnk_03000F50 = 0;
+    gSoundTaskFlags = 0;
+    gPlayingSongId = 0;
+    gBgmVolume = 0x100;
+    gFadeDuration = 0;
+    gSfxTrackActiveBits = 0;
+    gSfxTrackLoopBits = 0;
+    gSfxTrackFadeBits = 0;
 }
 
-u16 sub_80535E8(void)
+u16 Sound_GetFlags(void)
 {
-    return gUnk_03000F38;
+    return gSoundTaskFlags;
 }
 
-void sub_80535F4(void)
+void Sound_VSyncOff(void)
 {
     m4aSoundVSyncOff();
-    gUnk_03000F38 |= 1;
+    gSoundTaskFlags |= 1;
 }
 
-void sub_805360C(void)
+void Sound_VSyncOn(void)
 {
     m4aSoundVSyncOn();
-    gUnk_03000F38 &= 0xFFFE;
+    gSoundTaskFlags &= 0xFFFE;
 }
 
-void sub_8053628(u8 arg0, u16 arg1)
+void Bgm_Play(u8 arg0, u16 arg1)
 {
-    gUnk_03000F3A = arg0;
-    switch (gUnk_03000F3A)
+    gPlayingSongId = arg0;
+    switch (gPlayingSongId)
     {
         case 0x3F:
-            gUnk_03000F3A = 0x11B;
+            gPlayingSongId = 0x11B;
             break;
         case 0x40:
-            gUnk_03000F3A = 0x11C;
+            gPlayingSongId = 0x11C;
             break;
         case 0x41:
-            gUnk_03000F3A = 0x11A;
+            gPlayingSongId = 0x11A;
             break;
     }
-    m4aSongNumStart(gUnk_03000F3A);
+    m4aSongNumStart(gPlayingSongId);
     m4aMPlayImmInit((struct MusicPlayerInfo *)0x03005AB0);
-    sub_805369C(arg1);
+    Bgm_SetVolume(arg1);
 }
 
-void sub_8053688(void)
+void Bgm_Stop(void)
 {
-    m4aSongNumStop(gUnk_03000F3A);
+    m4aSongNumStop(gPlayingSongId);
 }
 
-void sub_805369C(u16 volume)
+void Bgm_SetVolume(u16 volume)
 {
 
     if (volume < 2)
@@ -160,75 +160,75 @@ void sub_805369C(u16 volume)
     m4aMPlayVolumeControl((struct MusicPlayerInfo *)0x03005AB0, 0xFF, volume);
 }
 
-void sub_80536C0(u8 arg0)
+void Bgm_FadeIn(u8 arg0)
 {
-    gUnk_03000F3E = 0;
-    gUnk_03000F40 = arg0;
-    gUnk_03000F41 = 0;
-    gUnk_03000F38 |= 2;
+    gFadeFromVolume = 0;
+    gFadeDuration = arg0;
+    gFadeCounter = 0;
+    gSoundTaskFlags |= 2;
 }
 
-void sub_80536EC(u8 arg0)
+void Bgm_FadeOut(u8 arg0)
 {
-    gUnk_03000F3E = gUnk_03000F3C;
-    gUnk_03000F40 = arg0;
-    gUnk_03000F41 = 0;
-    gUnk_03000F38 |= 4;
+    gFadeFromVolume = gBgmVolume;
+    gFadeDuration = arg0;
+    gFadeCounter = 0;
+    gSoundTaskFlags |= 4;
 }
 
-void sub_8053720(void)
+void Bgm_Continue(void)
 {
-    m4aSongNumContinue(gUnk_03000F3A);
+    m4aSongNumContinue(gPlayingSongId);
 }
 
-u8 sub_8053734(u8 arg0)
+u8 Sfx_TrackBusy(u8 arg0)
 {
-    return (gUnk_03000F42 >> arg0) & 1;
+    return (gSfxTrackActiveBits >> arg0) & 1;
 }
 
-INCLUDE_ASM("asm/matchings", sub_805374C);
-// void sub_805374C(u16 arg0, u8 arg1, u8 arg2) {
+INCLUDE_ASM("asm/matchings", Sfx_Play);
+// void Sfx_Play(u16 arg0, u8 arg1, u8 arg2) {
 
 //     MPlayStart(gMPlayInfos2[arg1], gSfxSongHeaderTable[arg0]);
-//     gUnk_03000F42 |= 1 << arg1;
-//     gUnk_03000F48[arg1] = arg0;
-//     if((gUnk_03000F43 >> arg1) & 1)
+//     gSfxTrackActiveBits |= 1 << arg1;
+//     gSfxTrackSongIds[arg1] = arg0;
+//     if((gSfxTrackLoopBits >> arg1) & 1)
 //     {
-//         gUnk_03000F43 &= ~(1 << arg1);
+//         gSfxTrackLoopBits &= ~(1 << arg1);
 //     }
-//     gUnk_03000F43 |= arg2 << arg1;
+//     gSfxTrackLoopBits |= arg2 << arg1;
 // }
 
-INCLUDE_ASM("asm/matchings", sub_80537C0);
-// void sub_80537C0(u16 arg0, u8 arg1) {
+INCLUDE_ASM("asm/matchings", Sfx_PlayFade);
+// void Sfx_PlayFade(u16 arg0, u8 arg1) {
 
 //     MPlayStart(gMPlayInfos2[arg1], gSfxSongHeaderTable[arg0]);
-//     gUnk_03000F42 |= 1 << arg1;
-//     gUnk_03000F48[arg1] = arg0;
+//     gSfxTrackActiveBits |= 1 << arg1;
+//     gSfxTrackSongIds[arg1] = arg0;
 
-//     if( (gUnk_03000F50 >> arg1) & 1)
+//     if( (gSfxTrackFadeBits >> arg1) & 1)
 //     {
-//         gUnk_03000F50 &= ~(1 << arg1);
+//         gSfxTrackFadeBits &= ~(1 << arg1);
 //     }
-//     gUnk_03000F50 |= (1 << arg1);
+//     gSfxTrackFadeBits |= (1 << arg1);
 
 //     m4aMPlayFadeOutTemporarily((struct MusicPlayerInfo* )0x03005AB0, 2);
 // }
 
-INCLUDE_ASM("asm/matchings", sub_8053838);
+INCLUDE_ASM("asm/matchings", Sfx_StopTrack);
 
-// void sub_8053838(u8 arg0) {
+// void Sfx_StopTrack(u8 arg0) {
 //     m4aMPlayStop(gMPlayInfos2[arg0]);
 
-//     gUnk_03000F42 &= ~(1 << arg0);
+//     gSfxTrackActiveBits &= ~(1 << arg0);
 
-//     if((gUnk_03000F43 >> arg0) & 1)
+//     if((gSfxTrackLoopBits >> arg0) & 1)
 //     {
-//         gUnk_03000F43 &= ~(1 << arg0);
+//         gSfxTrackLoopBits &= ~(1 << arg0);
 //     }
 // }
 
-s32 sub_8053884(u8 arg0)
+s32 Sfx_GetLoopFlag(u8 arg0)
 {
-    return (gUnk_03000F43 >> arg0) & 1;
+    return (gSfxTrackLoopBits >> arg0) & 1;
 }

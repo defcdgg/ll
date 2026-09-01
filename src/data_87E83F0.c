@@ -1,14 +1,15 @@
 #include "data_87E83F0.h"
 #include "code_0.h"
+#include "data_805769C.h"
 
 // 87E83F0
 const MainTaskFunc gMainTasks[] = {
-    sub_8003088, // Game Task
-    sub_80177AC, // Battle Task
+    Task_DispatchGameState, // Game Task
+    BattleTask_Run, // Battle Task
 };
 
-const UnkFunc gUnk_087E83F8[] = {sub_8001538, sub_8001D08, sub_8001354, sub_80030B0, sub_8001708, sub_8001828, sub_80018D4,
-                                      sub_8003114, sub_8001A7C, sub_8003128, sub_8003168, sub_80031E4, sub_8001BD0, sub_80031F8};
+const UnkFunc gUnk_087E83F8[] = {NewGame_Init, Task_MapExplore, SceneTransition_Load, SceneTransition_RequestMap, Scene_EnterMap, Scene_ExitToMenu, Scene_Reload,
+                                      Task_DialogueFrame, Scene_EnterDoor, Task_BattleMenuFrame, Scene_ReloadViaMenu, Task_SaveMenuFrame, Scene_RestoreAfterBattle, Task_TextFrame};
 
 
 const u32 gUnk_087E8430[] = {
@@ -693,7 +694,8 @@ const u8 gUnk_087E94FC[][4] = {
 
 
 
-const u32 gUnk_087E9818[] = {0x2005840, 0x200586C, 0x2005B00, 0x2005B2C};
+// Four 8x8 portrait positions: top-left, top-right, bottom-left, bottom-right.
+const u32 gDialogPortraitTilemapPtrs[] = {0x2005840, 0x200586C, 0x2005B00, 0x2005B2C};
 
 // off_87EA33C
 // const u8* const gGfx_StaticMapObject_PtrTable[] = {
@@ -721,47 +723,66 @@ const u32 gUnk_087E9818[] = {0x2005840, 0x200586C, 0x2005B00, 0x2005B2C};
 
 
 
-// u8 const gUnk_0805881C[] = INCBIN_U8("data/raw_data/gUnk_0805881C.bin");
-
-
-//gMoveDirectionLut
-u8 const gUnk_0805881C[] ={0, 1, 5, 0, 7, 8, 6,
-      0, 3, 2, 4, 0, 0, 0, 0, 0};
-
-
-
-
-      //gUnk_0805887C
-const u8 gSpriteTileCountTable[] = {
-    1, 4, 16, 64,  // Square: 8x8, 16x16, 32x32, 64x64
-    2, 4,  8, 32,  // Horizontal: 16x8, 32x8, 32x16, 64x32
-    2, 4,  8, 32,  // Vertical: 8x16, 8x32, 16x32, 32x64
-    99, 99, 99, 99 // Invalid/Prohibited Shape
-};
-
-
-//8058834
-const u8 gSpriteDimensionsTable[] = {
-    8, 8, 16, 16, 32, 32, 64, 64,  // Shape 0 (Square)
-    16, 8, 32, 8, 32, 16, 64, 32,  // Shape 1 (Horizontal)
-    8, 16, 8, 32, 16, 32, 32, 64,  // Shape 2 (Vertical)
-
-    1, 1, 1, 1, 1, 1, 1, 1,
-
-    15, 0, 0, 0, 252, 255, 228, 255,
-    15, 0, 0, 0, 0, 0, 240, 255
-};
-
-//8058834
-const s8 gSpriteDimensionsTable[] = {
-    8, 8, 16, 16, 32, 32, 64, 64,  // Shape 0 (Square)
-    16, 8, 32, 8, 32, 16, 64, 32,  // Shape 1 (Horizontal)
-    8, 16, 8, 32, 16, 32, 32, 64,  // Shape 2 (Vertical)
-
-    1, 1, 1, 1, 1, 1, 1, 1,
-
-    15, 0, 0, 0, -4, -1, -28, -1,
-    15, 0, 0, 0, 0, 0, -16, -1
-};
 */
 
+/* ==== 从 data/data1.s 的 blob 搬出: 0x087E9554..0x087E9818 (740 B) ====
+ * 三张连续的 ROM 指针表。表项写成对目标符号的引用 (重定位), 链接后与原字节完全一致,
+ * 好处: 目标资产改名/移动由链接器保证一致, 不再依赖硬写地址。*/
+
+/* 对话框头像 LZ77 图形表 (88 项, 每项解压成 0x800 B), 由 sub_8008620 按索引取用。
+ * 目标资产都在 src/data_805769C.c; 表项写成真重定位, 不再依赖 linker.ld 的绝对符号。*/
+const u32 gDialogPortraitGfxTable[] = {
+    (u32)gUnk_080597D8, (u32)gUnk_08059D48, (u32)gUnk_0805A2B4, (u32)gUnk_0805A830,
+    (u32)gUnk_0805ADA0, (u32)gUnk_0805B30C, (u32)gUnk_0805B83C, (u32)gUnk_0805BE10,
+    (u32)gUnk_0805C330, (u32)gUnk_0805C82C, (u32)gUnk_0805CD48, (u32)gUnk_0805D300,
+    (u32)gUnk_0805D8FC, (u32)gUnk_0805DEE4, (u32)gUnk_0805E4DC, (u32)gUnk_0805EAF4,
+    (u32)gUnk_0805EF98, (u32)gUnk_0805F4B0, (u32)gUnk_0805F970, (u32)gUnk_0805FE08,
+    (u32)gUnk_080602BC, (u32)gUnk_08060818, (u32)gUnk_08060D80, (u32)gUnk_080612F4,
+    (u32)gUnk_08061878, (u32)gUnk_08061DB0, (u32)gUnk_08062350, (u32)gUnk_080629D8,
+    (u32)gUnk_080630A8, (u32)gUnk_08063794, (u32)gUnk_08063E3C, (u32)gUnk_08064548,
+    (u32)gUnk_08064C28, (u32)gUnk_08065190, (u32)gUnk_0806574C, (u32)gUnk_08065CE8,
+    (u32)gUnk_0806624C, (u32)gUnk_08066808, (u32)gUnk_08066D84, (u32)gUnk_080673C4,
+    (u32)gUnk_080679B4, (u32)gUnk_08067FD4, (u32)gUnk_080685AC, (u32)gUnk_08068B48,
+    (u32)gUnk_080690E4, (u32)gUnk_080696A8, (u32)gUnk_08069C94, (u32)gUnk_0806A2A8,
+    (u32)gUnk_0806A8BC, (u32)gUnk_0806AE90, (u32)gUnk_0806B46C, (u32)gUnk_0806BA34,
+    (u32)gUnk_0806C008, (u32)gUnk_0806C5D4, (u32)gUnk_0806CB50, (u32)gUnk_0806CFD8,
+    (u32)gUnk_0806D468, (u32)gUnk_0806D8F4, (u32)gUnk_0806DDC8, (u32)gUnk_0806E294,
+    (u32)gUnk_0806E7AC, (u32)gUnk_0806ED8C, (u32)gUnk_0806F3B4, (u32)gUnk_0806FA28,
+    (u32)gUnk_08070018, (u32)gUnk_080706C8, (u32)gUnk_08070D9C, (u32)gUnk_080714B4,
+    (u32)gUnk_08071B88, (u32)gUnk_080720BC, (u32)gUnk_08072774, (u32)gUnk_08072E5C,
+    (u32)gUnk_080735F0, (u32)gUnk_08073BDC, (u32)gUnk_08074290, (u32)gUnk_08074934,
+    (u32)gUnk_08074F64, (u32)gUnk_08075504, (u32)gUnk_08075B04, (u32)gUnk_08076104,
+    (u32)gUnk_080767C8, (u32)gUnk_08076E00, (u32)gUnk_08077468, (u32)gUnk_08077A10,
+    (u32)gUnk_08077FE0, (u32)gUnk_080786C8, (u32)gUnk_08078CAC, (u32)gUnk_08079294
+};
+
+/* 队伍成员名字文本块表 (5 项), 由 gUnk_030047B4 选, 交给 TextBlocks_Render */
+const u32 gCharNameTextBlocks[] = {
+    (u32)gCharNameTextBlock_Homel, (u32)gCharNameTextBlock_Catarina, (u32)gCharNameTextBlock_Marius, (u32)gCharNameTextBlock_Stadjus,
+    (u32)gCharNameTextBlock_4
+};
+
+/* NPC 行为命令流表 (84 项), ChoiceMenu_HandleInput 取表项交给 Chara_SetCmdPtr */
+const u32 gCharaCmdStreams[] = {
+    (u32)gCharaCmdStream_87742, (u32)gCharaCmdStream_87756, (u32)gCharaCmdStream_8776A, (u32)gCharaCmdStream_87792,
+    (u32)gCharaCmdStream_8777E, (u32)gCharaCmdStream_877B2, (u32)gCharaCmdStream_877A2, (u32)gCharaCmdStream_877CE,
+    (u32)gCharaCmdStream_877EA, (u32)gCharaCmdStream_8781A, (u32)gCharaCmdStream_8784A, (u32)gCharaCmdStream_8786A,
+    (u32)gCharaCmdStream_8788A, (u32)gCharaCmdStream_8789E, (u32)gCharaCmdStream_878B2, (u32)gCharaCmdStream_878CA,
+    (u32)gCharaCmdStream_878E2, (u32)gCharaCmdStream_8791E, (u32)gCharaCmdStream_8795A, (u32)gCharaCmdStream_8799E,
+    (u32)gCharaCmdStream_879E2, (u32)gCharaCmdStream_87A0A, (u32)gCharaCmdStream_87A32, (u32)gCharaCmdStream_87A7A,
+    (u32)gCharaCmdStream_87ABA, (u32)gCharaCmdStream_87B12, (u32)gCharaCmdStream_87A56, (u32)gCharaCmdStream_87A9A,
+    (u32)gCharaCmdStream_87AE6, (u32)gCharaCmdStream_87B46, (u32)gCharaCmdStream_87B7A, (u32)gCharaCmdStream_87B8A,
+    (u32)gCharaCmdStream_87B9A, (u32)gCharaCmdStream_87BBA, (u32)gCharaCmdStream_87BC6, (u32)gCharaCmdStream_87BFE,
+    (u32)gCharaCmdStream_87C3A, (u32)gCharaCmdStream_87C72, (u32)gCharaCmdStream_87C92, (u32)gCharaCmdStream_87CB6,
+    (u32)gCharaCmdStream_87CDE, (u32)gCharaCmdStream_87D02, (u32)gCharaCmdStream_87D0E, (u32)gCharaCmdStream_87D46,
+    (u32)gCharaCmdStream_87D6A, (u32)gCharaCmdStream_87D82, (u32)gCharaCmdStream_87D96, (u32)gCharaCmdStream_87DD2,
+    (u32)gCharaCmdStream_87DFA, (u32)gCharaCmdStream_87E12, (u32)gCharaCmdStream_87E22, (u32)gCharaCmdStream_87E5A,
+    (u32)gCharaCmdStream_87E7E, (u32)gCharaCmdStream_87E92, (u32)gCharaCmdStream_87EA2, (u32)gCharaCmdStream_87EB2,
+    (u32)gCharaCmdStream_87EC2, (u32)gCharaCmdStream_87EDE, (u32)gCharaCmdStream_87F12, (u32)gCharaCmdStream_87F4E,
+    (u32)gCharaCmdStream_87F6A, (u32)gCharaCmdStream_87F8E, (u32)gCharaCmdStream_87FBA, (u32)gCharaCmdStream_87FEE,
+    (u32)gCharaCmdStream_88012, (u32)gCharaCmdStream_8802E, (u32)gCharaCmdStream_8806A, (u32)gCharaCmdStream_88096,
+    (u32)gCharaCmdStream_880B2, (u32)gCharaCmdStream_880D2, (u32)gCharaCmdStream_880F2, (u32)gCharaCmdStream_8810E,
+    (u32)gCharaCmdStream_8812A, (u32)gCharaCmdStream_88146, (u32)gCharaCmdStream_8815A, (u32)gCharaCmdStream_88176,
+    (u32)gCharaCmdStream_8818A, (u32)gCharaCmdStream_8819A, (u32)gCharaCmdStream_881AA, (u32)gCharaCmdStream_881C2,
+    (u32)gCharaCmdStream_881DE, (u32)gCharaCmdStream_881F6, (u32)gCharaCmdStream_8820A, (u32)gCharaCmdStream_88226
+};

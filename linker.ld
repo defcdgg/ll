@@ -9,13 +9,75 @@ MEMORY {
     rom (rx) : ORIGIN = 0x08000000, LENGTH = 8M
 }
 
+gUnk_08093418 = 0x08093418;
+gUnk_08092248 = 0x08092248;
+gUnk_08095028 = 0x08095028;
+gUnk_08095828 = 0x08095828;
+gUnk_080987C4 = 0x080987C4;
+gUnk_08087648 = 0x08087648;
+gUnk_08088D80 = 0x08088D80;
+gUnk_08089BC4 = 0x08089BC4;
+gUnk_0808EA0C = 0x0808EA0C;
+gUnk_080BABA0 = 0x080BABA0;
+gUnk_082893EC = 0x082893EC;
+gUnk_087E96B4 = 0x087E96B4;
+gUnk_087E9AA0 = 0x087E9AA0;
+gUnk_087EA020 = 0x087EA020;
+gUnk_087EA0FC = 0x087EA0FC;
+gUnk_087EA110 = 0x087EA110;
+gUnk_087EA124 = 0x087EA124;
+gUnk_087EA138 = 0x087EA138;
+gUnk_087EA33C = 0x087EA33C;
+gUnk_087EA368 = 0x087EA368;
+gUnk_087EA38C = 0x087EA38C;
+gUnk_087EB1F4 = 0x087EB1F4;
+gUnk_087EB214 = 0x087EB214;
+gUnk_087EB22C = 0x087EB22C;
+
+D_87EB2A8 = 0x087EB2A8;
+gUnk_0839CE7C = 0x0839CE7C;
+gUnk_0839B2E0 = 0x0839B2E0;
+gUnk_0839B462 = 0x0839B462;
+gUnk_0839D348 = 0x0839D348;
+gUnk_0839CC4C = 0x0839CC4C;
+gUnk_0839CE38 = 0x0839CE38;
+gUnk_0839CEFC = 0x0839CEFC;
+gUnk_08393B28 = 0x08393B28;
+gUnk_03000730_arr = 0x03000730;
+gUnk_087ED6A8 = 0x087ED6A8;
+gUnk_0861AAA4 = 0x0861AAA4;
+gUnk_0861C664 = 0x0861C664;
+gUnk_0861C764 = 0x0861C764;
+gUnk_087EA580 = 0x087EA580;
+gCharaBaseData = 0x087EA580;
+gUnk_0839B2A4 = 0x0839B2A4;
+gUnk_087E8430 = 0x087E8430;   /* 精灵图块 LZ77 指针表 (LoadSpriteSheetGfx) */
+gUnk_080B9DFC = 0x080B9DFC;   /* 精灵 OBJ 调色板数组 [][32] (LoadSpriteSheetPal) */
+gUnk_087EA1A0 = 0x087EA1A0;
+gUnk_0862D574 = 0x0862D574;
+gUnk_0862D434 = 0x0862D434;
+gInvPageItemIds = 0x0839CFAA;   /* 16 项: 菜单页号 -> 道具 id (见 data_805769C.h) */
+gUnk_03004980 = 0x03004980;   /* gInventory 的 u8[] 视图别名 */
+gUnk_087ED904 = 0x087ED904;
+gUnk_08619A60 = 0x08619A60;
+gUnk_08619430 = 0x08619430;
+gSaveSignature = 0x08098199;   /* 12B "LUNAR1_12_09" 存档签名 */
+gUnk_080981E6 = 0x080981E6;    /* u16[] 存档块长度表 {2, 0x5A, 8, 0} */
+gUnk_087EB1E8 = 0x087EB1E8;    /* 存档块指针表 {&gUnk_03004D48, gSaveTimers, gSaveFlags, ...} */
+gDialogPortraitTilemapPtrs = 0x087E9818; /* four dialog portrait tilemap positions */
+gUnk_087EB2E0 = 0x087EB2E0;    /* 角色头像 LZ77 指针表 (存档/队伍菜单用) */
+
 SECTIONS {
     ewram (NOLOAD) : ALIGN(4) {
         . = 0x00000000; gUnk_02000000 = .;
         . = 0x00004000; gUnk_02004000 = .;
         . = 0x00005000; gUnk_02005000 = .;
         . = 0x00005380; gUnk_02005380 = .;
-        . = 0x00005800; gUnk_02005800 = .;
+        . = 0x00005800; gWindowBgBuf = .;
+        . = 0x00005C44; gMsgLineBuf = .;   /* u16[29] Msg_RenderLine 输出行缓冲 */
+        . = 0x00016000; gUnk_02016000 = .;
+        . = 0x00016200; gUnk_02016200 = .;
+        . = 0x0003EE00; gCharaWalkCmdBuf = .;
         . = 0x00040000;
     } >ewram
 
@@ -34,40 +96,50 @@ SECTIONS {
         . = 0x00000028; gUnk_03000028 = .;
         . = 0x00000038; gUnk_03000038 = .;
         . = 0x00000048; gUnk_03000048 = .;
-        . = 0x00000058; gUnk_03000058 = .;
-        . = 0x000000BC; gUnk_030000BC = .;
+        . = 0x00000058; gUiSprites = .;
+        . = 0x000000BC; gUiSpritesAux = .;
 
         . = 0x00000184; gUnk_03000184 = .;
         . = 0x00000185; gUnk_03000185 = .;
-        . = 0x00000186; gUnk_03000186 = .;
+        . = 0x00000186; gMenuCursorGrp = .;
 
-        . = 0x00000187; gUnk_03000187 = .;
-        . = 0x00000188; gUnk_03000188 = .;
+        . = 0x00000187; gMenuCursorSel = .;
+        . = 0x00000188; gMenuCursorStack = .;
         . = 0x00000198; gUnk_03000198 = .;
+        . = 0x00000199; gInvCursor2 = .;
         . = 0x00000199; gUnk_03000199 = .;
 
-        . = 0x000001B4; gUnk_030001B4 = .;
+        . = 0x000001A0; gInvViewState = .;
+        . = 0x000001A0; gUnk_030001A0 = .;
+        . = 0x000001AA; gInvPageUpItems = .;
+        . = 0x000001AC; gInvPageDownItems = .;
 
-        . = 0x000001D0; gUnk_030001D0 = .;
+        . = 0x000001B4; gItemUseCtx = .;
 
-        . = 0x00000220; gUnk_03000220 = .;
-        . = 0x00000221; gUnk_03000221 = .;
-        . = 0x00000224; gUnk_03000224 = .;
-        . = 0x00000225; gUnk_03000225 = .;
-        . = 0x00000226; gUnk_03000226 = .;
-        . = 0x00000227; gUnk_03000227 = .;
+        . = 0x000001D0; gMsgTable = .;
+
+        . = 0x000001F0; gScreenIdleIconIds = .;
+        . = 0x00000200; gScreenIdleIconCursor = .;
+
+        . = 0x00000220; gSaveCurSlot = .;
+        . = 0x00000221; gSaveModeFlag = .;
+        . = 0x00000224; gSkillMenuTmpA = .;
+        . = 0x00000225; gSkillMenuTmpB = .;
+        . = 0x00000226; gPartyMenuIdx = .;
+        . = 0x00000227; gSkillMenuPage = .;
+        . = 0x0000022B; gUnk_0300022B = .;
         . = 0x00000248; gUnk_03000248 = .;
-        . = 0x00000312; gUnk_03000312 = .;
+        . = 0x00000312; gGstate312 = .;
 
-        . = 0x00000314; gUnk_03000314 = .;
+        . = 0x00000314; gGstate314 = .;
         . = 0x00000316; gUnk_03000316 = .;
-        . = 0x00000324; gUnk_03000324 = .;
-        . = 0x00000328; gUnk_03000328 = .;     
-        . = 0x0000032E; gUnk_0300032E = .;
-        . = 0x00000330; gUnk_03000330 = .;
-        . = 0x00000340; gUnk_03000340 = .;
-        . = 0x00000348; gUnk_03000348 = .;
-        . = 0x00000384; gUnk_03000384 = .;   
+        . = 0x00000324; gGstate324 = .;
+        . = 0x00000328; gBattleRngSeed = .;     
+        . = 0x0000032E; gGstate32E = .;
+        . = 0x00000330; gGstate330 = .;
+        . = 0x00000340; gGstate340 = .;
+        . = 0x00000348; gDialogCtx = .;
+        . = 0x00000384; gFlashFlags = .;   
         . = 0x00000386; gUnk_03000386 = .;
         . = 0x000004D4; gUnk_030004D4 = .;
         . = 0x000004D5; gUnk_030004D5 = .;
@@ -75,39 +147,88 @@ SECTIONS {
         . = 0x000004D7; gUnk_030004D7 = .; 
         . = 0x000004F8; gUnk_030004F8 = .;  
         . = 0x00000500; gUnk_03000500 = .;
-        . = 0x00000510; gUnk_03000510 = .;
+        . = 0x00000510; gBattleUiFlags = .;
         . = 0x00000512; gUnk_03000512 = .;
         . = 0x00000514; gUnk_03000514 = .;
-        . = 0x00000518; gUnk_03000518 = .;
-        . = 0x00000598; gUnk_03000598 = .;
+        . = 0x00000518; gObjFlagsA = .;
+        . = 0x00000598; gObjFlagsB = .;
+        . = 0x00000618; gUnk_03000618 = .;
+        . = 0x0000061A; gUnk_0300061A = .;
+        . = 0x0000061C; gUnk_0300061C = .;
+        . = 0x0000061E; gUnk_0300061E = .;
+        . = 0x00000620; gUnk_03000620 = .;
+        . = 0x00000622; gUnk_03000622 = .;
+        . = 0x00000624; gUnk_03000624 = .;
         . = 0x0000062C; gUnk_0300062C = .;
         . = 0x00000630; gUnk_03000630 = .;
+        . = 0x00000670; gUnk_03000670 = .;
+        . = 0x0000068C; gUnk_0300068C = .;
+        . = 0x0000068D; gUnk_0300068D = .;
+        . = 0x0000068E; gUnk_0300068E = .;
+        . = 0x000006F8; gUnk_030006F8 = .;
+        . = 0x00000714; gUnk_03000714 = .;
+        . = 0x00000715; gUnk_03000715 = .;
+        . = 0x00000716; gUnk_03000716 = .;
         . = 0x00000718; gUnk_03000718 = .;
         . = 0x0000071C; gUnk_0300071C = .;
         . = 0x00000730; gUnk_03000730 = .;
+        . = 0x0000073C; gUnk_0300073C = .;
         . = 0x0000073D; gUnk_0300073D = .;
         . = 0x00000744; gUnk_03000744 = .;
         . = 0x00000748; gUnk_03000748 = .;
         . = 0x00000758; gUnk_03000758 = .;
         . = 0x00000763; gUnk_03000763 = .;
+        . = 0x0000076A; gUnk_0300076A = .;
+        . = 0x0000076C; gUnk_0300076C = .;
+        . = 0x00000770; gUnk_03000770 = .;
+        . = 0x00000781; gUnk_03000781 = .;
+        . = 0x00000782; gUnk_03000782 = .;
         . = 0x00000788; gUnk_03000788 = .;
-        
         . = 0x000007BA; gUnk_030007BA = .;
+        . = 0x00000808; gUnk_03000808 = .;
+        . = 0x00000809; gUnk_03000809 = .;
+        . = 0x0000080A; gUnk_0300080A = .;
+        . = 0x0000080C; gUnk_0300080C = .;
+        . = 0x00000811; gUnk_03000811 = .;
+        . = 0x00000812; gUnk_03000812 = .;
+        . = 0x00000813; gUnk_03000813 = .;
         . = 0x00000814; gUnk_03000814 = .;
         . = 0x00000815; gUnk_03000815 = .;
         . = 0x00000816; gUnk_03000816 = .;
+        . = 0x00000818; gUnk_03000818 = .;
+        . = 0x00000820; gUnk_03000820 = .;
+        . = 0x00000825; gUnk_03000825 = .;
         . = 0x00000826; gUnk_03000826 = .;
+        . = 0x00000844; gUnk_03000844 = .;
+        . = 0x00000845; gUnk_03000845 = .;
+        . = 0x00000856; gUnk_03000856 = .;
+        . = 0x00000857; gUnk_03000857 = .;
+        . = 0x0000085A; gUnk_0300085A = .;
+        . = 0x0000085C; gUnk_0300085C = .;
         . = 0x00000865; gUnk_03000865 = .;
+        . = 0x0000086A; gUnk_0300086A = .;
         . = 0x00000882; gUnk_03000882 = .;
+        . = 0x00000884; gUnk_03000884 = .;
+        . = 0x00000886; gUnk_03000886 = .;
+        . = 0x00000888; gUnk_03000888 = .;
         . = 0x00000889; gUnk_03000889 = .;
+        . = 0x000008EC; gUnk_030008EC = .;
+        . = 0x000008F0; gUnk_030008F0 = .;
         . = 0x000008F1; gUnk_030008F1 = .;
         . = 0x000008F2; gUnk_030008F2 = .;
         . = 0x000008F3; gUnk_030008F3 = .;
         . = 0x00000906; gUnk_03000906 = .;
         . = 0x00000910; gUnk_03000910 = .;
         . = 0x00000911; gUnk_03000911 = .;
+        . = 0x00000918; gUnk_03000918 = .;
         . = 0x00000948; gUnk_03000948 = .;
+        . = 0x0000094A; gUnk_0300094A = .;
+        . = 0x0000094B; gUnk_0300094B = .;
+        . = 0x0000094C; gUnk_0300094C = .;
+        . = 0x0000094D; gUnk_0300094D = .;
         . = 0x0000097E; gUnk_0300097E = .;
+        . = 0x000009C5; gUnk_030009C5 = .;
+        . = 0x000009C8; gUnk_030009C8 = .;
         . = 0x000009D0; gUnk_030009D0 = .;
         . = 0x00000AD8; gUnk_03000AD8 = .;
         . = 0x00000ADD; gUnk_03000ADD = .;
@@ -115,24 +236,48 @@ SECTIONS {
         . = 0x00000AE0; gUnk_03000AE0 = .;
 
         . = 0x00000AE2; gUnk_03000AE2 = .;
+        . = 0x00000AE8; gUnk_03000AE8 = .;
+        . = 0x00000BE8; gUnk_03000BE8 = .;
         
         . = 0x00000D38; gUnk_03000D38 = .;
+        . = 0x00000D48; gUnk_03000D48 = .;
+        . = 0x00000D88; gUnk_03000D88 = .;
+        . = 0x00000DC8; gUnk_03000DC8 = .;
+        . = 0x00000DDC; gUnk_03000DDC = .;
+        . = 0x00000DDD; gUnk_03000DDD = .;
         . = 0x00000DDE; gUnk_03000DDE = .;
         . = 0x00000DF0; gUnk_03000DF0 = .;
         . = 0x00000E04; gUnk_03000E04 = .;
         . = 0x00000E05; gUnk_03000E05 = .;
+        . = 0x00000E08; gUnk_03000E08 = .;
+        . = 0x00000E30; gUnk_03000E30 = .;
+        . = 0x00000E68; gUnk_03000E68 = .;
+        . = 0x00000E6C; gUnk_03000E6C = .;
         . = 0x00000E70; gUnk_03000E70 = .;
+        . = 0x00000E72; gUnk_03000E72 = .;
+        . = 0x00000E74; gUnk_03000E74 = .;
+        . = 0x00000E78; gUnk_03000E78 = .;
+        . = 0x00000E80; gUnk_03000E80 = .;
+        . = 0x00000EA0; gUnk_03000EA0 = .;
+        . = 0x00000EC0; gUnk_03000EC0 = .;
+        . = 0x00000ECA; gUnk_03000ECA = .;
+        . = 0x00000ECB; gUnk_03000ECB = .;
+        . = 0x00000ECC; gUnk_03000ECC = .;
+        . = 0x00000ED8; gUnk_03000ED8 = .;
         . = 0x00000EE8; gUnk_03000EE8 = .;
         . = 0x00000F24; gUnk_03000F24 = .;
-        . = 0x00000F38; gUnk_03000F38 = .;
-        . = 0x00000F3A; gUnk_03000F3A = .;
-        . = 0x00000F3C; gUnk_03000F3C = .;
-        . = 0x00000F3E; gUnk_03000F3E = .;
-        . = 0x00000F40; gUnk_03000F40 = .;
-        . = 0x00000F41; gUnk_03000F41 = .;
-        . = 0x00000F42; gUnk_03000F42 = .;
-        . = 0x00000F43; gUnk_03000F43 = .;
-        . = 0x00000F50; gUnk_03000F50 = .;
+        . = 0x00000F2A; gUnk_03000F2A = .;
+        . = 0x00000F2C; gUnk_03000F2C = .;
+        . = 0x00000F2E; gUnk_03000F2E = .;
+        . = 0x00000F38; gSoundTaskFlags = .;
+        . = 0x00000F3A; gPlayingSongId = .;
+        . = 0x00000F3C; gBgmVolume = .;
+        . = 0x00000F3E; gFadeFromVolume = .;
+        . = 0x00000F40; gFadeDuration = .;
+        . = 0x00000F41; gFadeCounter = .;
+        . = 0x00000F42; gSfxTrackActiveBits = .;
+        . = 0x00000F43; gSfxTrackLoopBits = .;
+        . = 0x00000F50; gSfxTrackFadeBits = .;
         . = 0x00000F58; gMPlayTrack_0 = .;
         . = 0x00001408; gMPlayTrack_1 = .;
         . = 0x00001458; gMPlayTrack_2 = .;
@@ -145,174 +290,202 @@ SECTIONS {
         *libgcc.a:fp-bit.o(.bss);
         . = ALIGN(4); src/m4a.o(.bss*);
         
-        . = 0x000018F0; gUnk_030018F0 = .;
-        . = 0x00001940; gUnk_03001940 = .;
+        . = 0x000018F0; gSwitchFlags = .;
+        . = 0x00001940; gSioRecvWord = .;
         . = 0x00001944; gMainGameState = .;
         . = 0x00001948; gGameTimer = .;
         . = 0x00001950; gUnk_03001950 = .;
-        . = 0x00001988; gUnk_03001988 = .;
+        . = 0x00001988; gHBlankScrollCounter = .;
         . = 0x00001990; gLzContext = .;
         . = 0x000019B0; gHeldKeysRaw = .;
-        . = 0x000019C0; gUnk_030019C0 = .;
-        . = 0x00001AC0; gUnk_03001AC0 = .;
+        . = 0x000019C0; gHBlankWaveV = .;
+        . = 0x00001AC0; gMainTaskSlot = .;
         . = 0x00001AD0; gUnk_03001AD0 = .;    
-        . = 0x00001B50; gUnk_03001B50 = .;
-        . = 0x00001B54; gUnk_03001B54 = .;
-        . = 0x00001B60; gUnk_03001B60 = .;
-        . = 0x00001C60; gUnk_03001C60 = .;
+        . = 0x00001B50; gSioLinkState = .;
+        . = 0x00001B54; gHBlankWaveRow = .;
+        . = 0x00001B60; gHBlankWaveH = .;
+        . = 0x00001C60; gEventFlags = .;
         . = 0x00001CA0; gNewKeysRaw = .;
         . = 0x00001CB0; gUnk_03001CB0 = .;
-        . = 0x00001D30; gUnk_03001D30 = .;
+        . = 0x00001D30; gSioRetryTimer = .;
         . = 0x00001D80; gIntrMainBuf = .;
 
         . = 0x00001EE0; gUnk_03001EE0 = .;
-        . = 0x0000259C; gUnk_0300259C = .;
-        . = 0x000025A0; gUnk_030025A0 = .;
-        . = 0x000025A4; gUnk_030025A4 = .;
+        . = 0x0000259C; gVBlankPipelineMode = .;
+        . = 0x000025A0; gFrameCounter = .;
+        . = 0x000025A4; gRandCursor = .;
         . = 0x000025A8; gUnk_030025A8 = .;
-        . = 0x000025B0; gUnk_030025B0 = .;
+        . = 0x000025B0; gPlayerMoveDir = .;
 
-        . = 0x000025B4; gUnk_030025B4 = .;
+        . = 0x000025B4; gCameraPosX = .;
         . = 0x000025B8; gUnk_030025B8 = .;
-        . = 0x000025BC; gUnk_030025BC = .;
-        . = 0x000025C0; gUnk_030025C0 = .;
-        . = 0x000025D4; gUnk_030025D4 = .;
-        . = 0x000025D8; gUnk_030025D8 = .;
-        . = 0x000025E0; gUnk_030025E0 = .;
-        . = 0x000025F0; gUnk_030025F0 = .;
-        . = 0x000025F4; gUnk_030025F4 = .;
-        . = 0x000025F8; gUnk_030025F8 = .;
-        . = 0x000025FC; gUnk_030025FC = .;
-        . = 0x00002600; gUnk_03002600 = .;
-        . = 0x00002604; gUnk_03002604 = .;
+        . = 0x000025BC; gCurSpriteW = .;
+        . = 0x000025C0; gFollowerHistX = .;
+        . = 0x000025D4; gEncounterCounter = .;
+        . = 0x000025D8; gDialogueActive = .;
+        . = 0x000025E0; gFollowerHistY = .;
+        . = 0x000025F0; gCutsceneActive = .;
+        . = 0x000025F4; gSceneEntryFlag = .;
+        . = 0x000025F8; gCameraTargetX = .;
+        . = 0x000025FC; gCameraPosY = .;
+        . = 0x00002600; gScenePhase = .;
+        . = 0x00002604; gLogoEffectState = .;
         . = 0x00002608; gUnk_03002608 = .;
-        . = 0x0000260C; gUnk_0300260C = .;
-        . = 0x00002C30; gUnk_03002C30 = .;
-        . = 0x00002C34; gUnk_03002C34 = .;
+        . = 0x0000260C; gWarpAnimState = .;
+        . = 0x00002C30; gCurSpriteH = .;
+        . = 0x00002C34; gBattleResultType = .;
         . = 0x00002C38; gSilverAmount = .;
-        . = 0x00002C3C; gUnk_03002C3C = .;
+        . = 0x00002C3C; gCameraTargetY = .;
         . = 0x00002C40; gUnk_03002C40 = .;
-        . = 0x00002C44; gUnk_03002C44 = .;
-        . = 0x00002C48; gUnk_03002C48 = .;
-        . = 0x00002C4C; gUnk_03002C4C = .;
-        . = 0x00002C50; gUnk_03002C50 = .;
-        . = 0x00002C58; gUnk_03002C58 = .;
-        . = 0x00002C60; gUnk_03002C60 = .;
+        . = 0x00002C44; gPartyFollowFlags = .;
+        . = 0x00002C48; gAfterBattleCounter = .;
+        . = 0x00002C4C; gSceneLoadToggle = .;
+        . = 0x00002C50; gInputLockFrames = .;
+        . = 0x00002C58; gFollowerHistDir = .;
+        . = 0x00002C60; gCutsceneAnimFlags = .;
         . = 0x00002C80; gSpriteRenderQueue = .;
 
-        . = 0x00002E80; gUnk_03002E80 = .;
-        . = 0x00003150; gUnk_03003150 = .;    
-        . = 0x00003178; gUnk_03003178 = .;       
+        . = 0x00002E80; gActors = .;              /* Actor[24] —— 场上实体主数组 */
+        . = 0x00003150; gEffectActor = .;         /* == gActors[18] 别名 */
+        . = 0x00003178; gDialogArrowActors = .;   /* == &gActors[19] 别名 */       
    
-        . = 0x00003240; gUnk_03003240 = .;
+        . = 0x00003240; gPendingPalId = .;
         . = 0x00003250; gVramBufferPointers = .;
         
-        . = 0x000032D0; gUnk_030032D0 = .;
-        . = 0x000032D4; gUnk_030032D4 = .;
-        . = 0x000032E0; gUnk_030032E0 = .;
+        . = 0x000032D0; gPendingSpriteLoad = .;
+        . = 0x000032D4; gPendingGfxId = .;
+        . = 0x000032E0; gCutsceneAnimPals = .;
 
-        . = 0x00003360; gUnk_03003360 = .;
-        . = 0x00003380; gUnk_03003380 = .;
-        . = 0x00003480; gUnk_03003480 = .;
-        . = 0x00003490; gUnk_03003490 = .;
-        . = 0x000034B0; gUnk_030034B0 = .; 
-        . = 0x000034C0; gUnk_030034C0 = .;     
+        . = 0x00003360; gVramTransferCounts = .;
+        . = 0x00003380; gPalTransferQueue = .;
+        . = 0x00003480; gPendingCharaSwitch = .;
+        . = 0x00003490; gCutsceneAnimSlots = .;
+        . = 0x000034B0; gPendingPalSlot = .; 
+        . = 0x000034C0; gOamAffineBuf = .;     
         . = 0x000035C0; gOamBuffer = .;
         . = 0x000039C0; gVramTransferQueue = .;
         
         . = 0x00003AC0; gSpriteNodePool = .;
 
-        . = 0x000044C0; gUnk_030044C0 = .;
-        . = 0x00004540; gUnk_03004540 = .;
+        . = 0x000044C0; gCutsceneAnimScripts = .;
+        . = 0x00004540; gPendingGfxSlot = .;
 
-        . = 0x00004550; gUnk_03004550 = .;
+        . = 0x00004550; gBlendCoefficients = .;
+        . = 0x00004560; gWin0HWaveTable = .;
         . = 0x00004604; gUnk_03004604 = .;
-        . = 0x00004608; gUnk_03004608 = .;
-        . = 0x0000460C; gUnk_0300460C = .;
+        . = 0x00004608; gSceneTransitionArg = .;
+        . = 0x0000460C; gCameraDrawMode = .;
         . = 0x00004610; gHBlankEffectMode = .;
-        . = 0x00004614; gUnk_03004614 = .;
+        . = 0x00004614; gMoveCmdSetId = .;
         . = 0x00004618; gUnk_03004618 = .;
-        . = 0x00004624; gUnk_03004624 = .;
-        . = 0x0000462C; gUnk_0300462C = .;
+        . = 0x00004624; gScreenIdleEventFlags = .;
+        . = 0x0000462C; gChoiceListPtr = .;
         . = 0x00004634; gUnk_03004634 = .;
-        . = 0x00004638; gUnk_03004638 = .;
+        . = 0x00004638; gSpawnTileY = .;
+        . = 0x0000463C; gMapZoneType = .;
+        . = 0x00004640; gChoiceListLen = .;
+        . = 0x00004644; gZoneCheckTileYs = .;
         . = 0x00004648; gBG3ScrollY = .;
 
+        . = 0x0000464C; gCameraMinY = .;
+        . = 0x0000464C; gUnk_0300464C = .;
+        . = 0x00004650; gCameraMinX = .;
+        . = 0x00004650; gUnk_03004650 = .;
+        . = 0x00004654; gMapZoneEntryIdx = .;
         . = 0x00004658; gBlendControl = .;
-        . = 0x0000465C; gUnk_0300465C = .;
-        . = 0x00004660; gUnk_03004660 = .;
-        . = 0x0000466C; gUnk_0300466C = .;
-        . = 0x00004670; gUnk_03004670 = .;
+        . = 0x0000465C; gScreenFadeFlags = .;
+        . = 0x00004660; gIntroBgTileSetIndex = .;
+        . = 0x00004668; gUnk_03004668 = .;
+        . = 0x0000466C; gChoiceCursor = .;
+        . = 0x00004670; gSlotGfxId = .;
 
-        . = 0x0000467C; gUnk_0300467C = .;
-        . = 0x00004684; gUnk_03004684 = .;
+        . = 0x0000467C; gObjGraphicsSetId = .;
+        . = 0x00004680; gDrawCamEaseActive = .;
+        . = 0x00004684; gDrawCamY = .;
         . = 0x00004688; gUnk_03004688 = .;
-        . = 0x0000468C; gUnk_0300468C = .;
+        . = 0x0000468C; gSpawnTileX = .;
         . = 0x00004694; gUnk_03004694 = .;
-        . = 0x00004698; gUnk_03004698 = .;
+        . = 0x00004698; gBg1ScrollMode = .;
+        . = 0x0000469C; gChoiceSel = .;
         . = 0x000046A0; gUnk_030046A0 = .;
-        . = 0x000047A4; gUnk_030047A4 = .;
-        . = 0x000047A8; gUnk_030047A8 = .;
+        . = 0x000047A0; gMapZoneHeader = .;
+        . = 0x000047A4; gSpawnFacingDir = .;
+        . = 0x000047A8; gScreenFadeProgress = .;
         . = 0x000047AC; gUnk_030047AC = .;
-        . = 0x000047B0; gUnk_030047B0 = .;
+        . = 0x000047B0; gCurrentMapId = .;
         . = 0x000047B4; gUnk_030047B4 = .;
-        . = 0x000047B8; gUnk_030047B8 = .;
-        . = 0x000047BC; gUnk_030047BC = .;
-        . = 0x000047C0; gUnk_030047C0 = .;
-        . = 0x000047C8; gUnk_030047C8 = .;
+        . = 0x000047B8; gChoiceDestY = .;
+        . = 0x000047BC; gChoiceGroupIdx = .;
+        . = 0x000047C0; gDrawCamX = .;
+        . = 0x000047C4; gMapWidthPx = .;
+        . = 0x000047C4; gUnk_030047C4 = .;
+        . = 0x000047C8; gIntroBgTransferStage = .;
         . = 0x000047CC; gUnk_030047CC = .;
-        . = 0x000047D0; gUnk_030047D0 = .;
-        . = 0x000047E4; gUnk_030047E4 = .;
-        . = 0x000047F0; gUnk_030047F0 = .;
-        . = 0x00004800; gUnk_03004800 = .;
-        . = 0x00004820; gUnk_03004820 = .;
-        . = 0x00004824; gUnk_03004824 = .;
+        . = 0x000047D0; gSlotPalId = .;
+        . = 0x000047E0; gChoiceSubIdx = .;
+        . = 0x000047E4; gMapNpcSetId = .;
+        . = 0x000047EC; gMapHeightPx = .;
+        . = 0x000047EC; gUnk_030047EC = .;
+        . = 0x000047F0; gScreenFadeStep = .;
+        . = 0x00004800; gViewportFlags = .;
+        . = 0x00004820; gEncounterEnabled = .;
+        . = 0x00004824; gChoiceDestX = .;
         . = 0x00004828; gBG2ScrollY = .;
-        . = 0x00004834; gUnk_03004834 = .;
+        . = 0x00004834; gScreenFadeParam = .;
+        . = 0x00004838; gZoneCheckTileXs = .;
         . = 0x0000483C; gUnk_0300483C = .;
-        . = 0x00004840; gUnk_03004840 = .; 
+        . = 0x00004840; gSceneSubState = .; 
 
         . = 0x00004848; gBG2ScrollX = .;
         . = 0x0000484C; gBG3ScrollX = .;
-        . = 0x00004850; gUnk_03004850 = .;
+        . = 0x00004850; gCurrentSongId = .;
 
-        . = 0x00004854; gUnk_03004854 = .;
+        . = 0x00004854; gCameraSnapFlag = .;
         . = 0x00004860; gUnk_03004860 = .;
-        . = 0x00004870; gUnk_03004870 = .;
+        . = 0x00004870; gChestFlags = .;
         . = 0x00004890; gChestObjects = .;
         . = 0x00004910; gUnk_03004910 = .;
-        . = 0x00004920; gUnk_03004920 = .;
+        . = 0x00004914; gUnk_03004914 = .;
+        . = 0x00004918; gUnk_03004918 = .;
+        . = 0x00004920; gMapObjGfxSetId = .;
         . = 0x00004930; gStaticMapObjects = .;
+        . = 0x0000496C; gUnk_0300496C = .;
+        . = 0x00004970; gUnk_03004970 = .;
         
         . = 0x00004980; gInventory = .;
-        . = 0x00004A80; gUnk_03004A80 = .;
+        . = 0x00004A80; gEquipBonusDef = .;
         . = 0x00004A88; gBattleFormationIds = .;
-        . = 0x00004A90; gUnk_03004A90 = .;
-        . = 0x00004A94; gUnk_03004A94 = .;
-        . = 0x00004A98; gUnk_03004A98 = .;
+        . = 0x00004A90; gEquipBonusAtkBase = .;
+        . = 0x00004A94; gEquipBonusRes = .;
+        . = 0x00004A98; gEquipBonusMen = .;
         . = 0x00004AA0; gPartyMemberIds = .;
-        . = 0x00004AA8; gUnk_03004AA8 = .;
-        . = 0x00004AAC; gUnk_03004AAC = .;
-        . = 0x00004AB0; gUnk_03004AB0 = .;
-        . = 0x00004AB4; gUnk_03004AB4 = .;
-        . = 0x00004AB8; gUnk_03004AB8 = .;
-        . = 0x00004AC0; gUnk_03004AC0 = .;
+        . = 0x00004AA8; gEquipBonusDef2 = .;
+        . = 0x00004AAC; gEquipBonusAtk = .;
+        . = 0x00004AB0; gEquipBonusAgl = .;
+        . = 0x00004AB4; gEquipBonusNoa = .;
+        . = 0x00004AB8; gEquipBonusLuc = .;
+        . = 0x00004AC0; gPartyStats = .;
         . = 0x00004D40; gUnk_03004D40 = .;
         . = 0x00004D44; gUnk_03004D44 = .;
+        . = 0x00004D48; gUnk_03004D48 = .;
         . = 0x00004D4C; gUnk_03004D4C = .;
-        . = 0x00004D60; gUnk_03004D60 = .;
+        . = 0x00004D60; gSaveTimers = .;
 
-        . = 0x00004DC0; gUnk_03004DC0 = .;
-        . = 0x00004DC4; gUnk_03004DC4 = .;
-        . = 0x00004DC8; gUnk_03004DC8 = .;
+        . = 0x00004DC0; gBgTileReloadFlag = .;
+        . = 0x00004DC4; gSaveBusyA = .;
+        . = 0x00004DC8; gSaveFlags = .;
 
         . = 0x00004DD0; gUnk_03004DD0 = .;
-        . = 0x00004DD4; gUnk_03004DD4 = .;
-        . = 0x00004DD8; gUnk_03004DD8 = .;
-        . = 0x00004DF0; gUnk_03004DF0 = .;
+        . = 0x00004DD4; gSaveUiParam = .;
+        . = 0x00004DD8; gSaveBusyB = .;
+        . = 0x00004DDC; gSavedDispCnt = .;   /* 存档菜单进入前的 REG_DISPCNT 备份 */
+        . = 0x00004DE0; gSavedBldCnt = .;    /* 同上, REG_BLDCNT 备份 */
+        . = 0x00004DE4; gUnk_03004DE4 = .;
+        . = 0x00004DE8; gUnk_03004DE8 = .;
+        . = 0x00004DF0; gSioState = .;
         . = 0x00004E48; gUnk_03004E48 = .;
-        . = 0x00004F20; gUnk_03004F20 = .;
-        . = 0x00004F80; gUnk_03004F80 = .;
+        . = 0x00004F20; gSioSession = .;
+        . = 0x00004F80; gSioXferCtx = .;
         . = 0x00004F90; gUnk_03004F90 = .;
         . = 0x00004FA0; src/m4a.o(common_data);
         . = 0x00007FF8; gUnk_03007FF8 = .;
@@ -321,10 +494,15 @@ SECTIONS {
 
     .text : ALIGN(4) {
         asm/crt0.o(.text);
-        src/code_0.o(.text);
+        src/code_80002A0.o(.text);
         src/code_8005020.o(.text);
         src/save.o(.text);
-        src/code_1.o(.text);
+        src/code_8010F10.o(.text);
+        src/code_801A3C4.o(.text);
+        src/code_8020D50.o(.text);
+        src/code_80264C0.o(.text);
+        src/code_8044394.o(.text);
+        src/code_804F0B8.o(.text);
         src/sound.o(.text);
 
         asm/m4a_asm.o(.text);
@@ -365,3 +543,16 @@ SECTIONS {
     
 }
 
+gIntroBgPalettes = 0x08086C1C;
+gBgPalBackdropWhite = 0x08087216;
+gUiSpritesAuxDesc = 0x087EB2C4;
+gIntroBgTiles = 0x087E9828;
+gIntroBgMaps = 0x087E98C0;
+
+/* s32 返回类型别名 (sub_8009D34 需要无截断的返回值读取, 见 code_8005020.c) */
+Sprite_EnqueueRender_S32 = Sprite_EnqueueRender;
+
+/* ==== MOD-01 语义命名新增地址 (SECTIONS 外绝对符号) ==== */
+gCutsceneGfxBuf = 0x02020000;
+gSpritePoolBackup = 0x0203F000;
+gQueue34C0Backup = 0x0203FE00;

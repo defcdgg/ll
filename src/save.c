@@ -7,7 +7,7 @@
 #include "include_asm.h"
 #include "m4a.h"
 
-s32 sub_80109F8(u8 arg0)
+s32 Save_Fsm(u8 arg0)
 {
 
     switch (gUnk_03004D44)
@@ -46,10 +46,10 @@ s32 sub_80109F8(u8 arg0)
             if (VerifySram((u8 *)(gUnk_03004DD0 << 0xB) + 0x02021000, (u8 *)SRAM + (gUnk_03004DD0 << 0xB), 0x800) != 0)
             {
                 gUnk_03004D44 = 0xFD;
-                sub_8016508(0x27, 0xB);
-                if (gUnk_03000187 > 5U)
+                Msg_ShowById(0x27, 0xB);
+                if (gMenuCursorSel > 5U)
                 {
-                    gUnk_03000187 = gUnk_03000220 + 3;
+                    gMenuCursorSel = gSaveCurSlot + 3;
                     sub_800E668(0xFF);
                 }
             }
@@ -62,10 +62,10 @@ s32 sub_80109F8(u8 arg0)
                 else
                 {
                     gUnk_03004D44 = 0xFF;
-                    sub_8016508(0x19, 0xB);
-                    if (gUnk_03000187 > 5)
+                    Msg_ShowById(0x19, 0xB);
+                    if (gMenuCursorSel > 5)
                     {
-                        gUnk_03000187 = gUnk_03000220 + 3;
+                        gMenuCursorSel = gSaveCurSlot + 3;
                         sub_800E668(0xFF);
                     }
                 }
@@ -74,22 +74,22 @@ s32 sub_80109F8(u8 arg0)
             return 1;
 
         case 0xF9:
-            sub_8010BEC(0);
+            Save_FillSlot0(0);
             gUnk_03004D44 = 0xFA;
             return 1;
 
         case 0xFA:
-            sub_8010BEC(1);
+            Save_FillSlot0(1);
             gUnk_03004D44 = 0xFB;
             return 1;
 
         case 0xFB:
-            sub_8010BEC(2);
+            Save_FillSlot0(2);
             gUnk_03004D44 = 0xFC;
             return 1;
 
         case 0xFC:
-            sub_8010BEC(3);
+            Save_FillSlot0(3);
             gUnk_03004D44 = 0xFF;
             return 1;
 
@@ -104,7 +104,7 @@ s32 sub_80109F8(u8 arg0)
         case 0xFF:
             if (arg0 == 0)
             {
-                sub_8015F14();
+                SaveUi_DrawSlots();
             }
             gUnk_03004D44 = 0xFE;
             return 1;
@@ -114,7 +114,7 @@ s32 sub_80109F8(u8 arg0)
     }
 }
 
-INCLUDE_ASM("asm/matchings", sub_8010BEC);
-INCLUDE_ASM("asm/matchings", sub_8010CCC);
-INCLUDE_ASM("asm/matchings", sub_8010D80);
-INCLUDE_ASM("asm/matchings", sub_8010E58);
+INCLUDE_ASM("asm/matchings", Save_FillSlot0);
+INCLUDE_ASM("asm/matchings", Save_FillSlot1);
+INCLUDE_ASM("asm/matchings", Save_FillSlot2);
+INCLUDE_ASM("asm/matchings", Save_FillSlot3);

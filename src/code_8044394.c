@@ -360,7 +360,13 @@ u8 sub_804877C(u8 arg0)
 
     return gPartyStats[index].lv;
 }
-INCLUDE_ASM("asm/matchings", sub_80487A4);
+u8 sub_80487A4(u8 arg0)
+{
+    u32 base;
+
+    base = GetObjPool();
+    return gBattleFormationIds[*(u8 *)(base + arg0 * 0xC8 + 0xBB)];
+}
 u8 sub_80487CC(u8 arg0)
 {
     u8 i;

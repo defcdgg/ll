@@ -791,7 +791,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x08048690	sub_8048690	
 1	thumb	code_8044394	0x08048764	sub_8048764	
 1	thumb	code_8044394	0x0804877c	sub_804877C	
-1	thumb	code_8044394	0x080487a4	sub_80487A4	
+1	thumb	code_8044394	0x080487a4	sub_80487A4	✅ 2026-09-02 qwen: GetObjPool()+arg0*0xC8+0xBB 取 formation id → gBattleFormationIds[..] (同 sub_8048818 惯用法); fncheck OK 40B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x080487cc	sub_80487CC	
 1	thumb	code_8044394	0x08048818	sub_8048818	
 1	thumb	code_8044394	0x08048868	sub_8048868	

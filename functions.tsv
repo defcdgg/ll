@@ -72,7 +72,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80002A0	0x08003958	Chara_SetWalkPath	
 1	thumb	code_80002A0	0x08003b08	Chara_ProcessCmdStream	
 0	thumb	code_80002A0	0x08003c54	Chara_StepMove	
-1	thumb	code_80002A0	0x08003f40	sub_8003F40	
+1	thumb	code_80002A0	0x08003f40	CheckFacingEvent	✅ 2026-09-02 gpnux: A键面向交互，含宝箱坐标/开关/特殊事件门控；fncheck OK
 0	thumb	code_80002A0	0x080040e4	Party_FollowAnim	
 1	thumb	code_80002A0	0x08004358	Followers_ResetHistory	
 1	thumb	code_80002A0	0x080043d4	Followers_SyncToTail	
@@ -164,7 +164,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x08008df8	AnimSlot_PlayOnce	
 1	thumb	code_8005020	0x08008e44	BgMap_FillRow	
 1	thumb	code_8005020	0x08008e94	MapBg_FlushPending	
-0	thumb	code_8005020	0x08008f28	sub_8008F28	
+0	thumb	code_8005020	0x08008f28	ChestObjects_LoadForMap	⏸ 2026-09-02 gpnux: 扫描 256×8B 地图宝箱表，装载当前地图至 16 个 gChestObjects；语义已解，待匹配；fncheck OK
 1	thumb	code_8005020	0x08008fd0	Chest_BuildSprite	
 1	thumb	code_8005020	0x0800908c	Chest_Open	
 1	thumb	code_8005020	0x08009114	LoadDigitFontObjTiles	
@@ -357,7 +357,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x080175c0	sub_80175C0	✅ 2026-09-02 opencode: SIO槽清零; CpuFill32(0,&gSioSession,0x60)+循环清unk18[2]前4字节; 零常量需先入独立变量令movs r1,#0最先(规则103); fncheck OK
 1	thumb	code_8010F10	0x08017600	Sio_SetXferCtx	
 1	thumb	code_8010F10	0x0801761c	Sio_ClearSlot	
-0	thumb	code_8010F10	0x08017640	sub_8017640	
+1	thumb	code_8010F10	0x08017640	sub_8017640	✅ 2026-09-02 opencode: memcpy变体(字计数, 总长度count*4); (dst|src)&3对齐走逐字ldm/stm否则逐字节; void*参数+函数顶声明u8*d/s令dst→r3/src→r4 home正确; count=count*4;count--两句分开得lsls r2,r2,#2;subs r2,#1(规则104); fncheck OK	
 0	thumb	code_8010F10	0x0801768c	sub_801768C	
 0	thumb	code_8010F10	0x080177ac	BattleTask_Run	
 0	thumb	code_8010F10	0x08017fa4	sub_8017FA4	

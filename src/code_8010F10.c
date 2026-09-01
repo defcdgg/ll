@@ -1367,7 +1367,24 @@ void Sio_ClearSlot(void)
     *(u16 *)((u8 *)&gSioSession + 0x18 + index * 24) = 0;
     Sio_Shutdown();
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8017640);
+void sub_8017640(void *dst, void *src, s32 count)
+{
+    u8 *d;
+    u8 *s;
+    if (((u32)dst | (u32)src) & 3)
+    {
+        d = dst;
+        s = src;
+        count = count * 4;
+        count--;
+        while (count != -1) { *d++ = *s++; count--; }
+    }
+    else
+    {
+        count = count - 1;
+        while (count != -1) { *(u32 *)dst = *(u32 *)src; dst = (u8 *)dst + 4; src = (u8 *)src + 4; count--; }
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_801768C);
 INCLUDE_ASM("asm/nonmatchings", BattleTask_Run);
 INCLUDE_ASM("asm/nonmatchings", sub_8017FA4);

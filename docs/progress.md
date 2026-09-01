@@ -1499,3 +1499,34 @@ permuter 探索出: 把常量 0 存入独立变量 `zero = 0;`, 让指针经 `&g
 
 注: 提交时 ROM 未全绿, `fncheck.py --blame` 归属显示差异主要在 `data/sound_data.o`(4660B) 等
 其他 agent 未提交工作 (首个真实差异 0x080003d4, 早于本函数 0x080175c0); 本函数 fncheck OK, 照常提交。
+
+## 2026-09-02 `0x08088400` 地图宝箱表引用分析
+
+`0x08088400` 只有一个直接代码引用：`ChestObjects_LoadForMap`（原 `sub_8008F28`，
+0x08008F28）。函数以 `gMapNpcSetId` 为参数，从该地址开始按 8 字节步长扫描 256 条记录；
+首字节相等时依次建立 `gChestObjects[0..15]`，记录序号写入对象的 `field_1`，用于索引
+`gChestFlags`，坐标半字分别左移 3 后写入对象 `x/y`（Y 额外加 8），并调用
+`Chest_BuildSprite`。未命中的剩余对象被填成 `field_0=0xFF`、`sprNodeIdx=0`。
+
+表项已确认是 `ChestMapEntry`：`mapId`、`itemId`、`specialFlag`、保留字节、地图 tile
+坐标 `tileX/tileY`。`itemId` 被写入宝箱对象的 `field_3`；`CheckFacingEvent`（原
+`sub_8003F40`）在面向宝箱时返回 `field_3 + 1`，再由探索主循环转换为脚本事件号。
+`specialFlag` 设置对象状态位 7，面向交互时额外要求事件标志 `0x40`。
+
+已将 256 × 8B 原始数据结构化写入 `src/data_805769C.c` 的 `gChestSpawnTable`，并将
+`data/data.s` 的连续 blob 起点从 `0x08088400` 调整为 `0x08088C00`。表区与后续 64 字节
+数字字形数据均通过 ROM 偏移比较；两个重命名函数分别通过 168/420 字节 `fncheck`，全量
+`make` 与 `sha1sum -c ll.sha1` 均通过。
+
+## 2026-09-02 `sub_8017640` 匹配 (memcpy 对齐双路径, code_8010F10)
+
+76 字节 memcpy 变体: 参数 `(void *dst, void *src, s32 count)`, count 是**字数**, 总复制 `count*4` 字节。
+`((u32)dst | (u32)src) & 3` 为 0 → 4 字节对齐路径 `ldmia/stmia` 逐字复制 count 次; 否则逐字节复制 `count*4` 次。
+两条路径都做 `while (count != -1)` 预检 (count==0 时直接返回)。
+
+**卡点与解法 (新规律 104)**:
+1. **寄存器镜像**: 一次性分支内 `u8 *d = dst` / 直接用 `u8 *dst` 形参, 编译器生成 `adds r4,r0; adds r3,r1` (dst→r4, src→r3), 全函数镜像。改写成 `void *dst, void *src` 形参 + **函数顶部集中声明** `u8 *d; u8 *s;` (分支内再赋值), prologue 变为 `adds r3,r0; adds r4,r1` (dst→r3, src→r4) ✓。
+2. **LSL 槽**: 字节路径 `count = count * 4 - 1` 一句生成 `lsls r0,r2,#2; subs r2,r0,#1` (借用 r0); 拆两句 `count = count * 4; count--;` 生成 `lsls r2,r2,#2; subs r2,#1` (原地改 r2) ✓。
+3. 字路径直接用参数 dst/src 做指针 (不引入 d/s), 复用 prologue 的 r4=src。
+
+fncheck OK (76 bytes, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。

@@ -463,24 +463,23 @@ void sub_8020974(u8 *arg0, u16 arg1, u16 arg2, u8 arg3, u16 arg4)
                 entry->field_0, entry->field_4, entry->field_8, entry->field_A, arg4);
 }
 
-INCLUDE_ASM("asm/matchings", sub_80209C8);
-// void sub_80209C8(u8 *arg0)
-// {
-//     u16 *ptr;
-//     u16 new_var;
+void sub_80209C8(u8 *arg0)
+{
+    u16 *ptr;
+    u16 new_var;
 
-//     if (arg0[0xBE] <= 6)
-//     {
-//         ptr = (u16 *)(arg0 + 0x88);
-//         if (*ptr <= 0x1F)
-//         {
-//             *ptr += 4;
-//             ptr = (u16 *)(arg0 + 0xB0);
-//             new_var = *ptr | 2;
-//             *ptr = new_var;
-//         }
-//     }
-// }
+    if (arg0[0xBE] <= 6)
+    {
+        ptr = (u16 *)(arg0 + 0x88);
+        if (*ptr <= 0x1F)
+        {
+            *ptr += 4;
+            ptr = (u16 *)(arg0 + 0xB0);
+            new_var = *ptr | 2;
+            *ptr = new_var;
+        }
+    }
+}
 
 typedef struct {
     u8 pad0[0x88];

@@ -507,7 +507,7 @@ status	isa	module	addr	name	note
 1	thumb	code_801A3C4	0x08020914	sub_8020914	✅ 2026-09-02 qwen: obj[0xBE]<=10 → sub_801CBA4(obj,3,*(u16*)(obj+0x2A),obj[0x35],0) (5参,第5个入栈); 家族同 sub_80207DC/840 调用式; fncheck OK 40B; 全ROM SHA1 绿
 1	thumb	code_801A3C4	0x0802093c	sub_802093C	
 1	thumb	code_801A3C4	0x08020974	sub_8020974	
-1	thumb	code_801A3C4	0x080209c8	sub_80209C8	
+1	thumb	code_801A3C4	0x080209c8	sub_80209C8	✅ 2026-09-02 qwen: obj[0xBE]<=6 && *(u16*)(obj+0x88)<=0x1F → +4 且 *(u16*)(obj+0xB0)|=2 (MyStruct 家族 sub_80209EC, 但原型是 u8* 故用裸 cast; +=4 复用 cmp 的 ldrh, +0xB0 复用 +0x88 指针 adds #0x28); fncheck OK 36B; 全ROM SHA1 绿
 1	thumb	code_801A3C4	0x080209ec	sub_80209EC	
 1	thumb	code_801A3C4	0x08020a0c	sub_8020A0C	
 1	thumb	code_801A3C4	0x08020a7c	sub_8020A7C	

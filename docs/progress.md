@@ -1658,3 +1658,48 @@ fncheck OK (44B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
 4. 4 字节元素 → 索引 `lsls r0,r2,#2`。
 
 fncheck OK (76B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_8048764` 匹配 (场景对象技能槽取值, code_8044394)
+
+22 字节: `val = obj[0xA1]; return val <= 7 ? obj[0x99 + val] : val;` —— 从 0xC8 场景对象的
+8 槽技能数组 (0x99~0xA0) 按 `obj[0xA1]` 选择; 若该选择字节 >7 则原样返回它 (越界哨兵)。
+
+**MyStruct 定性 (回答"是否已定义结构体")**: 候选注释里的 `MyStruct{pad[153]; u8 data[8]@0x99; u8 chk@0xA1}`
+**不对应任何现成结构体**。对象确为 0xC8 场景对象, 唯一命名类型 `Unk_8020F4C` 是 code_8020D50.c 的
+**TU 局部** typedef, 且只列了 0x24/0xB0/0xBB/0xBE 等字段, **不含 0x99/0xA1**。本 TU (code_8044394)
+既有约定就是把对象当 `u8 *` + 裸偏移 (见已匹配的 sub_8048934/8984/89A4 的 `arg0 + 0x99`)。故沿用裸指针,
+不引入重复/冲突的本地 struct。
+
+**codegen 两个坑** (首版 `if(val>7)return val; return *(arg0+0x99+val);` FAIL):
+1. **地址结合序**: 目标 `adds r0,#0x99; adds r0,r0,r1` = `(arg0+0x99)+val`; 而 `*(arg0+0x99+val)`
+   被 GCC2 折成 `(val+arg0)+0x99` (顺序反了)。必须写 `ptr = arg0 + 0x99; return ptr[val];` 才拿到正确序 (规则 2 同源)。
+2. **分支极性**: 目标 `cmp #7; bls LOAD` + `return val` 落空 → 对应 `if (val <= 7) { LOAD } else { return val }`
+   的 if/else 写法; 写成 `if (val > 7) return val; ...` 会翻成 `bhi` 布局 (22B→24B 不等)。
+
+fncheck OK (22B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_80207DC` 匹配 (场景对象行为分派, code_801A3C4)
+
+100 字节: 5 参 `(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)`。按 `obj->field_BE` 三档分派到
+sub_801CBA4 (≤0xA) / sub_801CA08 (≤0x70) / sub_801CE80 ((u8)(BE-0x71) ≤ 0x8D), 均传 `(obj, 0, f2a, f35, 0)`。
+
+**卡点 (1 字节的 v home 选择)**: 目标 `adds r0,r4,#0; adds r0,#0xbe; ldrb r0,[r0]; adds r1,r0,#0`
+= 值读进 **r0** 再拷贝到 r1 作比较; 若先 `u8 v = obj[0xBE]` 落局部变量, 编译器生成
+`ldrb r1,[r0]; adds r0,r1,#0` (值在 r1, 拷贝到 r0), 差 2 字节。
+→ 不落局部、三处条件直接写 `obj[0xBE]` (第三次 `(u8)(obj[0xBE] - 0x71)`), 逐字节命中。
+
+fncheck OK (100B, 3 bl 槽忽略)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_804EF50` 匹配 (gUnk_03000D88 条件回写 gUnk_03004980, code_8044394)
+
+64 字节: 遍历 `gUnk_03000D88[0 .. gUnk_03000DDC)`, 凡 `field_0 > 0xDC` 的项, 把 `field_1` 写进
+`gUnk_03004980[field_0]`。与 sub_804EF90 同族 (共用 `Unk_03000DEntry gUnk_03000D88[]` + count `gUnk_03000DDC`)。
+
+**要点**:
+1. 无 break 的普通 for 被 GCC 旋转成 **bottom-test** (`blo loop`) + 循环前一次首检 peel (`cmp #0; bhs return`);
+   循环体每轮重读 count (`ldrb r0,[r3]`, r3 常驻 &count)。与规则 108 的 search-peel 不同, 这里是标准 for 旋转。
+2. `field_0` 只 `ldrb` 一次即复用 (既做 `>0xDC` 比较又做 `gUnk_03004980[]` 下标) → CSE, C 里写两遍同一表达式即可。
+3. 复用 iwram.h `Unk_03000DEntry` + 本文件 line1408 的 `extern u8 gUnk_03004980[]`; 删候选注释里冲突的本地
+   `typedef UnkStruct`/`extern UnkStruct gUnk_03000D88[]` (同 sub_804EF90 坑, 已记规则 108 变体)。
+
+fncheck OK (64B, 3 池重定位已施加, 0 bl 槽)。全 ROM SHA1 绿。

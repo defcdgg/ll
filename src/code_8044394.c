@@ -330,23 +330,22 @@ INCLUDE_ASM("asm/nonmatchings", sub_8048310);
 INCLUDE_ASM("asm/nonmatchings", sub_8048458);
 INCLUDE_ASM("asm/nonmatchings", sub_80485A4);
 INCLUDE_ASM("asm/nonmatchings", sub_8048690);
-INCLUDE_ASM("asm/matchings", sub_8048764);
+u8 sub_8048764(u8 *arg0)
+{
+    u8 val;
+    u8 *ptr;
 
-// typedef struct {
-//     u8 padding0[153];  // 0x00 ~ 0x98 填充
-//     u8 data_array[8];  // 0x99 ~ 0xA0 刚好 8 个元素的数组 (对应 val <= 7)
-//     u8 check_val;      // 0xA1 偏移处的字节
-// } MyStruct;
-
-// u8 sub_8048764(MyStruct *src) {
-//     u8 val = src->check_val;
-
-//     if (val <= 7) {
-//         return src->data_array[val];
-//     } else {
-//         return val;
-//     }
-// }
+    val = arg0[0xA1];
+    if (val <= 7)
+    {
+        ptr = arg0 + 0x99;
+        return ptr[val];
+    }
+    else
+    {
+        return val;
+    }
+}
 
 u8 sub_804877C(u8 arg0)
 {

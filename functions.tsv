@@ -501,7 +501,7 @@ status	isa	module	addr	name	note
 1	thumb	code_801A3C4	0x08020798	sub_8020798	
 1	thumb	code_801A3C4	0x080207a4	sub_80207A4	
 1	thumb	code_801A3C4	0x080207b4	sub_80207B4	
-0	thumb	code_801A3C4	0x080207dc	sub_80207DC	
+1	thumb	code_801A3C4	0x080207dc	sub_80207DC	✅ 2026-09-02 gpnux: 场景对象按field_BE分派三行为(sub_801CBA4/CA08/CE80, 均传(obj,0,f2a,f35,0)); 关键=v不落局部直接obj[0xBE]三次(落局部则ldrb进r1, 直接则进r0+adds r1拷贝); fncheck OK 100B	
 0	thumb	code_801A3C4	0x08020840	sub_8020840	
 0	thumb	code_801A3C4	0x080208a4	sub_80208A4	
 1	thumb	code_801A3C4	0x08020914	sub_8020914	
@@ -789,7 +789,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x08048458	sub_8048458	
 0	thumb	code_8044394	0x080485a4	sub_80485A4	
 0	thumb	code_8044394	0x08048690	sub_8048690	
-1	thumb	code_8044394	0x08048764	sub_8048764	
+1	thumb	code_8044394	0x08048764	sub_8048764	✅ 2026-09-02 qwen: obj[0xA1]<=7?obj[0x99+val]:val (对象=0xC8场景对象,无现成struct含0x99/0xA1,沿用裸指针 ptr=arg0+0x99 惯用法); fncheck OK 22B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x0804877c	sub_804877C	
 1	thumb	code_8044394	0x080487a4	sub_80487A4	✅ 2026-09-02 qwen: GetObjPool()+arg0*0xC8+0xBB 取 formation id → gBattleFormationIds[..] (同 sub_8048818 惯用法); fncheck OK 40B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x080487cc	sub_80487CC	
@@ -939,7 +939,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x0804ec04	sub_804EC04	
 1	thumb	code_8044394	0x0804eec4	sub_804EEC4	
 1	thumb	code_8044394	0x0804ef00	sub_804EF00	
-1	thumb	code_8044394	0x0804ef50	sub_804EF50	
+1	thumb	code_8044394	0x0804ef50	sub_804EF50	✅ 2026-09-02 opencode: 扫 gUnk_03000D88[0..gUnk_03000DDC), field_0>0xDC 则 gUnk_03004980[field_0]=field_1; GCC for 旋转成 bottom-test(blo)+首检 peel(bhs); 复用 Unk_03000DEntry/gUnk_03004980(line1408) 勿本地重定义; fncheck OK 64B
 1	thumb	code_8044394	0x0804ef90	sub_804EF90	✅ 2026-09-02 opencode: gUnk_03000D88[].field_0 线性查找 arg0->下标, 命中返 i 否则 0xFF; 规则108 变体(变长界 gUnk_03000DDC + ret 累加器); 复用 iwram.h Unk_03000DEntry(勿本地重定义 extern, 会冲突); fncheck OK 76B
 0	thumb	code_8044394	0x0804efdc	sub_804EFDC	
 1	thumb	code_8044394	0x0804f050	sub_804F050	✅ 2026-09-02 opencode: gInvPageItemIds[16] 线性查找 道具id->页号, for+break; GCC 把首迭代(i=0)peel 到循环外, 循环体 i++ 后 cmp#0xf/bhi 收尾返16; u8 arg0/i 触发 lsls/lsrs 字节截断; fncheck OK 44B

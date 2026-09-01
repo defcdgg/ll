@@ -797,7 +797,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x08048868	sub_8048868	
 0	thumb	code_8044394	0x080488cc	sub_80488CC	
 1	thumb	code_8044394	0x08048934	sub_8048934	
-1	thumb	code_8044394	0x08048984	sub_8048984	✅ 2026-09-02 qwen: obj[0x99+arg1]→gUnk_08093418[id*5+2]&0xF (家族同 sub_8048934); bytecmp OK 32B; 全ROM绿被 gpnux sub_804ABF8 WIP 阻塞
+1	thumb	code_8044394	0x08048984	sub_8048984	✅ 2026-09-02 qwen: obj[0x99+arg1]→gUnk_08093418[id*5+2]&0xF (家族同 sub_8048934); fncheck OK 32B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x080489a4	sub_80489A4	
 1	thumb	code_8044394	0x080489c8	sub_80489C8	
 1	thumb	code_8044394	0x080489e8	sub_80489E8	

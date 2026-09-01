@@ -1518,6 +1518,15 @@ permuter 探索出: 把常量 0 存入独立变量 `zero = 0;`, 让指针经 `&g
 数字字形数据均通过 ROM 偏移比较；两个重命名函数分别通过 168/420 字节 `fncheck`，全量
 `make` 与 `sha1sum -c ll.sha1` 均通过。
 
+## 2026-09-02 `0x08088C00` 数字字体调色板
+
+`0x08088C00` 只有 `LoadDigitFontObjTiles`（0x08009114）一处直接引用。函数在
+`gObjGraphicsSetId` bit7 清零时通过 DMA3 将该地址的 0x40 字节复制到 `0x050003C0`，
+对应 OBJ 调色板槽 14/15；同一函数随后从 `0x08088C40` 搬运 0x140 字节数字图块到槽 150。
+数据已定义为 `gDigitFontObjPalettes[2][16]`，每项为 BGR555 半字，保留原始 64 字节布局。
+`LoadDigitFontObjTiles` 已是合适语义名，无需进一步改名；连续 blob 起点相应后移至
+`0x08088C40`，后续数据地址保持不变。
+
 ## 2026-09-02 `sub_8017640` 匹配 (memcpy 对齐双路径, code_8010F10)
 
 76 字节 memcpy 变体: 参数 `(void *dst, void *src, s32 count)`, count 是**字数**, 总复制 `count*4` 字节。
@@ -1575,3 +1584,18 @@ bytecmp 8/216 (8 字节全为 bl 槽位, 非槽位差异 0); fncheck OK (184B, 2
 **给另外两个 "global-alloc 域" 挂起项 (sub_8018E34 / sub_804BE90) 的启示**:
 不要再去打 agbcc global.c 的 dump 补丁 (路径 a) —— 这条经验证明"提升决策"是可以被
 C 结构 (中间变量拆分 + 保持窄类型不落局部) 改变的, 值得先穷举结构再考虑改编译器。
+
+## 2026-09-02 `Save_SyncShadow` 匹配 (影子存档回拷, code_8010F10)
+
+88 字节: 把 `0x02027000` 影子缓冲的数据按 `gUnk_080981E6` 长度表逐块拷回
+`gUnk_087EB1E8` 指向的真实块地址 (Save_LoadContinue 的逆操作), 源偏移从 0xC 起连续递增。
+
+**结构与卡点 (u16/u32 类型选择)**:
+- 外层 `do { dest = gUnk_087EB1E8[i]; i++; 内层 while(len) 拷 len 字节; i = (u16)i; len = gUnk_080981E6[i]; } while(len)`
+- **i 必须用 u32**: 目标顶部只有裸 `adds r3,#1` (不归一化), 归一化 `lsls/lsrs #0x10` 只出现在
+  **循环底部** (`i = (u16)i`) —— 若 i 声明为 u16, 编译器每次 i++ 都插归一化, 整体错位。
+- **offset/len 必须用 u16**: 内层 `*dest = shadow[offset]; offset=(u16)(offset+1); dest++; len=(u16)(len-1)`
+  目标每次增量都带 `lsls/lsrs #0x10` 归一化。
+- **shadow 指针先声明** → prologue `ldr r5,=0x02027000` 排第一 (目标顺序: shadow→r5, offset→r4, i→r3)。
+
+bytecmp OK (88B 全等); fncheck OK; 全 ROM SHA1 绿。

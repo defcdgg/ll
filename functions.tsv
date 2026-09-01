@@ -333,7 +333,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08016978	Inv_FindFirstHeld	
 1	thumb	code_8010F10	0x080169ac	Inv_FindPrevHeld	
 1	thumb	code_8010F10	0x080169ec	Inv_FindHeldItemOnPage	✅ 2026-09-01 C: page就地复用存item(多一个qty会把表基址挤到r2,规87);表须真extern数组不能用强转宏(规102,20→0); fncheck OK 40B
-0	thumb	code_8010F10	0x08016a14	Save_SyncShadow	
+1	thumb	code_8010F10	0x08016a14	Save_SyncShadow	✅ 2026-09-02 gpnux: 影子缓冲回拷(LoadContinue逆); 关键=do-while i用u32(顶部裸inc§、仅底部(u16)归一化lsls/lsrs) + offset/len用u16(每次inc即归一化) + shadow指针先声明→r5首载; fncheck OK 88B	
 1	thumb	code_8010F10	0x08016a6c	Inv_SeekFirst	
 1	thumb	code_8010F10	0x08016aa0	Inv_PrevNonZero	
 1	thumb	code_8010F10	0x08016ad4	Inv_NextNonZero	

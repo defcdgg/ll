@@ -1134,7 +1134,38 @@ u8 Inv_FindHeldItemOnPage(u8 page)
 
     return page;
 }
-INCLUDE_ASM("asm/nonmatchings", Save_SyncShadow);
+/* 把 0x02027000 影子缓冲的存档数据拷回各真实块 (Save_LoadContinue 的逆操作)。
+ * 签名校验通过后调用: 逐块按长度表 gUnk_080981E6[i] 拷 count 字节到
+ * gUnk_087EB1E8[i] 指向的地址, 源偏移 offset 从 0xC 起连续递增。 */
+void Save_SyncShadow(void)
+{
+    u8 *shadow = (u8 *)0x02027000;
+    u16 offset = 0xC;
+    u32 i = 0;
+    u16 len;
+
+    len = gUnk_080981E6[0];
+    if (len == 0)
+        return;
+
+    do
+    {
+        u8 *dest = (u8 *)gUnk_087EB1E8[i];
+        i++;
+
+        while (len != 0)
+        {
+            *dest = shadow[offset];
+            offset = (u16)(offset + 1);
+            dest++;
+            len = (u16)(len - 1);
+        }
+
+        i = (u16)i;
+        len = gUnk_080981E6[i];
+    } while (len != 0);
+}
+
 void Inv_SeekFirst(void)
 {
     u8 i;

@@ -679,6 +679,13 @@
      (如 `flag = 1;`), 再交给 flow/CSE; 只有当 flag 写法也无法复刻时才考虑 goto, 且须在
      functions.tsv note 里标注"用了 goto 凑形, 待 flag 重构"。不要在规则里把 goto 当推荐手段。
      关联: 规则 104 (home 由声明形式决定)、规则 103 (调度槽位)、规则 100 (禁 goto)。
+108. **`for(i=0;i<N;i++){if(x==t[i])break;} return i;` 线性查找: GCC2 把首迭代(i=0)peel 到循环外, 循环体先 `i++` 再 `cmp #N-1/bhi` 收尾**（案例 `sub_804F050`）。
+     目标形状: `movs r1,#0; ldrb r3,[base]; cmp arg,r3; beq ret; loop: adds r0,r1,#1; (u8 截断 lsls/lsrs); cmp r1,#0xf; bhi ret; ldrb r0,[r1,base]; cmp arg,r0; bne loop; ret: mov r0,r1`。
+     —— 即 `t[0]` 的比较被提到循环前单独做一次, 循环内从 i=1 起, 退出条件写成 `i > N-1`(`bhi`) 而非 `i >= N`; 无命中时返回 N。
+     **要点**: ① 参数与 `i` 都必须是 `u8`, 才会产出 `lsls #0x18; lsrs #0x18` 字节截断 (arg0 入口也截断一次); 写成 `int i` 会丢这两条移位。
+     ② 表基址用**真 extern 数组** `gInvPageItemIds[i]` 索引, 不要 `((const u8*)0x0839CFAA)[i]` 强转宏 —— 后者换寄存器分配 (同 `code_8010F10.c` 注释, 规则见 data_805769C.h)。
+     ③ peel 是编译器自动做的, **不要**手写 `if(x==t[0])return 0;` 再进循环去"复刻"它, 直接写朴素 for+break 即命中。
+     关联: 规则 99 (数据表保持 1-D extern)。
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 

@@ -1616,21 +1616,18 @@ u8 sub_804EF90(u8 arg0)
 
 */
 INCLUDE_ASM("asm/nonmatchings", sub_804EFDC);
-INCLUDE_ASM("asm/matchings", sub_804F050);
-/*
 u8 sub_804F050(u8 arg0)
 {
     u8 i;
 
     for (i = 0; i < 16; i++)
     {
-        if(arg0 == gInvPageItemIds[i])
+        if (arg0 == gInvPageItemIds[i])
             break;
     }
-    
+
     return i;
 }
-    */
 void sub_804F07C(void)
 {
     gUnk_03000DDE = 0;

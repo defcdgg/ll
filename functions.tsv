@@ -942,7 +942,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804ef50	sub_804EF50	
 1	thumb	code_8044394	0x0804ef90	sub_804EF90	
 0	thumb	code_8044394	0x0804efdc	sub_804EFDC	
-1	thumb	code_8044394	0x0804f050	sub_804F050	
+1	thumb	code_8044394	0x0804f050	sub_804F050	✅ 2026-09-02 opencode: gInvPageItemIds[16] 线性查找 道具id->页号, for+break; GCC 把首迭代(i=0)peel 到循环外, 循环体 i++ 后 cmp#0xf/bhi 收尾返16; u8 arg0/i 触发 lsls/lsrs 字节截断; fncheck OK 44B
 1	thumb	code_8044394	0x0804f07c	sub_804F07C	
 1	thumb	code_8044394	0x0804f088	sub_804F088	
 1	thumb	code_804F0B8	0x0804f0b8	sub_804F0B8	✅ 2026-08-31 pi: 形参必须 s32 + 首句 arg1=(u8)arg1 (u8形参的<0被恒假折叠,规则65) + 两个 do{}while(0) 屏障(规则66); 84B fncheck OK

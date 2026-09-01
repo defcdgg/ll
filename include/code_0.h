@@ -961,7 +961,7 @@ void sub_804EF00();
 void sub_804EF50();
 void sub_804EF90();
 void sub_804EFDC();
-void sub_804F050();
+u8 sub_804F050(u8);
 void sub_804F07C();
 void sub_804F088();
 u8 sub_804F0B8(u8 *, s32);   // CheckObjectKindSlot: 比较对象 +0x91/+0x92 两个候选 id, 返 1/2/0

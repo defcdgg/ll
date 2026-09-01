@@ -1631,3 +1631,16 @@ fncheck OK (108 bytes, 1 bl 槽忽略)。全 ROM SHA1 绿。
    全连成 `adds r0,r0,r5; adds r0,r0,r6`; 内联则编译成 `adds r0,r0,r6; adds r0,r5,r0` 差 3 字节。
 
 fncheck OK (104B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_804F050` 匹配 (道具id->菜单页号 线性查找, code_8044394)
+
+44 字节: `for(i=0;i<16;i++) if(arg0==gInvPageItemIds[i]) break; return i;` —— 在 16 项页号表里
+反查道具 id 所在页, 未命中返回 16。语义与 `code_8010F10.c` 的 Inv_FindFirstHeld 家族共用同一张表。
+
+**一次成型 (候选 C 已在注释里, 直接实装即命中)**:
+1. `arg0`/`i` 都取 `u8` → 入口与 `i++` 各产一对 `lsls #0x18; lsrs #0x18` 字节截断 (写成 int 会丢)。
+2. 表用真 `extern const u8 gInvPageItemIds[]` 索引, 不用 `((const u8*)0x0839CFAA)[i]` 强转宏 (会换寄存器)。
+3. GCC2 自动把首迭代 (i=0 的 `t[0]` 比较) peel 到循环外, 循环体 `i++` 后 `cmp #0xf; bhi` 收尾返 16;
+   朴素 for+break 即复刻该形状, 无需手写 peel。→ 记入 RULES 108。
+
+fncheck OK (44B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。

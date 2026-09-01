@@ -1615,3 +1615,19 @@ gGstate312 = 新按下按键(keys & ~old), 对齐 gGstate330 传参。
    ldr r4=0x03000312 在 ldr r2=0x03000310 之前, 池条目随之排列 ✓。
 
 fncheck OK (108 bytes, 1 bl 槽忽略)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_804ABF8` 匹配 (tile 动画帧写入, code_8044394)
+
+104 字节: 按 `arg1*18 + gUnk_0300094D*2` 索引 `gUnk_0862D574` (u8*, 每动画 18 字节的 u16 帧表),
+把当前帧写入 `dest[0]/dest[0x20]` 两处 tilemap (值 = data*2 - 0x5000 / data*2 - 0x4FFF),
+帧号 `gUnk_0300094D++` 后: >3 或下一帧 == 0xF00 终止符 → 返回 1 (动画完), 否则 0。
+
+**关键 (三次迭代从 85B 差到 0)**:
+1. **表基址作局部指针** `u8 *base = gUnk_0862D574;` (用它两次读) → 基址进 r6、counter 地址进 r4,
+   加载顺序与目标一致 (直接写 gUnk_0862D574 池会后载)。
+2. **偏移拆局部变量** `off = gUnk_0300094D * 2 + arg1 * 18;` 再 `*(u16*)(base + off)`
+   → 算术排成 `lsls r3,r3,#1; lsls r2,r1,#3; adds r2,r2,r1; lsls r5,r2,#1; adds r3,r3,r5; adds r3,r3,r6`。
+3. **第二次读也要用局部 off2** (不能复用同表达式内联) → 加法顺序目标为 "先 +arg1*18 再 +base",
+   全连成 `adds r0,r0,r5; adds r0,r0,r6`; 内联则编译成 `adds r0,r0,r6; adds r0,r5,r0` 差 3 字节。
+
+fncheck OK (104B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。

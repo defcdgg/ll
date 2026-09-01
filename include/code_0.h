@@ -173,7 +173,7 @@ void MapBg_FlushPending();
 void ChestObjects_LoadForMap(u8);
 void Chest_BuildSprite(u8);
 void Chest_Open(u8);
-void LoadDigitFontObjTiles();   // 10 个数字字形 → OBJ 图块槽 150, + 4 组 OBJ 调色板
+void LoadDigitFontObjTiles();   // 10 个数字字形 → OBJ 图块槽 150, + 2 组 OBJ 调色板
 void ChestFlags_ClearAll();
 void ChestFlags_Toggle(u8);
 u8 ChestFlags_Test(u8);
@@ -805,7 +805,7 @@ u16 sub_8048818(u8, u8);
 u8 sub_8048868(u8, u8);
 void sub_80488CC();
 u8 sub_8048934(u8 *, u8);
-void sub_8048984();
+u8 sub_8048984(u8 *, u8);
 void sub_80489A4();
 u16 sub_80489C8(u8 *, u16);
 u8 sub_80489E8(u8 *, u8 *, u8, u16);
@@ -842,7 +842,7 @@ void sub_804AA2C();
 void sub_804AB10();
 void sub_804AB40();
 void sub_804ABD0();
-void sub_804ABF8();
+u32 sub_804ABF8(u16 *dest, u8 arg1);
 void sub_804AC60(void);
 void sub_804ACC0();
 void sub_804AD24();

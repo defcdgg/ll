@@ -439,21 +439,29 @@ u8 sub_8048934(u8 *arg0, u8 arg1)
     }
     return val;
 }
-INCLUDE_ASM("asm/matchings", sub_8048984);
-/*
-// #define gUnk_08093418 ((const u8 *)0x08093418)
-extern u8 gUnk_08093418[];
 u8 sub_8048984(u8 *arg0, u8 arg1)
 {
-    u8* ptr;
+    u8 *ptr;
     u8 index;
-    ptr =arg0+ 0x99;
 
+    ptr = arg0 + 0x99;
     index = ptr[arg1];
     return gUnk_08093418[index * 5 + 2] & 0xF;
 }
-*/
 INCLUDE_ASM("asm/matchings", sub_80489A4);
+/*
+extern u8 gUnk_08093418[];
+u8 sub_80489A4(u8 *arg0, u8 arg1)
+{
+    if (arg1 <= 7)
+    {
+        u8 *ptr = arg0 + 0x99; // 编译器会在这里先生成 adds r0, #0x99
+        arg1 = ptr[arg1];      // 随后生成 adds r0, r0, r2
+    }
+
+    return gUnk_08093418[arg1 * 5 + 1] & 0xF;
+}
+*/
 u16 sub_80489C8(u8 *arg0, u16 arg1)
 {
     s32 diff;
@@ -630,7 +638,11 @@ void sub_8048BD0(u8 *arg0)
         return;
     }
 }
+extern u8 gUnk_0839D5BC[];
+
 INCLUDE_ASM("asm/nonmatchings", sub_8048C30);
+
+
 INCLUDE_ASM("asm/nonmatchings", sub_8048C80);
 u8 sub_8048CEC(u8 *obj)
 {
@@ -719,7 +731,36 @@ INCLUDE_ASM("asm/matchings", sub_804ABD0);
 //         ptr[i + 0x20] = 0xB001;
 //     }
 // }
-INCLUDE_ASM("asm/nonmatchings", sub_804ABF8);
+/* tile 动画帧写入: 按 arg1*18 + gUnk_0300094D*2 索引 gUnk_0862D574 的 u16 帧表,
+ * 把当前帧写入 dest[0]/dest[0x20] 两处 tilemap (值 = data*2 - 0x5000 / -0x4FFF),
+ * 帧号 gUnk_0300094D++ 后检查: >3 或下一帧 == 0xF00 终止符 → 返回 1 (动画结束), 否则 0。 */
+extern u8 gUnk_0862D574[];
+
+u32 sub_804ABF8(u16 *dest, u8 arg1)
+{
+    u8 *base;
+    u16 data;
+    u16 off;
+    u16 off2;
+
+    base = gUnk_0862D574;
+    off = gUnk_0300094D * 2 + arg1 * 18;
+    data = *(u16 *)(base + off);
+    dest[0] = data * 2 - 0x5000;
+    dest[0x20] = data * 2 - 0x4FFF;
+
+    gUnk_0300094D++;
+
+    if (gUnk_0300094D > 3)
+        return 1;
+
+    off2 = gUnk_0300094D * 2 + arg1 * 18;
+    if (*(u16 *)(base + off2) == 0xF00)
+        return 1;
+
+    return 0;
+}
+
 extern u8 gUnk_0839D348[];
 
 void sub_804AC60(void)

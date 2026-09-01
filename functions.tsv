@@ -797,7 +797,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x08048868	sub_8048868	
 0	thumb	code_8044394	0x080488cc	sub_80488CC	
 1	thumb	code_8044394	0x08048934	sub_8048934	
-1	thumb	code_8044394	0x08048984	sub_8048984	
+1	thumb	code_8044394	0x08048984	sub_8048984	✅ 2026-09-02 qwen: obj[0x99+arg1]→gUnk_08093418[id*5+2]&0xF (家族同 sub_8048934); bytecmp OK 32B; 全ROM绿被 gpnux sub_804ABF8 WIP 阻塞
 1	thumb	code_8044394	0x080489a4	sub_80489A4	
 1	thumb	code_8044394	0x080489c8	sub_80489C8	
 1	thumb	code_8044394	0x080489e8	sub_80489E8	
@@ -834,7 +834,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804ab10	sub_804AB10	
 0	thumb	code_8044394	0x0804ab40	sub_804AB40	⏸ 剩4个全局strb顺序+r8/ip互换; 链式赋值94B=94C=0是关键形态
 1	thumb	code_8044394	0x0804abd0	sub_804ABD0	
-0	thumb	code_8044394	0x0804abf8	sub_804ABF8	
+1	thumb	code_8044394	0x0804abf8	sub_804ABF8	✅ 2026-09-02 gpnux: tile动画帧写入; 关键=off拆局部变量 + arg1*18/counter*2两个局部(第二次读复用base, 否则add顺序差); 表gUnk_0862D574[u8*, index arg1*18+counter*2], GBA tilemap值data*2-0x5000/-0x4FFF; fncheck OK 104B	
 1	thumb	code_8044394	0x0804ac60	sub_804AC60	
 0	thumb	code_8044394	0x0804acc0	sub_804ACC0	⏸ count/arg0扩展home互换+1拷贝(65分); 与AB40同族
 1	thumb	code_8044394	0x0804ad24	sub_804AD24	

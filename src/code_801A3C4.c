@@ -412,8 +412,6 @@ void sub_8020840(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
 }
 
 INCLUDE_ASM("asm/nonmatchings", sub_80208A4);
-INCLUDE_ASM("asm/matchings", sub_8020914);
-/*
 void sub_8020914(u8 *arg0)
 {
     if (arg0[0xBE] <= 10)
@@ -421,7 +419,6 @@ void sub_8020914(u8 *arg0)
         sub_801CBA4(arg0, 3, *(u16 *)(arg0 + 0x2A), arg0[0x35], 0);
     }
 }
-*/
 void sub_802093C(u8 *arg0)
 {
     u8 *ptr;

@@ -387,7 +387,18 @@ INCLUDE_ASM("asm/matchings", sub_80207B4);
 //     return sub_801C484(arg0);
 // }
 
-INCLUDE_ASM("asm/nonmatchings", sub_80207DC);
+/* 场景对象按 field_BE 分发到三种行为: ≤0xA → sub_801CBA4, ≤0x70 → sub_801CA08,
+ * 其余 (field_BE-0x71 ≤ 0x8D) → sub_801CE80; 均传 (obj, 0, f2a, f35, 0)。 */
+void sub_80207DC(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
+{
+    if (obj[0xBE] <= 0xA)
+        sub_801CBA4(obj, 0, f2a, f35, 0);
+    else if (obj[0xBE] <= 0x70)
+        sub_801CA08(obj, 0, f2a, f35, 0);
+    else if ((u8)(obj[0xBE] - 0x71) <= 0x8D)
+        sub_801CE80(obj, 0, f2a, f35, 0);
+}
+
 INCLUDE_ASM("asm/nonmatchings", sub_8020840);
 INCLUDE_ASM("asm/nonmatchings", sub_80208A4);
 INCLUDE_ASM("asm/matchings", sub_8020914);

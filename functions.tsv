@@ -726,7 +726,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804448c	sub_804448C	
 1	thumb	code_8044394	0x08044498	sub_8044498	
 1	thumb	code_8044394	0x080444a4	sub_80444A4	
-1	thumb	code_8044394	0x080444e8	sub_80444E8	
+1	thumb	code_8044394	0x080444e8	sub_80444E8	✅ 2026-09-02 opencode: 三全局(0844/0845/0856)全0则返1; 用命名 gUnk_03000844 非裸地址; fncheck OK 44B
 1	thumb	code_8044394	0x08044514	sub_8044514	
 1	thumb	code_8044394	0x08044574	sub_8044574	
 1	thumb	code_8044394	0x080445e0	sub_80445E0	
@@ -812,9 +812,9 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x08048c30	sub_8048C30	
 0	thumb	code_8044394	0x08048c80	sub_8048C80	
 1	thumb	code_8044394	0x08048cec	sub_8048CEC	
-1	thumb	code_8044394	0x08048d40	sub_8048D40	
-1	thumb	code_8044394	0x08048d64	sub_8048D64	
-1	thumb	code_8044394	0x08048d84	sub_8048D84	
+1	thumb	code_8044394	0x08048d40	sub_8048D40	✅ 2026-09-02 opencode: obj[0xBE]<=10 时清零 0x7E..0x86 五个u16; 关键=写5条 *(u16*)(arg0+const)=0 (用*ptr++/数组索引会致 r0/r1 互换 FAIL); fncheck OK 36B
+1	thumb	code_8044394	0x08048d64	sub_8048D64	✅ 2026-09-02 opencode: min((u16)(obj[0x6E]-obj[0x6C]), arg1) 语义: diff<arg1返(u16)diff否则arg1; u16形参/返回触发 lsl/lsr#16; fncheck OK 30B
+1	thumb	code_8044394	0x08048d84	sub_8048D84	✅ 2026-09-02 opencode: 两 obj 的 [0xAC]&0xF 之和 <=5 返1; 裸 u8* 偏移即可(勿引 MyStruct, 那是别 TU 局部); fncheck OK 30B
 0	thumb	code_8044394	0x08048da4	sub_8048DA4	
 0	thumb	code_8044394	0x08048f0c	sub_8048F0C	
 0	thumb	code_8044394	0x08048fb8	sub_8048FB8	
@@ -831,9 +831,9 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x0804a148	sub_804A148	
 0	thumb	code_8044394	0x0804a368	sub_804A368	
 0	thumb	code_8044394	0x0804aa2c	sub_804AA2C	
-1	thumb	code_8044394	0x0804ab10	sub_804AB10	
+1	thumb	code_8044394	0x0804ab10	sub_804AB10	✅ 2026-09-02 opencode: gUnk_03000970(指向200B obj数组的指针)[gUnk_03000949].value->0x97D, 置0x97B=1; 新登记 IWRAM 0x949/970/97B/97D; struct 必须恰好200B(remaining[146])才出 muls*0xc8; fncheck OK 48B
 0	thumb	code_8044394	0x0804ab40	sub_804AB40	⏸ 剩4个全局strb顺序+r8/ip互换; 链式赋值94B=94C=0是关键形态
-1	thumb	code_8044394	0x0804abd0	sub_804ABD0	
+1	thumb	code_8044394	0x0804abd0	sub_804ABD0	✅ 2026-09-02 opencode: 填 gUnk_02035B04 u16[i]与[i+0x20]=0xB001, i=0..0x19; 新登记 EWRAM 0x02035B04; for(i<=0x19) bottom-test bls; fncheck OK 40B
 1	thumb	code_8044394	0x0804abf8	sub_804ABF8	✅ 2026-09-02 gpnux: tile动画帧写入; 关键=off拆局部变量 + arg1*18/counter*2两个局部(第二次读复用base, 否则add顺序差); 表gUnk_0862D574[u8*, index arg1*18+counter*2], GBA tilemap值data*2-0x5000/-0x4FFF; fncheck OK 104B	
 1	thumb	code_8044394	0x0804ac60	sub_804AC60	
 0	thumb	code_8044394	0x0804acc0	sub_804ACC0	⏸ count/arg0扩展home互换+1拷贝(65分); 与AB40同族
@@ -937,14 +937,14 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x0804e85c	sub_804E85C	
 0	thumb	code_8044394	0x0804e9dc	sub_804E9DC	
 0	thumb	code_8044394	0x0804ec04	sub_804EC04	
-1	thumb	code_8044394	0x0804eec4	sub_804EEC4	
-1	thumb	code_8044394	0x0804ef00	sub_804EF00	
+1	thumb	code_8044394	0x0804eec4	sub_804EEC4	✅ 2026-09-02 opencode: 扫 gUnk_03000D48[0..gUnk_03000DDD) gInventory[field_0]=field_1; 复用 gInventory/Unk_03000DEntry; fncheck OK 60B
+1	thumb	code_8044394	0x0804ef00	sub_804EF00	✅ 2026-09-02 opencode: DC8[arg0].field_0!=0 时把 field_0 匹配项的 field_1 同步进 D88[i]; 复用 Unk_03000DEntry; fncheck OK 80B
 1	thumb	code_8044394	0x0804ef50	sub_804EF50	✅ 2026-09-02 opencode: 扫 gUnk_03000D88[0..gUnk_03000DDC), field_0>0xDC 则 gUnk_03004980[field_0]=field_1; GCC for 旋转成 bottom-test(blo)+首检 peel(bhs); 复用 Unk_03000DEntry/gUnk_03004980(line1408) 勿本地重定义; fncheck OK 64B
 1	thumb	code_8044394	0x0804ef90	sub_804EF90	✅ 2026-09-02 opencode: gUnk_03000D88[].field_0 线性查找 arg0->下标, 命中返 i 否则 0xFF; 规则108 变体(变长界 gUnk_03000DDC + ret 累加器); 复用 iwram.h Unk_03000DEntry(勿本地重定义 extern, 会冲突); fncheck OK 76B
 0	thumb	code_8044394	0x0804efdc	sub_804EFDC	
 1	thumb	code_8044394	0x0804f050	sub_804F050	✅ 2026-09-02 opencode: gInvPageItemIds[16] 线性查找 道具id->页号, for+break; GCC 把首迭代(i=0)peel 到循环外, 循环体 i++ 后 cmp#0xf/bhi 收尾返16; u8 arg0/i 触发 lsls/lsrs 字节截断; fncheck OK 44B
 1	thumb	code_8044394	0x0804f07c	sub_804F07C	
-1	thumb	code_8044394	0x0804f088	sub_804F088	
+1	thumb	code_8044394	0x0804f088	sub_804F088	✅ 2026-09-02 opencode: obj[0xBE]>10返2, 否则按 obj[0xA4]>0xDC 分派 sub_804E0E4/sub_804E2AC; 被调原型须非void(u8即可,egcs对u8返回恒截断); fncheck OK 48B
 1	thumb	code_804F0B8	0x0804f0b8	sub_804F0B8	✅ 2026-08-31 pi: 形参必须 s32 + 首句 arg1=(u8)arg1 (u8形参的<0被恒假折叠,规则65) + 两个 do{}while(0) 屏障(规则66); 84B fncheck OK
 0	thumb	code_804F0B8	0x0804f10c	sub_804F10C	
 0	thumb	code_804F0B8	0x0804f17c	sub_804F17C	

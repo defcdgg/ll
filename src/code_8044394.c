@@ -103,25 +103,22 @@ void sub_80444A4(u8 *arg0)
         *(u16 *)(base + ids[i] * 0xC8 + 0xB2) = 0;
     }
 }
-INCLUDE_ASM("asm/matchings", sub_80444E8);
-/*
 u8 sub_80444E8(void)
 {
-    if (*(u8 *)0x03000844 != 0)
+    if (gUnk_03000844 != 0)
     {
         return 0;
     }
-    if (*(u8 *)0x03000845 != 0)
+    if (gUnk_03000845 != 0)
     {
         return 0;
     }
-    if (*(u8 *)0x03000856 != 0)
+    if (gUnk_03000856 != 0)
     {
         return 0;
     }
     return 1;
 }
-*/
 void sub_8044514(s16 arg0)
 {
     gUnk_03000844 = 1;
@@ -664,60 +661,41 @@ u8 sub_8048CEC(u8 *obj)
     }
     return result;
 }
-INCLUDE_ASM("asm/matchings", sub_8048D40);
-// typedef struct {
-//     char gap1[0x7e];
-//     u16 a,b,c,d,e;
-//     char gap2[54];
-//     u8 check_val;
-// } MyStruct;
-
-// void sub_8048D40(MyStruct *ptr)
-// {
-//     if (ptr->check_val <= 10)
-//     {
-//         ptr->a = 0;
-//         ptr->b = 0;
-//         ptr->c = 0;
-//         ptr->d = 0;
-//         ptr->e = 0;
-//     }
-// }
-INCLUDE_ASM("asm/matchings", sub_8048D64);
-// u16 sub_8048D64(u8 *arg0, u16 arg1)
-// {
-//     s32 diff;
-
-//     diff = *(u16 *)(arg0 + 0x6E) - *(u16 *)(arg0 + 0x6C);
-//     if (diff < arg1)
-//     {
-//         return diff;
-//     }
-
-//     return arg1;
-// }
-INCLUDE_ASM("asm/matchings", sub_8048D84);
-/*
-typedef struct {
-    u8 pad[0xAC];
-    u8 value_at_AC;
-} UnkStructAC;
-
-u8 sub_8048D84(UnkStructAC *arg0, UnkStructAC *arg1)
+void sub_8048D40(u8 *arg0)
 {
-    // 提取 arg0 偏移 0xAC 字节的低 4 位
-    s32 val1 = arg0->value_at_AC & 0x0F;
-    // 提取 arg1 偏移 0xAC 字节的低 4 位
-    s32 val2 = arg1->value_at_AC & 0x0F;
-    
-    // 判断两者的低 4 位之和是否小于等于 5
-    if (val1 + val2 <= 5) {
-        return 1;
-    } else {
-        return 0;
+    if (arg0[0xBE] > 10)
+    {
+        return;
     }
+    *(u16 *)(arg0 + 0x7E) = 0;
+    *(u16 *)(arg0 + 0x80) = 0;
+    *(u16 *)(arg0 + 0x82) = 0;
+    *(u16 *)(arg0 + 0x84) = 0;
+    *(u16 *)(arg0 + 0x86) = 0;
 }
-*/
+u16 sub_8048D64(u8 *arg0, u16 arg1)
+{
+    s32 diff;
+
+    diff = *(u16 *)(arg0 + 0x6E) - *(u16 *)(arg0 + 0x6C);
+    if (diff < arg1)
+    {
+        return diff;
+    }
+
+    return arg1;
+}
+u8 sub_8048D84(u8 *arg0, u8 *arg1)
+{
+    s32 val1 = arg0[0xAC] & 0x0F;
+    s32 val2 = arg1[0xAC] & 0x0F;
+
+    if (val1 + val2 <= 5)
+    {
+        return 1;
+    }
+    return 0;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8048DA4);
 INCLUDE_ASM("asm/nonmatchings", sub_8048F0C);
 INCLUDE_ASM("asm/nonmatchings", sub_8048FB8);
@@ -734,20 +712,35 @@ INCLUDE_ASM("asm/nonmatchings", sub_8049DF8);
 INCLUDE_ASM("asm/nonmatchings", sub_804A148);
 INCLUDE_ASM("asm/nonmatchings", sub_804A368);
 INCLUDE_ASM("asm/nonmatchings", sub_804AA2C);
-INCLUDE_ASM("asm/matchings", sub_804AB10);
-INCLUDE_ASM("asm/nonmatchings", sub_804AB40);
-INCLUDE_ASM("asm/matchings", sub_804ABD0);
-// void sub_804ABD0(void) {
-//     u8 i;
-//     u16 *ptr;
+typedef struct {
+    u8 gap[0x35];
+    u8 value;
+    u8 remaining[146];
+} Unk_03000970; /* 200 字节 obj; gUnk_03000970 为指向该数组的指针 */
 
-//     ptr = (u16 *)0x02035B04;
-//     for (i = 0; i <= 0x19; i++)
-//     {
-//         ptr[i] = 0xB001;
-//         ptr[i + 0x20] = 0xB001;
-//     }
-// }
+extern u8 gUnk_03000949;
+extern u8 gUnk_0300097B;
+extern u8 gUnk_0300097D;
+extern Unk_03000970 *gUnk_03000970;
+
+void sub_804AB10(void)
+{
+    gUnk_0300097D = gUnk_03000970[gUnk_03000949].value;
+    gUnk_0300097B = 1;
+}
+INCLUDE_ASM("asm/nonmatchings", sub_804AB40);
+void sub_804ABD0(void)
+{
+    u8 i;
+    u16 *ptr;
+
+    ptr = gUnk_02035B04;
+    for (i = 0; i <= 0x19; i++)
+    {
+        ptr[i] = 0xB001;
+        ptr[i + 0x20] = 0xB001;
+    }
+}
 /* tile 动画帧写入: 按 arg1*18 + gUnk_0300094D*2 索引 gUnk_0862D574 的 u16 帧表,
  * 把当前帧写入 dest[0]/dest[0x20] 两处 tilemap (值 = data*2 - 0x5000 / -0x4FFF),
  * 帧号 gUnk_0300094D++ 后检查: >3 或下一帧 == 0xF00 终止符 → 返回 1 (动画结束), 否则 0。 */
@@ -1528,19 +1521,6 @@ INCLUDE_ASM("asm/nonmatchings", sub_804E7EC);
 INCLUDE_ASM("asm/nonmatchings", sub_804E85C);
 INCLUDE_ASM("asm/nonmatchings", sub_804E9DC);
 INCLUDE_ASM("asm/nonmatchings", sub_804EC04);
-INCLUDE_ASM("asm/matchings", sub_804EEC4);
-/*
-extern u8 gUnk_03000DDD;
-
-typedef struct 
-{
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-}UnkStruct;
-extern UnkStruct gUnk_03000D48[];
-
 void sub_804EEC4(void)
 {
     u8 i;
@@ -1550,37 +1530,23 @@ void sub_804EEC4(void)
         gInventory[gUnk_03000D48[i].field_0] = gUnk_03000D48[i].field_1;
     }
 }
-*/
-INCLUDE_ASM("asm/matchings", sub_804EF00);
-/*
-extern u8 gUnk_03000DDC;
-extern u8 gUnk_03004980[];
-
-typedef struct 
+void sub_804EF00(u8 arg0)
 {
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-}UnkStruct;
-extern UnkStruct gUnk_03000D88[];
-extern UnkStruct gUnk_03000DC8[];
-
-void sub_804EF00(u8 arg0) {
-    
     u8 i;
-    if(gUnk_03000DC8[arg0].field_0 == 0)
+
+    if (gUnk_03000DC8[arg0].field_0 == 0)
+    {
         return;
+    }
 
     for (i = 0; i < gUnk_03000DDC; i++)
     {
-        if(gUnk_03000D88[i].field_0 == gUnk_03000DC8[arg0].field_0)
+        if (gUnk_03000D88[i].field_0 == gUnk_03000DC8[arg0].field_0)
         {
             gUnk_03000D88[i].field_1 = gUnk_03000DC8[arg0].field_1;
         }
     }
 }
-*/
 void sub_804EF50(void)
 {
     u8 i;
@@ -1626,21 +1592,15 @@ void sub_804F07C(void)
 {
     gUnk_03000DDE = 0;
 }
-INCLUDE_ASM("asm/matchings", sub_804F088);
-/*
-u8 sub_804E2AC(u8*, u32);
-u8 sub_804E0E4(u8*, u32);
-
-
-u8 sub_804F088(u8* arg0, u32 arg1) {
-    if (arg0[0xBE] > 0xAU) {
+u8 sub_804F088(u8 *arg0, u32 arg1)
+{
+    if (arg0[0xBE] > 0xAU)
+    {
         return 2;
     }
-    if ( arg0[0xA4] > 0xDCU) {
-           return sub_804E0E4(arg0,arg1);
-    
-    } else {
-         return sub_804E2AC(arg0,arg1);
+    if (arg0[0xA4] > 0xDCU)
+    {
+        return sub_804E0E4(arg0, arg1);
     }
+    return sub_804E2AC(arg0, arg1);
 }
-*/

@@ -124,7 +124,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8005020	0x08005c70	Viewport_UpdateScroll	
 1	thumb	code_8005020	0x080064ac	BgMap_FillPattern	
 1	thumb	code_8005020	0x08006520	MapBg_LoadFull	
-0	thumb	code_8005020	0x0800661c	sub_800661C	
+0	thumb	code_8005020	0x0800661c	MapScene_Load	语义已确认: 地图场景资源/状态装载入口; fncheck OK (2026-09-02 codex)
 0	thumb	code_8005020	0x080071ec	sub_80071EC	
 1	thumb	code_8005020	0x0800729c	MapScene_InitSprites	
 0	thumb	code_8005020	0x08007350	sub_8007350	
@@ -354,7 +354,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8010F10	0x08017120	sub_8017120	
 0	thumb	code_8010F10	0x080171e4	sub_80171E4	
 1	thumb	code_8010F10	0x08017588	Sio_IsHost	
-0	thumb	code_8010F10	0x080175c0	sub_80175C0	
+1	thumb	code_8010F10	0x080175c0	sub_80175C0	✅ 2026-09-02 opencode: SIO槽清零; CpuFill32(0,&gSioSession,0x60)+循环清unk18[2]前4字节; 零常量需先入独立变量令movs r1,#0最先(规则103); fncheck OK
 1	thumb	code_8010F10	0x08017600	Sio_SetXferCtx	
 1	thumb	code_8010F10	0x0801761c	Sio_ClearSlot	
 0	thumb	code_8010F10	0x08017640	sub_8017640	

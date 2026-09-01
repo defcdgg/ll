@@ -127,7 +127,7 @@
 | sub_8020974 | 0x08020974 | 0x8020簇 | code_1.c | 脚本处理器: 把对象 + 两个属性字节 + 一张 20B 表的四个字段转发给 `sub_801B81C`。5 参全由入口截断定类(r0 指针 / r1,r2 u16 / r3 u8 / 栈参 u16)。**关键 = 规则 67**: 内联写 4 次 `gUnk_08393B28[arg1].field_X` 会被 CSE 成 `adds r,#4` 递增并把两个 ldrb 提升进 r8/r9(多 6 条指令); 提成 `Unk_08393B28 *entry = &gUnk_08393B28[arg1];` 后逐指令全等。副作用: 把 `Unk_08393B28` 的 typedef+extern 从 1484 行**整块前移**到 1286 行(纯搬迁, sub_8020CC4 代码生成不变已 fncheck 验证); 头文件 `void ()` → `void (u8*,u16,u16,u8,u16)`(否则 GCC2 报 default promotion 冲突) |
 | sub_8019304 | 0x08019304 | 0x8019簇 | code_1.c | **首试即字节全等**。清空 `gUnk_03000348[0..2]`(步长20): `for (i=0;i<=2;i++)` 的入口预测试被折叠(0<=2 可证), 底部 `cmp r2,#2; bls`。关键 = **必须用结构体成员形式逐个写**: 目标是同一基址的 11 个 `strb [r0,#N]` + 2 个 `strh [r0,#0xc/#0xe]`; 换成 `u8 *b; b[N]=0;` 立刻被 GCC2 强度削减成 `adds` 连续递增 → 50/56 字节差(实测, 印证规则 11/67)。0xb(field_B) **不清零**; 0xe/0xf 是一条 u16 存零 → 原代码在该处按 u16 看, 现有 iwram.h 把 field_E/F 拆成两个 u8, 故用 `*(u16 *)&ptr->field_E = 0;` 绕过, **未改共享头** |
 | sub_804C4D8 | 0x0804C4D8 | 0x804C簇 | code_1b.c | **结构体成员形式一击命中**(100 bytes 全等)。三个 u8 形参; 表 `gUnk_03000AE8` 步长16。⚠ 同一个 `x |= CONST`, 写成 `u8 *ptr; ptr[0] |= 0x40;` 时 GCC2 把 IOR 的**目的寄存器选成常量那个**(`mov r0, ip; orrs r0, r1`), 而目标是 `adds r0, r1, #0; orrs r0, r7`(先拷 b 再或常量) —— 换成 `Unk_03000AE8 *entry; entry->field_0 |= 0x40;` 立刻全对。共试 13 种非结构体写法(w1-w5/x1-x6/y6-y8/z1-z4)全部停在 66~90 分。类型冲突处理: iwram.h 只有 `extern u8 gUnk_03000AE8[]`, **不改共享头**, 改用本地 typedef + `(Unk_03000AE8 *)&gUnk_03000AE8[(arg0+i)*16]` 转型, 字节不变。另: 头文件 `void ()` 必须升为 `void (u8,u8,u8)`(否则 default promotion 冲突, 同 sub_8020974) |
-| **LoadArrowObjTiles** (LoadArrowObjTiles) | 0x08004CE8 | 0x8004簇 | code_80002A0.c | asm-match **转真C + 命名 + 文档**(56 bytes 全等)。功能: 按形参 bit7 选两套 4bpp 精灵图块之一, 用 DMA3/16bit 装入 **OBJ 图块槽 146** (VRAM 0x06011240)。`arg0>=0` → 0x08393728 共 2 块(◀ ▶, 64B); `arg0<0` → 0x08393768 共 4 块(◀ ▬ ▶ ▫, 128B)。配套: 兄弟函数 sub_8009114 在 bit7=0 时装 **10 个数字字形**到槽 150 (0x060112C0) + OBJ 调色板 0x050003C0, bit7=1 时它直接 return —— 所以 bit7 是"要不要数字字体"的图形变体位。唯一调用方 sub_800661C(未匹配) 传 `*(u8*)0x0300467C`。命名走 `#define LoadArrowObjTiles sub_8004CE8` 别名(asm 里仍 `bl sub_8004CE8`, 改真名会链接失败); 两处 ROM 地址用 .c 内 `#define` 常量, **未动 linker.ld/iwram.h**。形参必须 s8: 目标入口只有 `lsls r0,#0x18` 无配对 asrs(左移已把 bit7 送到符号位, 规则 36) |
+| **LoadArrowObjTiles** (LoadArrowObjTiles) | 0x08004CE8 | 0x8004簇 | code_80002A0.c | asm-match **转真C + 命名 + 文档**(56 bytes 全等)。功能: 按形参 bit7 选两套 4bpp 精灵图块之一, 用 DMA3/16bit 装入 **OBJ 图块槽 146** (VRAM 0x06011240)。`arg0>=0` → 0x08393728 共 2 块(◀ ▶, 64B); `arg0<0` → 0x08393768 共 4 块(◀ ▬ ▶ ▫, 128B)。配套: 兄弟函数 sub_8009114 在 bit7=0 时装 **10 个数字字形**到槽 150 (0x060112C0) + OBJ 调色板 0x050003C0, bit7=1 时它直接 return —— 所以 bit7 是"要不要数字字体"的图形变体位。唯一调用方 MapScene_Load(未匹配) 传 `*(u8*)0x0300467C`。命名走 `#define LoadArrowObjTiles sub_8004CE8` 别名(asm 里仍 `bl sub_8004CE8`, 改真名会链接失败); 两处 ROM 地址用 .c 内 `#define` 常量, **未动 linker.ld/iwram.h**。形参必须 s8: 目标入口只有 `lsls r0,#0x18` 无配对 asrs(左移已把 bit7 送到符号位, 规则 36) |
 | **LoadSpriteSheetGfx / LoadSpriteSheetPal** (原 sub_8004C8C / sub_8004CB8) | 0x08004C8C / 0x08004CB8 | 0x8004簇 | code_80002A0.c | asm-match **转真C + 命名 + 文档**(44 / 48 bytes 全等)。一对"精灵表槽位"装载器: `Gfx(slot,gfxId)` = `LZ77UnCompVram(gUnk_087E8430[gfxId], 0x06011400 + slot*0x900)`; `Pal(slot,palId)` = `DmaCopy16(3, gUnk_080B9DFC[palId], 0x05000200 + slot*32, 0x20)`。槽位数 **12** 由 `sub_8008C70` 的 `i < 12` 证实 (0x06011400 + 12*0x900 = 0x06018000 正好到 VRAM 尾)。⚠ **两条新踩的调度坑**: ① `LZ77UnCompVram(tbl[i], 0x06011400 + s*0x900)` 内联写会让 GCC2 先算 src, 尾部多一条 `adds r0, r2, #0`; 必须先把 dst 存进变量。② `DmaCopy16(3, tbl[i], expr, 0x20)` 内联写会让 `vu32 *dmaRegs` 被 CSE 提到最前(目标是在 src/dst 之后才 `ldr r2,=0x040000D4`); 必须先把 src/dst 各存变量。新增 linker.ld 绝对符号 gUnk_087E8430 / gUnk_080B9DFC(SECTIONS 外, 纯追加); 并把 code_8005020.c 里 8 处调用点换成别名, 字节不变 |
 | sub_80487CC | 0x080487CC | 0x8048簇 | code_1b.c | 首试即中; sub_80187A8 原型 u8→u32(调用方截断; 定义侧 return gUnk 代码生成不变); 0x03004AA0 就是 gPartyMemberIds(已有别名, 勿重复注册); 0xA1/0xA7 双条件或短路 |
 | sub_8008BA4 → **LoadSpriteAnimSet** | 0x08008BA4 | 0x8008簇 | code_8005020.c | asm-match 转真C, **首试字节全等**; `src=tbl[id]; end=*(u16*)src+slot; src+=2; for(i=slot;i<end;i++) src=parse(i,src);` —— `endSlot` 的 u16 截断(lsls/lsrs #0x10)必须写成 `*(u16*)src + startSlot` 单表达式, `src+=2` 必须排在 endSlot 之后、循环变量赋值之前(否则调度顺序变); 命名走 `#define` 别名(asm/matchings/sub_8052FAC.s 仍 `bl sub_8008BA4`, 改真名会链接失败) |
@@ -209,7 +209,7 @@
 | `sub_8007BD0` | **`MapZone_Trigger`** (#define) | fn | 按 gMapZoneType 0..4 分发 header[1..5] 记录表: 0=换图(state3+SwitchFlags_ClearRange) 1=图内传送(state4) 2=state8 3=首次进入跑脚本 4=朝向触发脚本 |
 | `gUnk_0300463C` | **`gMapZoneType`** | u8 | 命中区域动作号 0..4 / 0xFF=未命中 (MovePlayer 每帧先清 0xFF) |
 | `gUnk_03004654` | **`gMapZoneEntryIdx`** | u8 | 命中区域在其动作记录表内的下标 |
-| `gUnk_030047A0` | **`gMapZoneHeader`** | u32* | 当前地图区域头表 `{u32 cells; u32 type0..type4}`; cells=`{u8 count,[4B]{xTile,yTile,type,entryIdx}}`; 由 sub_800661C 从 `0x087EBB20[mapIdx]` 装载 |
+| `gUnk_030047A0` | **`gMapZoneHeader`** | u32* | 当前地图区域头表 `{u32 cells; u32 type0..type4}`; cells=`{u8 count,[4B]{xTile,yTile,type,entryIdx}}`; 由 MapScene_Load 从 `0x087EBB20[mapIdx]` 装载 |
 | `gUnk_03004838` | **`gZoneCheckTileXs`** | u8[4] | 足迹瓦片 X 坐标暂存 |
 | `gUnk_03004644` | **`gZoneCheckTileYs`** | u8[4] | 足迹瓦片 Y 坐标暂存 |
 
@@ -521,12 +521,12 @@
 ### sub_8009370 (0x08009370) — 挂起 (ptr 基址未被 CSE 保留 → 寄存器 home 级联)
 - **指令序列已 95% 复现** (w11, 79/184 字节差, 且差值全集中在 3 处), 语义完全清楚:
   `if (gUnk_03004910) sub_80094FC(); else { sub_8003264(); for (i=0;i<=3;i++) { b=gUnk_03000010[i];
-  if (b!=0 && (b&4)==0) DmaSet(3, &gUnk_0808A234[(gUnk_03000038[i][gUnk_03000020[i]>>gUnk_03000018[i]] << 5)+2], gUnk_03000028[i], 0x80000010); } }`
+  if (b!=0 && (b&4)==0) DmaSet(3, &gMenuEntityPaletteTable[(gUnk_03000038[i][gUnk_03000020[i]>>gUnk_03000018[i]] << 5)+2], gUnk_03000028[i], 0x80000010); } }`
 - 关键结构已拿下: `s16 i` + `for (i=0;i<=3;i++)` 自然产生 `lsls/asrs #0x10` 与 `+0x10000; >>16` 的 s16 归一化舞步;
   `DmaSet` 宏的 `dmaRegs[2];` 死读也对上了
 - **卡点 1 (根因)**: 目标把 `0x0808A234` 基址提升进 r8 (`ldr r7,=sym; mov r8,r7` 在入口),
-  而 `0x03000010` 反而在循环内现取。我直接写 `gUnk_0808A234` 时 GCC2 会把 `+2` 折进符号地址
-  (池变 `gUnk_0808A234+0x2`, 丢一条 `adds r0,#2`); 改用局部 `u8 *ptr = gUnk_0808A234;` 可保住 `+2`,
+  而 `0x03000010` 反而在循环内现取。我直接写 `gMenuEntityPaletteTable` 时 GCC2 会把 `+2` 折进符号地址
+  (池变 `gMenuEntityPaletteTable+0x2`, 丢一条 `adds r0,#2`); 改用局部 `u8 *ptr = gMenuEntityPaletteTable;` 可保住 `+2`,
   但 CSE 又把 ptr 当 `unique_reg_constant` 代入使用点 → 基址没提升, 反而挤掉了 0x03000010 的位置。
   即: **需要一个"能撑过 CSE 常量代入"的基址局部变量**。
 - **卡点 2**: `movs r0,#4; ands r0,r2` (目标, 结果落常量的寄存器) vs 我的 `ands r2,r0` (结果落 b 的寄存器)。
@@ -553,7 +553,7 @@ extern u8 gUnk_03000018[4];
 extern u16 gUnk_03000020[4];
 extern u32 gUnk_03000028[4];
 extern u8 *gUnk_03000038[4];
-extern u8 gUnk_0808A234[];
+extern u8 gMenuEntityPaletteTable[];
 extern void sub_80094FC(void);
 extern void sub_8003264(void);
 
@@ -570,7 +570,7 @@ void sub_8009370(void)
     else
     {
         sub_8003264();
-    ptr = gUnk_0808A234;
+    ptr = gMenuEntityPaletteTable;
 
         for (i = 0; i <= 3; i++)
         {
@@ -1466,3 +1466,36 @@ Start 写入，尚未确认读取者。
 `ScreenFade_Apply` 的生成要点：进度虽为 `s16`，但必须显式 `(u16)` 转换以产生目标的 `ldrh`；
 另外保留对局部 `blendControl` 的恒真死赋值，以让 GCC2 将其分配至 r4。移除该语句会使 156B 函数的
 寄存器分配及后续字节偏离。三函数均已通过 `fncheck`，全 ROM SHA1 为 OK。
+
+## 2026-09-02 `gUnk_0808A234` 引用分析与命名
+
+`0x0808A234` 在代码中有两条直接引用链，但只有一条真正把它当作表基址使用：
+
+| 引用函数 | 访问形状 | 结论 / 命名 |
+|---|---|---|
+| `sub_8009370` / `0x08009370` | VBlank 调色板刷新循环中，`base + (gUnk_03000038[i][gUnk_03000020[i] >> gUnk_03000018[i]] << 5) + 2`，DMA3 传 0x10 个半字到 `gUnk_03000028[i]` | `0x0808A234` 是 124 项 × 0x20B 的 OBJ 调色板表；建议改名 `MenuEnt_FlushPalettes`，数据改名 `gMenuEntityPaletteTable` |
+| `sub_800661C` / `0x0800661C` | 仅在场景资源分支中访问 `base + 0x1140 = 0x0808B374` 的一个字节，再 DMA 到 `0x05000140` | 这是后续独立数据 `byte_808B374` 的访问，不是调色板表消费者；函数职责是地图场景资源/状态总装载，已改名 `MapScene_Load` |
+
+`data/raw_data/byte_808A234.bin` 大小为 `3968 = 124 * 0x20` 字节。每项首半字为 `0xFFFF` 保留值，实际 OBJ 调色板刷新从偏移 `+2` 搬运 15 个 BGR555 色值。`MapScene_Load` 的 `+0x1140` 恰好越过该区域末端 `0x0808B1B3`，落在 `0x0808B374`，因此不能因共享一个字面池基址而给它使用调色板语义名。
+
+已落盘：`ll.cfg`/`functions.tsv`/调用点/asm 切片中的 `sub_800661C -> MapScene_Load`，绝对符号 `gMenuEntityPaletteTable = 0x0808A234`，以及 `scripts/data.json` 数据名同步。`MapScene_Load` 单函数 `fncheck` 为 OK；`sub_8009370` 当前由另一 agent 认领，正式改名待其锁释放后执行。
+
+## 2026-09-02 `sub_80175C0` 匹配 (SIO 槽位清零, code_8010F10)
+
+34 行小函数, 语义: SIO 会话初始化前的槽位清零。流程:
+1. `sub_8016C88()` (前置状态重置, 未匹配, 原型 K&R `void`);
+2. `CpuFill32(0, &gSioSession, 0x60)` — 控制字 `0x05000018` = 32bit | SRC_FIXED | 0x18, 清零结构体前 96 字节;
+3. 循环把 `unk18[2]` 两个 24 字节槽位各自前 4 字节 (`field_0`/`field_2`) 清零;
+4. `sub_8017120(1)`。
+
+**卡点与解法 (新规律 103)**: 循环体/指针初始化写法 (do-while 指针 / for 双初值) 都被编译器调度成
+`adds r4,#0x18; movs r0,#1; movs r1,#0` (零常量最后加载), 差 3 条指令顺序 18 字节。
+permuter 探索出: 把常量 0 存入独立变量 `zero = 0;`, 让指针经 `&gSioSession.unk18[zero]` 计算、
+赋值用 `p->field_0 = zero;`, 编译器便把 `movs r1,#0` 提到 preheader 最前,
+生成 `movs r1,#0; adds r4,#0x18; movs r0,#1`, 逐字节命中 (64B, fncheck OK)。
+
+原型: `void sub_80175C0(void)`, `void sub_8016C88(void)`, `void sub_8017120(u32)`, `CpuSet` 走 `gba/syscall.h`。
+未改名 (SIO 语义名待 `sub_8016C88`/`sub_8017120` 一带匹配后统一命名)。
+
+注: 提交时 ROM 未全绿, `fncheck.py --blame` 归属显示差异主要在 `data/sound_data.o`(4660B) 等
+其他 agent 未提交工作 (首个真实差异 0x080003d4, 早于本函数 0x080175c0); 本函数 fncheck OK, 照常提交。

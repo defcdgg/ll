@@ -1332,7 +1332,25 @@ u32 Sio_IsHost(void)
     }
     return ret;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_80175C0);
+void sub_80175C0(void)
+{
+    s32 i;
+    s32 zero;
+    Unk_03004F20_entry *p;
+
+    sub_8016C88();
+    CpuFill32(0, &gSioSession, 0x60);
+    zero = 0;
+    p = &gSioSession.unk18[zero];
+    i = 1;
+    do {
+        p->field_0 = zero;
+        p->field_2 = zero;
+        p++;
+        i--;
+    } while (i >= 0);
+    sub_8017120(1);
+}
 void Sio_SetXferCtx(u32 *arg0, u32 *arg1, u32 arg2, u32 arg3)
 {
     gSioXferCtx.field_4 = arg0;

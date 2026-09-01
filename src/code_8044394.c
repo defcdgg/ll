@@ -567,8 +567,6 @@ void sub_8048B30(u8 param1, u8 param2, u16 param3)
     gUnk_030008F3 = param2;
     gUnk_03000906 = param3;
 }
-INCLUDE_ASM("asm/matchings", sub_8048B5C);
-/*
 void sub_8048B5C(u8 *arg0, u8 arg1)
 {
     if (arg0[0x91] == 0xB3 || arg0[0x92] == 0xB3)
@@ -580,7 +578,6 @@ void sub_8048B5C(u8 *arg0, u8 arg1)
         *(u16 *)(arg0 + 0x88) = arg1;
     }
 }
-*/
 extern u8 gUnk_0839CC4C[];
 
 u8 sub_8048B88(u8 *arg0)
@@ -702,6 +699,27 @@ INCLUDE_ASM("asm/matchings", sub_8048D64);
 //     return arg1;
 // }
 INCLUDE_ASM("asm/matchings", sub_8048D84);
+/*
+typedef struct {
+    u8 pad[0xAC];
+    u8 value_at_AC;
+} UnkStructAC;
+
+u8 sub_8048D84(UnkStructAC *arg0, UnkStructAC *arg1)
+{
+    // 提取 arg0 偏移 0xAC 字节的低 4 位
+    s32 val1 = arg0->value_at_AC & 0x0F;
+    // 提取 arg1 偏移 0xAC 字节的低 4 位
+    s32 val2 = arg1->value_at_AC & 0x0F;
+    
+    // 判断两者的低 4 位之和是否小于等于 5
+    if (val1 + val2 <= 5) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+*/
 INCLUDE_ASM("asm/nonmatchings", sub_8048DA4);
 INCLUDE_ASM("asm/nonmatchings", sub_8048F0C);
 INCLUDE_ASM("asm/nonmatchings", sub_8048FB8);

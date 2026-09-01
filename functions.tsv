@@ -805,7 +805,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x08048a88	sub_8048A88	
 1	thumb	code_8044394	0x08048acc	sub_8048ACC	
 1	thumb	code_8044394	0x08048b30	sub_8048B30	
-1	thumb	code_8044394	0x08048b5c	sub_8048B5C	
+1	thumb	code_8044394	0x08048b5c	sub_8048B5C	✅ 2026-09-02 qwen: obj[0x91]==0xB3||obj[0x92]==0xB3 ? *(u16*)(obj+0x88)=0x20 : =arg1 (0xB3=空槽哨兵); fncheck OK 42B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x08048b88	sub_8048B88	
 1	thumb	code_8044394	0x08048bac	sub_8048BAC	
 1	thumb	code_8044394	0x08048bd0	sub_8048BD0	

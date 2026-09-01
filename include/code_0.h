@@ -813,7 +813,7 @@ u8 sub_8048A68(u8 *);
 void sub_8048A88(u8 *, s8, s8);
 void sub_8048ACC(u8 *, u8, u8);
 void sub_8048B30(u8, u8, u16);
-void sub_8048B5C();
+void sub_8048B5C(u8 *, u8);
 u8 sub_8048B88(u8 *);
 void sub_8048BAC();
 void sub_8048BD0(u8 *);

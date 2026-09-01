@@ -297,7 +297,7 @@ void MapBg_LoadFull(u8 arg0) {
     SoundMain_Frame();
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_800661C);
+INCLUDE_ASM("asm/nonmatchings", MapScene_Load);
 INCLUDE_ASM("asm/nonmatchings", sub_80071EC);
 /* 地图场景精灵初始化 (进入场景时): 槽 0 = 主角 (gPartyMemberIds[0]) 图块+调色板,
  * 槽 1 = 固定 11 号模型 (跟随者/光影?); 若场景描述符 field_9 有 NPC 集,
@@ -1254,7 +1254,8 @@ void MapBg_FlushPending(void)
             break;
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8008F28);
+/* 按当前地图从 0x08088400 的 256 项表中装载宝箱对象；见 ChestMapEntry。 */
+INCLUDE_ASM("asm/nonmatchings", ChestObjects_LoadForMap);
 void Chest_BuildSprite(u8 arg0)
 {
     struct SpriteNode *sprNode;
@@ -1359,7 +1360,40 @@ u8 ChestFlags_Test(u8 arg0)
     return (val >> (arg0 & 7)) & 1;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_80091C4);
-INCLUDE_ASM("asm/nonmatchings", sub_8009370);
+
+/* 调色板 DMA 上传: 平时整表刷新; 若 gUnk_03004910 非零则走特效流程 sub_80094FC。
+ * 逐项: 标志 gUnk_03000010[i] 非零且未设 bit2 → 计算表内偏移:
+ *   idx = gUnk_03000020[i] >> gUnk_03000018[i];  byte = gUnk_03000038[i][idx];
+ *   src = gMenuEntityPaletteTable + (byte << 5) + 2;  → DMA3 拷贝 32 字节到 gUnk_03000028[i]。 */
+extern const u8 gMenuEntityPaletteTable[];
+
+void sub_8009370(void)
+{
+    s16 i;
+
+    if (gUnk_03004910 != 0)
+    {
+        sub_80094FC();
+    }
+    else
+    {
+        PalTransfer_Flush();
+        for (i = 0; i <= 3; i++)
+        {
+            if (gUnk_03000010[i] != 0 && (gUnk_03000010[i] & 4) == 0)
+            {
+                u32 src;
+                u32 off;
+                u8 *base;
+
+                off = ((u32)(*(u8 *)(gUnk_03000038[i] + (gUnk_03000020[i] >> gUnk_03000018[i]))) << 5) + 2;
+                base = (u8 *)gMenuEntityPaletteTable;
+                src = (u32)(base + off);
+                DmaSet(3, src, gUnk_03000028[i], 0x80000010);
+            }
+        }
+    }
+}
 
 /* 调色板特效状态复位 (调色板暂存 0x0203E600, 备份 0x0203EA00):
  * mode: 1/7=白闪(开 WIN0 窗口), 3=黑闪, 5=备份当前调色板, 其他=从备份恢复。

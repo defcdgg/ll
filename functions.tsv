@@ -172,7 +172,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x08009184	ChestFlags_Toggle	
 1	thumb	code_8005020	0x080091a4	ChestFlags_Test	
 0	thumb	code_8005020	0x080091c4	sub_80091C4	
-0	thumb	code_8005020	0x08009370	sub_8009370	⏸ 已定性=global-alloc域(qtydump: 16 qty全r0, 循环体块0qty, 争议基址不在表内); 别再穷举C写法; 见RULES「global-alloc域三连」+progress; 候选permuter/sub_8009370/base.c (bytecmp 78/216)
+1	thumb	code_8005020	0x08009370	sub_8009370	✅ 2026-09-02 gpnux: 破global-alloc三连首例! 关键=条件直接写 `gUnk_03000010[i]!=0 && (gUnk_03000010[i]&4)==0`(不落 u8 b 局部, 否则zero_extend成SI致ands结果落错寄存器) + DMA源拆 `u8*base=gMenuEntityPaletteTable; u32 off=...; src=(u32)(base+off)`(保r8提升与+2) + DmaSet宏+预计算src变量. 语义: 调色板DMA上传/特效分支. fncheck OK 184B
 1	thumb	code_8005020	0x08009428	PaletteFx_Apply	
 0	thumb	code_8005020	0x080094fc	sub_80094FC	
 0	thumb	code_8005020	0x08009600	sub_8009600	

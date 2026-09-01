@@ -1546,3 +1546,32 @@ fncheck OK (76 bytes, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
    INCLUDE_ASM 不受影响, 安全。
 
 fncheck OK (92 bytes, 1 bl 槽忽略)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_8009370` 匹配 —— 破解 "global-alloc 域三连" 首例! (code_8005020)
+
+函数: 调色板 DMA 上传。`if (gUnk_03004910) sub_80094FC(); else { PalTransfer_Flush(); for (i=0;i<=3;i++) { ... DMA3 拷贝 32B ... } }`
+卡了多轮的 "global-alloc 域" 挂起项 (TSV 旧 note 明示"别再穷举 C 写法")。
+
+**最终解法 = 两个结构性关键点, 缺一不可:**
+
+1. **`b` 不要落局部变量**: 条件直接写 `gUnk_03000010[i] != 0 && (gUnk_03000010[i] & 4) == 0`
+   (两次直接下标访问)。若先 `b = gUnk_03000010[i]` 再 `b & 4`, GCC2 把 b zero_extend 成 SI,
+   循环里 `ands r2,r0` (结果落 b 的寄存器); 直接下标访问则保持 QI(subreg), 生成目标的
+   `movs r0,#4; ands r0,r2; cmp r0,#0` (结果落常量寄存器 r0)。
+   → 这一条同时解决 ands 方向 + `movs r0,#4` 顺序。
+
+2. **DMA 源拆三行**: `off = ((u32)(*(u8*)(gUnk_03000038[i] + (gUnk_03000020[i] >> gUnk_03000018[i]))) << 5) + 2;`
+   `base = (u8*)gMenuEntityPaletteTable;` `src = (u32)(base + off);` 再 `DmaSet(3, src, gUnk_03000028[i], 0x80000010);`
+   —— 让 `0x0808A234` 基址提升进 r8 (preheader `ldr r7,=0x0808A234; mov r8,r7`), 且 `0x03000010` 循环内现取,
+   与目标完全一致 (旧 base.c 直接写 gUnk_0808A234 会折叠 +2 进池常量)。
+
+**本轮 qtydump/-da 分析过程** (验证 global-alloc 层)**: 对候选跑 `-da`, 在 gccdump.greg 看
+"Registers to be allocated in sorted order" 排序 (refs/live_length), 确认关键差异是
+0x0808A234 (reg24, live=100) vs 0x03000010 (reg32, live=96) 的优先级竞争; 最终靠上述 C 结构
+让编译器把表基址提升进 r8 而 RAM 基址现取, 逐字节命中。
+
+bytecmp 8/216 (8 字节全为 bl 槽位, 非槽位差异 0); fncheck OK (184B, 2 bl 槽忽略); 全 ROM SHA1 绿。
+
+**给另外两个 "global-alloc 域" 挂起项 (sub_8018E34 / sub_804BE90) 的启示**:
+不要再去打 agbcc global.c 的 dump 补丁 (路径 a) —— 这条经验证明"提升决策"是可以被
+C 结构 (中间变量拆分 + 保持窄类型不落局部) 改变的, 值得先穷举结构再考虑改编译器。

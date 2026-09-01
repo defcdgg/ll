@@ -959,7 +959,7 @@ void sub_804EC04();
 void sub_804EEC4();
 void sub_804EF00();
 void sub_804EF50();
-void sub_804EF90();
+u8 sub_804EF90(u8);
 void sub_804EFDC();
 u8 sub_804F050(u8);
 void sub_804F07C();

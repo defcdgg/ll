@@ -940,7 +940,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804eec4	sub_804EEC4	
 1	thumb	code_8044394	0x0804ef00	sub_804EF00	
 1	thumb	code_8044394	0x0804ef50	sub_804EF50	
-1	thumb	code_8044394	0x0804ef90	sub_804EF90	
+1	thumb	code_8044394	0x0804ef90	sub_804EF90	✅ 2026-09-02 opencode: gUnk_03000D88[].field_0 线性查找 arg0->下标, 命中返 i 否则 0xFF; 规则108 变体(变长界 gUnk_03000DDC + ret 累加器); 复用 iwram.h Unk_03000DEntry(勿本地重定义 extern, 会冲突); fncheck OK 76B
 0	thumb	code_8044394	0x0804efdc	sub_804EFDC	
 1	thumb	code_8044394	0x0804f050	sub_804F050	✅ 2026-09-02 opencode: gInvPageItemIds[16] 线性查找 道具id->页号, for+break; GCC 把首迭代(i=0)peel 到循环外, 循环体 i++ 后 cmp#0xf/bhi 收尾返16; u8 arg0/i 触发 lsls/lsrs 字节截断; fncheck OK 44B
 1	thumb	code_8044394	0x0804f07c	sub_804F07C	

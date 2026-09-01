@@ -1592,22 +1592,11 @@ void sub_804EF50(void) {
     }
 }
 */
-INCLUDE_ASM("asm/matchings", sub_804EF90);
-/*
-extern u8 gUnk_03000DDC;
-typedef struct 
-{
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-}UnkStruct;
-extern UnkStruct gUnk_03000D88[];
-
 u8 sub_804EF90(u8 arg0)
 {
     u8 i;
     u8 ret = 0xFF;
+
     for (i = 0; i < gUnk_03000DDC; i++)
     {
         if (gUnk_03000D88[i].field_0 == arg0)
@@ -1619,8 +1608,6 @@ u8 sub_804EF90(u8 arg0)
 
     return ret;
 }
-
-*/
 INCLUDE_ASM("asm/nonmatchings", sub_804EFDC);
 u8 sub_804F050(u8 arg0)
 {

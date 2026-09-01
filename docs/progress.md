@@ -1644,3 +1644,17 @@ fncheck OK (104B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
    朴素 for+break 即复刻该形状, 无需手写 peel。→ 记入 RULES 108。
 
 fncheck OK (44B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_804EF90` 匹配 (gUnk_03000D88 线性查找, code_8044394)
+
+76 字节: `for(i=0;i<gUnk_03000DDC;i++) if(gUnk_03000D88[i].field_0==arg0){ret=i;break;}` —— 在
+`Unk_03000DEntry` (4B) 数组里按 field_0 反查 arg0, 命中返下标 i, 否则返 0xFF。规则 108 的变体。
+
+**要点**:
+1. 界是变量 `gUnk_03000DDC`: peel 首块先 `ldrb count; cmp #0; bhs`, 循环体每轮重读 count (全局不缓存)。
+2. 带 `ret` 累加器 (0xFF 默认) → 返回值走 r5, 与 sub_804F050 直接返 r1 不同, 但 peel/bhi 骨架一致。
+3. **复用 iwram.h 已有类型** `Unk_03000DEntry gUnk_03000D88[]` + `gUnk_03000DDC`; 候选注释里的本地
+   `typedef UnkStruct` + `extern UnkStruct gUnk_03000D88[]` 会与头文件冲突, 实装时删掉。
+4. 4 字节元素 → 索引 `lsls r0,r2,#2`。
+
+fncheck OK (76B, 0 池重定位, 0 bl 槽)。全 ROM SHA1 绿。

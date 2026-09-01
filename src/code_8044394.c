@@ -1565,32 +1565,18 @@ void sub_804EF00(u8 arg0) {
     }
 }
 */
-INCLUDE_ASM("asm/matchings", sub_804EF50);
-/*
-extern u8 gUnk_03000DDC;
-extern u8 gUnk_03004980[];
-
-typedef struct 
+void sub_804EF50(void)
 {
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-}UnkStruct;
-extern UnkStruct gUnk_03000D88[];
-
-void sub_804EF50(void) {
     u8 i;
 
     for (i = 0; i < gUnk_03000DDC; i++)
     {
-        if(gUnk_03000D88[i].field_0 > 0xDC)
+        if (gUnk_03000D88[i].field_0 > 0xDC)
         {
             gUnk_03004980[gUnk_03000D88[i].field_0] = gUnk_03000D88[i].field_1;
         }
     }
 }
-*/
 u8 sub_804EF90(u8 arg0)
 {
     u8 i;

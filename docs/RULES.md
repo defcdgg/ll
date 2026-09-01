@@ -672,9 +672,13 @@
      `tmp = gUnk_03000316; if ((s8)tmp > 0)` 后强制重读, 逐字节命中。
      **推论**: 想让减/改后的全局值被"当作新读"产出 ldrsb/ldrsh 序列, 就经一个局部变量中转,
      阻断寄存器数据流的 reuse; 这也是可控 "home 互换" 的一招。
-     另本案用 **readkeys/clear/tail 三标签 goto** 强制块布局: 目标 `ble readkeys` + `bgt clear`
-     决定基本块顺序 (readkeys 带 `b tail`, clear fall-through), 直接 C 平铺两分支会生成额外一跳。
-     关联: 规则 104 (home 由声明形式决定)、规则 103 (调度槽位)。
+     **⚠ 反例教训 (2026-09-02 踩坑)**: 本函数曾用 **readkeys/clear/tail 三标签 `goto`** 强控块布局来
+     匹配目标 (readkeys 带 `b tail`, clear fall-through)。`goto` 违反铁律 4 / 规则 100 —— 规则 100 已
+     证明这类"跳过块"控制流用 **flag 赋值让 GCC2 jump-threading 自生成绕过块** 同样逐字节命中且更规范。
+     **正确做法**: 遇到疑似非 goto 不可的控制流, 先按规则 100 把分支归约成对同一变量的赋值
+     (如 `flag = 1;`), 再交给 flow/CSE; 只有当 flag 写法也无法复刻时才考虑 goto, 且须在
+     functions.tsv note 里标注"用了 goto 凑形, 待 flag 重构"。不要在规则里把 goto 当推荐手段。
+     关联: 规则 104 (home 由声明形式决定)、规则 103 (调度槽位)、规则 100 (禁 goto)。
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 

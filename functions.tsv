@@ -798,7 +798,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x080488cc	sub_80488CC	
 1	thumb	code_8044394	0x08048934	sub_8048934	
 1	thumb	code_8044394	0x08048984	sub_8048984	✅ 2026-09-02 qwen: obj[0x99+arg1]→gUnk_08093418[id*5+2]&0xF (家族同 sub_8048934); fncheck OK 32B; 全ROM SHA1 绿
-1	thumb	code_8044394	0x080489a4	sub_80489A4	
+1	thumb	code_8044394	0x080489a4	sub_80489A4	✅ 2026-09-02 qwen: arg1<=7 时取 obj[0x99+arg1] 否则原值 → gUnk_08093418[id*5+1]&0xF (家族同 sub_8048934/8984); fncheck OK 36B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x080489c8	sub_80489C8	
 1	thumb	code_8044394	0x080489e8	sub_80489E8	
 1	thumb	code_8044394	0x08048a68	sub_8048A68	

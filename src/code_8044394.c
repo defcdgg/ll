@@ -448,20 +448,16 @@ u8 sub_8048984(u8 *arg0, u8 arg1)
     index = ptr[arg1];
     return gUnk_08093418[index * 5 + 2] & 0xF;
 }
-INCLUDE_ASM("asm/matchings", sub_80489A4);
-/*
-extern u8 gUnk_08093418[];
 u8 sub_80489A4(u8 *arg0, u8 arg1)
 {
     if (arg1 <= 7)
     {
-        u8 *ptr = arg0 + 0x99; // 编译器会在这里先生成 adds r0, #0x99
-        arg1 = ptr[arg1];      // 随后生成 adds r0, r0, r2
-    }
+        u8 *ptr = arg0 + 0x99;
 
+        arg1 = ptr[arg1];
+    }
     return gUnk_08093418[arg1 * 5 + 1] & 0xF;
 }
-*/
 u16 sub_80489C8(u8 *arg0, u16 arg1)
 {
     s32 diff;

@@ -2158,3 +2158,21 @@ values (slot=1, 若 count<=1 换 slot=0 重收), 移除首个 `obj[0xAC]` 匹配
 - count<=1 的槽切换: `cmp r4,#1; bhi` (u8 无符号>1 跳过换槽)。
 
 **验证**: fncheck OK 188B (5 bl 槽); 全 ROM make+SHA1 绿 (616/1065)。
+
+## sub_804D1B4 (0x0804D1B4, code_8044394) — ✅ 2026-09-02 sound-agent (fncheck OK 170B)
+obj 槽位概率填充: count=sub_80489E8(arg1,values,0,0x6F); obj[0xBC] = (Rng%0x65 < count*15)?
+1:0; switch((s8)obj[0xBC]) 选 0x08393B28 表条目 (case0: obj[+0x88] 指针 [2]; case1: 清
+obj[0xC2]+[8]), switch(entry->field_10): case0 → obj[0xBD]=values[(u8)Rng%count];
+case1 → obj[0xBD]=0。
+
+**匹配历程 (3730→3195→1080→620→400→0)**:
+1. `(u32)Rng_LcgNext()` 会给 u16 返回加 lsls/lsrs 规范化 (0x3730 差); 改
+   `((u32 (*)(void))Rng_LcgNext)()` 直取 u32 → 首处模不再截断 (0x3195)。
+2. `obj[0xBC] = cond?1:0` 三元表达式把地址/常量外提, 多占 r7/r8 (3195);
+   **if/else 双语句** → 目标"分支内 fresh 地址"复现 (1080)。
+3. entry 指针带 +0x10 (cast) 会被编译成 `adds r0,#0x10; ldrh [r0,#0]`, 目标要
+   `ldrh [r6,#0x10]` 折叠 → **新登记同址别名 gUnk_08393B28_entries + 结构体
+   field_10 成员访问** (RULES 109: 禁 cast 用别名), 折叠命中 (400→0)。
+4. 尾部 obj[0xBD] 用 value 临时 (RHS 先于地址, 规则115 配套)。
+
+**验证**: fncheck OK 170B (5 bl 槽, 1 池重定位); 全 ROM make+SHA1 绿 (617/1065)。

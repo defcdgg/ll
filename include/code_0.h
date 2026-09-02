@@ -1001,7 +1001,7 @@ void sub_804F280();
 void sub_804F64C();
 u32 Op_RemovePartyMember(u32 *);
 void sub_804F7F8();
-void sub_804F8D8();
+u32 sub_804F8D8(u32 *);
 void sub_804F974();
 void sub_804FA04();
 void sub_804FA94();

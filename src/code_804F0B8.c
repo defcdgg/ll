@@ -181,7 +181,47 @@ u32 Op_RemovePartyMember(u32 *ptr)
 // @ 0x0804F7F8
 INCLUDE_ASM("asm/nonmatchings", sub_804F7F8);
 // @ 0x0804F8D8
-INCLUDE_ASM("asm/nonmatchings", sub_804F8D8);
+// 脚本 opcode: 按 gAfterBattleCounter 状态机分派。
+//   state==3: 若 (sub_80187B4()&0x40)!=0 或 data[1]==0 → *ptr+=4;
+//             否则 *ptr = gUnk_02016200 + gUnk_02016000[data[1]]; 清 state 返 1。
+//   state==0: 初始化 gAfterBattleCounter=1 / gBattleResultType=data[3] /
+//             gUnk_030025B8=data[2]+0xBA|0x1C(按 data[2] 符号) / gMainGameState=5; 返 0。
+// 注: 用 `goto setup` 把 setup 块强制放成分支目标(冷路径)才匹配 `beq setup` 布局;
+//     非 goto 写法分支被反转成 `bne` 使 setup 落 fall-through (差 127B)。待 flag 重构。
+// 注: 跳转表需 `u16 idx = data[1] * 2` 中间量, 否则 ldr 基址被调度提到 lsls 前。
+u32 sub_804F8D8(u32 *ptr)
+{
+    u8 *data;
+    u8 state;
+    u16 idx;
+
+    data = (u8 *)*ptr;
+    state = gAfterBattleCounter;
+    if (state == 0)
+        goto setup;
+    if (state == 3)
+    {
+        if ((sub_80187B4() & 0x40) != 0 || data[1] == 0)
+            *ptr += 4;
+        else
+        {
+            idx = data[1] * 2;
+            *ptr = (u32)(gUnk_02016200 + *(u16 *)((u32)gUnk_02016000 + idx));
+        }
+        gAfterBattleCounter = 0;
+        return 1;
+    }
+    return 0;
+setup:
+    gAfterBattleCounter = 1;
+    gBattleResultType = data[3];
+    if ((s8)data[2] < 0)
+        gUnk_030025B8 = data[2] + 0xBA;
+    else
+        gUnk_030025B8 = data[2] + 0x1C;
+    gMainGameState = 5;
+    return 0;
+}
 // @ 0x0804F974
 INCLUDE_ASM("asm/nonmatchings", sub_804F974);
 // @ 0x0804FA04

@@ -954,7 +954,7 @@ status	isa	module	addr	name	note
 0	thumb	code_804F0B8	0x0804f64c	sub_804F64C	
 1	thumb	code_804F0B8	0x0804f768	Op_RemovePartyMember	
 0	thumb	code_804F0B8	0x0804f7f8	sub_804F7F8	
-0	thumb	code_804F0B8	0x0804f8d8	sub_804F8D8	
+1	thumb	code_804F0B8	0x0804f8d8	sub_804F8D8	✅ 2026-09-02 ll-agent: 状态机opcode(gAfterBattleCounter 0→初始化置5返0, 3→测sub_80187B4()&0x40/data[1]跳转表或+4返1); 关键=用goto setup强制setup落分支目标(非goto分支反转差127B)+u16 idx=data[1]*2中间量; fncheck OK 156B
 0	thumb	code_804F0B8	0x0804f974	sub_804F974	⏸ 2026-09-02 ll-agent: 条件跳转opcode(测data[3+2i]|data[4+2i]<<8的flags, 全置位→跳gUnk_02016200+[data[2]]表, 否则*ptr+=data[1]+3); 循环体/入口peel/分支极性全对, 剩13B=尾部cross-jump: 跳转路径base2(0x02016200)应落r2(ldr r2;adds r0,r0,r2;b 80)但编译器重用r1与推进路径t+3合并(adds r0,r0,r1); 穷举表达式序/off变量/指针算术/b1+idx拆分全撞13B(与sub_804FA04同族墙); 最佳候选permuter/sub_804F974/base.c; 需破坏寄存器重用(让base2拿r2)
 0	thumb	code_804F0B8	0x0804fa04	sub_804FA04	⏸ 2026-09-02 zai: 接管sound-agent; 语义全解+循环旋转已解; 新最佳候选30B→11B(真实3B): 共享newval(两体赋值,函数顶声明,统一*ptr=newval)+found体t=b+3+not-found体value中间变量单句加b2; 仅剩not-found体尾3字节=池装载LC1(0x02016200)落r0/value落r1, 目标LC1落r2/value落r0(ldrh r0,[r0]覆盖地址); 30+变体+permuter穷举全撞11B; 机制: cross-jump在reload后按硬寄存器合并, LC1=r1时与found体t(r1)合并adds; 需LC1拿r2但r1占用源不明(唯一活过窗口的LC0死于first-add); 候选permuter/sub_804FA04/base.c
 0	thumb	code_804F0B8	0x0804fa94	sub_804FA94	

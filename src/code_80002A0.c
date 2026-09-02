@@ -1724,6 +1724,7 @@ void Sprite_SetupDialogArrow(u8 charaId)
         }
     }
 }
+// @ 0x0800243C
 INCLUDE_ASM("asm/matchings", Sprite_EnqueueRender);
 
 /*
@@ -1979,6 +1980,7 @@ u8 Sprite_EnqueueRender(s16 x, s16 y, u8 arg2, s16 z, u8 arg4) {
 }
 */
 
+// @ 0x0800271C
 INCLUDE_ASM("asm/matchings", Sprite_UpdateCharaAnim);
 /*
 
@@ -2144,6 +2146,7 @@ asm(".align 2,0");
 
 */
 
+// @ 0x080029D8
 INCLUDE_ASM("asm/matchings", Anim_PlayCustom);
 
 /*
@@ -2261,6 +2264,7 @@ void Anim_PlayCustom(u8 arg0) {
 }
 */
 
+// @ 0x08002B54
 INCLUDE_ASM("asm/matchings", Anim_BuildOamChain);
 
 /*
@@ -2783,6 +2787,7 @@ void Sprites_ReleaseAll(void)
         gActors[i].sprNodeIdx = 0;
     }
 }
+// @ 0x080033E8
 INCLUDE_ASM("asm/matchings", Sprites_LoadMapNPCs);
 /*
 typedef struct {
@@ -2843,6 +2848,7 @@ void Sprites_LoadMapNPCs(u8 arg0) {
     }
 }
 */
+// @ 0x0800345C
 INCLUDE_ASM("asm/matchings", Chara_InitFromDesc);
 /*
 typedef struct{
@@ -3146,6 +3152,7 @@ void PendingSpriteLoad_Flush(void)
     gPendingSpriteLoad = 0;
 }
 
+// @ 0x08003958
 INCLUDE_ASM("asm/nonmatchings", Chara_SetWalkPath);
 // @ 0x08003B08
 void Chara_ProcessCmdStream(u16 arg0)
@@ -3244,8 +3251,11 @@ void Chara_ProcessCmdStream(u16 arg0)
         chara->facingDir = chara->targetFacing;
     }
 }
+// @ 0x08003C54
 INCLUDE_ASM("asm/nonmatchings", Chara_StepMove);
+// @ 0x08003F40
 INCLUDE_ASM("asm/matchings", CheckFacingEvent);
+// @ 0x080040E4
 INCLUDE_ASM("asm/nonmatchings", Party_FollowAnim);
 // INCLUDE_ASM("asm/matchings", Followers_ResetHistory);
 
@@ -3286,6 +3296,7 @@ void Followers_SyncToTail(void) {
     gActors[1].facingDir = gFollowerHistDir[7];
     gPartyFollowFlags &= 0x80;
 }
+// @ 0x0800445C
 INCLUDE_ASM("asm/matchings", Party_FollowStep);
 /*
 // @ 0x0800445C
@@ -3497,6 +3508,7 @@ void CutsceneAnim_Load(u16 arg0, u8 arg1, u8 arg2) {
 
 */
 
+// @ 0x0800478C
 INCLUDE_ASM("asm/nonmatchings", CutsceneAnim_PlayFrame);
 
 
@@ -3534,6 +3546,7 @@ void Chara_SetTilePos(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
     }
 }
 
+// @ 0x08004A00
 INCLUDE_ASM("asm/matchings", Chara_MoveBy);
 // void Chara_MoveBy(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 // {
@@ -3987,6 +4000,7 @@ void Sprite_FreeChain(struct SpriteNode *arg0)
         node = arg0->next;
     } while (node != 0);
 }
+// @ 0x08004F64
 INCLUDE_ASM("asm/matchings", Sprite_WriteOam);
 /* Sprite_WriteOam - 把一个精灵链节点渲染进 OAM 缓冲, 并推进 OAM 写入游标。
  *

@@ -2430,3 +2430,49 @@ linker 绝对声明，已移除，源码分别使用 `gChoiceDestTable`、`gMapS
   与本函数无关, 照常提交。另: HEAD 上 functions.tsv 的 sub_804F974 note 曾断行
   成无列首行, 会让 gen_asm.py 解析崩溃 (fresh checkout 无法构建), 本次提交附带
   修复该行。
+## sub_804FA04 (0x0804FA04, code_804F0B8) — ⏸ 续攻记录 (zai 接管, 30B→11B, 剩 3 真实字节)
+接管 sound-agent 的挂起认领。基线 1475 (fndiff)/30B (bytecmp) → **11B, 其中 8B 是两个 bl 槽,
+真实差异仅 3 字节** (0x68/0x6b/0x6c), 全部集中在 not-found 体尾部三指令的寄存器指配。
+
+**关键突破 — 共享 newval 形态 (permuter/sub_804FA04/base.c)**:
+```c
+u32 newval;                      // 函数顶声明
+if (result == 0)
+{
+    u32 value = *(u16 *)((u32)gUnk_02016000 + data[2] * 2);
+    newval = value + (u32)gUnk_02016200;
+}
+else
+{
+    u32 t = b + 3;
+    newval = *ptr + t;
+}
+*ptr = newval;                   // 共享 store → sum 成跨块全局伪寄存器
+```
+found 体与 ROM 逐字节一致 (`mov r1,r8; adds r1,#3; ldr r0,[r6]; adds r0,r0,r1`)。
+
+**本轮确认的编译器机制 (对同族 sub_804F974/sub_804FA94 同样适用)**:
+1. agbcc **没有调度 pass** (无 sched dump); 指令顺序 = expand/regmove 顺序, 常量池装载
+   由 CSE 生成伪寄存器装载 (insn 紧邻消费者), 位置天然正确 — 位置从来不是问题。
+2. **cross-jump 在 reload 之后运行** (toplev.c: 全局分配/reload → thread_prologue_epilogue →
+   jump_optimize(JUMP_CROSS_JUMP)) — 按硬寄存器合并尾指令。not-found 尾 `adds r0,r0,rX`
+   与 found 体 `adds r0,r0,r1` 同寄存器即被合并; 目标 ROM base2=r2 故不合并。
+3. local-alloc `find_free_reg` 按数字序扫 r0..r7, 窗口 = [2*出生指令, 2*死亡指令), 按
+   QTY_CMP_PRI (refs*size/寿命) 排序分配。M 形态分配序: slot→r0, LC1(短窗)→r0,
+   value 被挤→r1 — 这就是 3 字节差距的来源。
+4. **两难**: 共享 newval (M 形) → LC1→r0/value→r1 (value 错位); 两个体各自 store (S 形,
+   cross-jump 合并出公共 str) → value→r0 ✓ 但 LC1→r1 → 与 found 体 t=r1 尾合并。
+   目标要求 value→r0 **且** LC1→r2 同时成立。
+5. r2 需要窗口 [LC1 出生, 尾加法] 内 r0+r1 双占。r0=value 可解; **r1 占用源不明**:
+   块内唯一 r1 占用者是 LC0 (0x02016000 装载), 死于 first-add, 窗口 [4,6) 不覆盖
+   LC1 窗口 [10,12)。穷举 35+ 形态 (基址重叠存活期 N8/N9、base 复用 W4、do-while 屏障
+   D1-D3、数组下标 W6-W8、u16 value P3、两 store S1-S4、pi 风格 off P11、+= 形态 W3/S4)
+   全部收敛 11B 或 13B; permuter 2.4 万次迭代 (M1 种子) 无突破。已匹配同族
+   Op_IfSaveLoadedJump (r1 被 ptr 占用才得到 r2/r2) 与 Op_IfSaveFlagJump (r1 空闲得
+   r1/r1) 对照: 本函数 ptr 必须跨调用 → r6, r1 无活过值 — 与 ROM 的 r1/r2 指配矛盾,
+   怀疑原始 C 有一个此处不可见的 r1 存活量 (或 regmove 的隐性合并)。
+6. `-g` 变体不可用: 同 TU 的 sub_80532DC/Op_IfSaveFlagJump 等已按默认 flags 逐字节匹配。
+
+**下一步建议**: ① 用 gccdump 逐 pass 比对 regmove 输出 (regmove 在 -O2 因
+-fexpensive-optimizations 实际开启, 可能产生模型外的 qty 合并); ② 检查 regclass.c 的
+reg_pref 对 LC1 伪寄存器的建议值来源; ③ 同族 sub_804F974/sub_804FA94 解析后对照。

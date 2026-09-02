@@ -642,6 +642,7 @@ void sub_8020B54(void)
         gUnk_030006F8[i] = 0;
     gUnk_03000714 = 0;
     gUnk_03000715 = 0;
+    /* HACK (规则116): do-while 屏障打破 local_alloc 平手 tiebreak, 使 gUnk_03000716 的地址落到 r4 (目标轮换) */
     do { gUnk_03000716 = 0; } while (0);
 }
 

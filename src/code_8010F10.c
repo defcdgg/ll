@@ -512,36 +512,29 @@ void Save_StartWrite(void)
     Msg_ShowById(0x18, 0xB);
 }
 
-INCLUDE_ASM("asm/matchings", sub_8015ED0);
-/*
-
-extern u8 gUnk_08098199[];
-extern u8 gUnk_02021000[][0x2000];
-
-s32 sub_8015ED0(u8 arg0) {
-    u8 temp_r0;
-    u8* p;
-    void* var_r2;
+s32 sub_8015ED0(u8 arg0)
+{
+    u8 *p;
     u8 i;
 
-    if (arg0 > 3) {
+    if (arg0 > 3)
+    {
         return 0xFF;
     }
 
-    // p = gUnk_02021000[arg0];
     p = (u8 *)(0x02021000 + (arg0 * 0x2000));
-    
-    for(i = 0; i < 12; i++)
+
+    for (i = 0; i < 12; i++)
     {
-        if(*p != gUnk_08098199[i])
+        if (*p != gSaveSignature[i])
+        {
             return 1;
+        }
         p++;
     }
 
     return 0;
 }
-
-*/
 
 void SaveUi_DrawSlots(void)
 {
@@ -1593,9 +1586,8 @@ void sub_8018744(void)
 {
     gUnk_03000316 = 10;
 }
-INCLUDE_ASM("asm/matchings", sub_8018750);
-/*
 extern u8 gUnk_080936A0[];
+
 void sub_8018750(void)
 {
     u16 offset;
@@ -1613,9 +1605,8 @@ void sub_8018750(void)
         offset++;
     }
 
-    gUnk_03000340 = (u32)&gUnk_080936A0[offset];
+    gGstate340 = (u32)&gUnk_080936A0[offset];
 }
-*/
 
 u32 sub_801878C(void)
 {
@@ -2106,31 +2097,15 @@ void BgScrolls_WriteAll(void)
     REG_BG3HOFS = gUnk_03000500.field_C;
     REG_BG3VOFS = gUnk_03000500.field_E;
 }
-INCLUDE_ASM("asm/matchings", sub_801A3A8);
-/*
-
-typedef union{
-    struct{
-    u16 field_0;
-    u16 field_2;
-    u16 field_4;
-    u16 field_6;
-    u16 field_8;
-    u16 field_A;
-    u16 field_C;
-    u16 field_E;
-    }fields;
+typedef union {
     u16 array[4][2];
-}Unk_03000500;
-extern Unk_03000500 gUnk_03000500;
+} U0500_arr;
 
-void sub_801A3A8(u8 arg0, u16 arg1, u16 arg2) {
+void sub_801A3A8(u8 arg0, u16 arg1, u16 arg2)
+{
+    U0500_arr *u;
 
-    gUnk_03000500.array[arg0][0] = arg1;
-    gUnk_03000500.array[arg0][1] = arg2;
-    // temp_r0 = (u32) (arg0 << 0x18) >> 0x16;
-    // temp_r0->unk3000500 = arg1;
-    // temp_r0->unk3000502 = arg2;
+    u = (U0500_arr *)&gUnk_03000500;
+    u->array[arg0][0] = arg1;
+    u->array[arg0][1] = arg2;
 }
-
-*/

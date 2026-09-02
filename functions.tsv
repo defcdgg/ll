@@ -291,7 +291,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8010F10	0x08015e1c	sub_8015E1C	⏸规则17类寄存器分配硬骨头: 语义已全解(Text_PutGlyph 内联版+0xFF终止循环, dest=gWindowBgBuf/2+arg0+arg1*32, attr=arg2<<12 每分支各写, b==0空白/0xFE→0x280/else b*2, dest[0]=attr+tile & dest[0x20]=attr|(tile+1)); 但 8 版候选(v1-v8)最好仍差70/104B —— egcs 把 dest 放 ip(r12)、arg2<<28 放 r5 每轮>>16、指针放 r4、base 放 r3 的分配无法用等价C复现(我恒得 ptr→r3/arg2→r4/base→r2 的循环置换); 需 fndiff 逐指令长磨或改编译器; 最佳候选 permuter/sub_8015E1C/v8.c
 1	thumb	code_8010F10	0x08015e88	Save_ResetReadState	
 1	thumb	code_8010F10	0x08015ea0	Save_StartWrite	
-1	thumb	code_8010F10	0x08015ed0	sub_8015ED0	
+1	thumb	code_8010F10	0x08015ed0	sub_8015ED0	✅ 2026-09-02 qwen: arg0>3?0xFF: 比较 gUnk_02021000+arg0*0x2000 前12B 与 gSaveSignature, 不符返1 否则0; 原型 void()→s32(u8) 无调用方; fncheck OK 68B
 1	thumb	code_8010F10	0x08015f14	SaveUi_DrawSlots	
 1	thumb	code_8010F10	0x08015f50	SaveTimer_Get	
 1	thumb	code_8010F10	0x08015f74	SaveFlag_Set	
@@ -301,8 +301,8 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08016068	sub_8016068	✅ 2026-09-02 qwen: gPartyMemberIds[arg0]!=0xFF → DmaCopy32+DmaCopy16(规则55宏); K&R定义保 void() 原型(SceneBg_Reload 无参调用靠 r0 残留); 新登记 gUnk_0809E4E4@0x0809E4E4; fncheck OK 100B; 全ROM绿
 1	thumb	code_8010F10	0x080160cc	sub_80160CC	✅ 2026-09-02 qwen: 2×LZ77UnCompWram(gUnk_087EB2E0[11],0x02020000)+(0x080A0B58,0x02020800); 修复他人嵌套注释(/* extern */ 提前闭合致 TU 编译崩); fncheck OK 40B; 全ROM绿
 1	thumb	code_8010F10	0x080160f4	sub_80160F4	
-1	thumb	code_8010F10	0x08016178	sub_8016178	
-1	thumb	code_8010F10	0x080161f4	sub_80161F4	
+1	thumb	code_8010F10	0x08016178	sub_8016178	✅ 2026-09-02 qwen: 按 arg0 算 rows/cols 夹取(10/15) 后向 VRAM 0x02005800 填 0xB001 边框(嵌套循环); 原型 void()→void(u16) 无调用方; fncheck OK 124B
+1	thumb	code_8010F10	0x080161f4	sub_80161F4	✅ 2026-09-02 qwen: arg0-- 后 <<2, 向 VRAM 填 4 个 (0xB240+gUnk_08098308[arg0+i]); K&R定义保 void() 原型(MenuHp_Update 传3参); 新登记 gUnk_08098308; fncheck OK 88B
 1	thumb	code_8010F10	0x0801624c	Num_Draw16	
 1	thumb	code_8010F10	0x08016260	Hud_DrawLv	
 1	thumb	code_8010F10	0x080162a8	Hud_DrawHp	
@@ -366,7 +366,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8010F10	0x080184a8	sub_80184A8	
 0	thumb	code_8010F10	0x0801869c	sub_801869C	
 1	thumb	code_8010F10	0x08018744	sub_8018744	
-1	thumb	code_8010F10	0x08018750	sub_8018750	
+1	thumb	code_8010F10	0x08018750	sub_8018750	✅ 2026-09-02 qwen: 扫 gUnk_080936A0 计 0xFF 至 >0x128, gGstate340=&表[offset]; 0x03000340=gGstate340(复用); 新登记 gUnk_080936A0; fncheck OK 60B
 1	thumb	code_8010F10	0x0801878c	sub_801878C	
 1	thumb	code_8010F10	0x08018798	sub_8018798	
 1	thumb	code_8010F10	0x080187a8	sub_80187A8	
@@ -432,7 +432,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x0801a348	sub_801A348	
 1	thumb	code_8010F10	0x0801a35c	sub_801A35C	
 1	thumb	code_8010F10	0x0801a36c	BgScrolls_WriteAll	
-1	thumb	code_8010F10	0x0801a3a8	sub_801A3A8	
+1	thumb	code_8010F10	0x0801a3a8	sub_801A3A8	✅ 2026-09-02 qwen: gUnk_03000500 视作 u16[4][2], arr[arg0][0/1]=arg1/arg2; iwram.h 的 Unk_03000500 是 struct 无 array→用本地 union 转型(否则被 CSE 成单基址+displacement, 目标要两地址+r4); 原型→void(u8,u16,u16); fncheck OK 28B
 0	thumb	code_801A3C4	0x0801a3c4	sub_801A3C4	
 0	thumb	code_801A3C4	0x0801a5ec	sub_801A5EC	
 1	thumb	code_801A3C4	0x0801a684	sub_801A684	

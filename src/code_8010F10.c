@@ -1541,7 +1541,36 @@ void sub_8016C44(void)
     sub_800E668(0);
 }
 // @ 0x08016C88
-INCLUDE_ASM("asm/nonmatchings", sub_8016C88);
+/* SIO 联机初始化: 关中断清掉串行/DMA0 的 IE 位 (0xFF3F = 保留其它), 开中断;
+ * REG_RCNT = 0 把通用 I/O 端口切回 SIO 模式, SIOCNT 先写 0x2000 复位再 `|= 0x4003`
+ * 使能多玩家通信与起始位; 然后把会话状态结构整体清零 (0x130 字节), 填好
+ * 五个收发缓冲指针 (state+0x30/0x50/0x70/0xB0/0xF0) 与 0x14/0x18 的初值 0x10,
+ * 最后再关中断打开 DMA0 IRQ (IE |= 0x80) 并恢复中断。
+ * 顺序坑: `CpuFill32` 必须写在 `state = gSioState;` **之前** (目标里宏展开的
+ * `movs r6,#0; str r6,[sp]` 落在 `ldr r7,=gSioState` 之前), 反过来写会整体后移两条指令。 */
+void sub_8016C88(void)
+{
+    u8 *state;
+
+    REG_IME = 0;
+    REG_IE &= 0xFF3F;
+    REG_IME = 1;
+    REG_RCNT = 0;
+    REG_SIOCNT = 0x2000;
+    REG_SIOCNT |= 0x4003;
+    CpuFill32(0, gSioState, 0x130);
+    state = gSioState;
+    *(u32 *)(state + 0x14) = 0x10;
+    *(u32 *)(state + 0x18) = 0x10;
+    *(u8 **)(state + 0x1C) = state + 0x30;
+    *(u8 **)(state + 0x20) = state + 0x50;
+    *(u8 **)(state + 0x24) = state + 0x70;
+    *(u8 **)(state + 0x28) = state + 0xB0;
+    *(u8 **)(state + 0x2C) = state + 0xF0;
+    REG_IME = 0;
+    REG_IE |= 0x80;
+    REG_IME = 1;
+}
 // @ 0x08016D24
 INCLUDE_ASM("asm/nonmatchings", sub_8016D24);
 // @ 0x08016E30

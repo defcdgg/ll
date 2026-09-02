@@ -332,7 +332,7 @@ void MapScene_InitSprites(u8 arg0) {
     }
 }
 // @ 0x08007350
-INCLUDE_ASM("asm/nonmatchings", sub_8007350);
+INCLUDE_ASM("asm/nonmatchings", MapScene_LoadEventAnimations);
 // @ 0x08007964
 u8 *AnimSlot_Parse(u16 arg0, u8 *arg1)
 {
@@ -710,7 +710,7 @@ void Logo_LoadAssets(u8 arg0)
 /* gChoiceDataBase 声明见 include/data_805769C.h (const u8[]) */
 
 // @ 0x08008124
-u32 sub_8008124(void)
+u32 ChoiceMenu_BuildList(void)
 {
     u8 *p;
     u8 i;
@@ -835,7 +835,7 @@ void DialogPortrait_Set(u8 portraitId, u8 position)
 }
 
 // @ 0x080086FC
-void sub_80086FC(void)
+void Viewport_UpdateEffects(void)
 {
     if (gViewportFlags[0] & 1)
         gViewportFlags[1] = Rand_TableNext() & gViewportFlags[4];
@@ -1070,7 +1070,7 @@ extern u8 *gUnk_087EA1A0[];
 
 // 把 gUnk_087EA1A0[setId] 这一组动画模型 (共 *ptr 条) 逐条解析进
 // gUnk_030046A0[] 精灵模型描述符数组, 起始槽位为 startSlot。
-// 槽位号 = startSlot + 记录序号, 与 sub_8007350 (整组装入槽位 0..) 是同族写法。
+// 槽位号 = startSlot + 记录序号, 与 MapScene_LoadEventAnimations (整组装入槽位 0..) 是同族写法。
 // @ 0x08008BA4
 void sub_8008BA4(u8 setId, u8 startSlot)
 {
@@ -1157,7 +1157,7 @@ extern const u8 gChoiceDestTable[];
  * 实测 5 组, count = 5/7/9/9/5, 共 35 个目的地, 消耗 75/76 字节 (末 1 字节为 0 终止)。
  * 值域 x∈12..200, y∈32..128 → 240×160 屏幕的**像素坐标**。
  *
- * 组号 = gChoiceGroupIdx (由 sub_8008124 从 gChoiceDataBase 分层记录流定位);
+ * 组号 = gChoiceGroupIdx (由 ChoiceMenu_BuildList 从 gChoiceDataBase 分层记录流定位);
  * 选项号 = 调用者传入 (Scene_EnterDoor 传 gChoiceListPtr[gChoiceCursor] 的低 nibble)。
  *
  * 代码生成要点 (已逐字节验证, bytecmp OK 88B):
@@ -1319,14 +1319,15 @@ void MapBg_FlushPending(void)
             break;
     }
 }
-/* 按当前地图从 0x08088400 的 256 项表中装载宝箱对象；见 ChestMapEntry。 */
-void Chest_LoadForMap(u8 mapId)
+/* 按当前地图从 0x08088400 的 256 项表中装载宝箱对象；见 ChestSpawnEntry。 */
+// @ 0x08008F28
+void ChestObjects_LoadForMap(u8 mapId)
 {
     u8 slot;
     u8 recordIndex;
-    const ChestMapEntry *entry;
-    Chest *chest;
-    Chest *chestBase;
+    const ChestSpawnEntry *entry;
+    ChestObject *chest;
+    ChestObject *chestBase;
     u8 flags;
 
     slot = 0;
@@ -1336,7 +1337,7 @@ void Chest_LoadForMap(u8 mapId)
     {
         if (mapId == entry->mapId)
         {
-            chestBase = gChests;
+            chestBase = gChestObjects;
             chest = &chestBase[slot];
             chest->mapEntryIndex = recordIndex;
             chest->x = entry->tileX << 3;
@@ -1346,7 +1347,7 @@ void Chest_LoadForMap(u8 mapId)
             chest->flags = (flags >> (recordIndex & 7)) & 1;
             if (entry->specialFlag != 0)
                 chest->flags |= 0x80;
-            Chest_BuildSprite(slot);
+            ChestObject_BuildSprite(slot);
             slot++;
         }
 
@@ -1360,12 +1361,13 @@ void Chest_LoadForMap(u8 mapId)
 
     while (slot <= 0xF)
     {
-        gChests[slot].flags |= 0xFF;
-        gChests[slot].spriteNodeIdx = 0;
+        gChestObjects[slot].flags |= 0xFF;
+        gChestObjects[slot].spriteNodeIdx = 0;
         slot++;
     }
 }
-void Chest_BuildSprite(u8 arg0)
+// @ 0x08008FD0
+void ChestObject_BuildSprite(u8 arg0)
 {
     struct SpriteNode *sprNode;
     struct SpriteNode *sprSubNode;
@@ -1376,12 +1378,12 @@ void Chest_BuildSprite(u8 arg0)
     u16 attr2;
 
     objIdx = Sprite_AllocNode();
-    gChests[arg0].spriteNodeIdx = objIdx;
+    gChestObjects[arg0].spriteNodeIdx = objIdx;
     sprNode = &gSpriteNodePool[objIdx];
 
-    chestColor = 0x80 & gChests[arg0].flags ? 0xF : 0xE;
+    chestColor = 0x80 & gChestObjects[arg0].flags ? 0xF : 0xE;
 
-    if ((0x7F & gChests[arg0].flags) == 0)
+    if ((0x7F & gChestObjects[arg0].flags) == 0)
     {
 
         attr0 = 0;
@@ -1411,11 +1413,12 @@ void Chest_BuildSprite(u8 arg0)
     }
     sprNode->animStep = 0;
 }
-void Chest_Open(u8 arg0)
+// @ 0x0800908C
+void ChestObject_Open(u8 arg0)
 {
     u8 idx;
 
-    if (gChests[arg0].flags & 1)
+    if (gChestObjects[arg0].flags & 1)
     {
         Sfx_Play(9, 0, 0);
     }
@@ -1424,14 +1427,14 @@ void Chest_Open(u8 arg0)
         Sfx_Play(8, 0, 0);
     }
 
-    gChests[arg0].flags ^= 1;
+    gChestObjects[arg0].flags ^= 1;
 
-    idx = gChests[arg0].mapEntryIndex;
+    idx = gChestObjects[arg0].mapEntryIndex;
 
     gChestFlags[idx >> 3] ^= (1 << (idx & 7));
 
-    Sprite_FreeChain(&gSpriteNodePool[gChests[arg0].spriteNodeIdx]);
-    Chest_BuildSprite(arg0);
+    Sprite_FreeChain(&gSpriteNodePool[gChestObjects[arg0].spriteNodeIdx]);
+    ChestObject_BuildSprite(arg0);
     gUnk_03004860 = arg0;
 }
 
@@ -1473,22 +1476,22 @@ u8 ChestFlags_Test(u8 arg0)
     return (val >> (arg0 & 7)) & 1;
 }
 // @ 0x080091C4
-INCLUDE_ASM("asm/nonmatchings", sub_80091C4);
+INCLUDE_ASM("asm/nonmatchings", PaletteEffects_Update);
 
-/* 调色板 DMA 上传: 平时整表刷新; 若 gUnk_03004910 非零则走特效流程 sub_80094FC。
+/* 调色板 DMA 上传: 平时整表刷新; 若 gUnk_03004910 非零则走特效流程 PaletteFx_Step。
  * 逐项: 标志 gUnk_03000010[i] 非零且未设 bit2 → 计算表内偏移:
  *   idx = gUnk_03000020[i] >> gUnk_03000018[i];  byte = gUnk_03000038[i][idx];
  *   src = gMenuEntityPaletteTable + (byte << 5) + 2;  → DMA3 拷贝 32 字节到 gUnk_03000028[i]。 */
 extern const u8 gMenuEntityPaletteTable[];
 
 // @ 0x08009370
-void sub_8009370(void)
+void PaletteTransfer_Update(void)
 {
     s16 i;
 
     if (gUnk_03004910 != 0)
     {
-        sub_80094FC();
+        PaletteFx_Step();
     }
     else
     {
@@ -1572,7 +1575,7 @@ void PaletteFx_Apply(u8 arg0)
  * 注: 两个分支内的 u8 局部读取 gUnk_03004910 是**故意**的 —— 让 GCC2 不跨分支
  *   CSE 该读, 使计数器 c 落 r1、state 落 r0 并重读, 与目标逐字节一致。 */
 // @ 0x080094FC
-void sub_80094FC(void)
+void PaletteFx_Step(void)
 {
     u8 counter;
     u32 src;
@@ -1631,7 +1634,7 @@ void sub_80094FC(void)
 }
 
 // @ 0x08009600
-INCLUDE_ASM("asm/nonmatchings", sub_8009600);
+INCLUDE_ASM("asm/nonmatchings", PaletteFx_Transform);
 // @ 0x08009A5C
 void MenuEnt_ClearStates(void)
 {
@@ -2252,7 +2255,67 @@ void sub_800A534(u8 arg0)
         gEquipBonusNoa += 1;
 }
 // @ 0x0800A664
-INCLUDE_ASM("asm/nonmatchings", sub_800A664);
+void Stats_RebuildEquipBonuses(u8 arg0)
+{
+    PlayerStats *ptr;
+    u8 id1;
+    u8 id2;
+    u8 id3;
+    u8 id4;
+    u8 *entry1;
+    u8 *entry2;
+    u8 *entry3;
+    u8 *entry4;
+    u8 val;
+
+    if (arg0 != 0)
+        arg0--;
+    ptr = &gPartyStats[arg0];
+
+    gEquipBonusAtkBase = 0;
+    gEquipBonusDef2 = 0;
+    gEquipBonusAgl = 0;
+    gEquipBonusMen = 0;
+    gEquipBonusRes = 0;
+    gEquipBonusNoa = 0;
+    gEquipBonusLuc = 0;
+    gEquipBonusAtk = 0;
+    gEquipBonusDef = 0;
+
+    sub_800A534(ptr->equip_slot1);
+    sub_800A534(ptr->equip_slot2);
+    sub_800A534(ptr->equip_slot3);
+    sub_800A534(ptr->equip_slot4);
+    sub_800A534(ptr->equip_slot5);
+    sub_800A534(ptr->equip_slot6);
+
+    id1 = ptr->equip_slot1;
+    id2 = ptr->equip_slot2;
+    id3 = ptr->equip_slot3;
+    id4 = ptr->equip_slot4;
+    entry1 = &gUnk_087EA580[id1 * 12];
+    entry2 = &gUnk_087EA580[id2 * 12];
+    entry3 = &gUnk_087EA580[id3 * 12];
+    entry4 = &gUnk_087EA580[id4 * 12];
+
+    val = entry1[4] & 0xF0;
+    if (val == (entry2[4] & 0xF0) &&
+        val == (entry3[4] & 0xF0) &&
+        val == (entry4[4] & 0xF0))
+    {
+        switch (val >> 4)
+        {
+        case 0xF:
+            gEquipBonusAtk = 0x22;
+            gEquipBonusDef = 0x2D;
+            break;
+        case 0xE:
+            gEquipBonusAtk = 0x3C;
+            gEquipBonusDef = 0x3F;
+            break;
+        }
+    }
+}
 
 // @ 0x0800A79C
 void Stats_RecalcEquip(u8 arg0)
@@ -2419,7 +2482,7 @@ void EquipItem(u8 arg0, u8 newEquip, u8 equipSlotId) {
         }
     }
 
-    sub_800A664(arg0);
+    Stats_RebuildEquipBonuses(arg0);
     Stats_RecalcEquip(arg0);
 }
 

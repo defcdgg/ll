@@ -750,7 +750,7 @@
   "size": 16
  },
  {
-  "name": "byte_80870EC",
+  "name": "gWindowTransitionCurve",
   "address": "0x080870EC",
   "size": 129
  },
@@ -765,12 +765,12 @@
   "size": 1
  },
  {
-  "name": "word_80871C6",
+  "name": "gWalkDirVectors",
   "address": "0x080871C6",
   "size": 36
  },
  {
-  "name": "unk_80871EA",
+  "name": "gScrollEaseDeltas",
   "address": "0x080871EA",
   "size": 44
  },
@@ -815,477 +815,472 @@
   "size": 268
  },
  {
-  "name": "unk_808760C",
+  "name": "gCharNameTextBlock_Homel",
   "address": "0x0808760C",
   "size": 11
  },
  {
-  "name": "unk_8087617",
+  "name": "gCharNameTextBlock_Catarina",
   "address": "0x08087617",
   "size": 13
  },
  {
-  "name": "unk_8087624",
+  "name": "gCharNameTextBlock_Marius",
   "address": "0x08087624",
   "size": 13
  },
  {
-  "name": "unk_8087631",
+  "name": "gCharNameTextBlock_Stadjus",
   "address": "0x08087631",
   "size": 14
  },
  {
-  "name": "byte_808763F",
+  "name": "gCharNameTextBlock_4",
   "address": "0x0808763F",
   "size": 9
  },
  {
-  "name": "byte_8087648",
+  "name": "gChoiceDestTable",
   "address": "0x08087648",
   "size": 76
  },
  {
-  "name": "word_8087694",
+  "name": "gChoiceGateEventFlags",
   "address": "0x08087694",
   "size": 14
  },
  {
-  "name": "unk_80876A2",
+  "name": "gChoiceDataBase",
   "address": "0x080876A2",
   "size": 160
  },
  {
-  "name": "unk_8087742",
+  "name": "gCharaCmdStream_87742",
   "address": "0x08087742",
   "size": 20
  },
  {
-  "name": "unk_8087756",
+  "name": "gCharaCmdStream_87756",
   "address": "0x08087756",
   "size": 20
  },
  {
-  "name": "unk_808776A",
+  "name": "gCharaCmdStream_8776A",
   "address": "0x0808776A",
   "size": 20
  },
  {
-  "name": "unk_808777E",
+  "name": "gCharaCmdStream_8777E",
   "address": "0x0808777E",
   "size": 20
  },
  {
-  "name": "unk_8087792",
+  "name": "gCharaCmdStream_87792",
   "address": "0x08087792",
   "size": 16
  },
  {
-  "name": "unk_80877A2",
+  "name": "gCharaCmdStream_877A2",
   "address": "0x080877A2",
   "size": 16
  },
  {
-  "name": "byte_80877B2",
+  "name": "gCharaCmdStream_877B2",
   "address": "0x080877B2",
   "size": 28
  },
  {
-  "name": "unk_80877CE",
+  "name": "gCharaCmdStream_877CE",
   "address": "0x080877CE",
   "size": 28
  },
  {
-  "name": "unk_80877EA",
+  "name": "gCharaCmdStream_877EA",
   "address": "0x080877EA",
   "size": 48
  },
  {
-  "name": "unk_808781A",
+  "name": "gCharaCmdStream_8781A",
   "address": "0x0808781A",
   "size": 48
  },
  {
-  "name": "unk_808784A",
+  "name": "gCharaCmdStream_8784A",
   "address": "0x0808784A",
   "size": 32
  },
  {
-  "name": "unk_808786A",
+  "name": "gCharaCmdStream_8786A",
   "address": "0x0808786A",
   "size": 32
  },
  {
-  "name": "unk_808788A",
+  "name": "gCharaCmdStream_8788A",
   "address": "0x0808788A",
   "size": 20
  },
  {
-  "name": "unk_808789E",
+  "name": "gCharaCmdStream_8789E",
   "address": "0x0808789E",
   "size": 20
  },
  {
-  "name": "unk_80878B2",
+  "name": "gCharaCmdStream_878B2",
   "address": "0x080878B2",
   "size": 24
  },
  {
-  "name": "unk_80878CA",
+  "name": "gCharaCmdStream_878CA",
   "address": "0x080878CA",
   "size": 24
  },
  {
-  "name": "unk_80878E2",
+  "name": "gCharaCmdStream_878E2",
   "address": "0x080878E2",
   "size": 60
  },
  {
-  "name": "unk_808791E",
+  "name": "gCharaCmdStream_8791E",
   "address": "0x0808791E",
   "size": 60
  },
  {
-  "name": "unk_808795A",
+  "name": "gCharaCmdStream_8795A",
   "address": "0x0808795A",
   "size": 68
  },
  {
-  "name": "unk_808799E",
+  "name": "gCharaCmdStream_8799E",
   "address": "0x0808799E",
   "size": 68
  },
  {
-  "name": "unk_80879E2",
+  "name": "gCharaCmdStream_879E2",
   "address": "0x080879E2",
   "size": 40
  },
  {
-  "name": "unk_8087A0A",
+  "name": "gCharaCmdStream_87A0A",
   "address": "0x08087A0A",
   "size": 40
  },
  {
-  "name": "unk_8087A32",
+  "name": "gCharaCmdStream_87A32",
   "address": "0x08087A32",
   "size": 36
  },
  {
-  "name": "unk_8087A56",
+  "name": "gCharaCmdStream_87A56",
   "address": "0x08087A56",
   "size": 36
  },
  {
-  "name": "unk_8087A7A",
+  "name": "gCharaCmdStream_87A7A",
   "address": "0x08087A7A",
   "size": 32
  },
  {
-  "name": "unk_8087A9A",
+  "name": "gCharaCmdStream_87A9A",
   "address": "0x08087A9A",
   "size": 32
  },
  {
-  "name": "unk_8087ABA",
+  "name": "gCharaCmdStream_87ABA",
   "address": "0x08087ABA",
   "size": 44
  },
  {
-  "name": "unk_8087AE6",
+  "name": "gCharaCmdStream_87AE6",
   "address": "0x08087AE6",
   "size": 44
  },
  {
-  "name": "unk_8087B12",
+  "name": "gCharaCmdStream_87B12",
   "address": "0x08087B12",
   "size": 52
  },
  {
-  "name": "unk_8087B46",
+  "name": "gCharaCmdStream_87B46",
   "address": "0x08087B46",
   "size": 52
  },
  {
-  "name": "unk_8087B7A",
+  "name": "gCharaCmdStream_87B7A",
   "address": "0x08087B7A",
   "size": 16
  },
  {
-  "name": "unk_8087B8A",
+  "name": "gCharaCmdStream_87B8A",
   "address": "0x08087B8A",
   "size": 16
  },
  {
-  "name": "unk_8087B9A",
+  "name": "gCharaCmdStream_87B9A",
   "address": "0x08087B9A",
   "size": 32
  },
  {
-  "name": "unk_8087BBA",
+  "name": "gCharaCmdStream_87BBA",
   "address": "0x08087BBA",
   "size": 12
  },
  {
-  "name": "unk_8087BC6",
+  "name": "gCharaCmdStream_87BC6",
   "address": "0x08087BC6",
   "size": 56
  },
  {
-  "name": "unk_8087BFE",
+  "name": "gCharaCmdStream_87BFE",
   "address": "0x08087BFE",
   "size": 60
  },
  {
-  "name": "unk_8087C3A",
+  "name": "gCharaCmdStream_87C3A",
   "address": "0x08087C3A",
   "size": 56
  },
  {
-  "name": "unk_8087C72",
+  "name": "gCharaCmdStream_87C72",
   "address": "0x08087C72",
   "size": 32
  },
  {
-  "name": "unk_8087C92",
+  "name": "gCharaCmdStream_87C92",
   "address": "0x08087C92",
   "size": 36
  },
  {
-  "name": "unk_8087CB6",
+  "name": "gCharaCmdStream_87CB6",
   "address": "0x08087CB6",
   "size": 40
  },
  {
-  "name": "unk_8087CDE",
+  "name": "gCharaCmdStream_87CDE",
   "address": "0x08087CDE",
   "size": 36
  },
  {
-  "name": "unk_8087D02",
+  "name": "gCharaCmdStream_87D02",
   "address": "0x08087D02",
   "size": 12
  },
  {
-  "name": "unk_8087D0E",
+  "name": "gCharaCmdStream_87D0E",
   "address": "0x08087D0E",
   "size": 56
  },
  {
-  "name": "unk_8087D46",
+  "name": "gCharaCmdStream_87D46",
   "address": "0x08087D46",
   "size": 36
  },
  {
-  "name": "unk_8087D6A",
+  "name": "gCharaCmdStream_87D6A",
   "address": "0x08087D6A",
   "size": 24
  },
  {
-  "name": "unk_8087D82",
+  "name": "gCharaCmdStream_87D82",
   "address": "0x08087D82",
   "size": 20
  },
  {
-  "name": "unk_8087D96",
+  "name": "gCharaCmdStream_87D96",
   "address": "0x08087D96",
   "size": 60
  },
  {
-  "name": "unk_8087DD2",
+  "name": "gCharaCmdStream_87DD2",
   "address": "0x08087DD2",
   "size": 40
  },
  {
-  "name": "unk_8087DFA",
+  "name": "gCharaCmdStream_87DFA",
   "address": "0x08087DFA",
   "size": 24
  },
  {
-  "name": "unk_8087E12",
+  "name": "gCharaCmdStream_87E12",
   "address": "0x08087E12",
   "size": 16
  },
  {
-  "name": "unk_8087E22",
+  "name": "gCharaCmdStream_87E22",
   "address": "0x08087E22",
   "size": 56
  },
  {
-  "name": "unk_8087E5A",
+  "name": "gCharaCmdStream_87E5A",
   "address": "0x08087E5A",
   "size": 36
  },
  {
-  "name": "unk_8087E7E",
+  "name": "gCharaCmdStream_87E7E",
   "address": "0x08087E7E",
   "size": 20
  },
  {
-  "name": "unk_8087E92",
+  "name": "gCharaCmdStream_87E92",
   "address": "0x08087E92",
   "size": 16
  },
  {
-  "name": "unk_8087EA2",
+  "name": "gCharaCmdStream_87EA2",
   "address": "0x08087EA2",
   "size": 16
  },
  {
-  "name": "unk_8087EB2",
+  "name": "gCharaCmdStream_87EB2",
   "address": "0x08087EB2",
   "size": 16
  },
  {
-  "name": "unk_8087EC2",
+  "name": "gCharaCmdStream_87EC2",
   "address": "0x08087EC2",
   "size": 28
  },
  {
-  "name": "unk_8087EDE",
+  "name": "gCharaCmdStream_87EDE",
   "address": "0x08087EDE",
   "size": 52
  },
  {
-  "name": "unk_8087F12",
+  "name": "gCharaCmdStream_87F12",
   "address": "0x08087F12",
   "size": 60
  },
  {
-  "name": "unk_8087F4E",
+  "name": "gCharaCmdStream_87F4E",
   "address": "0x08087F4E",
   "size": 28
  },
  {
-  "name": "unk_8087F6A",
+  "name": "gCharaCmdStream_87F6A",
   "address": "0x08087F6A",
   "size": 36
  },
  {
-  "name": "unk_8087F8E",
+  "name": "gCharaCmdStream_87F8E",
   "address": "0x08087F8E",
   "size": 44
  },
  {
-  "name": "unk_8087FBA",
+  "name": "gCharaCmdStream_87FBA",
   "address": "0x08087FBA",
   "size": 52
  },
  {
-  "name": "unk_8087FEE",
+  "name": "gCharaCmdStream_87FEE",
   "address": "0x08087FEE",
   "size": 36
  },
  {
-  "name": "unk_8088012",
+  "name": "gCharaCmdStream_88012",
   "address": "0x08088012",
   "size": 28
  },
  {
-  "name": "unk_808802E",
+  "name": "gCharaCmdStream_8802E",
   "address": "0x0808802E",
   "size": 60
  },
  {
-  "name": "unk_808806A",
+  "name": "gCharaCmdStream_8806A",
   "address": "0x0808806A",
   "size": 44
  },
  {
-  "name": "unk_8088096",
+  "name": "gCharaCmdStream_88096",
   "address": "0x08088096",
   "size": 28
  },
  {
-  "name": "unk_80880B2",
+  "name": "gCharaCmdStream_880B2",
   "address": "0x080880B2",
   "size": 32
  },
  {
-  "name": "unk_80880D2",
+  "name": "gCharaCmdStream_880D2",
   "address": "0x080880D2",
   "size": 32
  },
  {
-  "name": "unk_80880F2",
+  "name": "gCharaCmdStream_880F2",
   "address": "0x080880F2",
   "size": 28
  },
  {
-  "name": "unk_808810E",
+  "name": "gCharaCmdStream_8810E",
   "address": "0x0808810E",
   "size": 28
  },
  {
-  "name": "unk_808812A",
+  "name": "gCharaCmdStream_8812A",
   "address": "0x0808812A",
   "size": 28
  },
  {
-  "name": "unk_8088146",
+  "name": "gCharaCmdStream_88146",
   "address": "0x08088146",
   "size": 20
  },
  {
-  "name": "unk_808815A",
+  "name": "gCharaCmdStream_8815A",
   "address": "0x0808815A",
   "size": 28
  },
  {
-  "name": "unk_8088176",
+  "name": "gCharaCmdStream_88176",
   "address": "0x08088176",
   "size": 20
  },
  {
-  "name": "unk_808818A",
+  "name": "gCharaCmdStream_8818A",
   "address": "0x0808818A",
   "size": 16
  },
  {
-  "name": "unk_808819A",
+  "name": "gCharaCmdStream_8819A",
   "address": "0x0808819A",
   "size": 16
  },
  {
-  "name": "unk_80881AA",
+  "name": "gCharaCmdStream_881AA",
   "address": "0x080881AA",
   "size": 24
  },
  {
-  "name": "unk_80881C2",
+  "name": "gCharaCmdStream_881C2",
   "address": "0x080881C2",
   "size": 28
  },
  {
-  "name": "unk_80881DE",
+  "name": "gCharaCmdStream_881DE",
   "address": "0x080881DE",
   "size": 24
  },
  {
-  "name": "unk_80881F6",
+  "name": "gCharaCmdStream_881F6",
   "address": "0x080881F6",
   "size": 20
  },
  {
-  "name": "unk_808820A",
+  "name": "gCharaCmdStream_8820A",
   "address": "0x0808820A",
   "size": 28
  },
  {
-  "name": "byte_8088226",
+  "name": "gCharaCmdStream_88226",
   "address": "0x08088226",
   "size": 20
  },
  {
-  "name": "byte_808823A",
+  "name": "gChoiceGroupPairTable",
   "address": "0x0808823A",
-  "size": 1
+  "size": 168
  },
  {
-  "name": "byte_808823B",
-  "address": "0x0808823B",
-  "size": 167
- },
- {
-  "name": "byte_80882E2",
+  "name": "gChoiceMenuMapRecordBlob",
   "address": "0x080882E2",
   "size": 286
  },

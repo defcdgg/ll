@@ -335,7 +335,54 @@ u16 sub_804542C(void)
     return result;
 }
 // @ 0x080454A4
-INCLUDE_ASM("asm/nonmatchings", sub_80454A4);
+// 队伍 EXP 发放: 对对象池前 5 项 (obj[0xAB]∉{7,8} 且 obj[0xBE]!=0xFF) 经 sub_80487A4 映射到
+// gPartyStats 加 EXP 并处理升级/封顶, 返回升级位掩码 (u8)。
+// 首循环的死读 `idx = ((volatile u8 *)obj)[0xBE];` 是原代码遗留的空扫描 —— 穷举 40+ 非 volatile
+// 形态全被 DCE 删掉, ROM 里的死读必然源于原代码的 volatile 读, 故按规则 121 破例保形。
+u8 sub_80454A4(u16 arg0)
+{
+    u32 base;
+    u16 new_var;
+    u8 result;
+    u8 i;
+    u8 *obj;
+    u8 idx;
+    u8 newLevel;
+
+    base = GetObjPool();
+    result = 0;
+    for (i = 0; i <= 4; i++)
+    {
+        obj = (u8 *)(i * 0xC8 + base);
+        if ((u8)(obj[0xAB] - 7) > 1)
+            idx = ((volatile u8 *)obj)[0xBE];
+    }
+    new_var = arg0;
+    for (i = 0; i <= 4; i++)
+    {
+        obj = (u8 *)(i * 0xC8 + base);
+        if ((u8)(obj[0xAB] - 7) <= 1)
+            continue;
+        if (obj[0xBE] == 0xFF)
+            continue;
+        idx = sub_80487A4(i);
+        if (idx != 0)
+            idx--;
+        if (gPartyStats[idx].lv > 0x61)
+            continue;
+        gPartyStats[idx].exp += new_var;
+        if (gPartyStats[idx].exp >= gPartyStats[idx].next_exp)
+        {
+            result |= (u8)(1 << i);
+            newLevel = ExpToLevel(gPartyStats[idx].exp);
+            gPartyStats[idx].next_exp = LevelToExp(newLevel);
+            gPartyStats[idx].lv = ExpToLevel(gPartyStats[idx].exp);
+        }
+        if (gPartyStats[idx].exp > 0x98967F)
+            gPartyStats[idx].exp = LevelToExp(0x61);
+    }
+    return result;
+}
 // @ 0x080455A0
 INCLUDE_ASM("asm/nonmatchings", sub_80455A0);
 // @ 0x08045688
@@ -2012,7 +2059,7 @@ void sub_804D708(u8 *obj, u8 *arg1)
     }
 }
 // @ 0x0804D798
-INCLUDE_ASM("asm/nonmatchings", sub_804D798);
+INCLUDE_ASM("asm/matchings", sub_804D798);  /* 台账修正: tsv=1 且 .s 已在 matchings/ (坑7); 见 INCIDENTS.md */
 // @ 0x0804D840
 INCLUDE_ASM("asm/nonmatchings", sub_804D840);
 // @ 0x0804D8F4

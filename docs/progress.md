@@ -109,7 +109,9 @@
 | sub_801D12C | 0x0801D12C | 0x801D簇 | code_1.c | 当 obj[0xBE]<=10 时更新 obj[0xA2]：输入状态 0..2 下，obj[0xAB] 的 1..7→1、8→2、0 且两个 u16 坐标相等→3；输入 5 只做前两种映射。`s16 value` 决定有符号比较；外层空 case4 和第二内层空 case0 决定目标比较树 |
 | sub_8045EB8 | 0x08045EB8 | 0x8048簇 | code_1b.c | ✅ 2026-09-02 gpnux (88B, fncheck OK)。语义: obj+0x8D..0x92 六个角色编号逐个查 `sub_804DD90(id, 1)` (= gUnk_087EA580[id*12+10] 指向的 AI 字节 bit6-7 分类), 命中 1/2/3 → obj+0xB8 的 u16 标志置位 1/2/4。三处定死形状: ① **`u8 sub_804DD90(u8, u8)` 原型**才产生 `lsls/lsrs #0x18` 返回值截断 (宽原型/K&R 不截, 且会把 0x6C+0x21 折成 0x8D); ② 取号必须走 `Sub6C{pad[0x21], ids[6]}` 结构视图 → 目标 `adds r0,r6,#0; adds r0,#0x21; adds r0,r0,r5` 三条; 写成 `obj+0x8D` 少一条, 写成 `base[0x21+i]` 变 `add r0,r5,r6` 两条 (取址树须是 (p+0x21)+i); ③ **多出来的 `movs r7, #0` 不是死代码, 而是一次被 CSE 折叠的真读**: 函数末尾 `*flags |= extra;` (extra 恒 0) → RMW 折成零指令, 但 flow 已判 extra live, 定义指令存活并逼出第 4 个 callee-saved。实测: 完全没用的 `u8 x = 0;` / `x++` / `if (x) {}` / `volatile u8 x = 0;` / 结构体局部 `s.a=0;`+`if (s.a)` / `for (x=0; x<0; x++) {}` 的初始化**全被 egcs 删干净**, 恒等读是唯一通路 (新规律见 RULES 坑11)。声明顺序 p/i/flags/extra = r6/r5/r4/r7, 把 extra 提前会整体错位。前一轮 `new_var=i` 冻结条件变量的方向错误, 已弃用 |
 | sub_8045F10 | 0x08045F10 | 0x8048簇 | code_1b.c | ⏸ 2026-09-02 gpnux: **指令流逐条一致 (132B), 只差 3 个 global-alloc home = 8 字节**。语义: `obj[0xBE]==0xFF`→返回 0; 否则 1; `dir=obj[0xAB]<=8` 时查九项跳转表 `bit = 1<<dir`, `(bit & (u16)dirMask)!=0` → 返回 2 (调用点传 0x114/0x43/0x20 = 朝向位掩码, 见 sub_8045B90 同族)。形状已穷举定死: ① 守卫必须 `dir = obj[0xAB]; if (dir <= 8) { switch (dir) {...} ... }` —— 直接 `if (obj[0xAB] <= 8)` 会留下两条 `cmp r0,#8; bhi` 且 dirMask 掉进 r5 (push 变 {r4,r5,lr}); ② 不能省守卫改用 `default: return result;` —— GCC 会 tail-dup 成 `movs r0,#1; b` 多 4 字节; ③ `default: bit = 0;` 会让 AND 在默认路径上真执行 (多 `movs r0,#0`); ④ 原型 `u8 f(u8 *, u16)` 才产生入口 `lsls r1,#0x10; lsrs r2,#0x10` 截断。卡点是纯 home 争议: 实测 pri (global.c:605 `floor_log2(refs)*refs/live*10000*size`, 降序) obj=3/13→0.231, result=4/42→0.190, dirMask=2/37→0.054, 候选发号 obj=r2/result=r3/dirMask=r4, 目标要 dirMask=r2 → 需 pri(dirMask)>0.231 (refs≥5 或 refs=4 且 live≤34)。已穷尽抬 refs 的写法: `x=x`/`(void)x`/`x|=0`/`x&=0xFFFF`/`x<<0`/`x*1`/重复子表达式 `(e&&e)`/`(e|e)`/`(e+e)`/`if(x){x=x;}`/`u16 m=dirMask` 别名 —— **全部被 tree/CSE 折掉, flow 里 refs 不变**; 唯一做到逐字节 0 分的是在 case 里塞 `dirMask++; dirMask--;` ×2 (伪造语句, 铁律 4 禁, 不合入, 仅存 permuter/sub_8045F10/output-20-1 作机制证据)。下一步候选方向: 找让 obj allocno 生死边界变化的写法 (规则 87 兼职法) 或 dirMask 真被多次读的自然形态。定量诊断手法与新工具见 RULES 规则 117 |
-| sub_8016E80 | 0x08016E80 | SIO簇 | code_1.c | ✅ 2026-09-02 gpnux (176B, fncheck OK)。SIO 收包: 关中断换 0x28/0x2C 双缓冲指针 → 清 state[5]/state[3] → 扫两个槽 (每槽 32B: 14×u16 校验区 + 24B 载荷), `(s16)sum == -0x11` 即校验通过 (发送端写 `~sum-0x10`, 两端相加正好 0xFFEF) → `CpuCopy32(载荷, arg0+i*24, 24)` + `state[3] |= 1<<i`, 无论命中都 `CpuFill32(0, 载荷, 24)` 清零 → `state[2] |= state[3]` 并 **return state[3]**。四个非显然点: ① 尾部多一条 `ldrb r0,[r1,#3]` 不是残渣, 是被 `void sub_8016E80();` 旧原型掩盖的真返回值 (新规律 RULES 118, 差 4B); ② 交换双缓冲的临时量**复用 packet** (单开 `u32 temp` 会多一个 allocno, BB0 home 全错位, 差 34B); ③ 循环体必须换用第二个指针 `st = state;` 才生成目标那条 `adds r7, r5, #0` (单变量写法根本不生成拷贝, 差 132B), 且 `i = 0;` 要写成循环外独立语句 + `for (; i <= 1; i++)` 空 init, 否则 `movs r6,#0` 落到拷贝之后; ④ 0x04000006/0x05000006 是 `CpuCopy32`/`CpuFill32` 宏展开 (后者自带 `vu32 tmp` 栈槽)。过程: 结构先靠 fndiff 逐条对齐 (声明序 5040 全排列 sweep 对 home 无效), 再靠 **decomp-permuter 跑出的 `j = 交换临时` 复用形态** (score 55) 提示"临时量是复用的循环变量"这一方向, 换成 packet 后 8B→只剩 bl 槽; permuter 产物本身含 `(u32)packet = x` 非标准写法与语义扭曲, 未直接采用, 只作线索 (规则 18 的"分数低≠对") |
+| sub_8016E80 | 0x08016E80 | SIO簇 | code_1.c | ✅ 2026-09-02 gpnux (176B, fncheck OK)。SIO 收包: 关中断换 0x28/0x2C 双缓冲指针 → 清 state[5]/state[3] → 扫两个槽 (每槽 32B: 14×u16 校验区 + 24B 载荷), `(s16)sum == -0x11` 即校验通过 (发送端写 `~sum-0x10`, 两端相加正好 0xFFEF) → `CpuCopy32(载荷, arg0+i*24, 24)` + `state[3] |= 1<<i`, 无论命中都 `CpuFill32(0, 载荷, 24)` 清零 → `state[2] |= state[3]` 并 **return state[3]**。四个非显然点: ① 尾部多一条 `ldrb r0,[r1,#3]` 不是残渣, 是被 `void sub_8016E80();` 旧原型掩盖的真返回值 (新规律 RULES 120, 差 4B); ② 交换双缓冲的临时量**复用 packet** (单开 `u32 temp` 会多一个 allocno, BB0 home 全错位, 差 34B); ③ 循环体必须换用第二个指针 `st = state;` 才生成目标那条 `adds r7, r5, #0` (单变量写法根本不生成拷贝, 差 132B), 且 `i = 0;` 要写成循环外独立语句 + `for (; i <= 1; i++)` 空 init, 否则 `movs r6,#0` 落到拷贝之后; ④ 0x04000006/0x05000006 是 `CpuCopy32`/`CpuFill32` 宏展开 (后者自带 `vu32 tmp` 栈槽)。过程: 结构先靠 fndiff 逐条对齐 (声明序 5040 全排列 sweep 对 home 无效), 再靠 **decomp-permuter 跑出的 `j = 交换临时` 复用形态** (score 55) 提示"临时量是复用的循环变量"这一方向, 换成 packet 后 8B→只剩 bl 槽; permuter 产物本身含 `(u32)packet = x` 非标准写法与语义扭曲, 未直接采用, 只作线索 (规则 18 的"分数低≠对") |
+| sub_8016C88 | 0x08016C88 | SIO簇 | code_1.c | ✅ 2026-09-02 gpnux (156B, fncheck OK, 1 bl 槽)。SIO 联机初始化: `IME=0 → IE &= 0xFF3F (清串行/DMA0 IRQ) → IME=1 → RCNT=0 (通用口切回 SIO) → SIOCNT=0x2000 复位 → SIOCNT |= 0x4003 (多玩家+使能+起始位) → CpuFill32(0, gSioState, 0x130) → state[0x14]=[0x18]=0x10 → 五个缓冲指针 state+0x30/0x50/0x70/0xB0/0xF0 填进 [0x1C..0x2C] → IME=0 → IE \|= 0x80 (开 DMA0 IRQ) → IME=1`。唯一坑: **`CpuFill32` 必须写在 `state = gSioState;` 之前** —— 宏展开的 `movs r6,#0; str r6,[sp]` 在目标里落在 `ldr r7,=gSioState` 前面, 反过来写差 4 字节 (一次命中, 无需 permuter)。寄存器复用: `movs r0,#1; mov r8,r0` + 末尾 `mov r0,r8; strh r0,[r5]` = 两处 `REG_IME = 1` 的常量被 CSE 塞进 callee-saved r8 (跨 `bl CpuSet` 存活, 规则 76 的同一形态)。语义名 `Sio_InitLink` 已试, 但 rename_fn.sh 在 sha1sum 步被**他人红基线**触发回滚 (asm/ 切片未回滚 → 链接报 undefined reference, 靠 `gen_asm.py --sync` 修好, 见 INCIDENTS), 基线转绿后再补改名 |
+| sub_8016D24 | 0x08016D24 | SIO簇 | code_1.c | ⏸ 语义全解 + 结构 ~90% 对 (132 vs 140 指令, 差 61B, 多为寄存器 home 级联)。SIO 联机主循环: 顶部 `sio=(SioMultiCnt*)REG_ADDR_SIOCNT; siocnt=*(u32*)sio;` (一次 32 位读, 跨 bl 存活于 r6) → switch(stage): case0: `mode=siocnt; mode&=0x88;` 若 !=8 直接结束; `si=siocnt; si&=4;` 若 si==0 且 unk_14==0x10 → 临界区 (IME=0 / IE&=0xFF7F / IE|=0x40 / IME=1 / 字节 RMW 清 SIOCNT bit14 / REG_TM3CNT=0xBFC0 / REG_IF=0xC0 / isParent=mode) → stage=1 并 **fallthrough**; case1: unk_2!=0 时 unk_8<=7 则 ++ 否则 stage=2 → **fallthrough**; case2: `sub_8016E80(arg0)`; default 什么都不做。末尾 `counter++` 后拼状态字返回: `status = (isParent==8?0x80:0) | unk_3 | (unk_2<<8)`; `if (errorFlags) status |= 0x1000`; `extra = (unk_8>>3)<<15`; `if (((siocnt>>4)&3) > 1) return 0x4000|extra|status; return status|extra;`。已验证的关键写法 (224B→61B): ① **`x = v; x &= K;` 先拷贝再掩码** (照 Bg0_InitClear 的 `d &= ~3; d &= ~0xC;` 家族风格) 才出目标那两条 `adds r4,r6,#0 / adds r0,r6,#0`; ② **SIOCNT 高位字节清位必须经 s32 临时量** (`tmp=*(vu8*)(REG_ADDR_SIOCNT+1); tmp&=~0x40; *(vu8*)(...)=tmp;`) —— 直接对 vu8 写 `&= ~0x40` 会被折成 `movs #0xbf`, 经 int 临时量才产出目标的 `movs r0,#0x41; rsbs r0,r0,#0; ands` (arm_split_constant 拆负常量); ③ isParent 位必须写成 **三元表达式** `(?0x80:0) | ...` 才有目标的双分支各算一遍 OR 链; ④ arg0 在目标里落 `ip`(r12) 而非 callee-saved。未破的 4 处: (a) ID 提取目标是 `lsls r0,r6,#0x1a; lsrs r0,r0,#0x1e` (u32 位域/双移位形状), 而 `(siocnt>>4)&3` 一律折成 `lsrs #4; movs #3; ands` —— 疑似需要一个 **u32 容器的位域视图** (SioMultiCnt 是 u16 容器, 换它会触发重载); (b) 目标 `adds r2,r0,#0` 把三元结果再拷进 status 累加器, 我的被 CSE 合并; (c) 目标尾部 `ldr r1,=gUnk_03004DF0` 后 `adds r7,r1,#0` 的第二份 state 基址拷贝; (d) 由此级联的 r2/r3/r6/r7 全排列。候选: permuter/sub_8016D24/base.c (61B); 定量诊断法见 RULES 规则 117, 兼职法见规则 87/120 | |
 | sub_8014084 | 0x08014084 | 0x8014簇 | code_1.c | 统计 `gUnk_03004D60[0..0x57]` 里非零半字节的个数，结果写 u16 `gUnk_03004DE4`。两条分支各自重复 `lsrs/adds/ldrb` 再选掩码（0xF0/0xF），公共尾部由 cross-jump 合并。**关键: 一个 `u32 val` 先装 `(u32)&gUnk_03004DE4` 做初始清零、循环里再装载入的字节** —— 这样地址伪寄存器在入口块内死亡, 循环里的计数器地址成为第二个跨块伪寄存器, 才会出现目标的 `adds r3, r1, #0` 并让 i→r2/字节→r1 归位; 直觉写法(宏解引用两次)只有一个地址伪寄存器, 占住 r1 把 i 挤到 r3(660分)。新注册 `gUnk_03004DE4`(iwram.h + linker.ld, 插在 4DD8 与 4DF0 之间)。→ 规则 87 |
 | sub_80140D0 | 0x080140D0 | 0x8014簇 | code_1.c | 同一半字节数组的"递增且封顶 5": 奇索引→高半字节、偶→低半字节。**关键: 奇路径必须写 `hi = nib << 4; byte = hi \| (byte & 0xF);`** —— u8 临时迫使截断绑在移位上, combine 合成 `lsls #0x1c; lsrs #0x18`, 且两操作数皆 u8 后末尾不再补 `lsls/lsrs #0x18`; 写成单表达式 `(u8)(nib << 4) \| ...` 则截断挪到 `orrs` 之后(630分)。偶路径 `(byte & 0xF0) \| nib` 本就无末尾截断, 两分支不对称是正常的。→ 规则 86 |
 | sub_8014124 | 0x08014124 | 0x8014簇 | code_1.c | 同数组的"递减若非零"（原 1385 分挂起项, 按规则 86 一次解开）。奇/偶路径都是 `nib = ...; if (nib == 0) nib = 1; nib -= 1;`，**`nib -= 1` 必须是独立语句**: 写成 `(nib - 1)` 内联会让 int 结果与 nib 共用寄存器(`subs r1,#1`)，目标要的是 `subs r1, r0, #1`(奇)/`subs r0, #1`(偶) 两种不同形态。奇路径再套规则 86 的 u8 临时 `hi`; 偶路径 `(byte & 0xF0) \| nib` 因 `nib -= 1` 已截断而保留末尾 `lsls/lsrs #0x18`(目标确有) |
@@ -2335,3 +2337,41 @@ id≤0x1FF 测 EventFlags_Test(id), >0x1FF 测 SwitchFlags_Test(id-0x200); 若�
 - 寄存器结构视图用**同址别名符号**: 新增 `gUnk_03004DF0`(类型 `Unk_03004DF0`, 见 iwram.h)
   与 `gSioState`(u8[], 老函数用) 同址 0x03004DF0。绝不用 `#define OBJ (*(struct*)0xADDR)` 宏
   (差 160B, 池字面量激增); 局部指针 `= (struct*)gSioState` 也不行 (差 185B)。
+
+## 2026-09-02 `Stats_RebuildEquipBonuses` 匹配 (sub_800A664, code_8005020)
+
+函数按 1-based 角色编号定位 `PlayerStats`，清零九项全局装备加成，依次调用
+`sub_800A534` 重算六个装备槽；随后读取前四个装备对应的 `gUnk_087EA580`
+表项，若高 nibble（形态类别）一致，则对 `0xE`/`0xF` 形态写入团队攻防加成。
+目标与候选的主体指令逐条一致，工程 `fncheck` 结果为 310B、11 个池重定位、
+6 个 `BL` 槽忽略。候选过程中修正了 `PlayerStats` 步长为 `0x40`，并沿用已匹配
+`PartyForm_ApplyBonus` 的 `u8 val = entry[4] & 0xF0` 形状，得到目标的
+`lsls #0x18`/`lsrs #0x1C` 和 `0xE` 优先分支布局。
+
+## 2026-09-02 `sub_80454A4` 匹配 (队伍 EXP 发放, code_8044394)
+
+**语义**: 给参战队伍成员发 EXP。遍历对象池前 5 项 (0xC8/项), 跳过
+`obj[0xAB] ∈ {7,8}` 与 `obj[0xBE]==0xFF` 的空槽; 对有效对象按
+`sub_80487A4(i)` (→ `gBattleFormationIds[obj[0xBB]]`) 映射到 `gPartyStats[idx]`,
+`idx` 非 0 时减 1; 若 `lv <= 0x61` 则 `exp += amount`; `exp >= next_exp` 时升级:
+`result |= 1<<i`, `next_exp = LevelToExp(ExpToLevel(exp))`, `lv = ExpToLevel(exp)`;
+再压 `exp` 上限 `> 0x98967F → exp = LevelToExp(0x61)`。返回 u8 升级位掩码。
+
+**匹配要点**:
+1. **首循环死读**: 第一个 `for(i=0..4)` 只做 `if ((u8)(obj[0xAB]-7) > 1) idx = obj[0xBE];`
+   且 `idx` 结果被丢弃 (目标 `ldrb r0,[r0]` 后直接 `adds r0,r6,#1` 覆盖)。穷举 40+ 非 volatile
+   形态全部被 DCE 删掉; 唯一逐字节一致是 `((volatile u8 *)obj)[0xBE]`。用户拍板: 因死读在 ROM
+   真实存在 = 原代码必然是 volatile 读, 属忠实还原, 允许破例 (规则 121, 与 OAM 先例区分)。
+2. **`new_var = arg0;` 放在第二个循环前** (permuter 找到, score 5): 让 `arg0` 先落 r4
+   (入口 `lsrs r4,r0,#0x10`), 到循环 2 前 `mov sl,r4` 再进 sl —— 复现目标 prologue
+   `mov r7,sl; mov r6,sb; mov r5,r8; push {r5,r6,r7}` 的三高位保存。
+3. **直写 `gPartyStats[idx].field` 而非 stats 指针** (规则 11 形态): 目标逐字段独立寻址
+   `adds r0,r3,#0; adds r0,#0x38; adds r4,r2,r0`, 用指针会折成 `[r4,#0x38]` 单基址。
+4. **`LevelToExp(ExpToLevel(exp))` 中间必须落 u8 临时变量** (`u8 newLevel`), 否则少
+   `lsls/lsrs #0x18` 截断 (差 4B)。
+5. 升级条件 `exp >= next_exp` 用 `bcc` (无符号小于) 而非 `blo`, 已按目标对齐。
+6. `result |= (u8)(1 << i)` + 返回前 u8 截断 (`lsls/lsrs`), 匹配 r8 逐位累积。
+
+**收尾**: fncheck OK 252B @0x080454A4 (1 池重定位, 6 bl 槽忽略); 原型 `void sub_80454A4()`
+→ `u8 sub_80454A4(u16)` (code_0.h, 规则 93; 无 C 调用方, 安全)。全 ROM SHA1 仍红 =
+并发 agent 的 in-progress 改动 (+4 整体位移, sound_data 等), 非本函数。

@@ -13,7 +13,7 @@
 │ Op_FullHealParty     │───→│ Silver_Add / Silver_Sub  │───→│ gSilverAmount       │
 │ Op_SilverAddSub      │    │ FullHealParty            │    │                     │
 │ Op_IfItemQtyJump     │    │ FullHealCharacter        │    │                     │
-│ Op_ChestOpen         │───→│ Chest_Open               │    │ gChestFlags         │
+│ Op_ChestOpen         │───→│ ChestObject_Open         │    │ gChestFlags         │
 │ Op_IfSaveLoadedJump  │───→│ (存档状态门)              │    │                     │
 └──────────────────────┘    │ EquipItem (换装)          │    │                     │
                             │   └→ Stats_RecalcEquip   │───→│ gUnk_08093418       │
@@ -36,7 +36,7 @@
 | Op_FullHealParty | 0x0805309C | 全队回复 |
 | Op_SilverAddSub | 0x08053104 | data[1]?+:- 金钱 |
 | Op_IfItemQtyJump | 0x08053138 | gInventory[id]>0x62 条件跳转 |
-| Op_ChestOpen | 0x0805316C | `Chest_Open(gUnk_03004860)` 开宝箱 |
+| Op_ChestOpen | 0x0805316C | `ChestObject_Open(gUnk_03004860)` 开宝箱 |
 | Op_IfSaveFlagJump | 0x0805321C | 存档标志条件跳转 |
 | Op_IfSaveLoadedJump | 0x080531A8 | 存档状态门 |
 
@@ -77,10 +77,10 @@
 ### 宝箱
 | 语义名 | 地址 | 语义 |
 |---|---|---|
-| ChestObjects_LoadForMap | 0x08008F28 | 场景切换时按地图筛选 256 项宝箱表，建立 gChests[16] |
+| ChestObjects_LoadForMap | 0x08008F28 | 场景切换时按地图筛选 256 项宝箱表，建立 gChestObjects[16] |
 | CheckFacingEvent | 0x08003F40 | A 键面向交互；宝箱项返回 itemId 对应的脚本事件 |
-| Chest_Open | 0x0800908C | 音效(8/9)+ChestFlags 翻转+精灵重建 |
-| Chest_BuildSprite | 0x08008FD0 | 宝箱 OAM 链 (开/关两形态) |
+| ChestObject_Open | 0x0800908C | 音效(8/9)+ChestFlags 翻转+精灵重建 |
+| ChestObject_BuildSprite | 0x08008FD0 | 宝箱 OAM 链 (开/关两形态) |
 | ChestFlags_ClearAll | 0x08009168 | gChestFlags[0x20] 清零 |
 | ChestFlags_Toggle | 0x08009184 | 位翻转 |
 | ChestFlags_Test | 0x080091A4 | 读位 |

@@ -182,6 +182,7 @@ extern u8 gUnk_03000758[];
 extern u8 gUnk_03000763;
 extern s8 gUnk_0300076A;
 extern u16 gUnk_0300076C;
+extern u16 gUnk_0300076E;
 extern u8 gUnk_03000770;
 extern u8 gUnk_03000781;
 extern u8 gUnk_03000782;

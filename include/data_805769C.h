@@ -171,7 +171,8 @@ extern const u8 gCharaCmdStream_8820A[];
 extern const u8 gCharaCmdStream_88226[];
 extern const u8 gChoiceDestTable[];      /* 0x08087648 分组变长目的地表 */
 extern const u8 gChoiceDataBase[];
-extern const u8 gUnk_0808823A[];
+extern const u8 gChoiceGroupPairTable[]; /* 0x0808823A, 84 项 × 2 B */
+extern const u8 gChoiceMenuMapRecordBlob[]; /* 0x080882E2..0x08088400 */
 
 /* 地图宝箱表 (0x08088400): 256 项 × 8B。
  * 装载器按 mapId 选出当前地图的项；itemId 作为交互脚本号，
@@ -184,9 +185,9 @@ typedef struct
     /* 0x03 */ u8 pad_3;
     /* 0x04 */ u16 tileX;
     /* 0x06 */ u16 tileY;
-} ChestMapEntry;
+} ChestSpawnEntry;
 
-extern const ChestMapEntry gChestSpawnTable[];
+extern const ChestSpawnEntry gChestSpawnTable[];
 
 /* 地图场景描述符 (0x08088D80): 180 项 × 0x14 字节。
  * 记录场景的资源集、显示/特效参数、NPC 槽组及 BG 数据索引。 */

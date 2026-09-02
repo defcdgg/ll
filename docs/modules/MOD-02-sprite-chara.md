@@ -67,7 +67,7 @@
 | sub_8016758 | 0x08016758 ✅C | 图块绘制 (Id 作为页选择, 已名) |
 
 图像数据: 每个地点 ID ↔ `gIntroBgMaps`/`gIntroBgPalettes`/`gIntroBgTiles` 的 19 张 256x160 整屏图 (见 IntroBg 节)。
-| 0x08008F28 | ❌ | `ChestObjects_LoadForMap` | 按 mapId 扫描 0x08088400 的 256×8B 宝箱表，装载最多 16 个 `Chest` 到 gChests |
+| 0x08008F28 | ✅C | `ChestObjects_LoadForMap` | 按 mapId 扫描 0x08088400 的 256×8B 宝箱表，装载最多 16 个 `ChestObject` 到 gChestObjects |
 | 0x08008E44 | ✅C | `BgMap_FillRow` | 0x020053A8 填 0xA200 行 (arg0 选值) + gViewportFlags[13]=1 |
 | 0x08008D18 | ✅C | `BgTile_PatchFlush` | LZ77 gUnk_030047CC→0x0600D000+(n-1)/2*0x800 + 调色板 DMA |
 | 0x08008D78 | ✅C | `Camera_GetDrawOffset` | 按 gCameraDrawMode 返回绘制偏移 |
@@ -81,7 +81,7 @@
 | 0x08009B64 | ✅C | `Palette_FillWhite` | 调色板全白 |
 | 0x080091C4 | ❌ | (待匹配) | (VBlank 调用族) |
 | 0x08005020 | ❌ | `VBlank_UpdateSpriteAndWindow` | VBlank 精灵/调色板传输后，推进 WIN0H 虹膜过渡并生成 81 行边界表 |
-| 0x080051D0/52F8/53B4/55E8/5C70 | ❌ | 51D0=`ScreenTransition_UpdateBlend`, 55E8=`MovePlayer`(#define 别名已应用), 5C70=精灵帧辅助; 其余待匹配 | MovePlayer(&gCameraTargetX,&gCameraTargetY,dirCode,speed): 按 `gWalkDirVectors`(0x080871C6, dir 0..8→s16 (dx,dy) 单位向量, 1=上顺时针) 步进, MapTile_At/CollisionBits 碰撞 + 8 方向滑动 switch + Actor[2..19]/Chest[16] 重叠检查; 命中区域时 MapZone_FindAt→MapZone_Trigger |
+| 0x080051D0/52F8/53B4/55E8/5C70 | ❌ | 51D0=`ScreenTransition_UpdateBlend`, 55E8=`MovePlayer`(#define 别名已应用), 5C70=精灵帧辅助; 其余待匹配 | MovePlayer(&gCameraTargetX,&gCameraTargetY,dirCode,speed): 按 `gWalkDirVectors`(0x080871C6, dir 0..8→s16 (dx,dy) 单位向量, 1=上顺时针) 步进, MapTile_At/CollisionBits 碰撞 + 8 方向滑动 switch + Actor[2..19]/gChestObjects[16] 重叠检查; 命中区域时 MapZone_FindAt→MapZone_Trigger |
 | 0x08007ADC/7BD0 | 7BD0 ✅C / 7ADC ⏸ | `MapZone_FindAt` / `MapZone_Trigger` | 地图区域触发系统: FindAt 算 (x,y) 16×16 足迹的 ≤4 个瓦片坐标 (gZoneCheckTileXs/Ys) 并在 `gMapZoneHeader`[0] 的 cells 表 {count, [4B]{xTile,yTile,type,entryIdx}} 查命中 → gMapZoneType/gMapZoneEntryIdx; Trigger 按 type 0..4 分发 header[1..5] 记录表: 0=换图(gMapNpcSetId/gSpawnTileX/Y/gSpawnFacingDir/gMoveCmdSetId, state=3, SwitchFlags_ClearRange) 1=图内传送(state=4) 2=state=8(gChoiceGroupIdx/gChoiceSubIdx) 3=首次进入跑脚本(2B 记录, SwitchFlags_Test 门) 4=A键+朝向触发脚本(4B 记录). 头表来源: MapScene_Load 装载 `0x087EBB20[mapIdx]`. **Trigger 已真C匹配** (fncheck 396B OK); FindAt 指令流全对仅剩 home (progress.md) |
 | 0x0800661C | ❌ | `MapScene_Load` | 地图场景资源/状态装载入口: 查 `gMapSceneDescriptors[arg0]`，装载 BG/OBJ 资源、窗口/调色板及菜单实体状态 |
 | 0x080071EC | ❌ | `MapScene_LoadNpcSlotIds` | 按场景描述符的 `npcSlotGroupId` 选择 NPC 槽组，写入槽 2..9 的图形/调色板 ID |
@@ -121,6 +121,7 @@
 |---|---|---|---|
 | 0x0800A79C | ✅C | `Stats_RecalcEquip` | base+equip→最终七维 |
 | 0x0800ABBC | ✅C | `Stats_ClearEquipBonus` | 9 个装备加成清零 |
+| 0x0800A664 | ✅C | `Stats_RebuildEquipBonuses` | 清零累计装备加成，重算六个装备槽，并应用四槽形态加成 |
 | 0x0800A9C0 | ✅asm | `EquipItem` | (附 C 注释) 换装 (旧装备回背包) |
 | 0x0800AA60 | ✅C | `AddInventoryItem` (已有名) | 背包+count (上限 99) |
 | 0x0800AA84 | ✅C | `RemoveInventoryItem` (已有名) | 背包-count (下限 0) |
@@ -140,7 +141,7 @@
 | 0x0800AB7C | ✅C | `Chara_ClearTempStatus` | 清临时状态 (field_unk[2/3]) |
 | 0x0801026C | ✅C | `ItemGetUsePower` | 道具威力 (0xAF 减半/0x63/0x83/0x84 减 2) |
 | 0x0801A0E4? | — | (MOD-04 区) | |
-| 0x0800A3C8/AC08/A1B4/A534/A664 | ❌ | A664=角色等级/技能初始化 (NewGame 调用) | |
+| 0x0800A3C8/AC08/A1B4/A534 | ❌ | 其余函数待匹配 | |
 
 ## 子系统 E: 宝箱 / 开关
 
@@ -150,10 +151,10 @@
 | 0x08088C00 | — | `gDigitFontObjPalettes` | 2 组 × 16 色 OBJ 调色板，供数字字体装载到槽 14/15 |
 | 0x08088C40 | — | `gDigitFontObjTiles` | 10 个 4bpp 8x8 数字字形 tile，供数字字体装载到 OBJ 槽 150~159 |
 | 0x08088D80 | — | `gMapSceneDescriptors` | 180 项 × 0x14 字节：场景资源/显示参数、NPC 槽组及 BG 数据索引 |
-| 0x08008FD0 | ✅C | `Chest_BuildSprite` | 宝箱精灵 OAM 链 (开/关两形态, 调色板按 field_0 bit7) |
-| 0x0800908C | ✅C | `Chest_Open` | 开宝箱: 音效(8/9)、gUnk_03004870 位翻转、重建精灵 |
+| 0x08008FD0 | ✅C | `ChestObject_BuildSprite` | 宝箱精灵 OAM 链 (开/关两形态, 调色板按 flags bit7) |
+| 0x0800908C | ✅C | `ChestObject_Open` | 开宝箱: 音效(8/9)、gChestFlags 位翻转、重建精灵 |
 | 0x08009114 | ✅C | `LoadDigitFontObjTiles` (已有名) | 数字字形+调色板装载 |
-| 0x08009168 | ✅C | `ChestFlags_ClearAll` | gUnk_03004870[0x20] 清零 |
+| 0x08009168 | ✅C | `ChestFlags_ClearAll` | gChestFlags[0x20] 清零 |
 | 0x08009184 | ✅C | `ChestFlags_Toggle` | 位翻转 |
 | 0x080091A4 | ✅C | `ChestFlags_Test` | 读位 |
 | 0x08009F48 | ✅C | `StaticObjs_Reset` | gStaticMapObjects[3] field_0=0 |

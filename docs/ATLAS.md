@@ -4,8 +4,8 @@
 >
 > **硬约束**: 模块 = 按原始顺序的连续函数区间, 不重排任何函数 (linker.ld 的 .text 顺序决定)
 
-- 函数 **1065**, 已匹配 **593** (55.7%), 未匹配 **472** / **107,699** 条指令
-- 亲和边 18261 条 (m=17530), 调度表 **6** 张, λ=0.3 → **31 个模块**
+- 函数 **1064**, 已匹配 **626** (58.8%), 未匹配 **438** / **105,599** 条指令
+- 亲和边 18261 条 (m=17552), 调度表 **6** 张, λ=0.3 → **31 个模块**
 
 ## 0. ROM 自己的模块骨架: 函数指针调度表
 
@@ -39,42 +39,42 @@
 | λ | 1.2 | 0.9 | 0.7 | 0.55 | 0.45 | 0.38 | 0.3 | 0.24 | 0.18 | 0.13 | 0.09 | 0.06 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 模块数 | 16 | 22 | 24 | 25 | 29 | 31 | 31 | 34 | 40 | 42 | 52 | 54 |
-| 目标值 | 30.59 | 36.11 | 40.7 | 44.45 | 47.12 | 49.22 | 51.7 | 53.62 | 55.84 | 57.91 | 59.8 | 61.39 |
+| 目标值 | 30.55 | 36.07 | 40.66 | 44.41 | 47.08 | 49.18 | 51.66 | 53.59 | 55.8 | 57.87 | 59.76 | 61.35 |
 
 ## 2. 模块清单 (按未匹配指令数 = 工作量排序)
 
 | 模块 | 分区 | 地址区间 | 函数 | 未匹配 | 未匹配指令 | 调度表 | 语义锚点 | 关键工作内存 |
 |---|---|---|---|---|---|---|---|---|
-| **M16** | ENGINE/OBJECT | 0x08032548–0x0803F658 | 62 | 62 | 19,191 | 0x0839D4CC(59) | — | 0x3000820, 0x3000822 |
+| **M16** | ENGINE/OBJECT | 0x08032548–0x0803F658 | 61 | 61 | 19,107 | 0x0839D4CC(59) | — | 0x3000820, 0x3000822 |
 | **M14** | ENGINE/OBJECT | 0x0802576C–0x080313EC | 62 | 61 | 16,512 | 0x0839CD5C(87) | — | 0x3000825, 0x3000820 |
-| **M12** | ENGINE/CORE | 0x0801B920–0x08021064 | 89 | 47 | 8,308 | — | ResetSceneObjects | 0x300068d, 0x30006f8 |
+| **M12** | ENGINE/CORE | 0x0801B920–0x08021064 | 89 | 42 | 8,090 | — | ResetSceneObjects | 0x300068d, 0x30006f8 |
 | **M07** | ENGINE/SYS | 0x0800ACA4–0x08010770 | 37 | 21 | 7,970 | — | BattleIntro_Setup, FullHealCharacter, ItemGetUsePower | 0x3000188, 0x3004aa0 |
-| **M13** | ENGINE/CORE | 0x080210C0–0x080256E4 | 27 | 22 | 7,239 | — | — | 0x300076c, 0x3000781 |
-| **M08** | ENGINE/SYS | 0x08010978–0x08016C2C | 87 | 20 | 7,189 | — | Hud_DrawHp, Hud_DrawLv, Hud_DrawMp | 0x2005800, 0x3000187 |
+| **M13** | ENGINE/CORE | 0x080210C0–0x080256E4 | 27 | 21 | 7,180 | — | — | 0x300076c, 0x3000781 |
+| **M08** | ENGINE/SYS | 0x08010978–0x08016C2C | 87 | 16 | 6,999 | — | Hud_DrawHp, Hud_DrawLv, Hud_DrawMp | 0x2005800, 0x3000187 |
 | **M17** | ENGINE/OBJECT | 0x0803FF54–0x08044680 | 32 | 20 | 6,385 | 0x0839CEC4(14) | — | 0x3000820, 0x3000825 |
-| **M19** | ENGINE/CORE | 0x080448A8–0x08048B30 | 65 | 46 | 6,083 | — | — | 0x3004ac0, 0x3004a88 |
-| **M28** | SCRIPT | 0x0804F250–0x0805305C | 77 | 24 | 5,068 | 0x0862D434(80) | BgTiles_LoadSet, FlushTileDma, Op_AnimSlotPause | 0x2016200, 0x3000e70 |
-| **M03** | BOOT/INTR | 0x08004EB8–0x08008DF8 | 55 | 11 | 4,106 | — | AnimSlot_Active, AnimSlot_BankReload, AnimSlot_Parse | 0x300467c, 0x40000d4 |
-| **M10** | ENGINE/CORE | 0x0801768C–0x0801A36C | 74 | 24 | 3,934 | — | BattleFx_DispOff, BattleFx_Init, BattleFx_Stop | 0x3000324, 0x3000384 |
-| **M21** | ENGINE/CORE | 0x08048D64–0x0804AD24 | 25 | 19 | 2,982 | — | — | 0x300094d, 0x3000949 |
+| **M19** | ENGINE/CORE | 0x080448A8–0x08048B30 | 65 | 45 | 6,040 | — | — | 0x3004ac0, 0x3004a88 |
+| **M28** | SCRIPT | 0x0804F250–0x0805305C | 77 | 23 | 5,036 | 0x0862D434(80) | BgTiles_LoadSet, FlushTileDma, Op_AnimSlotPause | 0x2016200, 0x3000e70 |
+| **M03** | BOOT/INTR | 0x08004EB8–0x08008DF8 | 55 | 10 | 4,019 | — | AnimSlot_Active, AnimSlot_BankReload, AnimSlot_Parse | 0x300467c, 0x40000d4 |
+| **M10** | ENGINE/CORE | 0x0801768C–0x0801A36C | 74 | 21 | 3,790 | — | BattleFx_DispOff, BattleFx_Init, BattleFx_Stop | 0x3000324, 0x3000384 |
+| **M21** | ENGINE/CORE | 0x08048D64–0x0804AD24 | 25 | 18 | 2,939 | — | — | 0x300094d, 0x3000949 |
 | **M11** | ENGINE/CORE | 0x0801A3A8–0x0801B8FC | 18 | 7 | 2,060 | — | — | 0x40000d4, 0x3000518 |
 | **M27** | ENGINE/CORE | 0x0804DD70–0x0804F244 | 28 | 12 | 1,684 | — | CheckObjectKindSlot, SioBattle_GetState, SioBattle_ResetState | 0x3000d88, 0x3000ddc |
 | **M23** | ENGINE/CORE | 0x0804B224–0x0804C6B0 | 41 | 14 | 1,616 | — | — | 0x3000ae8, 0x3000be8 |
 | **M15** | ENGINE/OBJECT | 0x08031580–0x080323B4 | 10 | 10 | 1,220 | 0x0839CD5C(87) | — | 0x3000868, 0x3000889 |
 | **M01** | BOOT/INTR | 0x080012B8–0x08004D38 | 66 | 4 | 978 | 0x087E83F0(16) | Anim_BuildOamChain, Anim_PlayCustom, Anim_StepChara | 0x3002e80, 0x3003ac0 |
-| **M09** | ENGINE/SYS | 0x08016C44–0x08017640 | 16 | 7 | 916 | — | Sio_BuildPacket, Sio_ClearSlot, Sio_IsHost | 0x3004df0, 0x4000208 |
-| **M05** | ENGINE/SYS | 0x080091A4–0x08009E80 | 19 | 4 | 819 | — | ChestFlags_Test, MenuEnt_ClearStates, MenuEnt_GetState | 0x3000010, 0x3004910 |
-| **M06** | ENGINE/SYS | 0x08009F48–0x0800AC08 | 29 | 5 | 699 | — | Chara_ClearTempStatus, Chara_GetFormGfx, EquipItem | 0x3004ac0, 0x3004aa8 |
-| **M25** | ENGINE/OBJECT | 0x0804D1B4–0x0804D708 | 8 | 8 | 684 | 0x0839CD5C(87) | — | — |
+| **M09** | ENGINE/SYS | 0x08016C44–0x08017640 | 16 | 6 | 878 | — | Sio_BuildPacket, Sio_ClearSlot, Sio_IsHost | 0x3004df0, 0x4000208 |
 | **M26** | ENGINE/OBJECT | 0x0804D798–0x0804DCD8 | 8 | 8 | 673 | 0x0839CD5C(87) | — | — |
-| **M24** | ENGINE/CORE | 0x0804C728–0x0804D0F8 | 18 | 7 | 666 | — | — | 0x3000d38, 0x3000be8 |
+| **M05** | ENGINE/SYS | 0x080091A4–0x08009E80 | 19 | 2 | 643 | — | ChestFlags_Test, MenuEnt_ClearStates, MenuEnt_GetState | 0x3000010, 0x3004910 |
+| **M06** | ENGINE/SYS | 0x08009F48–0x0800AC08 | 29 | 3 | 536 | — | Chara_ClearTempStatus, Chara_GetFormGfx, EquipItem | 0x3004ac0, 0x3004aa8 |
 | **M22** | ENGINE/CORE | 0x0804AD54–0x0804B1F8 | 9 | 3 | 399 | — | — | 0x3000ade, 0x3000948 |
-| **M18** | ENGINE/OBJECT | 0x080446A4–0x0804473C | 8 | 2 | 105 | 0x0839D4CC(59) | — | 0x3000826, 0x3000884 |
+| **M25** | ENGINE/OBJECT | 0x0804D1B4–0x0804D708 | 8 | 4 | 370 | 0x0839CD5C(87) | — | — |
+| **M24** | ENGINE/CORE | 0x0804C728–0x0804D0F8 | 18 | 2 | 283 | — | — | 0x3000d38, 0x3000be8 |
 | **M20** | ENGINE/CORE | 0x08048B5C–0x08048D40 | 8 | 2 | 88 | — | — | — |
-| **M04** | ENGINE/SYS | 0x08008E44–0x08009184 | 8 | 1 | 77 | — | BgMap_FillRow, ChestFlags_ClearAll, ChestFlags_Toggle | 0x3004870, 0x3004890 |
+| **M18** | ENGINE/OBJECT | 0x080446A4–0x0804473C | 8 | 1 | 56 | 0x0839D4CC(59) | — | 0x3000826, 0x3000884 |
 | **M29** | SCRIPT | 0x08053078–0x080533B4 | 19 | 1 | 48 | 0x0862D434(80) | Op_ChestOpen, Op_ClearSwitchTail, Op_EquipItem | 0x2016000, 0x2016200 |
 | **M00** | BOOT/INTR | 0x080002A0–0x0800128C | 34 | 0 | 0 | 0x0805769C(5) | AgbMain, Display_RestartAfterLoad, Display_ShutdownSequence | 0x40000d4, 0x300259c |
 | **M02** | BOOT/INTR | 0x08004D8C–0x08004E88 | 8 | 0 | 0 | — | Chara_AnyMoving, Chara_SetCmdPtr, Chara_SetPosDir | 0x3002e80, 0x30032d0 |
+| **M04** | ENGINE/SYS | 0x08008E44–0x08009184 | 8 | 0 | 0 | — | BgMap_FillRow, ChestFlags_ClearAll, ChestFlags_Toggle | 0x3004870, 0x3004890 |
 | **M30** | SCRIPT | 0x080533D4–0x08053884 | 18 | 0 | 0 | — | Bgm_Continue, Bgm_FadeIn, Bgm_FadeOut | 0x3000f38, 0x3000f42 |
 
 ## 3. 参数化同构家族 (一个任务包, 做一个中一串)
@@ -88,13 +88,10 @@
 | 4 | 4 | 61 | sub_804B7B0, sub_804B8E8, sub_804BD54, sub_804BE90 | M23 |
 | 3 | 3 | 191 | sub_802DFDC, sub_802F480, sub_80309B0 | M14 |
 | 3 | 3 | 122 | sub_8034440, sub_80345AC, sub_8034D94 | M16 |
-| 2 | 2 | 46 | sub_80207DC, sub_8020840 | M12 |
 | 2 | 2 | 145 | sub_8036EA4, sub_8037C40 | M16 |
 | 2 | 2 | 83 | sub_8045F94, sub_8046060 | M19 |
 | 2 | 2 | 87 | sub_804B834, sub_804BDD8 | M23 |
 | 2 | 2 | 235 | sub_804B96C, sub_804BF14 | M23 |
-| 2 | 1 | 48 | sub_804C4D8, sub_804C728 | M23,M24 ⚠跨 |
-| 2 | 2 | 79 | sub_804D260, sub_804D44C | M25 |
 | 2 | 2 | 64 | sub_804D310, sub_804D708 | M25 |
 | 2 | 2 | 80 | sub_804D840, sub_804DC24 | M26 |
 | 2 | 1 | 48 | sub_8053270, sub_80532DC | M29 |
@@ -240,7 +237,7 @@ ROM 表: 0x8058834, 0x87e8430, 0x80b9dfc, 0x805881c
  0x08004e88    21  Chara_SetPosDir              Chara_SetPosDir
 ```
 
-### M03 [BOOT/INTR]  0x08004EB8–0x08008DF8  (55 函数 / 11 未匹配 / 4,106 指令)
+### M03 [BOOT/INTR]  0x08004EB8–0x08008DF8  (55 函数 / 10 未匹配 / 4,019 指令)
 
 锚点: AnimSlot_Active, AnimSlot_BankReload, AnimSlot_Parse, AnimSlot_ParseLoop, AnimSlot_Pause, AnimSlot_PlayOnce, AnimSlot_Resume, AnimSlots_Release, AnimSlots_StepAll, BattleIntro_Cursor
 工作内存: 0x300467c, 0x40000d4, 0x30046a0, 0x3004550
@@ -279,7 +276,7 @@ ROM 表: 0x8088d80, 0x8087216, 0x87e9aa0, 0x87ea020
  0x08008124    65  sub_8008124                  sub_8008124
  0x080081c0    60  BattleIntro_Cursor           BattleIntro_Cursor
 *0x08008254   397  ChoiceMenu_HandleInput       ChoiceMenu_HandleInput
-*0x08008620    87  sub_8008620                  sub_8008620
+ 0x08008620    87  DialogPortrait_Set           DialogPortrait_Set
  0x080086fc    60  sub_80086FC                  sub_80086FC
  0x08008788   107  IntroBg_Load                 IntroBg_Load
  0x080088b4    22  ScreenFade_Start             ScreenFade_Start
@@ -305,9 +302,9 @@ ROM 表: 0x8088d80, 0x8087216, 0x87e9aa0, 0x87ea020
  0x08008df8    34  AnimSlot_PlayOnce            AnimSlot_PlayOnce
 ```
 
-### M04 [ENGINE/SYS]  0x08008E44–0x08009184  (8 函数 / 1 未匹配 / 77 指令)
+### M04 [ENGINE/SYS]  0x08008E44–0x08009184  (8 函数 / 0 未匹配 / 0 指令)
 
-锚点: BgMap_FillRow, ChestFlags_ClearAll, ChestFlags_Toggle, ChestObjects_LoadForMap, Chest_BuildSprite, Chest_Open, LoadDigitFontObjTiles, MapBg_FlushPending
+锚点: BgMap_FillRow, ChestFlags_ClearAll, ChestFlags_Toggle, ChestObject_BuildSprite, ChestObject_Open, ChestObjects_LoadForMap, LoadDigitFontObjTiles, MapBg_FlushPending
 工作内存: 0x3004870, 0x3004890, 0x40000d4, 0x3003ac0
 ROM 表: 0x8088400, 0x8088c40, 0x8088c00
 
@@ -315,15 +312,15 @@ ROM 表: 0x8088400, 0x8088c40, 0x8088c00
   地址        指令  ll.cfg 名                     函数
  0x08008e44    35  BgMap_FillRow                BgMap_FillRow
  0x08008e94    45  MapBg_FlushPending           MapBg_FlushPending
-*0x08008f28    77  ChestObjects_LoadForMap      ChestObjects_LoadForMap
- 0x08008fd0    78  Chest_BuildSprite            Chest_BuildSprite
- 0x0800908c    52  Chest_Open                   Chest_Open
+ 0x08008f28    77  ChestObjects_LoadForMap      ChestObjects_LoadForMap
+ 0x08008fd0    78  ChestObject_BuildSprite      ChestObject_BuildSprite
+ 0x0800908c    52  ChestObject_Open             ChestObject_Open
  0x08009114    25  LoadDigitFontObjTiles        LoadDigitFontObjTiles
  0x08009168    12  ChestFlags_ClearAll          ChestFlags_ClearAll
  0x08009184    14  ChestFlags_Toggle            ChestFlags_Toggle
 ```
 
-### M05 [ENGINE/SYS]  0x080091A4–0x08009E80  (19 函数 / 4 未匹配 / 819 指令)
+### M05 [ENGINE/SYS]  0x080091A4–0x08009E80  (19 函数 / 2 未匹配 / 643 指令)
 
 锚点: ChestFlags_Test, MenuEnt_ClearStates, MenuEnt_GetState, MenuEnt_Lock, MenuEnt_ParseAll, MenuEnt_ParseDesc, MenuEnt_ParseRange, MenuEnt_Unlock, PaletteFx_Apply, Palette_Backup
 工作内存: 0x3000010, 0x3004910, 0x40000d4, 0x3000020
@@ -333,9 +330,9 @@ ROM 表: 0x87ea138, 0x808a234, 0x80baba0, 0x808ea0c
   地址        指令  ll.cfg 名                     函数
  0x080091a4    14  ChestFlags_Test              ChestFlags_Test
 *0x080091c4   166  sub_80091C4                  sub_80091C4
-*0x08009370    71  sub_8009370                  sub_8009370
+ 0x08009370    71  sub_8009370                  sub_8009370
  0x08009428    77  PaletteFx_Apply              PaletteFx_Apply
-*0x080094fc   105  sub_80094FC                  sub_80094FC
+ 0x080094fc   105  sub_80094FC                  sub_80094FC
 *0x08009600   477  sub_8009600                  sub_8009600
  0x08009a5c    14  MenuEnt_ClearStates          MenuEnt_ClearStates
  0x08009a7c    32  MenuEnt_ParseAll             MenuEnt_ParseAll
@@ -352,7 +349,7 @@ ROM 表: 0x87ea138, 0x808a234, 0x80baba0, 0x808ea0c
  0x08009e80    91  StaticObj_BuildChain         StaticObj_BuildChain
 ```
 
-### M06 [ENGINE/SYS]  0x08009F48–0x0800AC08  (29 函数 / 5 未匹配 / 699 指令)
+### M06 [ENGINE/SYS]  0x08009F48–0x0800AC08  (29 函数 / 3 未匹配 / 536 指令)
 
 锚点: Chara_ClearTempStatus, Chara_GetFormGfx, EquipItem, ExpToLevel, FullHealParty, ItemFindSlot, ItemGetValue, LevelToExp, PartyForm_ApplyBonus, Party_AnyEquip
 工作内存: 0x3004ac0, 0x3004aa8, 0x3004ab8, 0x3004ab0
@@ -361,12 +358,12 @@ ROM 表: 0x87ea580, 0x8092248, 0x8093418, 0x80921f0
 ```
   地址        指令  ll.cfg 名                     函数
  0x08009f48    17  StaticObjs_Reset             StaticObjs_Reset
-*0x08009f70    78  sub_8009F70                  sub_8009F70
+ 0x08009f70    78  sub_8009F70                  sub_8009F70
  0x0800a048    73  Stats_BuildSkillList         Stats_BuildSkillList
  0x0800a0e4    86  Chara_GetFormGfx             Chara_GetFormGfx
 *0x0800a1b4   245  sub_800A1B4                  sub_800A1B4
 *0x0800a3c8   165  sub_800A3C8                  sub_800A3C8
-*0x0800a534    85  sub_800A534                  sub_800A534
+ 0x0800a534    85  sub_800A534                  sub_800A534
 *0x0800a664   126  sub_800A664                  sub_800A664
  0x0800a79c    83  Stats_RecalcEquip            Stats_RecalcEquip
  0x0800a86c    22  ExpToLevel                   ExpToLevel
@@ -438,7 +435,7 @@ ROM 表: 0x8095028, 0x87ea580, 0x87eb250, 0x8095828
 *0x08010770   200  sub_8010770                  sub_8010770
 ```
 
-### M08 [ENGINE/SYS]  0x08010978–0x08016C2C  (87 函数 / 20 未匹配 / 7,189 指令)
+### M08 [ENGINE/SYS]  0x08010978–0x08016C2C  (87 函数 / 16 未匹配 / 6,999 指令)
 
 锚点: Hud_DrawHp, Hud_DrawLv, Hud_DrawMp, InvUi_DrawCursors, InvUi_Main, Inv_FindFirstHeld, Inv_FindHeldItemOnPage, Inv_FindPrevHeld, Inv_NextNonZero, Inv_PrevNonZero
 工作内存: 0x2005800, 0x3000187, 0x3004aa0, 0x3004980
@@ -455,10 +452,10 @@ ROM 表: 0x8098199, 0x8095028, 0x839cfaa, 0x87eb2e0
 *0x08010f10   264  sub_8010F10                  sub_8010F10
  0x0801114c   119  sub_801114C                  sub_801114C
 *0x08011268   154  sub_8011268                  sub_8011268
-*0x080113cc    56  sub_80113CC                  sub_80113CC
+ 0x080113cc    56  sub_80113CC                  sub_80113CC
 *0x08011454  1371  sub_8011454                  sub_8011454
 *0x08012530   252  sub_8012530                  sub_8012530
-*0x08012790  1654  sub_8012790                  sub_8012790
+*0x08012790  1654  SaveUi_LoadScreen            SaveUi_LoadScreen
 *0x08013870    83  sub_8013870                  sub_8013870
 *0x08013934   197  sub_8013934                  sub_8013934
 *0x08013b0c   108  sub_8013B0C                  sub_8013B0C
@@ -512,7 +509,7 @@ ROM 表: 0x8098199, 0x8095028, 0x839cfaa, 0x87eb2e0
  0x08016628    38  MenuUi_SetExclusive          MenuUi_SetExclusive
  0x0801667c    18  MenuUi_HideAll               MenuUi_HideAll
  0x080166a4    37  Text_DrawChar                Text_DrawChar
-*0x080166fc    39  sub_80166FC                  sub_80166FC
+ 0x080166fc    39  sub_80166FC                  sub_80166FC
  0x08016758    53  sub_8016758                  sub_8016758
  0x080167d4    16  MenuUi_MoveCursor            MenuUi_MoveCursor
  0x080167f8    21  Party_SlotOfMember           Party_SlotOfMember
@@ -524,18 +521,18 @@ ROM 表: 0x8098199, 0x8095028, 0x839cfaa, 0x87eb2e0
  0x08016978    20  Inv_FindFirstHeld            Inv_FindFirstHeld
  0x080169ac    24  Inv_FindPrevHeld             Inv_FindPrevHeld
  0x080169ec    16  Inv_FindHeldItemOnPage       Inv_FindHeldItemOnPage
-*0x08016a14    38  Save_SyncShadow              Save_SyncShadow
+ 0x08016a14    38  Save_SyncShadow              Save_SyncShadow
  0x08016a6c    20  Inv_SeekFirst                Inv_SeekFirst
  0x08016aa0    21  Inv_PrevNonZero              Inv_PrevNonZero
  0x08016ad4    41  Inv_NextNonZero              Inv_NextNonZero
-*0x08016b30    57  sub_8016B30                  sub_8016B30
+ 0x08016b30    57  sub_8016B30                  sub_8016B30
  0x08016bb0    16  SaveUi_OpenLoad              SaveUi_OpenLoad
  0x08016be0    24  Text_WriteChars              Text_WriteChars
  0x08016c10    14  Text_FillHidden              Text_FillHidden
  0x08016c2c    10  Text_TileAt                  Text_TileAt
 ```
 
-### M09 [ENGINE/SYS]  0x08016C44–0x08017640  (16 函数 / 7 未匹配 / 916 指令)
+### M09 [ENGINE/SYS]  0x08016C44–0x08017640  (16 函数 / 6 未匹配 / 878 指令)
 
 锚点: Sio_BuildPacket, Sio_ClearSlot, Sio_IsHost, Sio_SetReady, Sio_SetXferCtx, Sio_Shutdown
 工作内存: 0x3004df0, 0x4000208, 0x4000128, 0x3004f20
@@ -557,10 +554,10 @@ ROM 表: 0x8098199, 0x8095028, 0x839cfaa, 0x87eb2e0
  0x080175c0    25  sub_80175C0                  sub_80175C0
  0x08017600    12  Sio_SetXferCtx               Sio_SetXferCtx
  0x0801761c    15  Sio_ClearSlot                Sio_ClearSlot
-*0x08017640    38  sub_8017640                  sub_8017640
+ 0x08017640    38  sub_8017640                  sub_8017640
 ```
 
-### M10 [ENGINE/CORE]  0x0801768C–0x0801A36C  (74 函数 / 24 未匹配 / 3,934 指令)
+### M10 [ENGINE/CORE]  0x0801768C–0x0801A36C  (74 函数 / 21 未匹配 / 3,790 指令)
 
 锚点: BattleFx_DispOff, BattleFx_Init, BattleFx_Stop, BattleTask_Run, BattleUiFlag_Clear, BattleUiFlag_Get, BattleUiFlag_Reset, BattleUiFlag_Set, Bg0_InitClear, BgLoad_Finish
 工作内存: 0x3000324, 0x3000384, 0x40000d4, 0x3000348
@@ -595,11 +592,11 @@ ROM 表: 0x80936a0, 0x861a4a4, 0x861a7e4, 0x87ed394
  0x08018874     2  GetBuf_37410                 GetBuf_37410
  0x0801887c    11  sub_801887C                  sub_801887C
  0x0801889c    11  sub_801889C                  sub_801889C
-*0x080188bc    38  sub_80188BC                  sub_80188BC
+ 0x080188bc    38  sub_80188BC                  sub_80188BC
 *0x08018928   125  sub_8018928                  sub_8018928
 *0x08018a58   158  sub_8018A58                  sub_8018A58
 *0x08018bf8   164  sub_8018BF8                  sub_8018BF8
-*0x08018d9c    50  sub_8018D9C                  sub_8018D9C
+ 0x08018d9c    50  sub_8018D9C                  sub_8018D9C
 *0x08018e34    40  sub_8018E34                  sub_8018E34
 *0x08018ea8   129  sub_8018EA8                  sub_8018EA8
 *0x08018fc0   184  sub_8018FC0                  sub_8018FC0
@@ -622,7 +619,7 @@ ROM 表: 0x80936a0, 0x861a4a4, 0x861a7e4, 0x87ed394
  0x08019e60    39  sub_8019E60                  sub_8019E60
  0x08019ecc     7  Disp_Bg1Off                  Disp_Bg1Off
  0x08019ee0    17  DialogCtx_SetHead            DialogCtx_SetHead
-*0x08019f08    56  sub_8019F08                  sub_8019F08
+ 0x08019f08    56  sub_8019F08                  sub_8019F08
 *0x08019f78   114  sub_8019F78                  sub_8019F78
  0x0801a05c     9  DialogCtx_GetField_C         DialogCtx_GetField_C
  0x0801a074    60  BgMap_PalFillRect            BgMap_PalFillRect
@@ -671,7 +668,7 @@ ROM 表: 0x8393a30, 0x8393a24, 0x8393a18, 0x87ebe00
  0x0801b8fc    17  sub_801B8FC                  sub_801B8FC
 ```
 
-### M12 [ENGINE/CORE]  0x0801B920–0x08021064  (89 函数 / 47 未匹配 / 8,308 指令)
+### M12 [ENGINE/CORE]  0x0801B920–0x08021064  (89 函数 / 42 未匹配 / 8,090 指令)
 
 锚点: ResetSceneObjects
 工作内存: 0x300068d, 0x30006f8, 0x300068c, 0x3000670
@@ -714,7 +711,7 @@ ROM 表: 0x8393b28, 0x861c664, 0x839cc4c, 0x861a004
 *0x0801ea70   221  sub_801EA70                  sub_801EA70
 *0x0801ec3c    88  sub_801EC3C                  sub_801EC3C
 *0x0801ed40   130  sub_801ED40                  sub_801ED40
-*0x0801ee6c    53  sub_801EE6C                  sub_801EE6C
+ 0x0801ee6c    53  sub_801EE6C                  sub_801EE6C
 *0x0801eee4   504  sub_801EEE4                  sub_801EEE4
 *0x0801f3fc   320  sub_801F3FC                  sub_801F3FC
 *0x0801f76c    46  sub_801F76C                  sub_801F76C
@@ -730,9 +727,9 @@ ROM 表: 0x8393b28, 0x861c664, 0x839cc4c, 0x861a004
  0x08020798     3  sub_8020798                  sub_8020798
  0x080207a4     5  sub_80207A4                  sub_80207A4
  0x080207b4    17  sub_80207B4                  sub_80207B4
-*0x080207dc    46  sub_80207DC                  sub_80207DC
-*0x08020840    46  sub_8020840                  sub_8020840
-*0x080208a4    51  sub_80208A4                  sub_80208A4
+ 0x080207dc    46  sub_80207DC                  sub_80207DC
+ 0x08020840    46  sub_8020840                  sub_8020840
+ 0x080208a4    51  sub_80208A4                  sub_80208A4
  0x08020914    19  sub_8020914                  sub_8020914
  0x0802093c    27  sub_802093C                  sub_802093C
  0x08020974    39  sub_8020974                  sub_8020974
@@ -744,7 +741,7 @@ ROM 表: 0x8393b28, 0x861c664, 0x839cc4c, 0x861a004
  0x08020ae4    13  sub_8020AE4                  sub_8020AE4
  0x08020b04    30  sub_8020B04                  sub_8020B04
  0x08020b48     3  sub_8020B48                  sub_8020B48
-*0x08020b54    22  sub_8020B54                  sub_8020B54
+ 0x08020b54    22  sub_8020B54                  sub_8020B54
  0x08020b90    18  sub_8020B90                  sub_8020B90
  0x08020bc0    24  sub_8020BC0                  sub_8020BC0
  0x08020bf0    26  sub_8020BF0                  sub_8020BF0
@@ -770,7 +767,7 @@ ROM 表: 0x8393b28, 0x861c664, 0x839cc4c, 0x861a004
  0x08021064    34  sub_8021064                  sub_8021064
 ```
 
-### M13 [ENGINE/CORE]  0x080210C0–0x080256E4  (27 函数 / 22 未匹配 / 7,239 指令)
+### M13 [ENGINE/CORE]  0x080210C0–0x080256E4  (27 函数 / 21 未匹配 / 7,180 指令)
 
 工作内存: 0x300076c, 0x3000781, 0x2035ac0, 0x3000768
 ROM 表: 0x8393a74, 0x8393a30, 0x861a7a4, 0x839b2a4
@@ -803,7 +800,7 @@ ROM 表: 0x8393a74, 0x8393a30, 0x861a7a4, 0x839b2a4
 *0x08025518   113  sub_8025518                  sub_8025518
  0x08025638     8  sub_8025638                  sub_8025638
 *0x08025650    58  sub_8025650                  sub_8025650
-*0x080256e4    59  sub_80256E4                  sub_80256E4
+ 0x080256e4    59  sub_80256E4                  sub_80256E4
 ```
 
 ### M14 [ENGINE/OBJECT]  0x0802576C–0x080313EC  (62 函数 / 61 未匹配 / 16,512 指令)
@@ -897,7 +894,7 @@ ROM 表: 0x8393b28, 0x8393a48, 0x8393b20, 0x8393a4d
 *0x080323b4   122  sub_80323B4                  sub_80323B4
 ```
 
-### M16 [ENGINE/OBJECT]  0x08032548–0x0803F658  (62 函数 / 62 未匹配 / 19,191 指令)
+### M16 [ENGINE/OBJECT]  0x08032548–0x0803F658  (61 函数 / 61 未匹配 / 19,107 指令)
 
 调度表: 0x0839D4CC(59)
 工作内存: 0x3000820, 0x3000822, 0x3000824, 0x3000825
@@ -948,8 +945,7 @@ ROM 表: 0x8393a48, 0x8393a4d, 0x839df67, 0x839df64
 *0x080392c0    74  sub_80392C0                  sub_80392C0
 *0x080393e0   286  sub_80393E0                  sub_80393E0
 *0x08039724   438  sub_8039724                  sub_8039724
-*0x08039c38    17  sub_8039C38                  sub_8039C38
-*0x08039c6c   795  sub_8039C6C                  sub_8039C6C
+*0x08039c38   728  sub_8039C38                  sub_8039C38
 *0x0803a478   362  sub_803A478                  sub_803A478
 *0x0803a8d0   575  sub_803A8D0                  sub_803A8D0
 *0x0803af60   453  sub_803AF60                  sub_803AF60
@@ -1011,7 +1007,7 @@ ROM 表: 0x83988a8, 0x839d4c4, 0x839cc4c, 0x8393b28
  0x08044680    15  sub_8044680                  sub_8044680
 ```
 
-### M18 [ENGINE/OBJECT]  0x080446A4–0x0804473C  (8 函数 / 2 未匹配 / 105 指令)
+### M18 [ENGINE/OBJECT]  0x080446A4–0x0804473C  (8 函数 / 1 未匹配 / 56 指令)
 
 调度表: 0x0839D4CC(59)
 工作内存: 0x3000826, 0x3000884
@@ -1020,7 +1016,7 @@ ROM 表: 0x839dbf6
 ```
   地址        指令  ll.cfg 名                     函数
  0x080446a4     9  sub_80446A4                  sub_80446A4
-*0x080446bc    49  sub_80446BC                  sub_80446BC
+ 0x080446bc    49  sub_80446BC                  sub_80446BC
  0x08044728     2  sub_8044728                  sub_8044728
  0x0804472c     2  sub_804472C                  sub_804472C
  0x08044730     2  sub_8044730                  sub_8044730
@@ -1029,7 +1025,7 @@ ROM 表: 0x839dbf6
 *0x0804473c    56  sub_804473C                  sub_804473C
 ```
 
-### M19 [ENGINE/CORE]  0x080448A8–0x08048B30  (65 函数 / 46 未匹配 / 6,083 指令)
+### M19 [ENGINE/CORE]  0x080448A8–0x08048B30  (65 函数 / 45 未匹配 / 6,040 指令)
 
 工作内存: 0x3004ac0, 0x3004a88, 0x30008ec, 0x30008f0
 ROM 表: 0x8093418, 0x839d5bc, 0x839d81a, 0x83988a8
@@ -1055,7 +1051,7 @@ ROM 表: 0x8093418, 0x839d5bc, 0x839d81a, 0x83988a8
  0x08045b90    46  sub_8045B90                  sub_8045B90
 *0x08045bf4   109  sub_8045BF4                  sub_8045BF4
 *0x08045d00   203  sub_8045D00                  sub_8045D00
-*0x08045eb8    43  sub_8045EB8                  sub_8045EB8
+ 0x08045eb8    43  sub_8045EB8                  sub_8045EB8
 *0x08045f10    46  sub_8045F10                  sub_8045F10
 *0x08045f94    83  sub_8045F94                  sub_8045F94
 *0x08046060    83  sub_8046060                  sub_8046060
@@ -1119,7 +1115,7 @@ ROM 表: 0x839cc4c, 0x839d5bc
  0x08048d40    18  sub_8048D40                  sub_8048D40
 ```
 
-### M21 [ENGINE/CORE]  0x08048D64–0x0804AD24  (25 函数 / 19 未匹配 / 2,982 指令)
+### M21 [ENGINE/CORE]  0x08048D64–0x0804AD24  (25 函数 / 18 未匹配 / 2,939 指令)
 
 工作内存: 0x300094d, 0x3000949, 0x3000910, 0x300094a
 ROM 表: 0x839b2e0, 0x839d348, 0x861a7a4, 0x8095028
@@ -1147,7 +1143,7 @@ ROM 表: 0x839b2e0, 0x839d348, 0x861a7a4, 0x8095028
  0x0804ab10    15  sub_804AB10                  sub_804AB10
 *0x0804ab40    58  sub_804AB40                  sub_804AB40
  0x0804abd0    15  sub_804ABD0                  sub_804ABD0
-*0x0804abf8    43  sub_804ABF8                  sub_804ABF8
+ 0x0804abf8    43  sub_804ABF8                  sub_804ABF8
  0x0804ac60    36  sub_804AC60                  sub_804AC60
 *0x0804acc0    43  sub_804ACC0                  sub_804ACC0
  0x0804ad24    20  sub_804AD24                  sub_804AD24
@@ -1221,18 +1217,18 @@ ROM 表: 0x861aaa4, 0x861c764
  0x0804c6b0    46  sub_804C6B0                  sub_804C6B0
 ```
 
-### M24 [ENGINE/CORE]  0x0804C728–0x0804D0F8  (18 函数 / 7 未匹配 / 666 指令)
+### M24 [ENGINE/CORE]  0x0804C728–0x0804D0F8  (18 函数 / 2 未匹配 / 283 指令)
 
 工作内存: 0x3000d38, 0x3000be8
 ROM 表: 0x8393b28, 0x839d5bc
 
 ```
   地址        指令  ll.cfg 名                     函数
-*0x0804c728    48  sub_804C728                  sub_804C728
-*0x0804c78c    91  sub_804C78C                  sub_804C78C
+ 0x0804c728    48  sub_804C728                  sub_804C728
+ 0x0804c78c    91  sub_804C78C                  sub_804C78C
 *0x0804c890    34  sub_804C890                  sub_804C890
-*0x0804c8e0   101  sub_804C8E0                  sub_804C8E0
-*0x0804c9b4    54  sub_804C9B4                  sub_804C9B4
+ 0x0804c8e0   101  sub_804C8E0                  sub_804C8E0
+ 0x0804c9b4    54  sub_804C9B4                  sub_804C9B4
  0x0804ca2c    49  sub_804CA2C                  sub_804CA2C
  0x0804caa0    49  sub_804CAA0                  sub_804CAA0
  0x0804cb18    49  sub_804CB18                  sub_804CB18
@@ -1245,21 +1241,21 @@ ROM 表: 0x8393b28, 0x839d5bc
  0x0804ce48    49  sub_804CE48                  sub_804CE48
  0x0804cebc    16  sub_804CEBC                  sub_804CEBC
 *0x0804cee0   249  sub_804CEE0                  sub_804CEE0
-*0x0804d0f8    89  sub_804D0F8                  sub_804D0F8
+ 0x0804d0f8    89  sub_804D0F8                  sub_804D0F8
 ```
 
-### M25 [ENGINE/OBJECT]  0x0804D1B4–0x0804D708  (8 函数 / 8 未匹配 / 684 指令)
+### M25 [ENGINE/OBJECT]  0x0804D1B4–0x0804D708  (8 函数 / 4 未匹配 / 370 指令)
 
 调度表: 0x0839CD5C(87)
 ROM 表: 0x8393b28
 
 ```
   地址        指令  ll.cfg 名                     函数
-*0x0804d1b4    78  sub_804D1B4                  sub_804D1B4
-*0x0804d260    79  sub_804D260                  sub_804D260
+ 0x0804d1b4    78  sub_804D1B4                  sub_804D1B4
+ 0x0804d260    79  sub_804D260                  sub_804D260
 *0x0804d310    64  sub_804D310                  sub_804D310
-*0x0804d3a0    78  sub_804D3A0                  sub_804D3A0
-*0x0804d44c    79  sub_804D44C                  sub_804D44C
+ 0x0804d3a0    78  sub_804D3A0                  sub_804D3A0
+ 0x0804d44c    79  sub_804D44C                  sub_804D44C
 *0x0804d4fc    83  sub_804D4FC                  sub_804D4FC
 *0x0804d5b4   159  sub_804D5B4                  sub_804D5B4
 *0x0804d708    64  sub_804D708                  sub_804D708
@@ -1320,7 +1316,7 @@ ROM 表: 0x839cfaa, 0x87ea580, 0x839ce38, 0x839cefc
  0x0804f244     3  SioBattle_GetState           SioBattle_GetState
 ```
 
-### M28 [SCRIPT]  0x0804F250–0x0805305C  (77 函数 / 24 未匹配 / 5,068 指令)
+### M28 [SCRIPT]  0x0804F250–0x0805305C  (77 函数 / 23 未匹配 / 5,036 指令)
 
 调度表: 0x0862D434(80)
 锚点: BgTiles_LoadSet, FlushTileDma, Op_AnimSlotPause, Op_AnimSlotResume, Op_BgmFadeIn, Op_BgmFadeOut, Op_BgmPlay, Op_BgmStop, Op_BgmVolume, Op_CameraFollow
@@ -1376,7 +1372,7 @@ ROM 表: 0x862d574, 0x87ed904, 0x87ed6d4, 0x83936a8
  0x08052a8c    12  Op_BgmFadeOut                Op_BgmFadeOut
  0x08052aa8    17  Op_SfxPlay                   Op_SfxPlay
  0x08052acc    12  Op_SfxStop                   Op_SfxStop
-*0x08052ae8    32  sub_8052AE8                  sub_8052AE8
+ 0x08052ae8    32  sub_8052AE8                  sub_8052AE8
  0x08052b34    30  sub_8052B34                  sub_8052B34
  0x08052b80    15  Op_WaitCharsStop             Op_WaitCharsStop
  0x08052ba0    28  Op_LoadCharaGfx              Op_LoadCharaGfx

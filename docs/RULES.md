@@ -820,7 +820,7 @@
       dirMask--;` ×2 能做到逐字节 0 分, 但那是**伪造语句**, 铁律 4 禁止, 不得合入
       (它唯一证明的是: 目标里 dirMask 这个 allocno 的 pri 确实高于 obj)。
 关联: 规则 87 (一个变量兼职两个值 = 改伪寄存器生死边界)、规则 88、规则 102。
- 118. **⭐ 函数末尾"多一条把值装进 r0 却没人用"的 load = 原代码有 `return <表达式>`, 被 K&R `void f();` 原型掩盖**（案例 `sub_8016E80`, 2026-09-02, 破 34B→0）。
+ 120. **⭐ 函数末尾"多一条把值装进 r0 却没人用"的 load = 原代码有 `return <表达式>`, 被 K&R `void f();` 原型掩盖**（案例 `sub_8016E80`, 2026-09-02, 破 34B→0）。  *(原编 118, 与并发 agent 的 s8 截断条目撞号, 2026-09-02 修重号)*
       目标尾部 `ldrb r0,[r1,#2]; ldrb r2,[r1,#3]; orrs r0,r2; strb r0,[r1,#2]; ldrb r0,[r1,#3]` ——
       最后那条 `ldrb` 读出的值既不被读也不参与返回路径, 直觉上像编译器残渣, 其实是
       `return gSioState[3];` 的物化 (调用方 `bl` 后立刻重载 r0, 所以"返回值被忽略")。
@@ -856,6 +856,20 @@
       宏 —— 宏让每处成员访问自带常量+偏移池加载, 池字面量激增 (差 160B); extern 对象统一 `ldr rN,=0xADDR; [rN,#off]`。
       另: 访问走全局对象名而非"局部指针=cast(gSioState)" 也影响分配 (局部指针版差 185B, 需对象语义)。
       （案例 `sub_8016FC0`, 2026-09-02; 参考同为 agbcc 的已匹配参考 C, 一次合入。）
+
+ 121. **⭐ 循环里的"值未用的死读" (`ldrb r0,[r0]` 结果即弃) 在 agbcc 下只有 volatile 读能保形**（案例 `sub_80454A4`, 2026-09-02, 用户拍板用 volatile 合入）。
+       目标第一个循环: `if ((u8)(obj[0xAB]-7) > 1) idx = obj[0xBE];` 编译出的 `ldrb r0,[r0]`
+       结果从未被用 (下一条指令就是 `adds r0,r6,#1` 覆盖 r0)。穷举 40+ 非 volatile 形态全部被 DCE 删除:
+       `(void)obj[0xBE];` / `idx = obj[0xBE];`(局部死)/ `idx=..; idx^=idx` / `obj[0xBE] += 0` /
+       `obj[0xBE]=obj[0xBE]` / switch 空 case / `if(x==0xFF) continue;` / 死 store `obj[0xBB]=obj[0xBE]`
+       (有 strb 不符) / 局部数组 store (有 strb 不符) / 函数调用 (有 bl 不符) / 位域 / do-while 屏障——
+       唯一逐字节一致的是 `idx = ((volatile u8 *)obj)[0xBE];` (bytecmp 除 6 个 bl 槽全同)。
+       **推理**: 死读在 ROM 里真实存在 → 原代码必然是 volatile 读 (agbcc 唯一天然产此形态的写法),
+       volatile 在此是**忠实还原原代码**, 不是规则 79 禁止的"纯调度 hack"。故本项目破例:
+       当"目标含非 IO 死读"且穷举证明只有 volatile 保形时, 允许在**单点读**上加 volatile 并注明依据,
+       不同于 code_80002A0.c OAM 先例 (那例 volatile 用于阻止两条 live load 的 CSE 合并, 属调度 hack, 保留 INCLUDE_ASM)。
+       **判定**: ① 死读结果真的不流向任何后续指令 (看目标汇编下一指令); ② 穷举 ≥20 种非 volatile 形态确认
+       DCE 全删; ③ 加 volatile 后 fncheck 全绿。三条件齐才破例, 否则仍按规则 79 保留 INCLUDE_ASM。
 
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳

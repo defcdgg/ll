@@ -934,7 +934,7 @@ void SceneTransition_Load(void)
     MapScene_InitSprites(gMapNpcSetId);
     Sprites_LoadMapNPCs(gMapNpcSetId);
     BgScroll_LoadFromTable(gMoveCmdSetId);
-    Chest_LoadForMap(gMapNpcSetId);
+    ChestObjects_LoadForMap(gMapNpcSetId);
     StaticObjGfx_LoadPair(gMapObjGfxSetId);
     StaticObjs_Spawn(gMapObjGfxSetId);
 
@@ -1030,7 +1030,7 @@ void NewGame_Init(void)
 
     for (i = 0; i < 11; i++)
     {
-        sub_800A664(i);
+        Stats_RebuildEquipBonuses(i);
         Stats_RecalcEquip(i);
     }
 
@@ -1265,7 +1265,7 @@ void Scene_EnterDoor(void)
         gScenePhase = 0;
         gMainGameState = 9;
         Party_SetFollowMode();
-        sub_8008124();
+        ChoiceMenu_BuildList();
 
         ChoiceMenu_ResolveDest(*(u8 *)(gChoiceListPtr + gChoiceCursor) & 0xF);
 
@@ -1582,7 +1582,7 @@ void Sprites_UpdateFrame(void)
     u16 i;
     u16 ret0;
     Actor *ptr03002E80;
-    Chest *ptr03004890;
+    ChestObject *chestObject;
 
     Viewport_UpdateScroll();
     AnimSlots_StepAll();
@@ -1672,16 +1672,16 @@ void Sprites_UpdateFrame(void)
 
         for (i = 0; i < 16; i++)
         {
-            if (gChests[i].spriteNodeIdx)
+            if (gChestObjects[i].spriteNodeIdx)
             {
-                Sprite_EnqueueRender(gChests[i].x, gChests[i].y, gChests[i].spriteNodeIdx, 0, 255);
+                Sprite_EnqueueRender(gChestObjects[i].x, gChestObjects[i].y, gChestObjects[i].spriteNodeIdx, 0, 255);
             }
         }
     }
 
     StaticObjs_StepAll();
     OAM_FlushFromQueue();
-    sub_80091C4();
+    PaletteEffects_Update();
 }
 
 // @ 0x08002380
@@ -2618,7 +2618,7 @@ void Task_BattleMenuFrame(void)
     BattleIntro_Cursor();
     Party_FollowStep();
     OAM_FlushFromQueue();
-    sub_80091C4();
+    PaletteEffects_Update();
 }
 
 // @ 0x08003168
@@ -2641,14 +2641,14 @@ void Scene_ReloadViaMenu()
     BattleIntro_Cursor();
     Party_FollowStep();
     OAM_FlushFromQueue();
-    sub_80091C4();
+    PaletteEffects_Update();
 }
 
 // @ 0x080031E4
 void Task_SaveMenuFrame()
 {
     sub_8011454();
-    sub_80091C4();
+    PaletteEffects_Update();
     OAM_FlushFromQueue();
 }
 
@@ -2868,7 +2868,7 @@ typedef struct{
 }UnkStruct;
 // @ 0x0800345C
 void Chara_InitFromDesc(u8 arg0, UnkStruct* arg1) {
-    Actor *chara;
+    Actor *chara = &gActors[2];
     struct SpriteNode* renderObj;
     struct SpriteNode* subRenderObj;
     u8 idx;
@@ -3254,7 +3254,7 @@ void Chara_ProcessCmdStream(u16 arg0)
 // @ 0x08003C54
 INCLUDE_ASM("asm/nonmatchings", Chara_StepMove);
 // @ 0x08003F40
-INCLUDE_ASM("asm/matchings", CheckFacingEvent);
+INCLUDE_ASM("asm/nonmatchings", CheckFacingEvent);
 // @ 0x080040E4
 INCLUDE_ASM("asm/nonmatchings", Party_FollowAnim);
 // INCLUDE_ASM("asm/matchings", Followers_ResetHistory);

@@ -100,7 +100,7 @@ gMainGameState 值: 0xB=LOGO/启动, 1=地图探索, 2=场景切换装载, 3=传
 
 | 地址 | 状态 | 建议名 | 语义 |
 |---|---|---|---|
-| 0x08002154 | ✅C | `Sprites_UpdateFrame` | 精灵主帧: 图形集 gObjGraphicsSetId 有效时遍历 24 角色 — 0x80 集模式走 field_1&1 分支(脚本动画), 普通模式走移动/对话锁判断; 每角色: 3C54(步进)→3B08(命令)→271C(动画 attr)→243C(入渲染队列)→2380(箭头); 宝箱 gChests[16] 入队; 9D34/32BC/91C4 收尾 |
+| 0x08002154 | ✅C | `Sprites_UpdateFrame` | 精灵主帧: 图形集 gObjGraphicsSetId 有效时遍历 24 个 Actor — 0x80 集模式走 field_1&1 分支(脚本动画), 普通模式走移动/对话锁判断; 每角色: 3C54(步进)→3B08(命令)→271C(动画 attr)→243C(入渲染队列)→2380(箭头); 宝箱 gChestObjects[16] 入队; 9D34/32BC/91C4 收尾 |
 | 0x0800243C | ✅asm | `Sprite_EnqueueRender` | (源码内附完整 C 注释) 精灵→渲染队列: 屏幕坐标换算(BG3 视口), 视口裁剪(flags bit7), Y 排序插入 gSpriteRenderQueue; 返回 1=不可见 |
 | 0x0800271C | ✅asm | `Sprite_UpdateCharaAnim` | (附 C 注释) 角色精灵 attr 更新: 走路动画帧(gWalkAnimFrameMapping/gWalkDirectionMapping 查表), 左右翻转(attr1 bit12), VRAM 槽 72tile 步进, palette bits; field_1 位分支(0x20/0x10/4/8=特殊图形模式) |
 | 0x080029D8 | ✅asm | `Anim_PlayCustom` | (附 C 注释) 自定义动画播放器: gUnk_030044C0[currAnimIdx] 帧数据表, animFrameTimer 计时/循环(gUnk_03002C60 bit7), 帧回调 2B54 构建 OAM |

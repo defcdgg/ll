@@ -998,7 +998,7 @@ status	isa	module	addr	name	note
 1	thumb	code_804F0B8	0x08052aa8	Op_SfxPlay	
 1	thumb	code_804F0B8	0x08052acc	Op_SfxStop	
 1	thumb	code_804F0B8	0x08052ae8	sub_8052AE8	✅ 2026-09-02 opencode: rec=*arg0 记录, 从 [1]..[2] 号段随机(Rng_LcgNext%(max-min+1))查 gUnk_02016000 表, 结果指针 0x02016200+val 写回 *arg0, 返1; 关键坑=表基址/目标基址必须写常量地址 (u16*)0x02016000 而非数组符号 gUnk_02016000, 否则 GCC2 把 SYMBOL_REF 基址留在 callee-saved r7 不 remat → val/max 寄存器错位(差15B); 常量地址才 remat 命中; bytecmp+objdump 与 target .text 0 差, fncheck OK 76B(2 bl 忽略)
-1	thumb	code_804F0B8	0x08052b34	sub_8052B34	
+1	thumb	code_804F0B8	0x08052b34	sub_8052B34	✅ 2026-09-02 opencode+TsilaAllaoui: 脚本 op 处理器, gUnk_03000E78<=7 时把返回地址 script_ptr+2 存 gUnk_03000E80[E78], 取 param1=script_ptr[1] 查 gUnk_02016000 跳转表得 addr, E78++, *ptr=gUnk_02016200+addr; 否则 *ptr=script_ptr+2; 返1; 关键=addr 须经 temp 变量 (temp=&tbl[param1]; addr=*temp) 否则 agbcc 换寻址; 复用 gUnk_02016000/02016200 命名符号(此压力级不需裸地址); fncheck OK 76B
 1	thumb	code_804F0B8	0x08052b80	Op_WaitCharsStop	
 1	thumb	code_804F0B8	0x08052ba0	Op_LoadCharaGfx	
 1	thumb	code_804F0B8	0x08052be0	Op_LoadCharaPal	

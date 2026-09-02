@@ -494,7 +494,28 @@ u32 sub_8052AE8(u32 *arg0)
     *arg0 = 0x02016200 + val;
     return 1;
 }
-INCLUDE_ASM("asm/matchings", sub_8052B34);
+u32 sub_8052B34(u8 **script_ptr_ptr)
+{
+    u8 param1;
+    u16 addr;
+    u8 *script_ptr = *script_ptr_ptr;
+    u16 *temp;
+
+    if (gUnk_03000E78 <= 7)
+    {
+        gUnk_03000E80[gUnk_03000E78] = (u32)(script_ptr + 2);
+        param1 = script_ptr[1];
+        addr = *(temp = &gUnk_02016000[param1]); /* temp 必需: 否则 agbcc 生成不同寻址 */
+        gUnk_03000E78++;
+        *script_ptr_ptr = gUnk_02016200 + addr;
+    }
+    else
+    {
+        *script_ptr_ptr = script_ptr + 2;
+    }
+
+    return 1;
+}
 u32 Op_WaitCharsStop(u32 *ptr)
 {
     if (Chara_AnyMoving() == 0)

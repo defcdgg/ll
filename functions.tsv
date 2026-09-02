@@ -920,7 +920,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x0804dabc	sub_804DABC	
 0	thumb	code_8044394	0x0804db64	sub_804DB64	
 0	thumb	code_8044394	0x0804dc24	sub_804DC24	
-0	thumb	code_8044394	0x0804dcd8	sub_804DCD8	
+0	thumb	code_8044394	0x0804dcd8	sub_804DCD8	⏸ 2026-09-02 opencode: 概率判定+掉落道具, 姊妹sub_804D1B4/D260/D708/D798同族(obj[0xBC]恒1+obj[0xC2]=0+entry offset=8); 剩12B=obj[0xBC]=1覆盖+obj[0xC2]=0的寄存器调度(r1/r2: target先copy&obj[0xBC]到r2再r1=0); 候选permuter/sub_804DCD8/
 1	thumb	code_8044394	0x0804dd70	sub_804DD70	
 1	thumb	code_8044394	0x0804dd90	sub_804DD90	
 1	thumb	code_8044394	0x0804de20	sub_804DE20	
@@ -955,7 +955,7 @@ status	isa	module	addr	name	note
 1	thumb	code_804F0B8	0x0804f768	Op_RemovePartyMember	
 0	thumb	code_804F0B8	0x0804f7f8	sub_804F7F8	
 0	thumb	code_804F0B8	0x0804f8d8	sub_804F8D8	
-0	thumb	code_804F0B8	0x0804f974	sub_804F974	
+⏸ 2026-09-02 ll-agent: 条件跳转opcode(测data[3+2i]|data[4+2i]<<8的flags, 全置位→跳gUnk_02016200+[data[2]]表, 否则*ptr+=data[1]+3); 循环体/入口peel/分支极性全对, 剩13B=尾部cross-jump: 跳转路径base2(0x02016200)应落r2(ldr r2;adds r0,r0,r2;b 80)但编译器重用r1与推进路径t+3合并(adds r0,r0,r1); 穷举表达式序/off变量/指针算术/b1+idx拆分全撞13B(与sub_804FA04同族墙); 最佳候选permuter/sub_804F974/base.c; 需破坏寄存器重用(让base2拿r2)
 0	thumb	code_804F0B8	0x0804fa04	sub_804FA04	⏸ 2026-09-02 sound-agent: 语义全解(条件跳转opcode: 循环测event/switch flags, 全0跳gUnk_02016200+[data[2]]表, 命中*ptr+=b+3); 循环旋转已解(规则116: count>i); 卡点=尾部寄存器分配+调度(not-found体lsl前/后加载base1 + r1/r2双基址, found体b+3先算); 穷举temp/换序/-g/permuter全撞1475; 候选permuter/sub_804FA04/base.c
 0	thumb	code_804F0B8	0x0804fa94	sub_804FA94	
 0	thumb	code_804F0B8	0x0804fb24	sub_804FB24	

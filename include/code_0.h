@@ -169,9 +169,9 @@ void BgPal_ResetFirst();
 void AnimSlot_PlayOnce(u16, u8 *);
 void BgMap_FillRow(u8);
 void MapBg_FlushPending();
-void Chest_LoadForMap(u8);
-void Chest_BuildSprite(u8);
-void Chest_Open(u8);
+void ChestObjects_LoadForMap(u8);
+void ChestObject_BuildSprite(u8);
+void ChestObject_Open(u8);
 void LoadDigitFontObjTiles();   // 10 个数字字形 → OBJ 图块槽 150, + 2 组 OBJ 调色板
 void ChestFlags_ClearAll();
 void ChestFlags_Toggle(u8);
@@ -754,7 +754,7 @@ void sub_8045098();
 void sub_804519C();
 void sub_8045328();
 u16 sub_80453D8(void);
-void sub_804542C();
+u16 sub_804542C(void);
 void sub_80454A4();
 void sub_80455A0();
 void sub_8045688();
@@ -965,7 +965,7 @@ void sub_804F07C();
 u8 sub_804F088(u8 *, u32);
 u8 sub_804F0B8(u8 *, s32);   // CheckObjectKindSlot: 比较对象 +0x91/+0x92 两个候选 id, 返 1/2/0
 #define CheckObjectKindSlot sub_804F0B8
-void sub_804F10C();
+s8 sub_804F10C(u8, u8);
 void sub_804F17C();
 void SioBattle_ResetState();
 u8 SioBattle_GetState();

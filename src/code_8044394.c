@@ -282,7 +282,34 @@ u16 sub_80453D8(void)
     }
     return result;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_804542C);
+u16 sub_804542C(void)
+{
+    u8 *base;
+    u16 result;
+    u8 i;
+    u8 *obj;
+
+    base = (u8 *)GetBuf_37410();
+    result = 0;
+    for (i = 0; i <= 6; i++)
+    {
+        obj = (u8 *)(i * 0xC8 + (u32)base);
+        if (obj[0xAB] == 8)
+        {
+            if (sub_80187B4() & 0x20)
+                result += *(u16 *)(*(u8 **)(obj + 0x88) + 0x28);
+            else
+                result += *(u16 *)(*(u8 **)(obj + 0x88) + 0x14);
+        }
+    }
+    if (sub_804F10C(5, 1) >= 0)
+    {
+        u16 bonus = (u16)(result / 10);
+        result = (u16)(result + bonus);
+    }
+    Silver_Add(result);
+    return result;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_80454A4);
 INCLUDE_ASM("asm/nonmatchings", sub_80455A0);
 INCLUDE_ASM("asm/nonmatchings", sub_8045688);
@@ -322,7 +349,52 @@ void sub_8045B90(u8 *obj, u8 index)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8045BF4);
 INCLUDE_ASM("asm/nonmatchings", sub_8045D00);
-INCLUDE_ASM("asm/nonmatchings", sub_8045EB8);
+/* obj+0x6C 起是 0x21 字节的移动/上下文块 (MOD-04: +0x6C/6E = 移动坐标),
+ * 紧随其后的 obj+0x8D..0x92 是 6 个角色编号。必须用 Sub6C 视图取号:
+ * 写成 `obj + 0x8D` 会被折成单一基址, 目标里 "(p + 0x21) + i" 的三条
+ * adds 就少一条; 写成 `base[0x21 + i]` 又变成 "r6 + r5 + 0x21" 的两条。
+ * 语义: 逐个编号查 sub_804DD90(id, 1) (= AI 行为字节 bit6-7 分类),
+ * 命中 1/2/3 就把 obj+0xB8 的 u16 标志位 0/1/2 置起来。
+ * 末尾 `*flags |= extra` 是**原代码遗留的空操作**: extra 恒为 0, GCC2 的
+ * CSE 把这条 RMW 整个折叠掉, 但 flow 已按"被读过"把 extra 判成 live,
+ * 于是只留下 `movs r7, #0` —— 这就是目标第 4 个 callee-saved 寄存器的
+ * 全部痕迹。删掉这一行 → push 退化成 {r4, r5, r6, lr}, 差 10 字节。
+ * (同族先例见 RULES 规则 89 / 坑11。) */
+typedef struct
+{
+    /* 0x00 */ u8 pad[0x21];
+    /* 0x21 */ u8 ids[6];
+} Sub6C;
+
+// @ 0x08045EB8
+void sub_8045EB8(u8 *obj)
+{
+    Sub6C *entry;
+    u8 i;
+    u16 *flags;
+    u8 extra;
+
+    entry = (Sub6C *)(obj + 0x6C);
+    i = 0;
+    flags = (u16 *)(obj + 0xB8);
+    extra = 0;
+    for (; i <= 5; i++)
+    {
+        switch (sub_804DD90(entry->ids[i], 1))
+        {
+        case 1:
+            *flags |= 1;
+            break;
+        case 2:
+            *flags |= 2;
+            break;
+        case 3:
+            *flags |= 4;
+            break;
+        }
+    }
+    *flags |= extra;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8045F10);
 INCLUDE_ASM("asm/nonmatchings", sub_8045F94);
 INCLUDE_ASM("asm/nonmatchings", sub_8046060);

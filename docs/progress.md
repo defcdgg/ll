@@ -1851,3 +1851,21 @@ else { p[idx]=0x92C0; q[idx]=0x92C0; p[0x241]=0x92C0; q[0x241]=0x92C0; }
 - 写值 0x92A2..5 各占一个池常量 (目标 8 个池槽全用上); else 分支 0x92C0 单池常量复用 r2。
 - bytecmp 报 4B 差为 bl 槽 + ld 生成的 interwork trampoline 垫尾 (168 vs 152), 指令域逐条全等;
   以 fncheck (合入真身) 为准 OK。此坑印证 bytecmp 对"含 bl 的候选"只比前缀, 长度差不代表不匹配。
+
+## 2026-09-02 `sub_8019F08` 匹配 (tilemap 区域改写, code_8010F10)
+
+112 字节: 把 tilemap 从 `startRow*32+startCol` 起的 width×height 区域, 每个 `u16 tile`
+`= (tile & 0xFC00) + addVal` (保留 tile 号, 低位替换为 addVal 偏移)。6 参数函数。
+
+**卡点与解法**:
+1. **声明顺序定寄存器 home**: `u8 row; u8 col; u16 *p;` (指针在最后) 生成 `adds r5,r4` (nextRow→r5)
+   与目标相反 (差 5 字节, r5↔r6 互换)。改成 `u16 *p; u8 col; u8 row;` (指针**最前**) 即 OK。
+   → 多变量函数内, 指针/数组局部先声明可强制高寄存器外的 home 分配。
+2. **起始指针写法**: `p = &tilemap[startRow * 32 + startCol]` (直接用数组取址) 生成目标的
+   `lsls r3,r3,#0x18; lsrs r3,r3,#0x13; adds r3,r3,r2; lsls r3,r3,#1` (合并×2)。
+   写成 `tilemap + startRow*32 + startCol` 则把 ×2 拆开进各项 (差 5-20 字节)。
+3. 原型 K&R → 全原型 `(u16*, u16, u8, u8, u8, u8)`; 调用点传 6 参无截断风险。
+
+fncheck OK (112 bytes, 0 池重定位, 0 bl 槽)。
+注: 合入时 make 因**其他 agent 未提交重构** (code_8005020.c 引用不存在切片 MapScene_LoadNpcSlotIds)
+红, 本 TU 独立编译通过、fncheck OK, 照常提交。

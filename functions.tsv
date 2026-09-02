@@ -412,7 +412,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08019e60	sub_8019E60	✅ 2026-08-31 pi: attr 未初始化局部(规则58) + 单个 tmp 双用 + do{}while(0) 屏障(规则59) + 基址用字面量(规则32); 108B fncheck OK
 1	thumb	code_8010F10	0x08019ecc	Disp_Bg1Off	
 1	thumb	code_8010F10	0x08019ee0	DialogCtx_SetHead	
-0	thumb	code_8010F10	0x08019f08	sub_8019F08	
+1	thumb	code_8010F10	0x08019f08	sub_8019F08	✅ 2026-09-02 opencode: tilemap区域改写(u16 tile&0xFC00+addVal); 起始&tilemap[startRow*32+startCol]+双重循环+w/height; key=指针u16*p;u8 col;u8 row声明序定r5/r6 home(p先声才OK); 原型K&R→全原型(u16*,u16,u8,u8,u8,u8); 调用点传6参无截断; fncheck OK	
 0	thumb	code_8010F10	0x08019f78	sub_8019F78	
 1	thumb	code_8010F10	0x0801a05c	DialogCtx_GetField_C	
 1	thumb	code_8010F10	0x0801a074	BgMap_PalFillRect	✅ K&R声明+定义; 声明顺序col,dst,row定r6/r7 home

@@ -302,11 +302,11 @@ u32 SaveTimer_Get(u8);
 void SaveFlag_Set(u8);
 s32 SaveFlag_Get(u8);
 void SaveUi_Open(u8);
-void sub_8016038();
+void sub_8016038(u8);
 void sub_8016068();
 void sub_80160CC();
 void sub_80160F4();
-void sub_8016178();
+void sub_8016178(u16);
 void sub_80161F4();
 void Num_Draw16(s16, u16 *);
 void Hud_DrawLv(u8, u8, u8);
@@ -419,7 +419,7 @@ void sub_8019E60();   // BlankTilemap: 清空 VRAM 图块 0x2C0 并把 1024 项 
 #define BlankTilemap sub_8019E60
 void Disp_Bg1Off();
 void DialogCtx_SetHead(u8, u8, u8);
-void sub_8019F08();
+void sub_8019F08(u16 *, u16, u8, u8, u8, u8);
 void sub_8019F78();
 u8 DialogCtx_GetField_C(u8);
 void BgMap_PalFillRect();  // K&R: ROM 调用点无截断 (被调入口截断由定义侧提供), 全原型会给 caller 加 lsls/lsrs 破坏已匹配的 sub_802576C

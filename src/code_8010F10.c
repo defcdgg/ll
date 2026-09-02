@@ -663,7 +663,10 @@ void sub_8016178(u16 arg0)
 }
 extern u8 gUnk_08098308[];
 
-void sub_80161F4(u8 arg0, u8 x, u8 y)
+void sub_80161F4(arg0, x, y)
+u8 arg0;
+u8 x;
+u8 y;
 {
     u16 *ptr;
     u16 i;
@@ -1933,7 +1936,22 @@ void DialogCtx_SetHead(u8 index, u8 arg1, u8 arg2)
     gDialogCtx[index].field_A = arg2;
     gDialogCtx[index].field_C = 5;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8019F08);
+void sub_8019F08(u16 *tilemap, u16 addVal, u8 startCol, u8 startRow, u8 width, u8 height)
+{
+    u16 *p;
+    u8 col;
+    u8 row;
+
+    p = &tilemap[startRow * 32 + startCol];
+    for (row = 0; row < height; row++)
+    {
+        for (col = 0; col < width; col++)
+        {
+            p[col] = (p[col] & 0xFC00) + addVal;
+        }
+        p += 32;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8019F78);
 u8 DialogCtx_GetField_C(u8 index)
 {

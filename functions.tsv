@@ -343,7 +343,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08016c10	Text_FillHidden	
 1	thumb	code_8010F10	0x08016c2c	Text_TileAt	
 1	thumb	code_8010F10	0x08016c44	sub_8016C44	
-0	thumb	code_8010F10	0x08016c88	sub_8016C88	
+1	thumb	code_8010F10	0x08016c88	sub_8016C88	✅ 2026-09-02 gpnux: SIO 联机初始化 (IME/IE/RCNT/SIOCNT 序列 + CpuFill32 清 0x130B + 五个缓冲指针); 坑: CpuFill32 必须写在 state=gSioState 之前 (否则 movs/str [sp] 与 ldr r7 顺序反, 差 4B); fncheck 152B OK; 语义名待定: Sio_InitLink (rename_fn.sh 因基线红回滚, 见 INCIDENTS)
 0	thumb	code_8010F10	0x08016d24	sub_8016D24	
 1	thumb	code_8010F10	0x08016e30	Sio_BuildPacket	
 1	thumb	code_8010F10	0x08016e80	sub_8016E80	✅ 2026-09-02 gpnux: SIO 收包; 三处变量兼职还原 home (交换临时量=packet 本身 / 循环用 st=state 第二伪寄存器 / i=0 独立语句), 末尾 return gSioState[3] 还原多出的 ldrb; CpuCopy32+CpuFill32 宏出 0x04000006/0x05000006; fncheck 176B OK

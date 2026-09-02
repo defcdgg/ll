@@ -164,9 +164,9 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x08008df8	AnimSlot_PlayOnce	
 1	thumb	code_8005020	0x08008e44	BgMap_FillRow	
 1	thumb	code_8005020	0x08008e94	MapBg_FlushPending	
-1	thumb	code_8005020	0x08008f28	Chest_LoadForMap	✅ 2026-09-02 codex: 扫描 256×8B gChestSpawnTable，按 mapId 装载对象并补齐 16 槽；fncheck OK (168B)
-1	thumb	code_8005020	0x08008fd0	Chest_BuildSprite	
-1	thumb	code_8005020	0x0800908c	Chest_Open	
+1	thumb	code_8005020	0x08008f28	ChestObjects_LoadForMap	✅ 2026-09-02 codex: 扫描 256×8B gChestSpawnTable，按 mapId 装载对象并补齐 16 槽；fncheck OK (168B)
+1	thumb	code_8005020	0x08008fd0	ChestObject_BuildSprite	✅ 2026-09-02 codex: 按 gChestObjects.flags 位7选择调色板并构建开/关宝箱 OAM 链；fncheck OK (188B)
+1	thumb	code_8005020	0x0800908c	ChestObject_Open	✅ 2026-09-02 codex: 翻转对象状态与 gChestFlags 对应位，释放并重建精灵链；fncheck OK (136B)
 1	thumb	code_8005020	0x08009114	LoadDigitFontObjTiles	
 1	thumb	code_8005020	0x08009168	ChestFlags_ClearAll	
 1	thumb	code_8005020	0x08009184	ChestFlags_Toggle	
@@ -746,7 +746,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x0804519c	sub_804519C	
 0	thumb	code_8044394	0x08045328	sub_8045328	
 1	thumb	code_8044394	0x080453d8	sub_80453D8	
-0	thumb	code_8044394	0x0804542c	sub_804542C	
+1	thumb	code_8044394	0x0804542c	sub_804542C	✅ 2026-09-02 opencode: 姊妹函数sub_80453D8同构(金币积累); fncheck OK
 0	thumb	code_8044394	0x080454a4	sub_80454A4	
 0	thumb	code_8044394	0x080455a0	sub_80455A0	
 0	thumb	code_8044394	0x08045688	sub_8045688	
@@ -758,8 +758,8 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x08045b90	sub_8045B90	
 0	thumb	code_8044394	0x08045bf4	sub_8045BF4	
 0	thumb	code_8044394	0x08045d00	sub_8045D00	
-0	thumb	code_8044394	0x08045eb8	sub_8045EB8	⏸ 已还原INCLUDE_ASM保基线; 最接近差1字节(cmp r7 vs r5); 见progress
-0	thumb	code_8044394	0x08045f10	sub_8045F10	
+1	thumb	code_8044394	0x08045eb8	sub_8045EB8	✅ 2026-09-02 gpnux: Sub6C{pad[0x21],ids[6]} 视图还原 (p+0x21)+i 取址树 + u8(u8,u8) 原型触发返回值截断; 末尾 `*flags |= extra(恒0)` 被 CSE 折叠但保住 movs r7,#0 (坑11); fncheck 88B OK
+0	thumb	code_8044394	0x08045f10	sub_8045F10	⏸ 指令流 100% 对 (132B 逐条一致), 只差 3 个 global-alloc home (obj↔dirMask 互换, 8 字节)。语义: obj[0xBE]!=0xFF→result=1; dir=obj[0xAB]<=8 时 switch(dir) 查 1<<dir 九项跳转表→bit, (bit & (u16)dirMask) 非零→result=2; 返回 0/1/2 (0=未激活 1=激活不朝向 2=激活且朝向)。已定死形状: ① 守卫必须写成 `dir = obj[0xAB]; if (dir <= 8) { switch (dir) ... }` (直接 `if (obj[0xAB] <= 8)` 会留两条 cmp r0,#8 且 dirMask 掉进 r5; 无守卫的 `default: return result;` 会被 tail-dup 成 movs r0,#1 多 4 字节)。② 原型必须 `u8 f(u8 *, u16)` 才在入口产生 lsls/lsrs #0x10 截断。定量卡点见 RULES 规则 117: 需 pri(dirMask)>pri(obj)=0.231 即 refs≥5 或 (refs=4 且 live≤34), 而一切"刷引用"写法都被 tree/CSE 折掉; 唯一达 0 分的 `case: dirMask++; dirMask--;` ×2 是伪造语句 (铁律 4 禁), 不合入。候选: permuter/sub_8045F10/base.c (score 8) 与 output-20-1 (score 4, 含伪造语句, 仅作机制证明); 诊断脚本 .scratch/gpnux/45eb8/probe_rtl.py
 0	thumb	code_8044394	0x08045f94	sub_8045F94	
 0	thumb	code_8044394	0x08046060	sub_8046060	
 0	thumb	code_8044394	0x0804612c	sub_804612C	
@@ -767,7 +767,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x080462e4	sub_80462E4	⏸真C待攻(现 INCLUDE_ASM matchings 保 status=1 字节绿): 231指令+r8/sb/sl三连(坑1:合并真C恐泄漏破同TU)+栈buf[12]+3调用(GetObjPool/sub_8045F10/sub_801F884); 语义=obj池按 sub_8045F10==2 收集索引到buf, 再按 sub_801F884(arg0) 的 nibble 过滤写回 arg1; 候选 permuter/sub_80462E4/v1.c 差320/456B(寄存器分配/循环peel全不同); 需专项逐块攻
 0	thumb	code_8044394	0x08046480	sub_8046480	
 0	thumb	code_8044394	0x08046558	sub_8046558	
-0	thumb	code_8044394	0x0804666c	sub_804666C	
+0	thumb	code_8044394	0x0804666c	sub_804666C	⏸ 2026-09-02 opencode: 收集buf[5]+sub_80466F0处理, 结构与已匹配sub_8046C50同构; 头两循环+尾部全逐字节对, 剩2B=第三循环 ldrb r1,[r0];adds r0,r1,#0 (我恒 ldrb r0,[r0]) 纯寄存器home; 已试 indices[j]/buffer[j]/idx局部/0xC8*序 全无效
 0	thumb	code_8044394	0x080466f0	sub_80466F0	
 1	thumb	code_8044394	0x08046c50	sub_8046C50	
 0	thumb	code_8044394	0x08046cd4	sub_8046CD4	
@@ -794,7 +794,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x080487cc	sub_80487CC	
 1	thumb	code_8044394	0x08048818	sub_8048818	
 1	thumb	code_8044394	0x08048868	sub_8048868	
-0	thumb	code_8044394	0x080488cc	sub_80488CC	
+0	thumb	code_8044394	0x080488cc	sub_80488CC	⏸ 2026-09-02 opencode: 技能查找(if id>0x2F查obj+0x88/0x8A else 查obj+0x99技能表, 命中调sub_8045A10); 语义已全解重写(v6: result/found双变量+do-while(1)+goto check), 布局/循环/池序全对, 剩22B=skills基址home(r5 vs r2)+result/found轮换(r7/r6 vs r6/r5), 纯global-alloc; 已试-g/register/声明序/链式/死引用/&obj[0x99]/cast 全无效; 候选permuter/sub_80488CC/base.c
 1	thumb	code_8044394	0x08048934	sub_8048934	
 1	thumb	code_8044394	0x08048984	sub_8048984	✅ 2026-09-02 qwen: obj[0x99+arg1]→gUnk_08093418[id*5+2]&0xF (家族同 sub_8048934); fncheck OK 32B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x080489a4	sub_80489A4	✅ 2026-09-02 qwen: arg1<=7 时取 obj[0x99+arg1] 否则原值 → gUnk_08093418[id*5+1]&0xF (家族同 sub_8048934/8984); fncheck OK 36B; 全ROM SHA1 绿
@@ -940,7 +940,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804ef00	sub_804EF00	✅ 2026-09-02 opencode: DC8[arg0].field_0!=0 时把 field_0 匹配项的 field_1 同步进 D88[i]; 复用 Unk_03000DEntry; fncheck OK 80B
 1	thumb	code_8044394	0x0804ef50	sub_804EF50	✅ 2026-09-02 opencode: 扫 gUnk_03000D88[0..gUnk_03000DDC), field_0>0xDC 则 gUnk_03004980[field_0]=field_1; GCC for 旋转成 bottom-test(blo)+首检 peel(bhs); 复用 Unk_03000DEntry/gUnk_03004980(line1408) 勿本地重定义; fncheck OK 64B
 1	thumb	code_8044394	0x0804ef90	sub_804EF90	✅ 2026-09-02 opencode: gUnk_03000D88[].field_0 线性查找 arg0->下标, 命中返 i 否则 0xFF; 规则108 变体(变长界 gUnk_03000DDC + ret 累加器); 复用 iwram.h Unk_03000DEntry(勿本地重定义 extern, 会冲突); fncheck OK 76B
-0	thumb	code_8044394	0x0804efdc	sub_804EFDC	
+1	thumb	code_8044394	0x0804efdc	sub_804EFDC	✅ 2026-09-02 opencode: tilemap渲染器(palette<<12作tile attr); fncheck OK
 1	thumb	code_8044394	0x0804f050	sub_804F050	✅ 2026-09-02 opencode: gInvPageItemIds[16] 线性查找 道具id->页号, for+break; GCC 把首迭代(i=0)peel 到循环外, 循环体 i++ 后 cmp#0xf/bhi 收尾返16; u8 arg0/i 触发 lsls/lsrs 字节截断; fncheck OK 44B
 1	thumb	code_8044394	0x0804f07c	sub_804F07C	
 1	thumb	code_8044394	0x0804f088	sub_804F088	✅ 2026-09-02 opencode: obj[0xBE]>10返2, 否则按 obj[0xA4]>0xDC 分派 sub_804E0E4/sub_804E2AC; 被调原型须非void(u8即可,egcs对u8返回恒截断); fncheck OK 48B

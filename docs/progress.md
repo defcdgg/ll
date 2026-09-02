@@ -2137,7 +2137,7 @@ obj 池槽位操作: 从 sub_80489E8 收集的 values 中删除 arg1 (移位), �
 1. `slot = !slot` 编译成 r0 计算+拷贝; 改显式 `if (slot==0) slot=1; else slot=0` (2780)。
 2. 残余结构差在移位循环: 直接 `count--; for(j=i; j<count; j++)` 会立即截断 count
    (subs+lsls+lsrs), 目标把 count-1 复制到 r3 作循环界、r4 作备、延迟到循环后 `count=(u8)r3` 截断。
-   **正解 (规则113)**: `for(j=i; j<count-1; j++) values[j]=values[j+1]; count--;`
+   **正解 (规则115)**: `for(j=i; j<count-1; j++) values[j]=values[j+1]; count--;`
    —— count-- 后置、循环界用 count-1, 编译器便按目标调度, obj 顺带落到 r8
    (需要 r7 作移位基址), 全程 score 0。
 - 两段扫描-移除逻辑完全同构 (槽0→槽1), 直接复制结构。

@@ -760,7 +760,26 @@
       已匹配调用方的寄存器分配漂移 (sub_8048818 formation r2→r3, 差 12B)。
       **定义改用旧式**: `u16 f(a,b,c) u8 a; u8 b; u8 c; { ... }` —— 与 `()` 声明兼容,
       且生成的 u8 入口掩码 (lsls/lsrs) 与全原型完全一致 (bytecmp 216B 同)。
-     关联: AGENTS.md §7「改名不得顺手改原型签名」; 判定: 改全原型后某调用方 fncheck FAIL。
+      关联: AGENTS.md §7「改名不得顺手改原型签名」; 判定: 改全原型后某调用方 fncheck FAIL。
+
+ 115. **移除-移位循环: `count--` 后置 + 循环界写 `count - 1`, 让截断延迟到循环后**（案例 `sub_804C8E0`, 2026-09-02）。
+      目标形状 (数组移除元素后 `break`):
+      ```
+      adds r0, r1, #0       @ j = i  (for 初始化先于界计算)
+      subs r4, #1           @ count-1 (不截断!)
+      adds r3, r4, #0       @ bound = count-1 的副本 (循环界用 r3, r4 作备)
+      cmp r0, r3; bge skip
+      do { values[j]=values[j+1]; j=(u8)(j+1); } while (j < r4);
+      lsls r0, r3; lsrs r4  @ count = (u8)count  (延迟截断写回)
+      ```
+      直觉写法 `count--; for (j=i; j<count; j++) values[j]=values[j+1];` 会**立即**截断
+      (`subs+lsls+lsrs` 紧跟 --), 循环界直接用截断后 count, 少了 bound 副本, 且 obj 被挤到
+      r7 而移位基址用 r3 —— 全部错位。
+      **正解**: `for (j=i; j<count-1; j++) values[j]=values[j+1]; count--;`
+      —— for-init(j=i) 先出, 界表达式 count-1 算进 r4 并复制 r3 作界, count-- 延迟到循环后
+      才以 (u8) 写回; 此形态下编译器把 obj 分配 r8 (r7 要让给移位基址 `mov r7, sp`)。
+      判定: 目标移位循环用 `mov r7, sp` 基址 + bound 副本 + 循环后 `lsls/lsrs` 截断。
+      关联: 规则 12 (调度器吊闩), 规则 10/33/47 (伪寄存器生命周期 ↔ 写法)。
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 

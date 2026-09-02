@@ -72,7 +72,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80002A0	0x08003958	Chara_SetWalkPath	
 1	thumb	code_80002A0	0x08003b08	Chara_ProcessCmdStream	
 0	thumb	code_80002A0	0x08003c54	Chara_StepMove	
-1	thumb	code_80002A0	0x08003f40	CheckFacingEvent	✅ 2026-09-02 gpnux: A键面向交互，含宝箱坐标/开关/特殊事件门控；fncheck OK
+0	thumb	code_80002A0	0x08003f40	CheckFacingEvent	⏸ 2026-09-02 codex: 已还原 INCLUDE_ASM；语义/草稿齐全，permuter 最佳 1070 但未字节匹配，待解决入口全局分配与宝箱开关分支布局
 0	thumb	code_80002A0	0x080040e4	Party_FollowAnim	
 1	thumb	code_80002A0	0x08004358	Followers_ResetHistory	
 1	thumb	code_80002A0	0x080043d4	Followers_SyncToTail	
@@ -127,7 +127,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8005020	0x0800661c	MapScene_Load	⏸ 3024B asm; 场景描述符表已结构化为 gMapSceneDescriptors[180] @0x08088D80; fncheck OK (2026-09-02 gpnux)
 0	thumb	code_8005020	0x080071ec	MapScene_LoadNpcSlotIds	⏸ 176B asm; 按场景 npcSlotGroupId 装载 8 个 NPC 槽的图形/调色板 ID; fncheck OK (2026-09-02 gpnux)
 1	thumb	code_8005020	0x0800729c	MapScene_InitSprites	
-0	thumb	code_8005020	0x08007350	sub_8007350	
+0	thumb	code_8005020	0x08007350	MapScene_LoadEventAnimations	⏸ 2026-09-02 codex: 按场景动画组加载并依据地图事件旗标播放一次性动画; 语义已确认, 保留 asm
 1	thumb	code_8005020	0x08007964	AnimSlot_Parse	
 1	thumb	code_8005020	0x080079bc	AnimSlot_ParseLoop	
 1	thumb	code_8005020	0x08007a1c	sub_8007A1C	✅ 2026-08-31 pi: 4条件须同时成立(规则30 flatten_expr/31 u32 vs 指针/32 字面量vs符号/33 死store/34 adds顺序); 192B fncheck OK
@@ -139,7 +139,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x080081c0	BattleIntro_Cursor	
 0	thumb	code_8005020	0x08008254	ChoiceMenu_HandleInput	
 1	thumb	code_8005020	0x08008620	DialogPortrait_Set	✅ 2026-09-02 codex: 88项头像资源选择、调色板绑定及4窗口8×8 tilemap初始化; fncheck OK (220B)
-1	thumb	code_8005020	0x080086fc	sub_80086FC	
+1	thumb	code_8005020	0x080086fc	Viewport_UpdateEffects	✅ 2026-09-02 codex: 每帧更新随机视口扰动、渐变系数和 BG1 显示位; fncheck OK
 1	thumb	code_8005020	0x08008788	IntroBg_Load	
 1	thumb	code_8005020	0x080088b4	ScreenFade_Start	✅ 2026-09-01 codex: 初始化 fade flags、signed step、起始扫描线进度及参数; fncheck 64B OK
 1	thumb	code_8005020	0x080088f4	AnimSlot_BankReload	
@@ -348,7 +348,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08016e30	Sio_BuildPacket	
 1	thumb	code_8010F10	0x08016e80	sub_8016E80	✅ 2026-09-02 gpnux: SIO 收包; 三处变量兼职还原 home (交换临时量=packet 本身 / 循环用 st=state 第二伪寄存器 / i=0 独立语句), 末尾 return gSioState[3] 还原多出的 ldrb; CpuCopy32+CpuFill32 宏出 0x04000006/0x05000006; fncheck 176B OK
 1	thumb	code_8010F10	0x08016f30	sub_8016F30	
-0	thumb	code_8010F10	0x08016fc0	sub_8016FC0	
+1	thumb	code_8010F10	0x08016fc0	sub_8016FC0	✅ 2026-09-02 gpnux: Multi-SIO 串行IRQ; 收FEFE同步头+unk_18>0xD即复位并交换收发双缓冲, 按unk_14/unk_18推进SIODATA8发送与unk_24[2][16]接收矩阵, 主机拉SIO Start位+启TM3; 新注册gSioState结构化别名gUnk_03004DF0(Unk_03004DF0类型, iwram.h); 寄存器必须按SioMultiCnt双u16视图(非volatile)访问出[base,#2]形状, vSioMultiCnt/io.h分开宏均改码型; fncheck 252B OK
 1	thumb	code_8010F10	0x080170bc	Sio_SetReady	
 1	thumb	code_8010F10	0x080170d0	Sio_Shutdown	
 0	thumb	code_8010F10	0x08017120	sub_8017120	
@@ -912,8 +912,8 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804d44c	sub_804D44C	✅ 2026-09-02 sound-agent: 同族孪生 x10 (与 sub_804D260 同构); 复用别名 gUnk_08393B28_entries; fncheck OK 174B
 0	thumb	code_8044394	0x0804d4fc	sub_804D4FC	⏸ 2026-09-02 sound-agent: 语义全解(switch((s8)obj[0xBC]) case1: obj[0xC2]=flag&Rng, entry=...[8+obj[0xC2]*2]); 卡点=switch值home: 目标movs r4,#0;ldrsb r4,[r1,r4]单次装载r4(callee-saved跨Rng存活)供case1复用ands r4,r0; 我恒r0+地址外提, case1重读obj[0xBC]; flag/s8指针/if-elseif变体全双装载1585-2530; permuter best 835; 候选permuter/sub_804D4FC/base.c(835)
 0	thumb	code_8044394	0x0804d5b4	sub_804D5B4	
-0	thumb	code_8044394	0x0804d708	sub_804D708	
-0	thumb	code_8044394	0x0804d798	sub_804D798	
+1	thumb	code_8044394	0x0804d708	sub_804D708	✅ 2026-09-02 opencode: 概率判定+drop道具, 姊妹sub_804D1B4(D260)同族但obj[0xBC]恒0无switch
+1	thumb	code_8044394	0x0804d798	sub_804D798	✅ 2026-09-02 opencode: 概率判定+随机槽位道具, 姊妹sub_804D708同族(obj[0xBC]恒1+obj[0xC2]选offset); fncheck OK
 0	thumb	code_8044394	0x0804d840	sub_804D840	
 0	thumb	code_8044394	0x0804d8f4	sub_804D8F4	
 0	thumb	code_8044394	0x0804da04	sub_804DA04	

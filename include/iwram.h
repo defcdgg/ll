@@ -868,6 +868,34 @@ extern u16 gUnk_03004DE4;
 
 extern u8 gSioState[];
 
+/* SIO 多机通信会话状态 (0x03004DF0)。gSioState 的结构化视图 (同址别名 gUnk_03004DF0):
+ * 现存已匹配子函数按 u8 下标访问, 本结构供新匹配使用; 字段语义名待 SIO 族匹配后统一。 */
+typedef struct
+{
+    u8 isParent;        // 0x00 1=主机(parent) 0=从机 (Sio_IsHost/SetReady 视作 mode)
+    u8 stage;           // 0x01 连接阶段
+    u8 unk_2;           // 0x02 收包位图累积
+    u8 unk_3;           // 0x03 收到位图
+    u8 unk_4;           // 0x04 包双缓冲交换标志
+    u8 unk_5;           // 0x05 帧完成标志 (本帧有包)
+    u8 unk_6;           // 0x06 对端就绪
+    u8 errorFlags;      // 0x07 SIO Error 位
+    u8 unk_8;
+    u8 sioInterrupted;  // 0x09 串行 IRQ 已处理
+    u8 unk_A;
+    u8 counter;         // 0x0B
+    u8 pad_C[0x14 - 0xC];
+    s32 unk_14;         // 0x14 发送推进计数
+    s32 unk_18;         // 0x18 接收列计数 (-1=复位换缓冲)
+    void *unk_1C;       // 0x1C 发送双缓冲 A
+    void *unk_20;       // 0x20 发送双缓冲 B
+    void *unk_24;       // 0x24 接收缓冲 A (每槽 16×u16)
+    void *unk_28;       // 0x28 接收缓冲 B
+    void *unk_2C;       // 0x2C 收包双缓冲 (sub_8016E80 交换)
+    void *unk_30;       // 0x30
+} Unk_03004DF0;
+extern Unk_03004DF0 gUnk_03004DF0;
+
 typedef struct
 {
     u16 field_0;

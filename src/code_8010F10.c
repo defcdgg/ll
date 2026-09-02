@@ -1673,7 +1673,88 @@ void sub_8016F30(void)
     }
 }
 // @ 0x08016FC0
-INCLUDE_ASM("asm/nonmatchings", sub_8016FC0);
+/* SIO 多机串行 IRQ 处理: 读 SIOMLT_RECV 到栈、取 SIO Error 位, 收到 0xFEFE 同步头且
+ * 接收列已满(unk_18>0xD)则复位并交换收发双缓冲; 再按 unk_14/unk_18 推进发送数据
+ * (SIODATA8=((u16*)unk_20)[unk_14]) 与接收矩阵 (unk_24[2][16]), 主机负责拉高
+ * SIO Start 位并启动 TM3 节拍。寄存器按 SioMultiCnt 双 u16 视图访问才出 ROM 的
+ * `ldr r,=0x04000128; ... [r,#±2]` 形状 (io.h 分开的 REG_SIOCNT/REG_SIODATA8
+ * 地址字面量会差池常量, 不能换); 必须用非 volatile 的 SioMultiCnt 而非 vSioMultiCnt。 */
+#define SIO_MULTI_CNT ((SioMultiCnt *)REG_ADDR_SIOCNT)
+
+void sub_8016FC0(void)
+{
+    void *temp_r1;
+    void *temp_r1_2;
+    u16 recv[4];
+
+    *(vu64 *)recv = REG_SIOMLT_RECV;
+    gUnk_03004DF0.errorFlags = SIO_MULTI_CNT->Error;
+
+    if ((recv[0] == 0xFEFE) && (gUnk_03004DF0.unk_18 > 0xD))
+    {
+        gUnk_03004DF0.unk_18 = -1;
+        temp_r1 = gUnk_03004DF0.unk_28;
+        gUnk_03004DF0.unk_28 = gUnk_03004DF0.unk_24;
+        gUnk_03004DF0.unk_24 = temp_r1;
+
+        if (gUnk_03004DF0.unk_4 != 0)
+        {
+            temp_r1_2 = gUnk_03004DF0.unk_20;
+            gUnk_03004DF0.unk_20 = gUnk_03004DF0.unk_1C;
+            gUnk_03004DF0.unk_1C = temp_r1_2;
+            gUnk_03004DF0.unk_4 = 0;
+            gUnk_03004DF0.unk_14 = 0;
+        }
+        REG_IME = 0;
+        gUnk_03007FF8 |= 0x80;
+        REG_IME = 1;
+    }
+
+    if (gUnk_03004DF0.unk_14 < 0xE)
+    {
+        SIO_MULTI_CNT->Data = ((u16 *)gUnk_03004DF0.unk_20)[gUnk_03004DF0.unk_14];
+    }
+
+    if (gUnk_03004DF0.unk_14 < 0xF)
+    {
+        gUnk_03004DF0.unk_14 += 1;
+    }
+
+    if (gUnk_03004DF0.unk_18 >= 0)
+    {
+        s32 var_r3;
+
+        for (var_r3 = 0; var_r3 < 2; var_r3++)
+        {
+            ((u16 (*)[16])gUnk_03004DF0.unk_24)[var_r3][gUnk_03004DF0.unk_18] = recv[var_r3];
+        }
+
+        if (gUnk_03004DF0.unk_18 == 0xD)
+        {
+            gUnk_03004DF0.unk_5 = 1;
+        }
+    }
+
+    if (gUnk_03004DF0.unk_18 < 0xF)
+    {
+        gUnk_03004DF0.unk_18 += 1;
+    }
+
+    if (gUnk_03004DF0.isParent)
+    {
+        REG_TM3CNT_H = 0;
+    }
+
+    if ((gUnk_03004DF0.unk_14 < 0xF) && gUnk_03004DF0.isParent)
+    {
+        REG_SIOCNT = REG_SIOCNT | 0x80;
+        REG_TM3CNT_H = 0xC0;
+    }
+
+    gUnk_03004DF0.sioInterrupted = 1;
+}
+#undef SIO_MULTI_CNT
+
 // @ 0x080170BC
 void Sio_SetReady(void)
 {

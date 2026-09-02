@@ -1,12 +1,13 @@
-未匹配 441 个
+未匹配 429 个
 
-[code_80002A0] 4
+[code_80002A0] 5
   0x08003958  Chara_SetWalkPath
   0x08003c54  Chara_StepMove
+  0x08003f40  CheckFacingEvent  ⏸ ⏸ 2026-09-02 codex: 已还原 INCLUDE_ASM；语义/草稿齐全，permuter 最佳 1070
   0x080040e4  Party_FollowAnim
   0x0800478c  CutsceneAnim_PlayFrame
 
-[code_8005020] 37
+[code_8005020] 36
   0x08005020  sub_8005020
   0x080052f8  sub_80052F8
   0x080053b4  sub_80053B4
@@ -14,10 +15,9 @@
   0x08005c70  Viewport_UpdateScroll
   0x0800661c  MapScene_Load  ⏸ ⏸ 3024B asm; 场景描述符表已结构化为 gMapSceneDescriptors[180] @0x08088D
   0x080071ec  MapScene_LoadNpcSlotIds  ⏸ ⏸ 176B asm; 按场景 npcSlotGroupId 装载 8 个 NPC 槽的图形/调色板 ID; fnche
-  0x08007350  sub_8007350
+  0x08007350  MapScene_LoadEventAnimations  ⏸ ⏸ 2026-09-02 codex: 按场景动画组加载并依据地图事件旗标播放一次性动画; 语义已确认, 保留 asm
   0x08007adc  sub_8007ADC  ⏸ ⏸ 指令流100%一致剩27B纯home(i/mask,tx/ty/fx,count/j); 候选permuter/su
   0x08008254  ChoiceMenu_HandleInput
-  0x08008f28  ChestObjects_LoadForMap  ⏸ ⏸ 2026-09-02 gpnux: 扫描 256×8B 地图宝箱表，装载当前地图至 16 个 gChestObjec
   0x080091c4  sub_80091C4
   0x08009600  sub_8009600
   0x0800a1b4  sub_800A1B4
@@ -45,7 +45,7 @@
   0x08010624  sub_8010624
   0x08010770  sub_8010770
 
-[code_8010F10] 43
+[code_8010F10] 41
   0x08010f10  sub_8010F10
   0x08011268  sub_8011268  ⏸ ⏸ 2026-09-02 opencode: 技能菜单物品页绘制=ClearBuffer(0x02005AA0,8,6)
   0x08011454  sub_8011454
@@ -64,8 +64,6 @@
   0x08015e1c  sub_8015E1C  ⏸ ⏸规则17类寄存器分配硬骨头: 语义已全解(Text_PutGlyph 内联版+0xFF终止循环, dest=gWind
   0x08016c88  sub_8016C88
   0x08016d24  sub_8016D24
-  0x08016e80  sub_8016E80
-  0x08016fc0  sub_8016FC0
   0x08017120  sub_8017120
   0x080171e4  sub_80171E4
   0x0801768c  sub_801768C
@@ -90,9 +88,8 @@
   0x08019b98  sub_8019B98
   0x08019f78  sub_8019F78
 
-[code_801A3C4] 50
+[code_801A3C4] 48
   0x0801a3c4  sub_801A3C4
-  0x0801a5ec  sub_801A5EC
   0x0801a6f4  sub_801A6F4
   0x0801a884  sub_801A884
   0x0801ad0c  sub_801AD0C
@@ -140,7 +137,6 @@
   0x08020228  sub_8020228
   0x0802031c  sub_802031C
   0x08020648  sub_8020648
-  0x08020b54  sub_8020B54  ⏸ ⏸规则17未解: 6字节差纯是三个 sym=0 地址伪寄存器轮换(目标0x714→r5/0x715→r6/0x716→r
 
 [code_8020D50] 25
   0x08021184  sub_8021184  ⏸ ⏸ 头部块b/idx/ptr/val四级home; permuter 905; 见progress
@@ -318,8 +314,7 @@
   0x08043b5c  sub_8043B5C
   0x08043f90  sub_8043F90
 
-[code_8044394] 109
-  0x080445e8  sub_80445E8
+[code_8044394] 103
   0x0804473c  sub_804473C
   0x080448a8  sub_80448A8
   0x08044a40  sub_8044A40
@@ -327,7 +322,6 @@
   0x08045098  sub_8045098
   0x0804519c  sub_804519C
   0x08045328  sub_8045328
-  0x0804542c  sub_804542C
   0x080454a4  sub_80454A4
   0x080455a0  sub_80455A0
   0x08045688  sub_8045688
@@ -338,15 +332,14 @@
   0x08045a74  sub_8045A74
   0x08045bf4  sub_8045BF4
   0x08045d00  sub_8045D00
-  0x08045eb8  sub_8045EB8  ⏸ ⏸ 已还原INCLUDE_ASM保基线; 最接近差1字节(cmp r7 vs r5); 见progress
-  0x08045f10  sub_8045F10
+  0x08045f10  sub_8045F10  ⏸ ⏸ 指令流 100% 对 (132B 逐条一致), 只差 3 个 global-alloc home (obj↔dirM
   0x08045f94  sub_8045F94
   0x08046060  sub_8046060
   0x0804612c  sub_804612C
   0x0804621c  sub_804621C
   0x08046480  sub_8046480
   0x08046558  sub_8046558
-  0x0804666c  sub_804666C
+  0x0804666c  sub_804666C  ⏸ ⏸ 2026-09-02 opencode: 收集buf[5]+sub_80466F0处理, 结构与已匹配sub_804
   0x080466f0  sub_80466F0
   0x08046cd4  sub_8046CD4
   0x08046e18  sub_8046E18
@@ -366,7 +359,7 @@
   0x08048458  sub_8048458
   0x080485a4  sub_80485A4
   0x08048690  sub_8048690
-  0x080488cc  sub_80488CC
+  0x080488cc  sub_80488CC  ⏸ ⏸ 2026-09-02 opencode: 技能查找(if id>0x2F查obj+0x88/0x8A else 查o
   0x08048c30  sub_8048C30
   0x08048c80  sub_8048C80  ⏸ ⏸概率判定, 语义全解: threshold=switch(arg0[0xAB]{2→5,3→0x14,5→0xa,el
   0x08048da4  sub_8048DA4
@@ -409,8 +402,6 @@
   0x0804d310  sub_804D310  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(D260孪生无switch, 死存储obj[0xBC]=0
   0x0804d4fc  sub_804D4FC  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(switch((s8)obj[0xBC]) case1: 
   0x0804d5b4  sub_804D5B4
-  0x0804d708  sub_804D708
-  0x0804d798  sub_804D798
   0x0804d840  sub_804D840
   0x0804d8f4  sub_804D8F4
   0x0804da04  sub_804DA04
@@ -427,11 +418,8 @@
   0x0804e85c  sub_804E85C
   0x0804e9dc  sub_804E9DC
   0x0804ec04  sub_804EC04
-  0x0804efdc  sub_804EFDC
 
-[code_804F0B8] 26
-  0x0804f10c  sub_804F10C
-  0x0804f17c  sub_804F17C
+[code_804F0B8] 24
   0x0804f280  sub_804F280
   0x0804f64c  sub_804F64C
   0x0804f7f8  sub_804F7F8

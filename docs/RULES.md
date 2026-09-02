@@ -800,8 +800,45 @@
      判定: 目标三条 strb 顺序 714,715,716 而 C 得 714,716,715 (链式) / r4,r5,r6 (散写) 时,
      先试"最后一个存储加 do-while 屏障", 比链式赋值更精准 —— 链式还会搅乱池序 (规则 110)。
      关联: 规则 17 (同题已解)、规则 25 (do-while 屏障定槽)、规则 110 (链式=地址伪寄存器压缩)。
-
-
+ 117. **跨块 home 争议 = global-alloc 的 `allocno_compare` 排序, 用 `-da` 的 `.flow` 转储量化**（案例 `sub_8045F10`, 2026-09-02, 未破）。
+      规则 88 说"跨块的 home 归 global-alloc, 别查 qty 表", 但没说怎么算 —— 补上:
+      源码 `tools/agbcc/gcc/global.c:605 allocno_compare()`, 与 QTY_CMP_PRI **同形**:
+      `pri = floor_log2(n_refs) * n_refs / allocno_live_length * 10000 * size`, **降序**发号,
+      同分按 allocno 号小者优先; 再由 `find_reg()` 按 r0→r15 升序取第一个不冲突的硬寄存器
+      (两轮: pass0 只准复用"已被别的 allocno 占用"的槽, pass1 才准开新槽)。
+      取数: `agbcc -da` 会吐 `x.i.flow`, 里面 `Register N used R times across L insns; set S times; user var`
+      就是 (n_refs, live_length), 且这是 **global-alloc 前**的真值 (`-dl` 的 lreg 是分配后的, 数字会漂)。
+      用法: 目标 home 与候选 home 只差一次**相邻交换**时, 先算出两者 pri, 再看要把哪个 allocno
+      的 refs 抬到多少 / live 压到多少 —— 比盲改写法快一个数量级。
+      实测 `sub_8045F10`: obj(3 refs/13 live)=0.231 > result(4/42)=0.190 > dirMask(2/37)=0.054
+      → 候选发号 obj=r2, result=r3, dirMask=r4; 目标要 dirMask=r2, 即 pri(dirMask) 必须 > 0.231
+      (refs≥5, 或 refs=4 且 live≤34)。
+      ⚠ **抬 refs 这条路基本是死的**: `x = x` / `(void)x` / `x |= 0` / `x &= 0xFFFF` / `x << 0` /
+      `x * 1` / 重复子表达式 `(e && e)` `(e | e)` `(e + e)` / `if (x) { x = x; }` **全部在 tree/CSE
+      阶段被折掉**, flow 里 refs 纹丝不动 (与规则 88 对 local-alloc 的结论一致)。
+      能抬 refs 的只有"语义上真读写该变量"的语句, 而那必然留下指令 —— 所以 `case: dirMask++;
+      dirMask--;` ×2 能做到逐字节 0 分, 但那是**伪造语句**, 铁律 4 禁止, 不得合入
+      (它唯一证明的是: 目标里 dirMask 这个 allocno 的 pri 确实高于 obj)。
+关联: 规则 87 (一个变量兼职两个值 = 改伪寄存器生死边界)、规则 88、规则 102。
+ 118. **⭐ 函数末尾"多一条把值装进 r0 却没人用"的 load = 原代码有 `return <表达式>`, 被 K&R `void f();` 原型掩盖**（案例 `sub_8016E80`, 2026-09-02, 破 34B→0）。
+      目标尾部 `ldrb r0,[r1,#2]; ldrb r2,[r1,#3]; orrs r0,r2; strb r0,[r1,#2]; ldrb r0,[r1,#3]` ——
+      最后那条 `ldrb` 读出的值既不被读也不参与返回路径, 直觉上像编译器残渣, 其实是
+      `return gSioState[3];` 的物化 (调用方 `bl` 后立刻重载 r0, 所以"返回值被忽略")。
+      判据: **epilogue (`add sp/pop/bx`) 之前**出现一条目的寄存器为 r0、且其值在程序里
+      再未被使用的 load/算术指令 → 先按"真返回值"补 `return`, 而不是当死代码删。
+      配套坑: 头文件里 `void f();` 是**旧式非原型声明**, 定义写成 `u8 f(u8 *)` 不会报冲突,
+      但反过来若先按 void 定义, 就永远少这一条指令 (本例差 2 条 = 4 字节)。
+      同函数另两处可复用的 home 手法 (规则 87 的同一思路, 案例同):
+      ① **交换双缓冲的临时量复用循环指针变量** (`packet = *(u16 **)(state+0x2C); ... *(u32 *)(state+0x28) = (u32) packet;`)
+        —— 单开一个 `u32 temp` 会多出一个 allocno, BB0 的 state/temp home 整体错位 (实测差 34B→8B);
+      ② **循环里换用第二个指针变量** (`st = state;` 放在 `i = 0;` 之后) 才生成目标那条
+        `adds r7, r5, #0`; 全程只用 `state` 则不生成 (实测差 132B→8B)。
+      ③ `i = 0;` 必须是循环外的独立语句 + `for (; i <= 1; i++)` 空 init, 否则 `movs rN,#0`
+        会落到那条拷贝之后。
+      ④ 收尾的 `CpuSet` 立即数 0x04000006 / 0x05000006 分别是 `CpuCopy32(src,dst,24)` 与
+        `CpuFill32(0,dst,24)` 的宏展开 (后者自带 `vu32 tmp` 栈槽 = `sub sp,#4` + `str r0,[sp]`),
+        别手写裸 CpuSet (规则 55)。
+      关联: 规则 54 (非 void 无 return 锁死 r0 —— 本条是它的镜像)、规则 87、规则 117。
  118. **s8 返回值截断位置: `s8 tmp = result; if (tmp >= 0)` 使 `lsls/lsrs #0x18` 排在 `cmp` 之前**（案例 `sub_804F10C`, 2026-09-02）。
       目标: `call → lsls r0,#0x18; lsrs r1,#0x18; cmp r0,#0; blt; adds r7,r1,#0`
       朴素写 `if (result >= 0) { found = result; break; }` 产 `lsls r0,#0x18; cmp r0,#0; blt; lsrs r7,#0x18`
@@ -810,9 +847,18 @@
       编译器把截断指令提前。同理, `int idx = values[i] * 0xC8` 把乘法从子表达式提升为独立伪寄存器,
       避免内联求值时 `pool + values[i] * 0xC8` 的乘-加序列被调度器重排。
       关联: 规则 71 (局部收窄改变生命周期)、规则 106 (中间变量决定 global-alloc)、规则 115 (截断延迟到循环后)。
+ 119. **SIOCNT/SIODATA8 这类"控制+数据同基址"硬件寄存器, 想要 ROM 的 `ldr rN,=0x04000128; strh rX,[rN,#2]`
+      形状 (基址池字面量三处共享一个), 必须按两-u16 结构视图访问: `((SioMultiCnt *)REG_ADDR_SIOCNT)->Data`;
+      io.h 分开的 `REG_SIOCNT`/`REG_SIODATA8` 各开一个地址字面量 → 池差 4B。且必须用**非 volatile** 的
+      `SioMultiCnt`(types.h 已带): 换 `vSioMultiCnt`(volatile) 会把 `.Error` 读拆成半字访存, 破坏目标
+      `ldr word + lsls #0x19/lsrs #0x1f` 位域提取形状 (差 137B)。配套②: 同址 RAM 的"结构化视图"应注册成
+      **独立别名符号** (如 gUnk_03004DF0, 与 gSioState 同址双符号), 不要用 `#define OBJ (*(struct*)0xADDR)`
+      宏 —— 宏让每处成员访问自带常量+偏移池加载, 池字面量激增 (差 160B); extern 对象统一 `ldr rN,=0xADDR; [rN,#off]`。
+      另: 访问走全局对象名而非"局部指针=cast(gSioState)" 也影响分配 (局部指针版差 185B, 需对象语义)。
+      （案例 `sub_8016FC0`, 2026-09-02; 参考同为 agbcc 的已匹配参考 C, 一次合入。）
+
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
-
 agbcc (egcs 1.1 系) 自带 RTL 转储开关, 对定位寄存器 home 问题极其有用:
 
 ```bash
@@ -1100,6 +1146,27 @@ for f in glob.glob('include/*.h')+glob.glob('src/*.c'):
 → 同一坑的另一面: 往已被 `#include` 的头文件里搬 typedef/extern 时, 必须**同时删掉** .c 里的
 本地重复声明 (agbcc 对 typedef 重复报 `conflicting types` 且是**错误**), 且要逐字段核对
 两边布局一致再删, 否则改了类型 = 改了 codegen。
+
+### 11. 目标里多出一个"死" callee-saved 初始化 (`movs r7, #0` 且全函数不再读 r7)
+
+全 ROM 只有两例 (sub_8045EB8 / ChestObjects_LoadForMap)。egcs 会删掉"写了从没读"的
+局部变量初始化 (实测 `u8 x = 0;` 完全不用 / `x++` / `if (x) {}` / `volatile u8 x = 0;` /
+结构体局部 `s.a = 0;`+`if (s.a)` **全部被删**, 一个都不留), 所以这个 `movs r7, #0`
+**必然对应源码里真实存在的一次读**, 只是那次读被 CSE 折成了零指令:
+
+    *flags |= extra;      /* extra 恒为 0 → OR 0 被折叠, RMW 整条消失 */
+
+关键在**顺序**: CSE 折叠读点发生在 flow 算活跃性**之后**, flow 仍把 `extra` 记成 live,
+于是定义它的 `movs r7, #0` 活了下来, 并逼出第 4 个 callee-saved 寄存器 (push 变
+`{r4,r5,r6,r7,lr}`)。同理 `*flags += x;`、`*flags = *flags | x;` 这类"值恒等"的
+读点都可以当吊闩用 (与规则 89 的"故意保留死代码"是一对反向技巧: 89 是**造**一条假读,
+这里是**留**一条真读到被折叠的表达式上)。
+
+排查配方 (sub_8045EB8 实测, 88B 全绿):
+1. 先按语义写最小版 (基址指针 + `u8 i = 0` + 目标原型), 确认只差 push/pop 与那条 `movs rN,#0`;
+2. 补一个末位声明的局部 (`u8 extra = 0;`) + 函数末尾一条恒等读 → 一次命中;
+3. 声明顺序 = 伪寄存器顺序: 目标里 `p, i, flags, extra` 分别落 r6/r5/r4/r7,
+   把 extra 提前会整体错位 (见规则 51/54 的 home 讨论)。
 
 ## 工具与命令补充 (速查见 AGENTS.md §4)
 | 工具 | 位置 | 用途 |

@@ -507,6 +507,7 @@ SECTIONS {
         . = 0x00004DE4; gUnk_03004DE4 = .;
         . = 0x00004DE8; gUnk_03004DE8 = .;
         . = 0x00004DF0; gSioState = .;
+        . = 0x00004DF0; gUnk_03004DF0 = .;
         . = 0x00004E48; gUnk_03004E48 = .;
         . = 0x00004F20; gSioSession = .;
         . = 0x00004F80; gSioXferCtx = .;

@@ -2083,3 +2083,17 @@ SFX 调度器: sub_804DE8C() → 遍历 obj 池 (GetObjPool + sub_80489E8 收集
   事后把对方 WIP 副本拷回工作区, 不回退不代修。
 
 **验证**: fncheck sub_804C78C OK 260B (12 池重定位, 15 bl 槽); HEAD 全 ROM make+SHA1 绿。
+
+## sub_804C9B4 (0x0804C9B4, code_8044394) — ✅ 2026-09-02 sound-agent (fncheck OK 120B)
+SFX 换歌: 遍历 obj 池收集 id, 对 obj=pool+id*0xC8, 若 obj[0xBE]==9 则清零 obj[0xBC],
+重取池 (GetObjPool + sub_80489E8(values,1,0x7F)), obj[0xBD]=values[Rng_LcgNext()%count], **break 整个循环**。
+
+**要点**:
+- 直接 `obj[0xBD] = values[...]` 时编译器把 LHS 地址 (obj+0xBD) 提前算进 r4, 与目标
+  RHS-先算 (r1 存值, 再算地址) 不符 (r4/r5 分配互换, 差 4B)。
+  **用 `value` 临时变量先把 RHS 算完再赋值**, 编译器便按目标顺序生成 (score 0)。
+- 跳表区: 目标分派函数在 1 参原型下传冗余第2参 (见 sub_804C78C 记录)。
+- 整文件被并发 agent 反复 checkout/编辑, 提交前用 `git checkout HEAD --` + 只插自己函数
+  构建验证 (HEAD+自己=绿), 提交只 `git add` 该文件, 事后恢复他人 WIP。
+
+**验证**: fncheck sub_804C9B4 OK 120B (6 bl 槽); 与 sub_804C78C 同 build 时全 ROM 绿。

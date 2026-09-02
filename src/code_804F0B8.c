@@ -47,7 +47,9 @@ u8 sub_804F0B8(u8 *arg0, s32 arg1)
         ret = 2;
     return ret;
 }
+// @ 0x0804F10C
 INCLUDE_ASM("asm/nonmatchings", sub_804F10C);
+// @ 0x0804F17C
 INCLUDE_ASM("asm/nonmatchings", sub_804F17C);
 // INCLUDE_ASM("asm/nonmatchings", SioBattle_ResetState);
 // @ 0x0804F210
@@ -81,7 +83,9 @@ void SioBattle_ClearSlots(void)
 
     gUnk_03000E30 = 0;
 }
+// @ 0x0804F280
 INCLUDE_ASM("asm/nonmatchings", sub_804F280);
+// @ 0x0804F64C
 INCLUDE_ASM("asm/nonmatchings", sub_804F64C);
 // @ 0x0804F768
 u32 Op_RemovePartyMember(u32 *ptr)
@@ -118,11 +122,17 @@ u32 Op_RemovePartyMember(u32 *ptr)
     *ptr += 2;
     return 1;
 }
+// @ 0x0804F7F8
 INCLUDE_ASM("asm/nonmatchings", sub_804F7F8);
+// @ 0x0804F8D8
 INCLUDE_ASM("asm/nonmatchings", sub_804F8D8);
+// @ 0x0804F974
 INCLUDE_ASM("asm/nonmatchings", sub_804F974);
+// @ 0x0804FA04
 INCLUDE_ASM("asm/nonmatchings", sub_804FA04);
+// @ 0x0804FA94
 INCLUDE_ASM("asm/nonmatchings", sub_804FA94);
+// @ 0x0804FB24
 INCLUDE_ASM("asm/nonmatchings", sub_804FB24);
 extern u16 (*gUnk_0862D434[])(u32 *);
 
@@ -142,11 +152,17 @@ void ScriptPump_Run(void)
         }
     }
 }
+// @ 0x0805008C
 INCLUDE_ASM("asm/nonmatchings", sub_805008C);
+// @ 0x080501B8
 INCLUDE_ASM("asm/nonmatchings", sub_80501B8);
+// @ 0x08050434
 INCLUDE_ASM("asm/nonmatchings", sub_8050434);
+// @ 0x0805063C
 INCLUDE_ASM("asm/nonmatchings", sub_805063C);
+// @ 0x08050720
 INCLUDE_ASM("asm/nonmatchings", sub_8050720);
+// @ 0x080511A0
 INCLUDE_ASM("asm/nonmatchings", sub_80511A0);
 // @ 0x08051230
 u32 Op_ScriptStop(u32 *ptr)
@@ -184,8 +200,11 @@ u32 Op_ScriptStop(u32 *ptr)
     }
     return 0;
 }
+// @ 0x080512C4
 INCLUDE_ASM("asm/nonmatchings", sub_80512C4);
+// @ 0x080513A0
 INCLUDE_ASM("asm/nonmatchings", sub_80513A0);
+// @ 0x0805144C
 INCLUDE_ASM("asm/nonmatchings", sub_805144C);
 // @ 0x08051A1C
 u32 Op_OpenWindow(u32 *ptr)
@@ -224,7 +243,9 @@ u32 Op_OpenWindow(u32 *ptr)
     }
     return 1;
 }
+// @ 0x08051AEC
 INCLUDE_ASM("asm/nonmatchings", sub_8051AEC);
+// @ 0x08051BE4
 INCLUDE_ASM("asm/nonmatchings", sub_8051BE4);
 
 // @ 0x08052574
@@ -250,7 +271,9 @@ void Script_ResetVM(void)
     }
     gUnk_03000ECA = 0;
 }
+// @ 0x080525E8
 INCLUDE_ASM("asm/nonmatchings", sub_80525E8);
+// @ 0x080526A0
 INCLUDE_ASM("asm/nonmatchings", sub_80526A0);
 
 // 脚本 VM 启动/跳转: 按 arg1 模式设置脚本指针 gUnk_03000E6C, 然后清局部槽并置运行标志。
@@ -449,6 +472,7 @@ u32 Op_CloseWindow(u32 *ptr)
     }
     return 0;
 }
+// @ 0x080529B8
 INCLUDE_ASM("asm/nonmatchings", sub_80529B8);
 
 // @ 0x08052A14
@@ -850,6 +874,7 @@ u32 Op_WaitCharaAnim(u32 *ptr)
     }
     return 0;
 }
+// @ 0x08052F44
 INCLUDE_ASM("asm/nonmatchings", sub_8052F44);
 // @ 0x08052FAC
 u32 Op_LoadAnimSet(u32 *ptr)
@@ -1154,6 +1179,7 @@ u32 Op_SaveOp(u32 *ptr)
 
     return 1;
 }
+// @ 0x08053270
 INCLUDE_ASM("asm/nonmatchings", sub_8053270);
 // 脚本 opcode: 遍历脚本数据里的一段 u16 标志号列表, 逐个清除标志位。
 //   项数 = data[1] >> 1, 每项 = data[2+2k] | data[3+2k] << 8 (小端拼 u16)

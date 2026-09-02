@@ -1568,7 +1568,60 @@ void Sio_BuildPacket(u8 *src)
     state[4] = 1;
 }
 // @ 0x08016E80
-INCLUDE_ASM("asm/nonmatchings", sub_8016E80);
+/* 收包: 关中断交换 0x28/0x2C 双缓冲指针, 清 state[5] (本帧有包) 与 state[3] (收到位图),
+ * 再扫两个槽位 (每槽 32 字节 = 14 个 u16 校验区 + 24 字节载荷):
+ *   14 个 u16 求和截到 s16 后 == -0x11 即校验通过 (发送端 Sio_BuildPacket 写的是
+ *   `~sum - 0x10`, 两端相加正好得 0xFFEF), 命中就把载荷 CpuCopy32 到 arg0 + i*24
+ *   并在 state[3] 置第 i 位; 无论命中与否都把载荷区 CpuFill32 清零。
+ *   最后 state[2] |= state[3] 把"本帧收到"累积进总位图, 并返回 state[3]。
+ * 三处形状靠"变量兼职"还原 (RULES 规则 87/117):
+ *   ① 交换的临时量就是 packet 本身 (没有第四个 temp 伪寄存器, 否则 BB0 的 home 全错位);
+ *   ② 循环里用的是 st (= state 的第二个伪寄存器), 目标入口块后的 `adds r7, r5, #0`
+ *      就是这条拷贝, 单变量写法不会产生它;
+ *   ③ `i = 0;` 必须写成循环外的独立语句 (for 的 init 留空), 否则 `movs r6,#0`
+ *      会落到拷贝之前, 与目标顺序相反。
+ * 返回类型 u8 且末尾多一条 `ldrb r0,[r1,#3]`: 原代码确实 return state[3],
+ * 调用方 (sub_8016D24) 忽略返回值 —— 删掉 return 会少两条指令。 */
+u8 sub_8016E80(u8 *arg0)
+{
+    u8 *state;
+    u8 *st;
+    s32 i;
+    u32 j;
+    u32 sum;
+    u16 *packet;
+    u8 recvFlag;
+
+    REG_IME = 0;
+    state = gSioState;
+    packet = *(u16 **)(state + 0x2C);
+    *(u32 *)(state + 0x2C) = *(u32 *)(state + 0x28);
+    *(u32 *)(state + 0x28) = (u32) packet;
+    recvFlag = state[5];
+    state[5] = 0;
+    REG_IME = 1;
+    state[3] = 0;
+    if (recvFlag != 0)
+    {
+        i = 0;
+        st = state;
+        for (; i <= 1; i++)
+        {
+            packet = *(u16 **)(st + 0x2C) + (i << 4);
+            sum = 0;
+            for (j = 0; j <= 0xD; j++)
+                sum += packet[j];
+            if ((s16)sum == -0x11)
+            {
+                CpuCopy32(packet + 2, arg0 + i * 24, 24);
+                st[3] |= 1 << i;
+            }
+            CpuFill32(0, packet + 2, 24);
+        }
+    }
+    gSioState[2] |= gSioState[3];
+    return gSioState[3];
+}
 // @ 0x08016F30
 void sub_8016F30(void)
 {

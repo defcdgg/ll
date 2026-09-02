@@ -350,7 +350,7 @@ void sub_8016C44();
 void sub_8016C88();
 void sub_8016D24();
 void Sio_BuildPacket(u8 *);
-void sub_8016E80();
+u8 sub_8016E80(u8 *);    /** 收包; 确实返回 gSioState[3], 调用方忽略 (删 return 会少两条指令) */
 void sub_8016F30();
 void sub_8016FC0();
 void Sio_SetReady();

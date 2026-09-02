@@ -376,16 +376,14 @@ void sub_80207A4(void)
     gUnk_03000630--;
 }
 
-INCLUDE_ASM("asm/matchings", sub_80207B4);
-// u8 sub_80207B4(void *arg0)
-// {
-//     if ((sub_80187B4() & 0x20))
-//     {
-//         return sub_801BE34(arg0);
-//     }
-
-//     return sub_801C484(arg0);
-// }
+u8 sub_80207B4(void *arg0)
+{
+    if (sub_80187B4() & 0x20)
+    {
+        return sub_801C484(arg0);
+    }
+    return sub_801BE34(arg0);
+}
 
 /* 场景对象按 field_BE 分发到三种行为: ≤0xA → sub_801CBA4, ≤0x70 → sub_801CA08,
  * 其余 (field_BE-0x71 ≤ 0x8D) → sub_801CE80; 均传 (obj, 0, f2a, f35, 0)。 */

@@ -500,7 +500,7 @@ status	isa	module	addr	name	note
 0	thumb	code_801A3C4	0x08020648	sub_8020648	
 1	thumb	code_801A3C4	0x08020798	sub_8020798	
 1	thumb	code_801A3C4	0x080207a4	sub_80207A4	
-1	thumb	code_801A3C4	0x080207b4	sub_80207B4	
+1	thumb	code_801A3C4	0x080207b4	sub_80207B4	✅ 2026-09-02 qwen: sub_80187B4()&0x20 ? sub_801C484(arg0) : sub_801BE34(arg0); ⚠ 候选注释分支映射反了(写成 set→BE34), 按 bne 目标核对实为 set→C484; fncheck OK 40B(3 bl 槽); 全ROM SHA1 绿
 1	thumb	code_801A3C4	0x080207dc	sub_80207DC	✅ 2026-09-02 gpnux: 场景对象按field_BE分派三行为(sub_801CBA4/CA08/CE80, 均传(obj,0,f2a,f35,0)); 关键=v不落局部直接obj[0xBE]三次(落局部则ldrb进r1, 直接则进r0+adds r1拷贝); fncheck OK 100B	
 1	thumb	code_801A3C4	0x08020840	sub_8020840	✅ 2026-09-02 gpnux: sub_80207DC孪生(仅第一/二分派r1常量=0xA/5), 同款"obj[0xBE]不落局部三次直访"; fncheck OK 100B	
 0	thumb	code_801A3C4	0x080208a4	sub_80208A4	

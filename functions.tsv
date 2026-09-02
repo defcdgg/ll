@@ -1062,5 +1062,5 @@ status	isa	module	addr	name	note
 1	thumb	sound	0x08053734	Sfx_TrackBusy	
 1	thumb	sound	0x0805374c	Sfx_Play	
 1	thumb	sound	0x080537c0	Sfx_PlayFade	
-1	thumb	sound	0x08053838	Sfx_StopTrack	
+1	thumb	sound	0x08053838	Sfx_StopTrack	✅ 2026-09-02 qwen: m4aMPlayStop(gMPlayInfos2[arg0]); gSfxTrackActiveBits&=~(1<<arg0); if((gSfxTrackLoopBits>>arg0)&1) gSfxTrackLoopBits&=~(1<<arg0); 新登记 ROM 符号 gMPlayInfos2@0x087EDC80; fncheck OK 76B; 全ROM绿
 1	thumb	sound	0x08053884	Sfx_GetLoopFlag	

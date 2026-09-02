@@ -215,18 +215,19 @@ INCLUDE_ASM("asm/matchings", Sfx_PlayFade);
 //     m4aMPlayFadeOutTemporarily((struct MusicPlayerInfo* )0x03005AB0, 2);
 // }
 
-INCLUDE_ASM("asm/matchings", Sfx_StopTrack);
+extern struct MusicPlayerInfo *gMPlayInfos2[];
 
-// void Sfx_StopTrack(u8 arg0) {
-//     m4aMPlayStop(gMPlayInfos2[arg0]);
+void Sfx_StopTrack(u8 arg0)
+{
+    m4aMPlayStop(gMPlayInfos2[arg0]);
 
-//     gSfxTrackActiveBits &= ~(1 << arg0);
+    gSfxTrackActiveBits &= ~(1 << arg0);
 
-//     if((gSfxTrackLoopBits >> arg0) & 1)
-//     {
-//         gSfxTrackLoopBits &= ~(1 << arg0);
-//     }
-// }
+    if ((gSfxTrackLoopBits >> arg0) & 1)
+    {
+        gSfxTrackLoopBits &= ~(1 << arg0);
+    }
+}
 
 s32 Sfx_GetLoopFlag(u8 arg0)
 {

@@ -71,6 +71,7 @@ gUnk_087EB1E8 = 0x087EB1E8;    /* 存档块指针表 {&gUnk_03004D48, gSaveTimer
 gDialogPortraitTilemapPtrs = 0x087E9818; /* four dialog portrait tilemap positions */
 gUnk_087EB2E0 = 0x087EB2E0;    /* 角色头像 LZ77 指针表 (存档/队伍菜单用) */
 gUnk_087EBDF0 = 0x087EBDF0;    /* BG tileset LZ77 指针表[4] → VRAM 0x06008000 + idx*0x1000 */
+gMPlayInfos2 = 0x087EDC80;    /* 音轨 MusicPlayerInfo 指针表[4] (Sfx_* 用) */
 gUnk_0809E4E4 = 0x0809E4E4;    /* 角色调色板/图形表 [N][32] (sub_8016068 DMA 源) */
 gUnk_08098308 = 0x08098308;    /* 数字/字形 tile 属性表 (sub_80161F4 VRAM 填充源) */
 gUnk_080936A0 = 0x080936A0;    /* 字节表, sub_8018750 扫描 0xFF 计数 */

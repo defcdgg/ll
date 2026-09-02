@@ -25,6 +25,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8005020);
 // 注: 下面 `if (bldcnt != 0xFF)` 对未初始化变量赋值是**故意保留的死代码** ——
 //     它让 GCC2 提前给 bldcnt 选定 callee-saved r4, 否则尾部会重新物化
 //     `movs r0,#0xff`, 与目标不一致(删掉差 130 字节)。参见 RULES 规则 89。
+// @ 0x080051D0
 void ScreenFade_Apply(void)
 {
     vu8 *vcountReg;
@@ -67,6 +68,7 @@ void ScreenFade_Apply(void)
     }
 }
 
+// @ 0x0800526C
 void ScreenFade_Update(void)
 {
     REG_BLDCNT = gBlendControl;
@@ -99,6 +101,7 @@ void ScreenFade_Update(void)
 INCLUDE_ASM("asm/nonmatchings", sub_80052F8);
 INCLUDE_ASM("asm/nonmatchings", sub_80053B4);
 INCLUDE_ASM("asm/nonmatchings", sub_80055E8);
+// @ 0x08005B2C
 u16 *MapTile_At(s16 x, s16 y)
 {
     s16 screenX, screenY;
@@ -126,6 +129,7 @@ u16 *MapTile_At(s16 x, s16 y)
         return (u16 *)0x02004800 + (tileY * 32) + tileX;
     }
 }
+// @ 0x08005BB4
 u16 MapTile_CollisionBits(u16 *tiles, u16 x, u16 y)
 {
     u16 *src;
@@ -199,6 +203,7 @@ u16 MapTile_CollisionBits(u16 *tiles, u16 x, u16 y)
 }
 INCLUDE_ASM("asm/nonmatchings", Viewport_UpdateScroll);
 
+// @ 0x080064AC
 void BgMap_FillPattern(u16 arg0)
 {
     u16 x;
@@ -240,6 +245,7 @@ extern u8* gUnk_087E9AA0[];
  *   - DMA 0x4A60 字节 → 0x06000000 (BG VRAM);
  *   - field_12: gUnk_082893EC 子表 (0x140 半字) → BG PLTT; BgPal_ResetFirst 复位底色;
  *   - field_E: gUnk_087EA020[] 指针 (LZ77 tilemap) 解压 → 0x02005000 → 0x0600F000 (SBB)。 */
+// @ 0x08006520
 void MapBg_LoadFull(u8 arg0) {
     u8 idx;
     u16 i;
@@ -284,6 +290,7 @@ INCLUDE_ASM("asm/nonmatchings", MapScene_LoadNpcSlotIds);
  * 槽 1 = 固定 11 号模型 (跟随者/光影?); 若场景描述符 npcSlotGroupId 有 NPC 集,
  * 把槽 2..9 里已在用的图块/调色板模型 (gSlotGfxId/gSlotPalId, 0xFF=空) 重载进 OBJ VRAM
  * (VRAM 最多 8 种 NPC 模型, 有的模型不变只是颜色不同)。 */
+// @ 0x0800729C
 void MapScene_InitSprites(u8 arg0) {
     u16 i;
 
@@ -318,6 +325,7 @@ void MapScene_InitSprites(u8 arg0) {
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8007350);
+// @ 0x08007964
 u8 *AnimSlot_Parse(u16 arg0, u8 *arg1)
 {
     u32 temp_r0;
@@ -356,6 +364,7 @@ u8 *AnimSlot_Parse(u16 arg0, u8 *arg1)
 
     return arg1;
 }
+// @ 0x080079BC
 u8 *AnimSlot_ParseLoop(u16 arg0, u8 *arg1)
 {
     u32 temp_r0;
@@ -402,6 +411,7 @@ u8 *AnimSlot_ParseLoop(u16 arg0, u8 *arg1)
 // 行跳距 0x80 个 u16; 每帧大小 = field_8 * field_9 * 2 字节。
 // 注: rows 在声明处的提前赋值是 GCC2 寄存器分配所需(该死 store 会被删除,
 //     但决定字面池加载位置与 home 寄存器选择), 删掉则不匹配。
+// @ 0x08007A1C
 void sub_8007A1C(s16 arg0)
 {
     Unk_030046A0 *ptr;
@@ -453,6 +463,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8007ADC);
  * 0=换图: 装载点 5 字段 + state 3 + 清开关位图; 1=图内传送: 4 字段 + state 4;
  * 2=state 8 (byte 0x47BC/0x47E0); 3=开关未置则跑脚本(2B 记录)返回 1; 4=A 键+朝向门控跑脚本(4B 记录)返回 0;
  * type>4 (含 0xFF 未命中) 返回 1。 */
+// @ 0x08007BD0
 s32 MapZone_Trigger(void)
 {
     u32 *header = gMapZoneHeader;
@@ -538,6 +549,7 @@ extern u8 gUnk_030047B4;
 
 void Logo_LoadAssets(u8 arg0);
 
+// @ 0x08007D5C
 void MapBg_LoadInterior(u8 arg0) {
     u16* dest;
     u16 i;
@@ -623,6 +635,7 @@ extern const u8 gUnk_08087500[];
  * 代码生成要点: gfx 指针 ±偏移 形态 (r4 缓存 + adds r1, r4, r2) 才能命中目标的字面池内联布局,
  * 用独立符号 (gUnk_08087500 等) 会多出 4 个池导致 ROM 布局漂移。 */
 /* 选项场景 LOGO/标志精灵装载 (v2 草稿: attr0 用局部变量传参) */
+// @ 0x08007FB8
 void Logo_LoadAssets(u8 arg0)
 {
     SpriteNode* sprNode;
@@ -687,6 +700,7 @@ void Logo_LoadAssets(u8 arg0)
 }
 /* gChoiceDataBase 声明见 include/data_805769C.h (const u8[]) */
 
+// @ 0x08008124
 u32 sub_8008124(void)
 {
     u8 *p;
@@ -730,6 +744,7 @@ u32 sub_8008124(void)
     gChoiceListLen = i;
 }
 
+// @ 0x080081C0
 void BattleIntro_Cursor(void)
 {
 
@@ -764,6 +779,7 @@ void BattleIntro_Cursor(void)
 }
 INCLUDE_ASM("asm/nonmatchings", ChoiceMenu_HandleInput);
 /* Select one of the 88 portrait assets and seed its 8x8 dialogue tilemap. */
+// @ 0x08008620
 void DialogPortrait_Set(u8 portraitId, u8 position)
 {
     u16 *dst;
@@ -808,6 +824,7 @@ void DialogPortrait_Set(u8 portraitId, u8 position)
     gPendingPortraitSlot = 0;
 }
 
+// @ 0x080086FC
 void sub_80086FC(void)
 {
     if (gViewportFlags[0] & 1)
@@ -833,6 +850,7 @@ extern const u8* gIntroBgTiles[];    // [id*2]=3KB tile组, [id*2+1]=可选 8-ti
 extern const u8* gIntroBgMaps[];     // [id] LZ77 32x20 tilemap -> SBB 3 (0x0600E000)
 extern const u16 gIntroBgPalettes[][0x20];
 
+// @ 0x08008788
 void IntroBg_Load(u8 arg0)
 {
     gIntroBgTransferStage = 0;
@@ -876,6 +894,7 @@ void IntroBg_Load(u8 arg0)
 }
 
 
+// @ 0x080088B4
 void ScreenFade_Start(u16 flags, s16 step, s16 param)
 {
     gScreenFadeParam = param;
@@ -893,6 +912,7 @@ void ScreenFade_Start(u16 flags, s16 step, s16 param)
     gScreenFadeFlags = flags;
 }
 
+// @ 0x080088F4
 void AnimSlot_BankReload(void)
 {
     if ((u32) * (u16 *)0x0300467C <= 0xFCU)
@@ -918,6 +938,7 @@ void AnimSlot_BankReload(void)
  *   注: 旧名 HBlank_WaveDma / 旧注释"声音DMA0旋转" 是误读 —— 目的端 0x04000040
  *   是 REG_WIN0H (io.h: REG_OFFSET_WIN0H=0x40), 不是声音 FIFO (FIFO A/B 在 0xA0/0xAC)。
  */
+// @ 0x08008978
 void Win0H_WaveDmaByVCount(void) {
     u16 waveIdx;
     u8 subState = (u8)(gSceneSubState - 1);
@@ -941,6 +962,7 @@ void Win0H_WaveDmaByVCount(void) {
     }
     DmaSet(0, gWindowTransitionScanlineTable + (waveIdx * 2), (void *)REG_ADDR_WIN0H, 0xE0400001);
 }
+// @ 0x080089E0
 void ScreenFx_SetMode(u16 arg0)
 {
 
@@ -964,6 +986,7 @@ void ScreenFx_SetMode(u16 arg0)
     gSceneSubState = arg0;
 }
 
+// @ 0x08008A3C
 void AnimSlots_Release(void)
 {
     s16 i;
@@ -974,6 +997,7 @@ void AnimSlots_Release(void)
     }
 }
 
+// @ 0x08008A60
 void AnimSlots_StepAll(void)
 {
     s16 i;
@@ -983,6 +1007,7 @@ void AnimSlots_StepAll(void)
         sub_8007A1C(i);
     }
 }
+// @ 0x08008A80
 void BgTiles_LoadUiSet(u8 arg0)
 {
     if (arg0 == 0)
@@ -1003,6 +1028,7 @@ void BgTiles_LoadUiSet(u8 arg0)
 
     nullsub_5();
 }
+// @ 0x08008B14
 void BgScroll_LoadFromTable(u16 arg0) {
 
     gCameraMinX = gMapViewportBoundsTable[arg0].cameraMinXBlocks << 6;
@@ -1013,6 +1039,7 @@ void BgScroll_LoadFromTable(u16 arg0) {
 
     gMapHeightPx = gCameraMinY + (gMapViewportBoundsTable[arg0].mapHeightBlocks << 6);
 }
+// @ 0x08008B5C
 void PlayerSheets_Load(void)
 {
     // gSlotGfxId.field_0 = gPartyMemberIds[0];
@@ -1034,6 +1061,7 @@ extern u8 *gUnk_087EA1A0[];
 // 把 gUnk_087EA1A0[setId] 这一组动画模型 (共 *ptr 条) 逐条解析进
 // gUnk_030046A0[] 精灵模型描述符数组, 起始槽位为 startSlot。
 // 槽位号 = startSlot + 记录序号, 与 sub_8007350 (整组装入槽位 0..) 是同族写法。
+// @ 0x08008BA4
 void sub_8008BA4(u8 setId, u8 startSlot)
 {
     u8 *src;
@@ -1050,16 +1078,19 @@ void sub_8008BA4(u8 setId, u8 startSlot)
     }
 }
 
+// @ 0x08008BE4
 void AnimSlot_Pause(u8 arg0)
 {
     gUnk_030046A0[arg0].field_3 |= 2;
 }
 
+// @ 0x08008BFC
 void AnimSlot_Resume(u8 arg0)
 {
     gUnk_030046A0[arg0].field_3 &= 0xFD;
 }
 
+// @ 0x08008C14
 u8 AnimSlot_Active(u8 arg0)
 {
     return gUnk_030046A0[arg0].field_0;
@@ -1067,6 +1098,7 @@ u8 AnimSlot_Active(u8 arg0)
 
 /* 重载单个精灵表槽位: 图块用 gSlotGfxId[slot]、调色板用 gSlotPalId[slot],
  * 0xFF 表示该部分不动。整块受 gObjGraphicsSetId 的 bit7 屏蔽。 */
+// @ 0x08008C24
 void ReloadSpriteSheet(u8 slot)
 {
 
@@ -1085,6 +1117,7 @@ void ReloadSpriteSheet(u8 slot)
 }
 
 /* 全量重载全部 12 个精灵表槽位(0x06011400 + 12*0x900 = 0x06018000 正好到 VRAM 尾)。 */
+// @ 0x08008C70
 void ReloadAllSpriteSheets(void)
 {
     u8 i;
@@ -1124,6 +1157,7 @@ extern const u8 gChoiceDestTable[];
  *     (目标把 ptr++ 放在读 count 之后, 与 while 的底部测试配合)
  *   - 取项写成 `ptr + (arg0 << 1)` 再 `ptr[0]`/`ptr[1]`, 不要合并成 `ptr[arg0*2]`
  */
+// @ 0x08008CC0
 void ChoiceMenu_ResolveDest(u8 choiceIdx)
 {
     const u8 *ptr;
@@ -1149,6 +1183,7 @@ void ChoiceMenu_ResolveDest(u8 choiceIdx)
 }
 // }
 
+// @ 0x08008D18
 void DialogPortrait_FlushPending(void)
 {
     u32 i;
@@ -1171,6 +1206,7 @@ void DialogPortrait_FlushPending(void)
     }
 }
 
+// @ 0x08008D78
 u16 Camera_GetDrawOffset(void)
 {
     switch (gCameraDrawMode)
@@ -1189,16 +1225,19 @@ u16 Camera_GetDrawOffset(void)
     }
 }
 
+// @ 0x08008DCC
 void Bgm_Request(u8 arg0)
 {
     gCurrentSongId = arg0;
 }
 
+// @ 0x08008DD8
 void BgPal_ResetFirst(void)
 {
     DmaCopy16(3, (void *)0x08087216, (void *)0x05000000, 2);
 }
 
+// @ 0x08008DF8
 void AnimSlot_PlayOnce(u16 arg0, u8 *arg1)
 {
     u16 count;
@@ -1216,6 +1255,7 @@ void AnimSlot_PlayOnce(u16 arg0, u8 *arg1)
         count--;
     }
 }
+// @ 0x08008E44
 void BgMap_FillRow(u8 arg0)
 {
     u16 *dest;
@@ -1244,6 +1284,7 @@ void BgMap_FillRow(u8 arg0)
     gViewportFlags[13] = 1;
 }
 
+// @ 0x08008E94
 void MapBg_FlushPending(void)
 {
     switch (gIntroBgTransferStage)
@@ -1389,6 +1430,7 @@ void Chest_Open(u8 arg0)
  *   gDigitFontObjPalettes (0x08088C00) → 0x050003C0  0x40 B  = 2 组 16 色 OBJ 调色板(槽 14~15)
  * 受 gObjGraphicsSetId 的 bit7 屏蔽; 槽 146~149 是箭头/滚动条字形(见 LoadArrowObjTiles)。
  * ⚠ `0x80 & gObjGraphicsSetId` 的常量在左不能改位置, 否则 GCC2 生成的指令序列会变(规则 5)。 */
+// @ 0x08009114
 void LoadDigitFontObjTiles(void)
 {
     if (!(GFXSET_NO_SPRITE_LOAD & gObjGraphicsSetId))
@@ -1398,6 +1440,7 @@ void LoadDigitFontObjTiles(void)
         DmaCopy16(3, 0x08088C00, 0x050003C0, 0x20 * 2);
     }
 }
+// @ 0x08009168
 void ChestFlags_ClearAll()
 {
     u8 i = 0;
@@ -1407,10 +1450,12 @@ void ChestFlags_ClearAll()
         gChestFlags[i++] = 0;
     }
 }
+// @ 0x08009184
 void ChestFlags_Toggle(u8 arg0)
 {
     gChestFlags[arg0 >> 3] ^= (1 << (arg0 & 7));
 }
+// @ 0x080091A4
 u8 ChestFlags_Test(u8 arg0)
 {
     u8 val;
@@ -1425,6 +1470,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_80091C4);
  *   src = gMenuEntityPaletteTable + (byte << 5) + 2;  → DMA3 拷贝 32 字节到 gUnk_03000028[i]。 */
 extern const u8 gMenuEntityPaletteTable[];
 
+// @ 0x08009370
 void sub_8009370(void)
 {
     s16 i;
@@ -1459,6 +1505,7 @@ void sub_8009370(void)
 extern u8 gUnk_03004914;
 extern u8 gUnk_03004918;
 
+// @ 0x08009428
 void PaletteFx_Apply(u8 arg0)
 {
     u16 i;
@@ -1513,6 +1560,7 @@ void PaletteFx_Apply(u8 arg0)
  * 计数器到 4 时把窗口完全打开 (WIN0V=0x100, WININ/WINOUT=0x3F)。
  * 注: 两个分支内的 u8 局部读取 gUnk_03004910 是**故意**的 —— 让 GCC2 不跨分支
  *   CSE 该读, 使计数器 c 落 r1、state 落 r0 并重读, 与目标逐字节一致。 */
+// @ 0x080094FC
 void sub_80094FC(void)
 {
     u8 counter;
@@ -1572,6 +1620,7 @@ void sub_80094FC(void)
 }
 
 INCLUDE_ASM("asm/nonmatchings", sub_8009600);
+// @ 0x08009A5C
 void MenuEnt_ClearStates(void)
 {
     s16 i;
@@ -1585,6 +1634,7 @@ void MenuEnt_ClearStates(void)
 extern u8 *gUnk_087EA138[];
 
 /* 解析 gUnk_087EA138[arg0-1] 组的全部条目 (条目 id 从 0 起, 写 0x02005000 区窗口) */
+// @ 0x08009A7C
 void MenuEnt_ParseAll(u8 arg0)
 {
     u8 count;
@@ -1607,6 +1657,7 @@ void MenuEnt_ParseAll(u8 arg0)
     }
 }
 /* 解析 gUnk_087EA138[arg1] 组的条目 id [arg0, arg0+count) 区间 */
+// @ 0x08009AC4
 void MenuEnt_ParseRange(u8 arg0, u8 arg1)
 {
     u8 end;
@@ -1620,25 +1671,30 @@ void MenuEnt_ParseRange(u8 arg0, u8 arg1)
         cur++;
     }
 }
+// @ 0x08009B04
 void MenuEnt_Unlock(u8 arg0)
 {
     gUnk_03000010[arg0] &= 0xFB;
 }
+// @ 0x08009B1C
 void MenuEnt_Lock(u8 arg0)
 {
     gUnk_03000010[arg0] |= 4;
 }
 
+// @ 0x08009B34
 u8 MenuEnt_GetState(u8 arg0)
 {
     return gUnk_03000010[arg0];
 }
 
+// @ 0x08009B44
 void Palette_Backup(void)
 {
     DmaCopy16(3, PLTT, 0x0203EA00, PLTT_SIZE);
 }
 
+// @ 0x08009B64
 void Palette_FillWhite(void)
 {
     u16 i;
@@ -1654,6 +1710,7 @@ void Palette_FillWhite(void)
     }
 }
 
+// @ 0x08009B84
 u8 *MenuEnt_ParseDesc(u8 arg0, u8 *src)
 {
     gUnk_03000010[arg0] = src[0];
@@ -1683,6 +1740,7 @@ extern u16 gUnk_080BABA0[][16];
 extern u16* gUnk_087EA38C[];
 extern u8* gUnk_087EA368[];
 
+// @ 0x08009BF0
 void StaticObjGfx_LoadPair(u8 arg0) {
     u8* var_r4;
     u8 var_r5;
@@ -1711,6 +1769,7 @@ void StaticObjGfx_LoadPair(u8 arg0) {
  * {u16 count} + count × {u8 gfxSlot, u8 高字节, u16 x, u16 y, u16 z},
  * 填入 gStaticMapObjects[0..count-1]: field_C = 描述半字高字节, field_2/field_3(pal) = 图形槽 idx/+12,
  * dataPtr = gUnk_087EA368[palSlot] 动画描述, field_0=1 激活, 其余清零。 */
+// @ 0x08009C84
 void StaticObjs_Spawn(u8 arg0) {
     u16 var_r5;
     u8 idx;
@@ -1764,6 +1823,7 @@ s32 Sprite_EnqueueRender_S32(u16, u16, u8, u16, u8);
  * gUnk_03004D4C != 0 (菜单打开) 时整帧跳过。 */
 void StaticObj_BuildChain(u8, u8*);
 
+// @ 0x08009D34
 void StaticObjs_StepAll() {
     s16 var_ip;
     StaticMapObject* var_r7;
@@ -1867,6 +1927,7 @@ void StaticObjs_StepAll() {
  *   {u8 y, u8 高字节, u8 x, u8 高字节, u8 tileOffset, u8}}。
  * y 高字节拼进 attr0 (0x80<<7=0x4000 翻转位由 Sprite_InitChainNode 处理),
  * tileId 从 OBJ VRAM 基址 + tileOffset + 槽 field_2 选块, paletteId = field_3。 */
+// @ 0x08009E80
 void StaticObj_BuildChain(u8 arg0, u8* var_r6) {
     struct SpriteNode* subRenderObj;
     struct SpriteNode* renderObj;
@@ -1917,6 +1978,7 @@ void StaticObj_BuildChain(u8 arg0, u8* var_r6) {
 }
 
 
+// @ 0x08009F48
 void StaticObjs_Reset(void)
 {
     s16 i;
@@ -1944,6 +2006,7 @@ extern const u8 gStatGrowthCurveTables[];
  *   ⑤ 定义必须用 K&R 旧式风格 (与头文件 `u16 sub_8009F70();` 空形参声明配套):
  *      改成全原型会触发 GCC2 的 default-promotion 冲突报错, 且会让已匹配的
  *      调用方 sub_8048818 的 formation 寄存器分配从 r2 漂到 r3 (规则 7 的坑) */
+// @ 0x08009F70
 u16 sub_8009F70(classId, lv, statIdx)
 u8 classId;
 u8 lv;
@@ -2023,6 +2086,7 @@ extern u8 gUnk_08093418[];
  *     "[0]==0xFF 且 pid==1" 那条路直接跳到接受块 (ROM 就是 `b accept` 绕过 `cmp flag,#0`)
  *   - 本函数使用 r8/sb → 有 GCC2 跳函数泄漏风险 (规则 51), 合入后必须看全量 SHA1
  */
+// @ 0x0800A048
 void Stats_BuildSkillList(u8 *skills, u8 lv, u8 groupId)
 {
     u8 i;
@@ -2057,6 +2121,7 @@ void Stats_BuildSkillList(u8 *skills, u8 lv, u8 groupId)
         count++;
     }
 }
+// @ 0x0800A0E4
 u8 Chara_GetFormGfx(u8 arg0)
 {
     u8 var_r2;
@@ -2125,6 +2190,7 @@ extern u8 gUnk_087EA580[];
  *  val 装载落在 ands 与 subs 之间。第一分支的 `u8 bonusVal = entry[6]` 重读被
  *  CSE 合并成 val 的副本 (不增指令), 作用是缩短 val 的伪寄存器生命周期, 使
  *  其全局分配优先级高于 entry 基址 → val 落 r2/基址落 r3 (规则 112)。 */
+// @ 0x0800A534
 void sub_800A534(u8 arg0)
 {
     u8 *entry;
@@ -2173,6 +2239,7 @@ void sub_800A534(u8 arg0)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_800A664);
 
+// @ 0x0800A79C
 void Stats_RecalcEquip(u8 arg0)
 {
     PlayerStats *chara;
@@ -2202,6 +2269,7 @@ void Stats_RecalcEquip(u8 arg0)
 }
 extern u32 gUnk_08092248[];
 
+// @ 0x0800A86C
 u8 ExpToLevel(s32 value) {
     s32 ret;
     u8 i;
@@ -2219,6 +2287,7 @@ u8 ExpToLevel(s32 value) {
 
     return i - 1;
 }
+// @ 0x0800A8A0
 u32 LevelToExp(u8 arg0) {
     u8 i;
     u32 sum = 0;
@@ -2233,6 +2302,7 @@ u32 LevelToExp(u8 arg0) {
 
 extern u8 gUnk_08093418[];
 
+// @ 0x0800A8D0
 u8 ItemFindSlot(u8 arg0, u8 arg1)
 {
     u8 i;
@@ -2251,6 +2321,7 @@ u8 ItemFindSlot(u8 arg0, u8 arg1)
     return 0xFF;
 }
 
+// @ 0x0800A924
 void Party_InitStats(void)
 {
     u8 i;
@@ -2265,17 +2336,21 @@ void Party_InitStats(void)
         gInventory[i] = 0;
     }
 }
+// @ 0x0800A958
 u8 ItemGetValue(u8 arg0) {
     return gUnk_08093418[(arg0 - 1) * 5 + 4];
 }
+// @ 0x0800A970
 void sub_800A970(void* arg0) {
     *((u16*)arg0+1) = *((u16*)arg0 + 9);
 }
+// @ 0x0800A978
 void sub_800A978(void* arg0) {
     *((u16*)arg0+2) = *((u16*)arg0 + 10);
 }
 
 //FullHealParty
+// @ 0x0800A980
 void FullHealParty(void)
 {
     u8 i;
@@ -2295,6 +2370,7 @@ void FullHealParty(void)
         ptr->mp = ptr->max_mp;
     }
 }
+// @ 0x0800A9C0
 void EquipItem(u8 arg0, u8 newEquip, u8 equipSlotId) {
     u8 oldEquip;
     u8 var_r0;
@@ -2333,6 +2409,7 @@ void EquipItem(u8 arg0, u8 newEquip, u8 equipSlotId) {
 }
 
 // sub_800AA60 = AddInventoryItem
+// @ 0x0800AA60
 void sub_800AA60(u8 itemId, u8 count)
 {
     s32 totalCount;
@@ -2349,6 +2426,7 @@ void sub_800AA60(u8 itemId, u8 count)
 }
 
 // sub_800AA84 = RemoveInventoryItem
+// @ 0x0800AA84
 void sub_800AA84(u8 itemId, u8 count)
 {
     s32 totalCount;
@@ -2364,6 +2442,7 @@ void sub_800AA84(u8 itemId, u8 count)
     }
 }
 
+// @ 0x0800AAA4
 void Silver_Add(s32 arg0)
 {
     gSilverAmount += arg0;
@@ -2373,6 +2452,7 @@ void Silver_Add(s32 arg0)
         gSilverAmount = 999999;
     }
 }
+// @ 0x0800AAC0
 void Silver_Sub(s32 arg0)
 {
     gSilverAmount -= arg0;
@@ -2384,20 +2464,24 @@ void Silver_Sub(s32 arg0)
 }
 extern u8 gUnk_087EA580[];
 
+// @ 0x0800AADC
 u8 sub_800AADC(u8 arg0) {
     return gUnk_087EA580[arg0 * 12 + 4] & 0xF;
 }
 extern u8 gUnk_087EA580[];
 
+// @ 0x0800AAF8
 u16 sub_800AAF8(u8 arg0) {
     return gUnk_087EA580[arg0 * 12] + (gUnk_087EA580[arg0 * 12 + 1] << 8);
 }
 extern u8 gUnk_087EA580[];
 
+// @ 0x0800AB18
 u16 sub_800AB18(u8 arg0) {
     return gUnk_087EA580[arg0 * 12 + 2] + (gUnk_087EA580[arg0 * 12 + 3] << 8);
 }
 
+// @ 0x0800AB3C
 u8 Party_AnyEquip(void)
 {
 
@@ -2420,6 +2504,7 @@ u8 Party_AnyEquip(void)
     }
     return 0;
 }
+// @ 0x0800AB7C
 void Chara_ClearTempStatus(u8 arg0)
 {
     PlayerStats *actor;
@@ -2435,6 +2520,7 @@ void Chara_ClearTempStatus(u8 arg0)
         }
     }
 }
+// @ 0x0800ABBC
 void Stats_ClearEquipBonus(void)
 {
     gEquipBonusAtkBase = 0;
@@ -2450,6 +2536,7 @@ void Stats_ClearEquipBonus(void)
 /* PartyForm_ApplyBonus — 队伍形态一致性检查 (0x0800AC08):
  * 4 名角色 (1-based id) 的种族/形态字节 (field_4 高 4 位) 全部相同时,
  * 若形态为 0xE/0xF (特殊形态) 则设置全队攻/防加成 (Stats_RecalcEquip 消费)。 */
+// @ 0x0800AC08
 void PartyForm_ApplyBonus(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 {
     u8 val;
@@ -2482,6 +2569,7 @@ void PartyForm_ApplyBonus(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 
 
 //FullHealCharacter
+// @ 0x0800ACA4
 void FullHealCharacter(u8 arg0)
 {
     PlayerStats *ptr;
@@ -2498,6 +2586,7 @@ void FullHealCharacter(u8 arg0)
 
 INCLUDE_ASM("asm/nonmatchings", sub_800ACC8);
 
+// @ 0x0800B14C
 void SceneBg_Reload(void)
 {
     if (gUnk_03004D4C != 0) {
@@ -2567,6 +2656,7 @@ void SceneBg_Reload(void)
             DmaCopy16(3, (void *)0x02004800, (void *)0x0600E800, 0x800);
     }
 }
+// @ 0x0800B2D0
 void MenuState_Reset(void)
 {
     u8 i;
@@ -2585,6 +2675,7 @@ void MenuState_Reset(void)
         gMenuCursorStack[i] = 0;
     }
 }
+// @ 0x0800B314
 void MenuHp_Update(void)
 {
     u8 i;
@@ -2630,6 +2721,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_800B374);
  *   - 两个分支各自重复写一次 Text_PutGlyph 调用, **不能外提** (规则 38): 目标就是两份调用点
  *   - `dst++` 在目标里是 `adds r0,r5,#0; adds r5,#2` (先传后推), 不要写成 `*dst++` 以外的形式
  */
+// @ 0x0800BEE4
 void Msg_RenderLine(u8 *src, u8 palette)
 {
     u16 *dst = gMsgLineBuf;
@@ -2683,6 +2775,7 @@ void Msg_RenderLine(u8 *src, u8 palette)
  *     用独立符号会改成 `ldr r0,=0x030000BC` 并多出一个字面池项 (实测多 20 字节)
  *   - `|=` 目标是 `movs r1,#8; orrs r1, r2` (先物化常量再或, 规则 5/76 同类)
  */
+// @ 0x0800BF5C
 void PartyUi_InitEntities(u8 mode)
 {
     u16 i;
@@ -2718,6 +2811,7 @@ void PartyUi_InitEntities(u8 mode)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_800BFF8);
 
+// @ 0x0800C0D8
 void BattleIntro_Setup(void)
 {
     u16 i;
@@ -2752,6 +2846,7 @@ void BattleIntro_Setup(void)
 INCLUDE_ASM("asm/nonmatchings", sub_800C194);
 INCLUDE_ASM("asm/nonmatchings", sub_800C2F8);
 
+// @ 0x0800E170
 void MenuUi_SetEntityPos(u8 arg0, u8 arg1, u8 arg2)
 {
 
@@ -2799,6 +2894,7 @@ extern Vec2* gUnk_087EB1F4[];
 extern Vec2* gUnk_087EB214[];
 extern Vec2* gUnk_087EB22C[];
 
+// @ 0x0800E668
 void sub_800E668(u8 arg0) {
     Vec2* ptr;
 
@@ -2872,6 +2968,7 @@ UI 精灵实体滑动设定 (UiSprite_BeginSlide, asm 已匹配; 下方为等价
    mode 1: 终点 (0x28, 8);  mode 0: 终点 (idx*0x28+0x48, 8);
    其他:   按 gPartyMemberIDs[idx] 在编队 gFormationIDs[5] 里的位次 +2 查
            gPositionTable 得 (x+0x18, y+8)。
+// @ 0x0800E71C
 void UiSprite_BeginSlide(u8 idx, u8 mode) {
     UISpriteEntity* sprite;
     u8 ch_id;
@@ -2929,6 +3026,7 @@ void UiSprite_BeginSlide(u8 idx, u8 mode) {
  *      - 把 x/y 写进关联 SpriteNode (gSpriteNodePool[oamSlotId]) 的 OAM 属性:
  *        attr0 <- y (低 8 位), attr1 <- x-0x20 (低 9 位), attr2 <- tileId
  *        (bit2/3 变体: 从 0x5000/0x6000 窗口字库行选块, 直接清低 10 位加 tileId)。 */
+// @ 0x0800E7BC
 void UiSprites_Update(void) {
     u8 step;
     u16 i;
@@ -3026,6 +3124,7 @@ extern u8* gUiSpritesAuxDesc[];
  * 卡点: 目标零常量分配到 sb (`movs r2,#0; mov sb,r2`), 0x4000/0x3FF 常量直接经 r2 物化;
  * 本侧分配到 r9 且常量走 ip 中转 (多余 mov 对) —— 需 permuter 探索声明顺序。
  *
+// @ 0x0800EB98
 void MenuUi_SpawnAuxSprites(u8 arg0) {
     u8 y;
     u8* src;
@@ -3106,6 +3205,7 @@ static inline void drawSome(u8 var_r7, u8 idx, u8 plttIdx)
 
 
 
+// @ 0x0800F4A8
 void MenuUi_DrawItemList(void) {
     u8 idx;
 
@@ -3211,6 +3311,7 @@ extern u8 gInvPageDownItems[];
 /* 从 gUnk_03004980 物品/事件表中, 以 gInvViewState[0] 为起点向下、
  * 以 gInvViewState[9] 为起点向上, 各最多拾取 2 个非零项到
  * gInvPageUpItems[] / gInvPageDownItems[]。 */
+// @ 0x0800F670
 void sub_800F670(void)
 {
     u8 idx;
@@ -3259,6 +3360,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_800FB2C);
 INCLUDE_ASM("asm/nonmatchings", sub_800FDEC);
 INCLUDE_ASM("asm/nonmatchings", sub_800FF10);
 INCLUDE_ASM("asm/nonmatchings", sub_8010170);
+// @ 0x0801026C
 u8 ItemGetUsePower(u8 arg0, u8 arg1)
 {
 
@@ -3319,6 +3421,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8010300);
 u8 EventFlags_Test(u16);
 extern u8 gUnk_080987C4[];
 
+// @ 0x08010434
 u8 WarpTable_Check(void)
 {
     u8 i;
@@ -3356,6 +3459,7 @@ extern const u8 gScreenIdleIconPageMap[];
  * 把对应地图 ID (gScreenIdleIconPageMap[i]) 依次填进 gScreenIdleIconIds 并以 0 补满 16 项,
  * 最后游标归零。调用点: sub_800ACC8 (菜单场景初始化)。
  * 消费者: sub_800C2F8 (游标/翻页) + sub_800F3AC (逐项绘制地点图标)。 */
+// @ 0x08010978
 void ScreenIdleIcons_BuildList(void)
 {
     u8 i;

@@ -473,6 +473,9 @@ INCLUDE_ASM("asm/nonmatchings", sub_80154E8);
 INCLUDE_ASM("asm/nonmatchings", sub_8015658);
 
 INCLUDE_ASM("asm/matchings", sub_8015AF0);
+// ⏸ 无候选; 逻辑已全解(见 progress.md): 两处 tilemap 写(0x020059AA/0x02005BEA)+gUnk_08093550 查表;
+//   卡在 GCC2 调度: 目标把 store 基址 ldr 插在 (bit|0x826) 之后, 我方版本提前物化基址 → +0xd 起错位。
+//   需 gUnk_03000228(IWRAM)/gUnk_08093550(ROM) 符号 + 逐条对齐调度, 待攻。
 
 void InvUi_DrawCursors(void)
 {

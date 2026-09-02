@@ -810,7 +810,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x08048bac	sub_8048BAC	✅ 2026-09-02 qwen: obj[0xBE]<=10? gUnk_0839CC4C_entries[obj[0x8D]].value:0 (4B表{u16,u8 value@2,u8}, 家族同 sub_8048B88 读+0); 结构体数组视图需别名符号 gUnk_0839CC4C_entries@0x0839CC4C (u8[] 视图被 sub_8048B88 占用; 直址 cast 致 base-late 寄存器错配, 唯全局 struct[] 声明才 base-early); fncheck OK 36B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x08048bd0	sub_8048BD0	
 0	thumb	code_8044394	0x08048c30	sub_8048C30	
-0	thumb	code_8044394	0x08048c80	sub_8048C80	
+0	thumb	code_8044394	0x08048c80	sub_8048C80	⏸概率判定, 语义全解: threshold=switch(arg0[0xAB]{2→5,3→0x14,5→0xa,else→0x14}) + (kind<=10?arg0[0x8B]:0) + (kind<=10?5:0x14), 返 (u16)(((u32(*)(void))Rng_LcgNext)()%100) < threshold; 首句 GetObjPool() 结果被丢弃; 卡点(不可复现编译器伪影): ① 目标有 8B 幽灵栈帧(sub sp,#8/add sp,#8, 中间零 [sp] 访问)——等价C(含 long long/取址局部/不同返回型)均不触发, 疑原编译器版本差异; ② 第二个 adds 的操作数序 adds r4,r2,r4 vs 我恒 adds r4,r4,r2; 实际仅差 ~6B 但帧位移致级联; 候选 permuter/sub_8048C80/v4.c(已 thr=u32 出 bhs、switch{2,3,5} 出 cmp#3 支、(u32(*)(void)) 出 __umodsi3)
 1	thumb	code_8044394	0x08048cec	sub_8048CEC	
 1	thumb	code_8044394	0x08048d40	sub_8048D40	✅ 2026-09-02 opencode: obj[0xBE]<=10 时清零 0x7E..0x86 五个u16; 关键=写5条 *(u16*)(arg0+const)=0 (用*ptr++/数组索引会致 r0/r1 互换 FAIL); fncheck OK 36B
 1	thumb	code_8044394	0x08048d64	sub_8048D64	✅ 2026-09-02 opencode: min((u16)(obj[0x6E]-obj[0x6C]), arg1) 语义: diff<arg1返(u16)diff否则arg1; u16形参/返回触发 lsl/lsr#16; fncheck OK 30B

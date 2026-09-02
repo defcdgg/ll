@@ -2128,3 +2128,18 @@ SFX 换歌: 遍历 obj 池收集 id, 对 obj=pool+id*0xC8, 若 obj[0xBE]==9 则�
 (76B≠baserom 80B) 造成整 ROM 红, 复原后 ROM 反而转绿; WIP 副本完好保存在
 permuter/sub_804C890/{base.c,v2.c}, functions.tsv 仍 status=0。见 INCIDENTS.md 新增行。
 
+
+## sub_804C8E0 (0x0804C8E0, code_8044394) — ✅ 2026-09-02 sound-agent (fncheck OK 210B)
+obj 池槽位操作: 从 sub_80489E8 收集的 values 中删除 arg1 (移位), 槽空则切换 slot (0→1)
+再试一次, 返回 values[Rng_LcgNext()%count]。
+
+**匹配历程 (3200→2780→0)**:
+1. `slot = !slot` 编译成 r0 计算+拷贝; 改显式 `if (slot==0) slot=1; else slot=0` (2780)。
+2. 残余结构差在移位循环: 直接 `count--; for(j=i; j<count; j++)` 会立即截断 count
+   (subs+lsls+lsrs), 目标把 count-1 复制到 r3 作循环界、r4 作备、延迟到循环后 `count=(u8)r3` 截断。
+   **正解 (规则113)**: `for(j=i; j<count-1; j++) values[j]=values[j+1]; count--;`
+   —— count-- 后置、循环界用 count-1, 编译器便按目标调度, obj 顺带落到 r8
+   (需要 r7 作移位基址), 全程 score 0。
+- 两段扫描-移除逻辑完全同构 (槽0→槽1), 直接复制结构。
+
+**验证**: fncheck OK 210B (4 bl 槽); 全 ROM make+SHA1 绿 (615/1065)。

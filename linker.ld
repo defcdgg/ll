@@ -41,6 +41,7 @@ D_87EB2A8 = 0x087EB2A8;
 gUnk_0839CE7C = 0x0839CE7C;
 gUnk_0839B2E0 = 0x0839B2E0;
 gUnk_0839B462 = 0x0839B462;
+gUnk_0839BB4C = 0x0839BB4C;    /* tile 动画帧表 (sub_804EFDC 用) */
 gUnk_0839D348 = 0x0839D348;
 gUnk_0839CC4C = 0x0839CC4C;
 gUnk_0839CC4C_entries = 0x0839CC4C;
@@ -464,7 +465,7 @@ SECTIONS {
         . = 0x00004854; gCameraSnapFlag = .;
         . = 0x00004860; gUnk_03004860 = .;
         . = 0x00004870; gChestFlags = .;
-        . = 0x00004890; gChests = .;
+        . = 0x00004890; gChestObjects = .;
         . = 0x00004910; gUnk_03004910 = .;
         . = 0x00004914; gUnk_03004914 = .;
         . = 0x00004918; gUnk_03004918 = .;

@@ -825,6 +825,7 @@ void sub_8048BD0(u8 *arg0)
         return;
     }
 }
+extern u8 gUnk_0839BB4C[];
 extern u8 gUnk_0839D5BC[];
 
 // @ 0x08048C30
@@ -2202,7 +2203,30 @@ u8 sub_804EF90(u8 arg0)
     return ret;
 }
 // @ 0x0804EFDC
-INCLUDE_ASM("asm/nonmatchings", sub_804EFDC);
+void sub_804EFDC(u8 *base, u8 x, u8 y, u8 *tile, u8 palette)
+{
+    u16 *dest;
+    u8 tp;
+    u8 *tbl;
+    u16 i;
+
+    dest = (u16 *)(base + (y * 32 + x) * 2);
+    tp = sub_804F050(*tile);
+    tbl = (u8 *)gUnk_0839BB4C + tp * 24;
+    for (i = 0; i <= 0x17; i++)
+    {
+        if (tbl[i] != 0 && tbl[i] != 0xFF)
+        {
+            dest[i] = (palette << 12) + tbl[i] * 2;
+            dest[i + 0x20] = (palette << 12) + (tbl[i] * 2 + 1);
+        }
+        else
+        {
+            dest[i] = (palette << 12) + 1;
+            dest[i + 0x20] = (palette << 12) + 1;
+        }
+    }
+}
 // @ 0x0804F050
 u8 sub_804F050(u8 arg0)
 {

@@ -113,6 +113,7 @@ cd permuter/<fn> && timeout 280 ../../.venv/bin/python ../../tools/decomp-permut
 | `python3 scripts/tsv_init.py` | 从 src/*.c 重新推导 functions.tsv (note 保留) |
 | `scripts/rename_fn.sh <old> <new>` | **全链改名一条命令** (ll.cfg→code.s→引用点→gen_asm→fncheck, 失败自动回滚) |
 | `scripts/match_fn.sh <fn>` | **合入收尾一条命令** (校验真C→gen_asm→重编→fncheck→SHA1→打印收尾清单) |
+| `scripts/mkpermuter.py <函数名或0x地址>` | 一键建 permuter 套件: 从 asm/{non,}matchings 拷 .s 出 target.o, 把 src 里的真 C 函数体原样拷成 base.c 种子; INCLUDE_ASM 占位自动跳过 |
 | `make code.s` / `make asm` | 重出反汇编 / 增量重建 asm/ |
 | `make verify` | 全量终验: make+SHA1+audit+status=1 全量字节核验 |
 | `make remaining [TU=xxx]` | 未匹配报表 (scripts/remaining.py) |

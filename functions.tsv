@@ -267,7 +267,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x080113cc	sub_80113CC	✅ 2026-09-02 op1: 手写 while(页号<=15 && 未持有) 旋转循环 + for 计数后续持有>=2 页; 首候选 fncheck 136B 全等; 语义=向后找"其后仍有>=2 持有页"的有效页号 (0=无页, 0xFF=不足)
 0	thumb	code_8010F10	0x08011454	sub_8011454	
 0	thumb	code_8010F10	0x08012530	sub_8012530	
-0	thumb	code_8010F10	0x08012790	sub_8012790	
+0	thumb	code_8010F10	0x08012790	SaveUi_LoadScreen	
 0	thumb	code_8010F10	0x08013870	sub_8013870	
 0	thumb	code_8010F10	0x08013934	sub_8013934	
 0	thumb	code_8010F10	0x08013b0c	sub_8013B0C	
@@ -821,7 +821,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x080492c0	sub_80492C0	
 0	thumb	code_8044394	0x080494f0	sub_80494F0	
 0	thumb	code_8044394	0x080497b0	sub_80497B0	
-0	thumb	code_8044394	0x080498e0	sub_80498E0	
+0	thumb	code_8044394	0x080498e0	sub_80498E0	⏸规则17类寄存器轮换: 语义全解(磁盘动画帧写入器, sub_804ABF8 同族): ptr=(u8*)gUnk_030009C0, byte=ptr[(s8)gUnk_030009BF*4], tile=gUnk_08095028[byte][gUnk_0300094D], dest[0]=tile*2-0x5000/dest[0x20]=-0x4FFF, 94D++, 重算 tile 若==0或frame>7返1否则0; 卡点=callee-saved r4/r5/r6 分配给 ptr/BF/table 的轮换(目标 ptr→r4/BF→r5/table→r6 即创建序, 我恒得 BF→r4/table→r5/ptr→r6)+重算 frame 载入序; v1-v6 全撞 34B 地板; 需 fndiff 长磨; 候选 permuter/sub_80498E0/v3.c
 0	thumb	code_8044394	0x08049958	sub_8049958	
 0	thumb	code_8044394	0x08049ad8	sub_8049AD8	
 0	thumb	code_8044394	0x08049b70	sub_8049B70	

@@ -136,7 +136,7 @@ s32 sub_8007BD0(void);  // 按 gMapZoneType 0..4 分发: 0=换图(装载点+stat
 #define MapZone_Trigger sub_8007BD0
 void MapBg_LoadInterior(u8);
 void Logo_LoadAssets(u8);
-u32 sub_8008124();  // 返回类型非 void 但体内无 return —— 原 ROM 即如此(占住 r0 使寄存器整体上移)
+u32 ChoiceMenu_BuildList();  // 返回类型非 void 但体内无 return —— 原 ROM 即如此(占住 r0 使寄存器整体上移)
 void BattleIntro_Cursor();
 void ChoiceMenu_HandleInput(u16);
 void DialogPortrait_Set(u8 portraitId, u8 position);
@@ -440,7 +440,33 @@ void sub_801A35C();
 void BgScrolls_WriteAll();
 void sub_801A3A8(u8, u16, u16);
 void sub_801A3C4();
-void sub_801A5EC();
+typedef struct
+{
+    u32 f_00;
+    u32 f_04;
+    u32 f_08;
+    u32 f_0C;
+    u32 f_10;
+    u32 f_14;
+    u16 f_18;
+    u16 f_1A;
+    u16 f_1C;
+    u16 f_1E;
+    u16 f_20;
+    u16 f_22;
+    u16 f_24;
+    u16 f_26;
+    u8 f_28;
+    u8 f_29;
+    u8 f_2A;
+    u8 f_2B;
+    u8 f_2C;
+    u8 f_2D;
+    u8 f_2E;
+    u8 f_2F;
+} Unk_801A5EC;
+
+void sub_801A5EC(Unk_801A5EC *, Unk_801A5EC *);
 void sub_801A684(u8 *);
 void sub_801A6F4();
 u8 sub_801A884(u8 *, u8, u8 *);

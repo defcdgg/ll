@@ -12,7 +12,31 @@
 // @ 0x0801A3C4
 INCLUDE_ASM("asm/nonmatchings", sub_801A3C4);
 // @ 0x0801A5EC
-INCLUDE_ASM("asm/nonmatchings", sub_801A5EC);
+void sub_801A5EC(Unk_801A5EC *dst, Unk_801A5EC *src)
+{
+    dst->f_00 = src->f_00;
+    dst->f_04 = src->f_04;
+    dst->f_08 = src->f_08;
+    dst->f_0C = src->f_0C;
+    dst->f_18 = src->f_18;
+    dst->f_28 = src->f_28;
+    dst->f_1A = src->f_1A;
+    dst->f_1C = src->f_1C;
+    dst->f_1E = src->f_1E;
+    dst->f_29 = src->f_29;
+    dst->f_2A = src->f_2A;
+    dst->f_2B = src->f_2B;
+    dst->f_2C = src->f_2C;
+    dst->f_2D = src->f_2D;
+    dst->f_2E = src->f_2E;
+    dst->f_10 = src->f_10;
+    dst->f_14 = src->f_14;
+    dst->f_20 = src->f_20;
+    dst->f_22 = src->f_22;
+    dst->f_24 = src->f_24;
+    dst->f_2F = src->f_2F;
+    dst->f_26 = src->f_26;
+}
 // @ 0x0801A684
 void sub_801A684(u8 *arg0)
 {

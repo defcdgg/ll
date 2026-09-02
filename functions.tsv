@@ -124,8 +124,8 @@ status	isa	module	addr	name	note
 0	thumb	code_8005020	0x08005c70	Viewport_UpdateScroll	
 1	thumb	code_8005020	0x080064ac	BgMap_FillPattern	
 1	thumb	code_8005020	0x08006520	MapBg_LoadFull	
-0	thumb	code_8005020	0x0800661c	MapScene_Load	语义已确认: 地图场景资源/状态装载入口; fncheck OK (2026-09-02 codex)
-0	thumb	code_8005020	0x080071ec	sub_80071EC	
+0	thumb	code_8005020	0x0800661c	MapScene_Load	⏸ 3024B asm; 场景描述符表已结构化为 gMapSceneDescriptors[180] @0x08088D80; fncheck OK (2026-09-02 gpnux)
+0	thumb	code_8005020	0x080071ec	MapScene_LoadNpcSlotIds	⏸ 176B asm; 按场景 npcSlotGroupId 装载 8 个 NPC 槽的图形/调色板 ID; fncheck OK (2026-09-02 gpnux)
 1	thumb	code_8005020	0x0800729c	MapScene_InitSprites	
 0	thumb	code_8005020	0x08007350	sub_8007350	
 1	thumb	code_8005020	0x08007964	AnimSlot_Parse	
@@ -285,7 +285,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x0801543c	sub_801543C	
 0	thumb	code_8010F10	0x080154e8	sub_80154E8	
 0	thumb	code_8010F10	0x08015658	sub_8015658	
-1	thumb	code_8010F10	0x08015af0	sub_8015AF0	
+1	thumb	code_8010F10	0x08015af0	sub_8015AF0	⏸ 无候选; 逻辑全解(0x020059AA/0x02005BEA 两处 tilemap 写 + gUnk_08093550[gSaveUiParam*8+gUnk_03000228+4] 查表); 卡 GCC2 store 基址调度(目标把 ldr 基址插在 (bit|0x826) 之后, 我方提前物化); 需 gUnk_03000228(IWRAM)/gUnk_08093550(ROM) 符号; 详情 progress.md
 1	thumb	code_8010F10	0x08015b90	InvUi_DrawCursors	
 0	thumb	code_8010F10	0x08015c18	InvUi_Main	
 0	thumb	code_8010F10	0x08015e1c	sub_8015E1C	⏸规则17类寄存器分配硬骨头: 语义已全解(Text_PutGlyph 内联版+0xFF终止循环, dest=gWindowBgBuf/2+arg0+arg1*32, attr=arg2<<12 每分支各写, b==0空白/0xFE→0x280/else b*2, dest[0]=attr+tile & dest[0x20]=attr|(tile+1)); 但 8 版候选(v1-v8)最好仍差70/104B —— egcs 把 dest 放 ip(r12)、arg2<<28 放 r5 每轮>>16、指针放 r4、base 放 r3 的分配无法用等价C复现(我恒得 ptr→r3/arg2→r4/base→r2 的循环置换); 需 fndiff 逐指令长磨或改编译器; 最佳候选 permuter/sub_8015E1C/v8.c
@@ -424,7 +424,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x0801a1dc	BattleFx_Stop	
 1	thumb	code_8010F10	0x0801a218	BattleFx_DispOff	
 1	thumb	code_8010F10	0x0801a270	sub_801A270	
-1	thumb	code_8010F10	0x0801a2ac	sub_801A2AC	
+1	thumb	code_8010F10	0x0801a2ac	sub_801A2AC	⏸ 逻辑正确(switch((arg0>>6)&2){case2,3} 产 range-check cmp#3/bgt+cmp#2/blt); 卡寄存器分配: 目标 strh r0 保 arg0 于 r0 且 arg0<<16 入 r3, GCC2 却 clobber r0 再 >>16 恢复→错位; permuter 平台期 240; 详情 progress.md
 1	thumb	code_8010F10	0x0801a2ec	sub_801A2EC	✅ 2026-09-02 qwen: BG tileset 流式解压 gUnk_030004F8<=3 → LZ77UnCompVram(gUnk_087EBDF0[pos], 0x06008000+pos*0x1000); pos++ (全局不缓存→调用后重读); 新登记 ROM 符号 gUnk_087EBDF0@0x087EBDF0 (linker.ld SECTIONS 外); fncheck OK 56B; 全ROM SHA1 绿
 1	thumb	code_8010F10	0x0801a324	BgLoad_Reset	
 1	thumb	code_8010F10	0x0801a330	BgLoad_Finish	

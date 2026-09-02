@@ -1886,3 +1886,32 @@ rematerializable → 每处重取 `ldr [pc]` → 分配命中目标 (bytecmp min
 
 **并发提示**: 合入时工作区被另一 agent 的未完成改名 (code_8005020.c→MapScene_LoadNpcSlotIds, asm 未生成) 弄红,
 非本函数之锅; 本函数已 bytecmp + objdump 双重定性, 定向提交自己的文件。
+
+## 2026-09-02 `0x08088D80` 地图场景描述符表
+
+`0x08088D80..0x08089B8F` 是 180 项、每项 `0x14` 字节的地图场景描述符表，
+不是调色板数据，也不是 225 项的 `0x10` 字节表。已按地址顺序写入
+`src/data_805769C.c` 的 `gMapSceneDescriptors[180]`，字段为 12 个字节加 4 个小端
+半字：场景装载/显示参数、NPC 槽组号、碰撞阈值、tilemap、tileset、BG 调色板索引。
+
+直接消费者已统一使用 `gMapSceneDescriptors`：`MapBg_LoadFull`、`MapScene_Load` 的
+调用链、`MapScene_InitSprites` 以及 `Sprites_LoadMapNPCs` 的 NPC 槽组字段。
+`MapScene_Load` 和 `MapScene_LoadNpcSlotIds` 已完成语义命名但仍保留原始 asm，
+对应台账 note 标为挂起；四个相关函数 fncheck 均 OK，场景表 `0xE10` 字节比较通过，
+整 ROM `make && sha1sum -c ll.sha1` 通过。
+
+## 2026-09-02 code_8010F10.c matchings 批量 (qwen): 8 命中 + 2 挂起
+
+本 TU 10 个 `INCLUDE_ASM("asm/matchings")` 全部处理: **8 个已实装 fncheck 绿** (sub_80160CC/038/068/178/1F4, sub_8015ED0, sub_8018750, sub_801A3A8), **2 个挂起** (sub_801A2AC, sub_8015AF0)。全 ROM SHA1 绿。
+
+**已实装要点**:
+- sub_80160CC: 修好了他人遗留的**嵌套注释炸弹** (`// ... /* extern */` 在块注释内, `*/` 提前闭合致整个 TU 编译崩) → 顺带解锁本文件。
+- sub_8016038/068: `gUnk_03004AA0` 即 `gPartyMemberIds` (复用勿重注册); 068 用 DmaCopy32/16 宏 (规则55), 且因 `SceneBg_Reload`(已匹配) 以 `sub_8016068()` **无参调用靠 r0 残留**传 arg0 → 必须保 `void()` 原型 → 用 **K&R 定义** `void sub_8016068(arg0) u8 arg0;` 规避 "default promotion 不能匹配空参数表" 冲突。sub_80161F4 同理 (MenuHp_Update 传3参, K&R 定义)。
+- sub_8016178: rows/cols 夹取后向 VRAM 0x02005800 填 0xB001 边框。
+- sub_8015ED0: 比较 `0x02021000+arg0*0x2000` 前 12B 与 `gSaveSignature` (=0x08098199, 复用)。
+- sub_8018750: `gUnk_03000340` 即 `gGstate340` (复用)。
+- sub_801A3A8: 关键 —— iwram.h 的 `Unk_03000500` 是 struct 无 array 成员; 用 `u16*` 或 `u16(*)[2]` 转型会被 GCC2 **CSE 成单基址+displacement** (`strh [r0,#2]`), 而目标要**两个独立地址 + r4** (`array[arg0][0]`/`[1]` 各算一次)。解法 = 本地 `typedef union { u16 array[4][2]; }` 转型 → 命中。新登记 ROM 符号 gUnk_0809E4E4/08098308/080936A0。
+
+**挂起 1 — sub_801A2AC** (BLEND 寄存器设置): 逻辑 = `REG_BLDCNT=arg0; REG_BLDALPHA=arg1|(arg2<<8); if((arg0>>6)&2 落在[2,3]) REG_BLDY=arg1;`。range-check 形状来自 `switch((arg0>>6)&2){case 2:case 3:}` (v3 逻辑完全正确)。**卡点**: 目标 `strh r0,[r1]` 把 arg0 留在 r0、`arg0<<16` 放 r3; GCC2 对我方任意写法都 `lsls r0,r0,#16` 先 clobber r0 再 `lsrs r3,r0,#16` 恢复 → 寄存器错位。RTL 转储显示 arg0 的伪寄存器在 <<16 后即 REG_DEAD。permuter 语句序探索平台期 score=240 (非0)。候选文件 `permuter/sub_801A2AC/` (base.c=v3)。待攻方向: 换 arg0 用法让 GCC2 保留 r0 (如把 BLDCNT store 与 mode 计算解耦到不同中间量), 或深挖 -dl 调度。
+
+**挂起 2 — sub_8015AF0** (背包 UI 光标 tile 写入): 无候选, 逻辑已全解 (见上 TSV note)。两处 tilemap 写 (0x020059AA / 0x02005BEA) + `gUnk_08093550[gSaveUiParam*8 + gUnk_03000228 + 4]` 查表。**卡点**: GCC2 把 store 基址 `ldr r2,=0x020059AA` 的调度位置 —— 目标插在 `(bit|0x826)` 之后, 我方版本提前物化基址 → +0xd 起错位。需先登记 gUnk_03000228(IWRAM)/gUnk_08093550(ROM) 符号 (本次为尝试已加又回退, 保持绿)。待攻: 逐条对齐两条 store 的基址/常量物化顺序。

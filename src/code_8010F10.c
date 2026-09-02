@@ -72,7 +72,36 @@ void sub_801114C(void)
 
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8011268);
-INCLUDE_ASM("asm/nonmatchings", sub_80113CC);
+
+/* 在 16 页道具表 gInvPageItemIds[] 中, 从 gSkillMenuPage+1 页向后找第一个
+ * 仍持有的道具页 i (gUnk_03004980[itemId] != 0); 之后至少还要有 2 个持有页
+ * 才算有效, 返回页号 i; 没有候选页返回 0, 候选不足返回 0xFF。 */
+extern u8 gUnk_03004980[];
+
+u8 sub_80113CC(void)
+{
+    u8 i;
+    u8 j;
+    u8 count;
+
+    i = gSkillMenuPage + 1;
+    while (i <= 15 && gUnk_03004980[gInvPageItemIds[i]] == 0)
+        i++;
+    if (i > 14)
+        return 0;
+    count = 0;
+    for (j = i + 1; j <= 15; j++)
+    {
+        if (gUnk_03004980[gInvPageItemIds[j]] != 0)
+        {
+            count++;
+            if (count == 2)
+                return i;
+        }
+    }
+    return 0xFF;
+}
+
 INCLUDE_ASM("asm/nonmatchings", sub_8011454);
 INCLUDE_ASM("asm/nonmatchings", sub_8012530);
 INCLUDE_ASM("asm/nonmatchings", sub_8012790);
@@ -484,6 +513,35 @@ void Save_StartWrite(void)
 }
 
 INCLUDE_ASM("asm/matchings", sub_8015ED0);
+/*
+
+extern u8 gUnk_08098199[];
+extern u8 gUnk_02021000[][0x2000];
+
+s32 sub_8015ED0(u8 arg0) {
+    u8 temp_r0;
+    u8* p;
+    void* var_r2;
+    u8 i;
+
+    if (arg0 > 3) {
+        return 0xFF;
+    }
+
+    // p = gUnk_02021000[arg0];
+    p = (u8 *)(0x02021000 + (arg0 * 0x2000));
+    
+    for(i = 0; i < 12; i++)
+    {
+        if(*p != gUnk_08098199[i])
+            return 1;
+        p++;
+    }
+
+    return 0;
+}
+
+*/
 
 void SaveUi_DrawSlots(void)
 {
@@ -525,8 +583,46 @@ void SaveUi_Open(u8 arg0)
     ClearBuffer((u16 *)0x02005800, 30, 20);
 }
 INCLUDE_ASM("asm/matchings", sub_8016038);
+/*
+
+extern u8 gUnk_03004AA0[];
+extern u8* gUnk_087EB2E0[];
+
+void sub_8016038(u8 arg0) {
+    u8 temp_r0;
+    temp_r0 = gUnk_03004AA0[arg0];
+    if (temp_r0 != 0xFF) {
+        LZ77UnCompWram(gUnk_087EB2E0[temp_r0], 0x02020000);
+    }
+}
+
+*/
 INCLUDE_ASM("asm/matchings", sub_8016068);
-INCLUDE_ASM("asm/matchings", sub_80160CC);
+/*
+
+extern u8 gUnk_03004AA0[];
+
+extern u8 gUnk_0809E4E4[][32];
+
+void sub_8016068(u8 arg0) {
+    u8 temp_r1;
+    temp_r1 = gUnk_03004AA0[arg0];
+
+    if (temp_r1 != 0xFF) {
+        DmaCopy32(3, 0x02020000, (arg0 * 0x600) + 0x06014000, 0x6C0);
+        DmaCopy16(3, gUnk_0809E4E4[temp_r1],(arg0 << 5) + 0x05000260, 0x20);
+
+    }
+}
+
+*/
+extern u8 *gUnk_087EB2E0[];
+
+void sub_80160CC(void)
+{
+    LZ77UnCompWram(gUnk_087EB2E0[11], 0x02020000);
+    LZ77UnCompWram(0x080A0B58, 0x02020800);
+}
 void sub_80160F4(void)
 {
     DmaCopy32(3, 0x02020000, 0x06013800, 0x800);
@@ -536,7 +632,81 @@ void sub_80160F4(void)
     DmaCopy16(3, 0x0808B7D4, 0x050001C0, 0x40);
 }
 INCLUDE_ASM("asm/matchings", sub_8016178);
+
+/*
+#define VRAM_BUF_2005800 (u16*)0x02005800
+
+void sub_8016178(u16 arg0) {
+    u16 rows;
+    u16 cols;
+    u16* ptr;
+    u16 y, x;
+    u16* temp_r5;
+
+    if(arg0 == 0)
+        return;
+
+    rows = (arg0 * (arg0 - 1) + 1);
+
+    if(rows > 10)
+        rows = 10;
+    
+    cols = arg0 << 3;
+
+    if(cols > 15)
+        cols = 15;
+
+    ptr = VRAM_BUF_2005800 + (15 - cols) + (10 - rows) * 32;
+
+    cols = cols * 2;
+    rows = rows * 2;
+
+    for (y = 0; y < rows; y++) {
+        temp_r5 = ptr;
+    
+        for (x = 0; x < cols; x++) {
+            *ptr++ = 0xB001;
+        }
+        ptr = temp_r5 + 0x20;
+    }
+
+}
+
+*/
 INCLUDE_ASM("asm/matchings", sub_80161F4);
+
+/*
+#define VRAM_BUF_2005800 (u16*)0x02005800
+
+typedef struct
+{
+    u8 unk0;
+    u8 unk1;
+    u8 unk2;
+    u8 unk3;
+}Unk_08098308;
+
+extern u8 gUnk_08098308[];
+
+void sub_80161F4(u8 arg0, u8 x, u8 y) {
+    u16* ptr;
+    u16 i;
+
+    if (arg0 != 0) {
+        arg0--;
+    }
+    arg0 <<= 2;
+    ptr = VRAM_BUF_2005800 + x + y * 32;
+
+    for( i = 0; i < 4; i++)
+    {
+        *ptr++ =   0xB240 + gUnk_08098308[arg0 + i];
+        // ptr++;
+    }
+
+}
+
+*/
 
 void Num_Draw16(s16 arg0, u16 *dest)
 {
@@ -1448,6 +1618,28 @@ void sub_8018744(void)
     gUnk_03000316 = 10;
 }
 INCLUDE_ASM("asm/matchings", sub_8018750);
+/*
+extern u8 gUnk_080936A0[];
+void sub_8018750(void)
+{
+    u16 offset;
+    u16 count;
+
+    offset = 0;
+    count = 0;
+
+    while (count <= 0x128)
+    {
+        if (gUnk_080936A0[offset] == 0xFF)
+        {
+            count++;
+        }
+        offset++;
+    }
+
+    gUnk_03000340 = (u32)&gUnk_080936A0[offset];
+}
+*/
 
 u32 sub_801878C(void)
 {
@@ -1843,17 +2035,16 @@ void sub_801A270(void)
     DmaWait(3);
 }
 
-INCLUDE_ASM("asm/matchings", sub_801A2AC);
-// void sub_801A2AC(u16 arg0, u8 arg1, u8 arg2)
-// {
-//     REG_BLDCNT = arg0;
-//     REG_BLDALPHA = arg1 | (arg2 << 8);
+void sub_801A2AC(u16 arg0, u8 arg1, u8 arg2)
+{
+    REG_BLDCNT = arg0;
+    REG_BLDALPHA = arg1 | (arg2 << 8);
 
-//     if (((arg0 >> 6) & 2) == 2)
-//     {
-//         REG_BLDY = arg1;
-//     }
-// }
+    if (((arg0 >> 6) & 2) == 2)
+    {
+        REG_BLDY = arg1;
+    }
+}
 extern u8 *gUnk_087EBDF0[];
 
 void sub_801A2EC(void)
@@ -1901,3 +2092,30 @@ void BgScrolls_WriteAll(void)
     REG_BG3VOFS = gUnk_03000500.field_E;
 }
 INCLUDE_ASM("asm/matchings", sub_801A3A8);
+/*
+
+typedef union{
+    struct{
+    u16 field_0;
+    u16 field_2;
+    u16 field_4;
+    u16 field_6;
+    u16 field_8;
+    u16 field_A;
+    u16 field_C;
+    u16 field_E;
+    }fields;
+    u16 array[4][2];
+}Unk_03000500;
+extern Unk_03000500 gUnk_03000500;
+
+void sub_801A3A8(u8 arg0, u16 arg1, u16 arg2) {
+
+    gUnk_03000500.array[arg0][0] = arg1;
+    gUnk_03000500.array[arg0][1] = arg2;
+    // temp_r0 = (u32) (arg0 << 0x18) >> 0x16;
+    // temp_r0->unk3000500 = arg1;
+    // temp_r0->unk3000502 = arg2;
+}
+
+*/

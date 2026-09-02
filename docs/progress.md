@@ -1798,3 +1798,23 @@ ldr r7,[sp,#48]; mov sl,r7; ldr r4,[sp,#52]; mov ip,r4`
 结论: 这是 global-alloc 域参数提升的固定分配, "穷举等价 C 写法" 改不动寄存器 home。
 待攻方向: ① 参照 sub_801B81C (10 参同族已匹配) 找其 C 触发提升的"参数数量+类型"精确组合;
 ② 规则 102 的路子: 检查 `arg1`(0x02035AC0) 是否需要声明为指针以改变 home; ③ 已留 v19/v35/v38 候选。
+
+## sub_80113CC (0x080113CC, code_8010F10) — ✅ 2026-09-02 op1
+背包 16 页道具表的翻页探测: 从 `gSkillMenuPage+1` 向后找第一个持有页 (`gUnk_03004980[gInvPageItemIds[i]] != 0`),
+且其后 15 页内至少还有 2 个持有页才有效。返回: 页号 i / 0 (i 越过 14, 无候选) / 0xFF (后续持有不足 2)。
+调用点 code_0.s 两处 (`bl sub_80113CC`, 0x0800D85E/0x0800DB26 附近), 返回值做 `lsrs #0x18` 后按非零分支 → u8 返回正确。
+
+C 形状 (bytecmp + fncheck 136B 一次全等, 首候选即中):
+```c
+i = gSkillMenuPage + 1;
+while (i <= 15 && gUnk_03004980[gInvPageItemIds[i]] == 0) i++;   // 双条件顶置旋转循环 (同规则73形状)
+if (i > 14) return 0;
+count = 0;
+for (j = i + 1; j <= 15; j++) { if (... != 0) { count++; if (count == 2) return i; } }
+return 0xFF;
+```
+要点:
+- 上界 `<= 15` / `> 14` 这对 u8 魔数就是目标的 `cmp #0xf; bhi` + `cmp #0xe; bls`, 不要改成 `< 16`/`> 13` 试探。
+- 内层命中计数用 `if (count == 2) return i;` 直接对应 `cmp r3, #2; beq → movs r0,#i` 的提前出口。
+- `gUnk_03004980` 在本 TU 原先没有 extern, 已按惯例放函数上方局部 extern (与 code_8005020/8044394/804F0B8 一致)。
+- code_0.h:272 原型已是 `u8 sub_80113CC(void)`, 本函数没有 K&R 原型坑。

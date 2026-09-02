@@ -894,11 +894,11 @@ void SceneTransition_Load(void)
     gPlayerMoveDir = gSpawnFacingDir;
     Party_FollowAnim();
     Party_FollowStep();
-    sub_800661C(gMapNpcSetId);
+    MapScene_Load(gMapNpcSetId);
     MapScene_InitSprites(gMapNpcSetId);
     Sprites_LoadMapNPCs(gMapNpcSetId);
     BgScroll_LoadFromTable(gMoveCmdSetId);
-    sub_8008F28(gMapNpcSetId);
+    ChestObjects_LoadForMap(gMapNpcSetId);
     StaticObjGfx_LoadPair(gMapObjGfxSetId);
     StaticObjs_Spawn(gMapObjGfxSetId);
 
@@ -1164,7 +1164,7 @@ void Scene_Reload(void)
     Party_FollowStep();
     gVBlankPipelineMode = 1;
     REG_IME = 1;
-    sub_800661C(gMapNpcSetId);
+    MapScene_Load(gMapNpcSetId);
 
     if (!(1 & Script_GetFlags()))
     {
@@ -1286,7 +1286,7 @@ void Scene_RestoreAfterBattle(void)
 
     Party_FollowStep();
     Followers_ResetHistory();
-    sub_800661C(gMapNpcSetId);
+    MapScene_Load(gMapNpcSetId);
     sub_80525E8(gCurrentSongId, 0, 1);
     ReloadAllSpriteSheets();
     BgScroll_LoadFromTable(gMoveCmdSetId);
@@ -1374,7 +1374,7 @@ void Task_MapExplore(void)
             {
                 if (gNewKeysRaw & A_BUTTON)
                 {
-                    eventId = sub_8003F40();
+                    eventId = CheckFacingEvent();
                     if (eventId != 0)
                     {
                         sub_80526A0(eventId - 1, 2);
@@ -2737,11 +2737,11 @@ typedef struct {
   u16 field_E;
   u16 field_10;
   u16 field_12;
-}Unk_08088D80;
+}MapSceneDescriptor;
 
 extern u8 gUnk_08091948[];
 
-extern Unk_08088D80 gUnk_08088D80[];
+extern const MapSceneDescriptor gMapSceneDescriptors[];
 
 typedef struct {
     u16 field_0;
@@ -2761,7 +2761,7 @@ void Sprites_LoadMapNPCs(u8 arg0) {
     if (gObjGraphicsSetId & 0x80) 
         return;
 
-    i = temp_r3 = gUnk_08088D80[arg0].field_9;
+    i = temp_r3 = gMapSceneDescriptors[arg0].npcSlotGroupId;
     if (i == 0)
         return;
 
@@ -3173,7 +3173,7 @@ void Chara_ProcessCmdStream(u16 arg0)
     }
 }
 INCLUDE_ASM("asm/nonmatchings", Chara_StepMove);
-INCLUDE_ASM("asm/matchings", sub_8003F40);
+INCLUDE_ASM("asm/matchings", CheckFacingEvent);
 INCLUDE_ASM("asm/nonmatchings", Party_FollowAnim);
 // INCLUDE_ASM("asm/matchings", Followers_ResetHistory);
 

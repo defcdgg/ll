@@ -14,9 +14,11 @@
 @	.incbin "baserom.gba", 0x59794, 0x6AF214 - 0x59794
 
 rom_data:
-	/* 0x0808760C..0x08088400 (3464 B) 已搬到 src/data_805769C.c:
-	   gCharNameTextBlock_* (队伍成员名字) + gCharaCmdStream_* (NPC 行为命令流) */
-	.incbin "baserom.gba", 0x88400, 0x38EEF4 - 0x88400
+	/* 0x0808760C..0x08089BC4 (9660 B) 已搬到 src/data_805769C.c:
+	   gCharNameTextBlock_* + gCharaCmdStream_* + gChestSpawnTable +
+	   gDigitFontObjPalettes + gDigitFontObjTiles + gMapSceneDescriptors +
+	   gSaveMapUnlockFlags */
+	.incbin "baserom.gba", 0x89BC4, 0x38EEF4 - 0x89BC4
 
 	.global gUnk_0838EEF4
 gUnk_0838EEF4:

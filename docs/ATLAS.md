@@ -4,7 +4,7 @@
 >
 > **硬约束**: 模块 = 按原始顺序的连续函数区间, 不重排任何函数 (linker.ld 的 .text 顺序决定)
 
-- 函数 **1065**, 已匹配 **592** (55.6%), 未匹配 **473** / **107,724** 条指令
+- 函数 **1065**, 已匹配 **593** (55.7%), 未匹配 **472** / **107,699** 条指令
 - 亲和边 18261 条 (m=17530), 调度表 **6** 张, λ=0.3 → **31 个模块**
 
 ## 0. ROM 自己的模块骨架: 函数指针调度表
@@ -62,7 +62,7 @@
 | **M23** | ENGINE/CORE | 0x0804B224–0x0804C6B0 | 41 | 14 | 1,616 | — | — | 0x3000ae8, 0x3000be8 |
 | **M15** | ENGINE/OBJECT | 0x08031580–0x080323B4 | 10 | 10 | 1,220 | 0x0839CD5C(87) | — | 0x3000868, 0x3000889 |
 | **M01** | BOOT/INTR | 0x080012B8–0x08004D38 | 66 | 4 | 978 | 0x087E83F0(16) | Anim_BuildOamChain, Anim_PlayCustom, Anim_StepChara | 0x3002e80, 0x3003ac0 |
-| **M09** | ENGINE/SYS | 0x08016C44–0x08017640 | 16 | 8 | 941 | — | Sio_BuildPacket, Sio_ClearSlot, Sio_IsHost | 0x3004df0, 0x4000208 |
+| **M09** | ENGINE/SYS | 0x08016C44–0x08017640 | 16 | 7 | 916 | — | Sio_BuildPacket, Sio_ClearSlot, Sio_IsHost | 0x3004df0, 0x4000208 |
 | **M05** | ENGINE/SYS | 0x080091A4–0x08009E80 | 19 | 4 | 819 | — | ChestFlags_Test, MenuEnt_ClearStates, MenuEnt_GetState | 0x3000010, 0x3004910 |
 | **M06** | ENGINE/SYS | 0x08009F48–0x0800AC08 | 29 | 5 | 699 | — | Chara_ClearTempStatus, Chara_GetFormGfx, EquipItem | 0x3004ac0, 0x3004aa8 |
 | **M25** | ENGINE/OBJECT | 0x0804D1B4–0x0804D708 | 8 | 8 | 684 | 0x0839CD5C(87) | — | — |
@@ -194,7 +194,7 @@ ROM 表: 0x8058834, 0x87e8430, 0x80b9dfc, 0x805881c
 *0x08003958   197  Chara_SetWalkPath            Chara_SetWalkPath
  0x08003b08   143  Chara_ProcessCmdStream       Chara_ProcessCmdStream
 *0x08003c54   339  Chara_StepMove               Chara_StepMove
- 0x08003f40   183  sub_8003F40                  sub_8003F40
+ 0x08003f40   183  CheckFacingEvent             CheckFacingEvent
 *0x080040e4   286  Party_FollowAnim             Party_FollowAnim
  0x08004358    51  Followers_ResetHistory       Followers_ResetHistory
  0x080043d4    57  Followers_SyncToTail         Followers_SyncToTail
@@ -265,8 +265,8 @@ ROM 表: 0x8088d80, 0x8087216, 0x87e9aa0, 0x87ea020
 *0x08005c70   717  Viewport_UpdateScroll        Viewport_UpdateScroll
  0x080064ac    54  BgMap_FillPattern            BgMap_FillPattern
  0x08006520    92  MapBg_LoadFull               MapBg_LoadFull
-*0x0800661c   993  sub_800661C                  sub_800661C
-*0x080071ec    78  sub_80071EC                  sub_80071EC
+*0x0800661c   993  MapScene_Load                MapScene_Load
+*0x080071ec    78  MapScene_LoadNpcSlotIds      MapScene_LoadNpcSlotIds
  0x0800729c    73  MapScene_InitSprites         MapScene_InitSprites
 *0x08007350   636  sub_8007350                  sub_8007350
  0x08007964    42  AnimSlot_Parse               AnimSlot_Parse
@@ -307,7 +307,7 @@ ROM 表: 0x8088d80, 0x8087216, 0x87e9aa0, 0x87ea020
 
 ### M04 [ENGINE/SYS]  0x08008E44–0x08009184  (8 函数 / 1 未匹配 / 77 指令)
 
-锚点: BgMap_FillRow, ChestFlags_ClearAll, ChestFlags_Toggle, Chest_BuildSprite, Chest_Open, LoadDigitFontObjTiles, MapBg_FlushPending
+锚点: BgMap_FillRow, ChestFlags_ClearAll, ChestFlags_Toggle, ChestObjects_LoadForMap, Chest_BuildSprite, Chest_Open, LoadDigitFontObjTiles, MapBg_FlushPending
 工作内存: 0x3004870, 0x3004890, 0x40000d4, 0x3003ac0
 ROM 表: 0x8088400, 0x8088c40, 0x8088c00
 
@@ -315,7 +315,7 @@ ROM 表: 0x8088400, 0x8088c40, 0x8088c00
   地址        指令  ll.cfg 名                     函数
  0x08008e44    35  BgMap_FillRow                BgMap_FillRow
  0x08008e94    45  MapBg_FlushPending           MapBg_FlushPending
-*0x08008f28    77  sub_8008F28                  sub_8008F28
+*0x08008f28    77  ChestObjects_LoadForMap      ChestObjects_LoadForMap
  0x08008fd0    78  Chest_BuildSprite            Chest_BuildSprite
  0x0800908c    52  Chest_Open                   Chest_Open
  0x08009114    25  LoadDigitFontObjTiles        LoadDigitFontObjTiles
@@ -535,7 +535,7 @@ ROM 表: 0x8098199, 0x8095028, 0x839cfaa, 0x87eb2e0
  0x08016c2c    10  Text_TileAt                  Text_TileAt
 ```
 
-### M09 [ENGINE/SYS]  0x08016C44–0x08017640  (16 函数 / 8 未匹配 / 941 指令)
+### M09 [ENGINE/SYS]  0x08016C44–0x08017640  (16 函数 / 7 未匹配 / 916 指令)
 
 锚点: Sio_BuildPacket, Sio_ClearSlot, Sio_IsHost, Sio_SetReady, Sio_SetXferCtx, Sio_Shutdown
 工作内存: 0x3004df0, 0x4000208, 0x4000128, 0x3004f20
@@ -554,7 +554,7 @@ ROM 表: 0x8098199, 0x8095028, 0x839cfaa, 0x87eb2e0
 *0x08017120    87  sub_8017120                  sub_8017120
 *0x080171e4   426  sub_80171E4                  sub_80171E4
  0x08017588    21  Sio_IsHost                   Sio_IsHost
-*0x080175c0    25  sub_80175C0                  sub_80175C0
+ 0x080175c0    25  sub_80175C0                  sub_80175C0
  0x08017600    12  Sio_SetXferCtx               Sio_SetXferCtx
  0x0801761c    15  Sio_ClearSlot                Sio_ClearSlot
 *0x08017640    38  sub_8017640                  sub_8017640

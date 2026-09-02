@@ -17,7 +17,7 @@ extern const u8 gRandShuffleTable[];
 extern const u8 gWindowTransitionCurve[];
 
 /* ScreenIdleIcons 的 bit→地图ID 对照表 (bit i = 进入地图 [i] 时置位
- * gScreenIdleEventFlags 的 bit i, 由地图装载 sub_800661C 写入);
+ * gScreenIdleEventFlags 的 bit i, 由地图装载 MapScene_Load 写入);
  * [13]=0x78 特例: 不在进入时置位, 由事件标志 0xFD 解锁; [15]=0 结束符 */
 extern const u8 gScreenIdleIconPageMap[];
 
@@ -35,6 +35,10 @@ extern const u16 gDialogPortraitPalettes[];
 extern const u8 gDialogPortraitPaletteIds[];
 extern const u32 gDialogPortraitGfxTable[];   /* 88 项, 定义在 src/data_87E83F0.c */
 extern const u32 gDialogPortraitTilemapPtrs[];
+
+/* 菜单实体 OBJ 调色板表 (0x0808A234): 124 项 × 0x20 字节。
+ * 每项第一个半字为保留值，MenuEnt_FlushPalettes 从 +2 DMA 15 色。 */
+extern const u8 gMenuEntityPaletteTable[];
 
 
 extern const u8 pltt_08057854[];
@@ -168,6 +172,57 @@ extern const u8 gCharaCmdStream_88226[];
 extern const u8 gChoiceDestTable[];      /* 0x08087648 分组变长目的地表 */
 extern const u8 gChoiceDataBase[];
 extern const u8 gUnk_0808823A[];
+
+/* 地图宝箱表 (0x08088400): 256 项 × 8B。
+ * 装载器按 mapId 选出当前地图的项；itemId 作为交互脚本号，
+ * specialFlag=1 的项还受事件标志 0x40 门控。坐标是地图 tile 坐标。 */
+typedef struct
+{
+    /* 0x00 */ u8 mapId;
+    /* 0x01 */ u8 itemId;
+    /* 0x02 */ u8 specialFlag;
+    /* 0x03 */ u8 pad_3;
+    /* 0x04 */ u16 tileX;
+    /* 0x06 */ u16 tileY;
+} ChestMapEntry;
+
+extern const ChestMapEntry gChestSpawnTable[];
+
+/* 地图场景描述符 (0x08088D80): 180 项 × 0x14 字节。
+ * 记录场景的资源集、显示/特效参数、NPC 槽组及 BG 数据索引。 */
+typedef struct
+{
+    /* 0x00 */ u8 bgLoadMode;          /* MapScene_Load 的背景/特殊场景分支 */
+    /* 0x01 */ u8 gfxSetId;            /* OBJ 图形资源集/模式 */
+    /* 0x02 */ u8 hBlankMode;          /* HBlank 波形模式 */
+    /* 0x03 */ u8 sceneSubState;       /* 场景子状态 */
+    /* 0x04 */ u8 bgScrollMode;        /* BG1 滚动模式 */
+    /* 0x05 */ u8 reserved_5;
+    /* 0x06 */ u8 menuEntitySetId;     /* 菜单实体描述集 */
+    /* 0x07 */ u8 spriteAnimSetId;     /* 场景动画组 */
+    /* 0x08 */ u8 bg3Mode;             /* BG3/显示模式参数 */
+    /* 0x09 */ u8 npcSlotGroupId;      /* NPC 图形/调色板槽组 */
+    /* 0x0A */ u8 bg2Mode;             /* BG2/场景附加模式参数 */
+    /* 0x0B */ u8 sceneFlag;           /* 场景标志 */
+    /* 0x0C */ u16 collisionTileMax;   /* 地图碰撞判定阈值 */
+    /* 0x0E */ u16 tilemapId;          /* 地图 tilemap 资源索引 */
+    /* 0x10 */ u16 tileSetId;          /* 地图 tile 资源索引 */
+    /* 0x12 */ u16 bgPaletteId;        /* BG 调色板资源索引 */
+} MapSceneDescriptor;
+
+extern const MapSceneDescriptor gMapSceneDescriptors[];
+
+/* 场景选择项对应的存档解锁标志编号表 (0x08089B90)，前 49 项由存档 UI
+ * 扫描，末尾 3 个零为表尾填充。 */
+extern const u8 gSaveMapUnlockFlags[];
+
+/* 数字字体 OBJ 调色板 (0x08088C00): 2 组 × 16 色 BGR555，分别装入 OBJ
+ * 调色板槽 14 和 15；LoadDigitFontObjTiles 从每组起始处 DMA 0x20 字节。 */
+extern const u16 gDigitFontObjPalettes[2][16];
+
+/* 数字字体 OBJ 图块 (0x08088C40): 10 个 4bpp 8x8 tile，共 0x140 字节，
+ * LoadDigitFontObjTiles 装入 OBJ 图块槽 150~159。 */
+extern const u8 gDigitFontObjTiles[];
 
 extern const u32 gUnk_080597D8[];
 extern const u32 gUnk_08059D48[];

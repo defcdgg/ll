@@ -1280,27 +1280,27 @@
   "size": 286
  },
  {
-  "name": "unk_8088400",
+  "name": "gChestSpawnTable",
   "address": "0x08088400",
   "size": 2048
  },
  {
-  "name": "unk_8088C00",
+  "name": "gDigitFontObjPalettes",
   "address": "0x08088C00",
   "size": 64
  },
  {
-  "name": "unk_8088C40",
+  "name": "gDigitFontObjTiles",
   "address": "0x08088C40",
   "size": 320
  },
  {
-  "name": "stru_8088D80",
+  "name": "gMapSceneDescriptors",
   "address": "0x08088D80",
   "size": 3600
  },
  {
-  "name": "unk_8089B90",
+  "name": "gSaveMapUnlockFlags",
   "address": "0x08089B90",
   "size": 52
  },
@@ -1440,7 +1440,7 @@
   "size": 14
  },
  {
-  "name": "byte_808A234",
+  "name": "gMenuEntityPaletteTable",
   "address": "0x0808A234",
   "size": 3968
  },

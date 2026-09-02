@@ -1,4 +1,4 @@
-未匹配 473 个
+未匹配 456 个
 
 [code_80002A0] 4
   0x08003958  Chara_SetWalkPath
@@ -6,21 +6,20 @@
   0x080040e4  Party_FollowAnim
   0x0800478c  CutsceneAnim_PlayFrame
 
-[code_8005020] 42
+[code_8005020] 41
   0x08005020  sub_8005020
   0x080052f8  sub_80052F8
   0x080053b4  sub_80053B4
   0x080055e8  sub_80055E8  ⏸ ⏸ 612指令+r8/sb; 语义已全解(MapZone子系统); 待攻
   0x08005c70  Viewport_UpdateScroll
-  0x0800661c  sub_800661C
-  0x080071ec  sub_80071EC
+  0x0800661c  MapScene_Load  ⏸ ⏸ 3024B asm; 场景描述符表已结构化为 gMapSceneDescriptors[180] @0x08088D
+  0x080071ec  MapScene_LoadNpcSlotIds  ⏸ ⏸ 176B asm; 按场景 npcSlotGroupId 装载 8 个 NPC 槽的图形/调色板 ID; fnche
   0x08007350  sub_8007350
   0x08007adc  sub_8007ADC  ⏸ ⏸ 指令流100%一致剩27B纯home(i/mask,tx/ty/fx,count/j); 候选permuter/su
   0x08008254  ChoiceMenu_HandleInput
   0x08008620  sub_8008620
-  0x08008f28  sub_8008F28
+  0x08008f28  ChestObjects_LoadForMap  ⏸ ⏸ 2026-09-02 gpnux: 扫描 256×8B 地图宝箱表，装载当前地图至 16 个 gChestObjec
   0x080091c4  sub_80091C4
-  0x08009370  sub_8009370  ⏸ ⏸ 已定性=global-alloc域(qtydump: 16 qty全r0, 循环体块0qty, 争议基址不在表内);
   0x080094fc  sub_80094FC
   0x08009600  sub_8009600
   0x08009f70  sub_8009F70
@@ -50,13 +49,12 @@
   0x08010624  sub_8010624
   0x08010770  sub_8010770
 
-[code_8010F10] 52
+[code_8010F10] 43
   0x08010f10  sub_8010F10
   0x08011268  sub_8011268
-  0x080113cc  sub_80113CC
   0x08011454  sub_8011454
   0x08012530  sub_8012530
-  0x08012790  sub_8012790
+  0x08012790  SaveUi_LoadScreen  ⏸ ⏸ 2026-09-02 gpnux: 存档/场景选择 UI 主状态机；扫描 gSaveMapUnlockFlags 并
   0x08013870  sub_8013870
   0x08013934  sub_8013934
   0x08013b0c  sub_8013B0C
@@ -67,18 +65,13 @@
   0x080154e8  sub_80154E8
   0x08015658  sub_8015658
   0x08015c18  InvUi_Main
-  0x08015e1c  sub_8015E1C
-  0x080166fc  sub_80166FC
-  0x08016a14  Save_SyncShadow
-  0x08016b30  sub_8016B30
+  0x08015e1c  sub_8015E1C  ⏸ ⏸规则17类寄存器分配硬骨头: 语义已全解(Text_PutGlyph 内联版+0xFF终止循环, dest=gWind
   0x08016c88  sub_8016C88
   0x08016d24  sub_8016D24
   0x08016e80  sub_8016E80
   0x08016fc0  sub_8016FC0
   0x08017120  sub_8017120
   0x080171e4  sub_80171E4
-  0x080175c0  sub_80175C0
-  0x08017640  sub_8017640
   0x0801768c  sub_801768C
   0x080177ac  BattleTask_Run
   0x08017fa4  sub_8017FA4
@@ -86,25 +79,22 @@
   0x080182a8  sub_80182A8
   0x080184a8  sub_80184A8
   0x0801869c  sub_801869C
-  0x080188bc  sub_80188BC
   0x08018928  sub_8018928
   0x08018a58  sub_8018A58
   0x08018bf8  sub_8018BF8
-  0x08018d9c  sub_8018D9C
   0x08018e34  sub_8018E34  ⏸ ⏸ 已定性=global-alloc域(qtydump: 17 qty最长life仅12, 尾段base->r0/r1之
   0x08018ea8  sub_8018EA8
   0x08018fc0  sub_8018FC0
   0x080191cc  sub_80191CC
   0x0801933c  sub_801933C
-  0x080196d4  sub_80196D4
+  0x080196d4  sub_80196D4  ⏸ ⏸ agbcc栈参数提升(r8-r11)深度决策; 9参(dialogCtx索引+8), 目标prologue: pus
   0x08019784  sub_8019784
   0x080199e0  sub_80199E0
   0x08019ad0  sub_8019AD0
   0x08019b98  sub_8019B98
-  0x08019f08  sub_8019F08
   0x08019f78  sub_8019F78
 
-[code_801A3C4] 54
+[code_801A3C4] 50
   0x0801a3c4  sub_801A3C4
   0x0801a5ec  sub_801A5EC
   0x0801a6f4  sub_801A6F4
@@ -142,7 +132,6 @@
   0x0801ea70  sub_801EA70
   0x0801ec3c  sub_801EC3C
   0x0801ed40  sub_801ED40
-  0x0801ee6c  sub_801EE6C
   0x0801eee4  sub_801EEE4
   0x0801f3fc  sub_801F3FC
   0x0801f76c  sub_801F76C
@@ -155,10 +144,7 @@
   0x08020228  sub_8020228
   0x0802031c  sub_802031C
   0x08020648  sub_8020648
-  0x080207dc  sub_80207DC
-  0x08020840  sub_8020840
-  0x080208a4  sub_80208A4
-  0x08020b54  sub_8020B54  ⏸ ⏸ 三sym=0存储寄存器轮换r5/r6/r4; 6排列全试; 规则17
+  0x08020b54  sub_8020B54  ⏸ ⏸规则17未解: 6字节差纯是三个 sym=0 地址伪寄存器轮换(目标0x714→r5/0x715→r6/0x716→r
 
 [code_8020D50] 26
   0x08021184  sub_8021184  ⏸ ⏸ 头部块b/idx/ptr/val四级home; permuter 905; 见progress
@@ -338,9 +324,8 @@
   0x08043b5c  sub_8043B5C
   0x08043f90  sub_8043F90
 
-[code_8044394] 120
+[code_8044394] 118
   0x080445e8  sub_80445E8
-  0x080446bc  sub_80446BC
   0x0804473c  sub_804473C
   0x080448a8  sub_80448A8
   0x08044a40  sub_8044A40
@@ -355,7 +340,7 @@
   0x080457ac  sub_80457AC
   0x08045860  sub_8045860
   0x08045940  sub_8045940
-  0x08045a10  sub_8045A10
+  0x08045a10  sub_8045A10  ⏸ ⏸ 2026-09-02 gpnux: tile动画帧; 头部/主体已逐字节对(表gUnk_08093418[b*5+4
   0x08045a74  sub_8045A74
   0x08045bf4  sub_8045BF4
   0x08045d00  sub_8045D00
@@ -396,7 +381,7 @@
   0x080492c0  sub_80492C0
   0x080494f0  sub_80494F0
   0x080497b0  sub_80497B0
-  0x080498e0  sub_80498E0
+  0x080498e0  sub_80498E0  ⏸ ⏸规则17类寄存器轮换: 语义全解(磁盘动画帧写入器, sub_804ABF8 同族): ptr=(u8*)gUnk_0
   0x08049958  sub_8049958
   0x08049ad8  sub_8049AD8
   0x08049b70  sub_8049B70
@@ -406,8 +391,7 @@
   0x0804a148  sub_804A148
   0x0804a368  sub_804A368
   0x0804aa2c  sub_804AA2C
-  0x0804ab40  sub_804AB40  ⏸ ⏸ 剩4个全局strb顺序+r8/ip互换; 链式赋值94B=94C=0是关键形态
-  0x0804abf8  sub_804ABF8
+  0x0804ab40  sub_804AB40  ⏸ ⏸ do-while+守卫+链式94B=(94C=0) 已压到17字节差(仅A/D的home互换r8⇄ip); 全部链/
   0x0804acc0  sub_804ACC0  ⏸ ⏸ count/arg0扩展home互换+1拷贝(65分); 与AB40同族
   0x0804ae2c  sub_804AE2C
   0x0804af60  sub_804AF60
@@ -460,7 +444,7 @@
   0x0804ec04  sub_804EC04
   0x0804efdc  sub_804EFDC
 
-[code_804F0B8] 27
+[code_804F0B8] 26
   0x0804f10c  sub_804F10C
   0x0804f17c  sub_804F17C
   0x0804f280  sub_804F280
@@ -485,6 +469,5 @@
   0x080525e8  sub_80525E8
   0x080526a0  sub_80526A0
   0x080529b8  sub_80529B8  ⏸ ⏸ 序列全对多占1寄存器; 根因=尾部*ptr+=2被CSE复用data; 见progress
-  0x08052ae8  sub_8052AE8  ⏸ ⏸ 双池加载+r0值链未破(1075); 15+拼法; 见progress
   0x08052f44  sub_8052F44  ⏸ ⏸ permuter沙箱forkserver被拒; 语义已确认(队伍ID匹配+跳转表)
   0x08053270  sub_8053270  ⏸ ⏸ 循环内高位寄存器home错位(ptr/data/limit); 见progress

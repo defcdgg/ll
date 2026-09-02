@@ -272,7 +272,7 @@ void sub_8011268();
 u8 sub_80113CC(void);
 void sub_8011454();
 void sub_8012530();
-void sub_8012790();
+void SaveUi_LoadScreen();
 void sub_8013870();
 void sub_8013934();
 void sub_8013B0C();

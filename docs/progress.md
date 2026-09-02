@@ -1958,3 +1958,38 @@ gPartyStats[charaId].field_unk[2]==2 && field_unk[3]==arg1 → count++`。
    自然布局, 无需手工干预; varG 全指令全等但池在尾部 = 8B 假差, permuter 语句重排后归位。
 4. code_0.h 原型 `void sub_8016B30()` → `u8 sub_8016B30(u8,u8)`: GCC2 拒绝空参数表 + 带参定义
    ("can't match an empty parameter name list declaration"), 只能补全原型; 唯一调用者未匹配, 零风险。
+
+## 2026-09-02 `0x08089B90` 场景选择解锁标志表与 `SaveUi_LoadScreen` 命名
+
+`0x08089B90..0x08089BC3` 是 52 字节的 u8 表，不属于前面的 180 项地图场景描述符，
+也不属于后面的 `0x08089BC4` BG 滚动参数表。`SaveUi_LoadScreen`（原
+`sub_8012790`，`0x08012790`）在场景选择 UI 的多个方向键分支中以选项下标索引该表，
+将表项传给 `SaveFlag_Get` 判断场景是否解锁；确认后把选项下标加 `0x82` 传给
+`MapScene_Load`。表中前 49 项是解锁标志编号排列，末尾 3 个零是尾部填充。
+
+已将该数据按原地址顺序写入 `src/data_805769C.c` 的 `gSaveMapUnlockFlags[52]`，
+在 `include/data_805769C.h`、`linker.ld` 与 `scripts/data.json` 登记，并将 `data/data.s`
+的 blob 起点后移到 `0x08089BC4`。`sub_8012790` 已通过改名管线统一为
+`SaveUi_LoadScreen`（`ll.cfg`、调用点、asm 切片和原型均同步），函数仍保留原始 asm，
+因此台账 status 保持 0；`fncheck` 为 4320 字节 OK，整 ROM `make` + SHA1 通过。
+
+## sub_804AB40 (0x0804AB40, code_8044394) — ⏸ 2026-09-02 opencode-1 (17字节差)
+扫 ROM 表 0x0839B2E0 数 0xF00 项至 arg0 个; 复位 gUnk_0300094A-D 四字节;
+sub_8050434(&tbl[i], 0x6F1E); sub_80187C0(0x400); 返回 &tbl[i]。姊妹函数 sub_804ACC0 同构 (表 0x0839B462)。
+
+**已解** (从前人的 2090 分压到 bytecmp 17 字节差):
+1. 循环 = **do-while + 守卫**: `if (i < arg0) do {...} while (count < arg0)` — 顶测 i 一次、底测 count,
+   才能得到目标形状 (守卫 bcs + 底 bcc), 写 for/while 都会多测一次 (规则21 同族, ACC0 note 已提)。
+2. 终址必须用 `&gUnk_0839B2E0[i]` (常量伪寄存器与循环 HOT 的拷贝共用 home, 免 r6)。
+3. 94 赋值 = **两散 + 一链**: `94A=0; 94B=(94C=0); 94D=0;` — 链使 B/C 地址共享伪寄存器,
+   把散写从 4 个地址伪寄存器压到 3 个, r8/ip 的 home 争议因此消掉一半。
+
+**剩 17 字节** = 9 条指令: 入口 4 条 (A/D 的 ldr/mov home 在 r8⇄ip 互换) + 尾段 5 条
+(目标 stores=[A,B,C,D] 且 processing=[D,C,A,B]; mine stores=[A,C,B,D] processing=[A,C,D,B])。
+**已穷尽** (300+ 变体, bytecmp 实测): 全链 4/3+1/1+3/双链 × 全排列、24 纯排列、8 有序集合划分、
+ptr 变量 (vh/wk16 变大 168B)、ret 前置/后置、i/count 声明序、d=0 半独立、permuter 两轮 (~10万次)。
+机制推论: 存储序 = 分配序, 目标 [D,ip][C,r7][B,sb][A,r8] 隐含 qty 创建序 D→C→B→A;
+但能产生该序的所有 C 写法都同时破坏循环体 home — 是 local-alloc/global-alloc 交互的深层问题
+(同 RULES.md "global-alloc 域三连" 一类, 穷举 C 写法改不动)。
+**最优候选**: permuter/sub_804AB40/base.c (= /tmp/opencode/ab40/vj.c 结构)。下一步候选:
+(a) global-alloc 转储 (RULES 88 延伸); (b) 用 -g 变体编译试; (c) 等 ACC0 先解 (同构家族互抄)。

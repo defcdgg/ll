@@ -104,7 +104,7 @@ u8 sub_80113CC(void)
 
 INCLUDE_ASM("asm/nonmatchings", sub_8011454);
 INCLUDE_ASM("asm/nonmatchings", sub_8012530);
-INCLUDE_ASM("asm/nonmatchings", sub_8012790);
+INCLUDE_ASM("asm/nonmatchings", SaveUi_LoadScreen);
 INCLUDE_ASM("asm/nonmatchings", sub_8013870);
 INCLUDE_ASM("asm/nonmatchings", sub_8013934);
 INCLUDE_ASM("asm/nonmatchings", sub_8013B0C);

@@ -227,34 +227,34 @@ void BgMap_FillPattern(u16 arg0)
             break;
     }
 }
-/* 场景描述符 (0x08088D80, 225 项 × 0x10B): field_9=NPC 集数, field_10=tile 块起始索引,
- * field_12=BG 调色板子表索引, field_E=tilemap 索引; 详见 MapBg_LoadFull/MapScene_InitSprites。 */
-typedef struct {
-  u8 field_0;
-  u8 field_1;
-  u8 field_2;
-  u8 field_3;
-  u8 field_4;
-  u8 field_5;
-  u8 field_6;
-  u8 field_7;
-  u8 field_8;
-  u8 field_9;
-  u8 field_A;
-  u8 field_B;
-  u16 field_C;
-  u16 field_E;
-  u16 field_10;
-  u16 field_12;
-}Unk_08088D80;
-
-extern const Unk_08088D80 gUnk_08088D80[];
 extern u8* gUnk_087EA020[];
 extern u8 gUnk_082893EC[][0x140];
 
+typedef struct
+{
+    u8 bgLoadMode;
+    u8 gfxSetId;
+    u8 hBlankMode;
+    u8 sceneSubState;
+    u8 bgScrollMode;
+    u8 reserved_5;
+    u8 menuEntitySetId;
+    u8 spriteAnimSetId;
+    u8 bg3Mode;
+    u8 npcSlotGroupId;
+    u8 bg2Mode;
+    u8 sceneFlag;
+    u16 collisionTileMax;
+    u16 tilemapId;
+    u16 tileSetId;
+    u16 bgPaletteId;
+} MapSceneDescriptor;
+
+extern const MapSceneDescriptor gMapSceneDescriptors[];
+
 extern u8* gUnk_087E9AA0[];
 
-/* 地图整背景装载 (场景切换时): 按 gUnk_08088D80[arg0] 场景描述符
+/* 地图整背景装载 (场景切换时): 按 gMapSceneDescriptors[arg0] 场景描述符
  *   - field_10 起把 gUnk_087E9AA0[] 里最多 5 块 LZ77 tile 逐块解压到 0x02020000 (每块 4KB 槽);
  *   - DMA 0x4A60 字节 → 0x06000000 (BG VRAM);
  *   - field_12: gUnk_082893EC 子表 (0x140 半字) → BG PLTT; BgPal_ResetFirst 复位底色;
@@ -265,7 +265,7 @@ void MapBg_LoadFull(u8 arg0) {
 
     VBlankIntrWait();
     SoundMain_Frame();
-    idx = gUnk_08088D80[arg0].field_10;
+    idx = gMapSceneDescriptors[arg0].tileSetId;
     i = 0;
     while(gUnk_087E9AA0[idx] != 0)
     {
@@ -285,11 +285,11 @@ void MapBg_LoadFull(u8 arg0) {
     VBlankIntrWait();
     SoundMain_Frame();
 
-    DmaCopy16(3, &gUnk_082893EC[gUnk_08088D80[arg0].field_12], 0x05000000, 0x140);
+    DmaCopy16(3, &gUnk_082893EC[gMapSceneDescriptors[arg0].bgPaletteId], 0x05000000, 0x140);
 
     BgPal_ResetFirst();
 
-    DmaCopy16(3, gUnk_087EA020[gUnk_08088D80[arg0].field_E], 0x02005000, 0x280*2);
+    DmaCopy16(3, gUnk_087EA020[gMapSceneDescriptors[arg0].tilemapId], 0x02005000, 0x280*2);
 
     DmaCopy16(3, 0x02005000, 0x0600F000, 0x800);
 
@@ -298,9 +298,9 @@ void MapBg_LoadFull(u8 arg0) {
 }
 
 INCLUDE_ASM("asm/nonmatchings", MapScene_Load);
-INCLUDE_ASM("asm/nonmatchings", sub_80071EC);
+INCLUDE_ASM("asm/nonmatchings", MapScene_LoadNpcSlotIds);
 /* 地图场景精灵初始化 (进入场景时): 槽 0 = 主角 (gPartyMemberIds[0]) 图块+调色板,
- * 槽 1 = 固定 11 号模型 (跟随者/光影?); 若场景描述符 field_9 有 NPC 集,
+ * 槽 1 = 固定 11 号模型 (跟随者/光影?); 若场景描述符 npcSlotGroupId 有 NPC 集,
  * 把槽 2..9 里已在用的图块/调色板模型 (gSlotGfxId/gSlotPalId, 0xFF=空) 重载进 OBJ VRAM
  * (VRAM 最多 8 种 NPC 模型, 有的模型不变只是颜色不同)。 */
 void MapScene_InitSprites(u8 arg0) {
@@ -317,7 +317,7 @@ void MapScene_InitSprites(u8 arg0) {
     gSlotPalId[1] = 11;
     LoadSpriteSheetGfx(1, 11);
     LoadSpriteSheetPal(1, 11);
-    if(gUnk_08088D80[arg0].field_9 != 0)
+    if(gMapSceneDescriptors[arg0].npcSlotGroupId != 0)
     {
         for(i = 0; i < 8; i++)
         {
@@ -1327,8 +1327,8 @@ void Chest_Open(u8 arg0)
 }
 
 /* 把“数字 0~9 字形”连同对应的 OBJ 调色板装进去, 供 HUD/菜单直接拼数字用:
- *   0x08088C40 → 0x060112C0  0x140 B = 10 个 4bpp 8×8 图块 = OBJ 图块槽 150~159
- *   0x08088C00 → 0x050003C0  0x40 B  = 2 组 16 色 OBJ 调色板(槽 14~15)
+ *   gDigitFontObjTiles (0x08088C40) → 0x060112C0  0x140 B = 10 个 4bpp 8×8 图块 = OBJ 图块槽 150~159
+ *   gDigitFontObjPalettes (0x08088C00) → 0x050003C0  0x40 B  = 2 组 16 色 OBJ 调色板(槽 14~15)
  * 受 gObjGraphicsSetId 的 bit7 屏蔽; 槽 146~149 是箭头/滚动条字形(见 LoadArrowObjTiles)。
  * ⚠ `0x80 & gObjGraphicsSetId` 的常量在左不能改位置, 否则 GCC2 生成的指令序列会变(规则 5)。 */
 void LoadDigitFontObjTiles(void)

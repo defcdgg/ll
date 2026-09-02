@@ -107,7 +107,7 @@ gMainGameState 值: 0xB=LOGO/启动, 1=地图探索, 2=场景切换装载, 3=传
 | 0x08002B54 | ✅asm | `Anim_BuildOamChain` | (附 C 注释) 从帧数据建 OAM 链: oamDataPtr 6B/节点, VRAM 拷贝请求(4B2C), attr0/1/2 组装, 翻转(gUnk_03002C60 bit6), gSpriteWidth/Height |
 | 0x080032BC | ✅C | `OAM_FlushFromQueue` | 渲染队列→OAM 缓冲: 遍历 gSpriteRenderQueue, 每链逐节点 4F64 写入(游标>0x7F 停), 剩余 OAM 清隐(0xA0) |
 | 0x08003348 | ✅C | `Sprites_ReleaseAll` | 释放全部 24 角色的精灵链 (flags=0, next=0) |
-| 0x080033E8 | ✅asm | `Sprites_LoadMapNPCs` | (附 C 注释) 装载地图 NPC 组: gUnk_08088D80[arg0].field_9 组号→gUnk_08091948 数量→gUnk_087EA394 描述符表逐个 345C |
+| 0x080033E8 | ✅asm | `Sprites_LoadMapNPCs` | (附 C 注释) 装载地图 NPC 组: `gMapSceneDescriptors[arg0].npcSlotGroupId` 组号→gUnk_08091948 数量→gUnk_087EA394 描述符表逐个 345C |
 | 0x0800345C | ✅asm | `Chara_InitFromDesc` | (附 C 注释) 从 16B 描述符初始化角色: tile 坐标<<3, palette/图形, field_1 状态位→attr 链形状(bit2/4/5/6 四种 OAM 形态), 初始化全字段 |
 | 0x0800375C | ✅C | `Chara_InitDialogArrow` | 初始化对话框箭头角色 (gUnk_03003178[idx], palette 9, x=相机+idx*40+40) |
 | 0x080037DC | ✅C | `Chara_InitEffect` | 初始化特效角色 (gUnk_03002E80[arg0], palette 5) |

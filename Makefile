@@ -85,7 +85,7 @@ CONTEXT_FLAGS := -DM2C -DPLATFORM_GBA=1 -Dsize_t=int
 
 ### TARGETS ###
 
-.PHONY: all rom compare clean tidy format check_format ctx code.s asm verify remaining
+.PHONY: all rom compare progress clean tidy format check_format ctx code.s asm verify remaining
 
 $(shell mkdir -p $(ASM_BUILDDIR) $(C_BUILDDIR) $(DATA_BUILDDIR))
 
@@ -93,6 +93,11 @@ all: compare
 
 compare: rom
 	$(SHA1) $(BUILD_NAME).sha1
+	@$(MAKE) progress
+
+# 匹配进度: functions.tsv status=1 占比 (独立运行: make progress)
+progress:
+	@awk -F'\t' 'NR>1 && NF>1 {t++; if ($$1==1) m++} END {printf "匹配进度: %d/%d (%.1f%%)\n", m, t, m*100/t}' functions.tsv
 
 rom: $(ROM)
 

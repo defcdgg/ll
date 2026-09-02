@@ -267,7 +267,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x080113cc	sub_80113CC	✅ 2026-09-02 op1: 手写 while(页号<=15 && 未持有) 旋转循环 + for 计数后续持有>=2 页; 首候选 fncheck 136B 全等; 语义=向后找"其后仍有>=2 持有页"的有效页号 (0=无页, 0xFF=不足)
 0	thumb	code_8010F10	0x08011454	sub_8011454	
 0	thumb	code_8010F10	0x08012530	sub_8012530	
-0	thumb	code_8010F10	0x08012790	sub_8012790	
+0	thumb	code_8010F10	0x08012790	SaveUi_LoadScreen	⏸ 2026-09-02 gpnux: 存档/场景选择 UI 主状态机；扫描 gSaveMapUnlockFlags 并以 SaveFlag_Get 判断可用场景，确认后调用 MapScene_Load；已完成语义改名，保留原始 asm；fncheck OK (4320B)
 0	thumb	code_8010F10	0x08013870	sub_8013870	
 0	thumb	code_8010F10	0x08013934	sub_8013934	
 0	thumb	code_8010F10	0x08013b0c	sub_8013B0C	
@@ -832,7 +832,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x0804a368	sub_804A368	
 0	thumb	code_8044394	0x0804aa2c	sub_804AA2C	
 1	thumb	code_8044394	0x0804ab10	sub_804AB10	✅ 2026-09-02 opencode: gUnk_03000970(指向200B obj数组的指针)[gUnk_03000949].value->0x97D, 置0x97B=1; 新登记 IWRAM 0x949/970/97B/97D; struct 必须恰好200B(remaining[146])才出 muls*0xc8; fncheck OK 48B
-0	thumb	code_8044394	0x0804ab40	sub_804AB40	⏸ 剩4个全局strb顺序+r8/ip互换; 链式赋值94B=94C=0是关键形态
+0	thumb	code_8044394	0x0804ab40	sub_804AB40	⏸ do-while+守卫+链式94B=(94C=0) 已压到17字节差(仅A/D的home互换r8⇄ip); 全部链/排列族已穷尽(300+变体); 最优候选=permuter/sub_804AB40/base.c (vj); 详情见 progress.md §AB40
 1	thumb	code_8044394	0x0804abd0	sub_804ABD0	✅ 2026-09-02 opencode: 填 gUnk_02035B04 u16[i]与[i+0x20]=0xB001, i=0..0x19; 新登记 EWRAM 0x02035B04; for(i<=0x19) bottom-test bls; fncheck OK 40B
 1	thumb	code_8044394	0x0804abf8	sub_804ABF8	✅ 2026-09-02 gpnux: tile动画帧写入; 关键=off拆局部变量 + arg1*18/counter*2两个局部(第二次读复用base, 否则add顺序差); 表gUnk_0862D574[u8*, index arg1*18+counter*2], GBA tilemap值data*2-0x5000/-0x4FFF; fncheck OK 104B	
 1	thumb	code_8044394	0x0804ac60	sub_804AC60	

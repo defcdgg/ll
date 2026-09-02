@@ -77,6 +77,8 @@
 ### 宝箱
 | 语义名 | 地址 | 语义 |
 |---|---|---|
+| ChestObjects_LoadForMap | 0x08008F28 | 场景切换时按地图筛选 256 项宝箱表，建立 gChestObjects[16] |
+| CheckFacingEvent | 0x08003F40 | A 键面向交互；宝箱项返回 itemId 对应的脚本事件 |
 | Chest_Open | 0x0800908C | 音效(8/9)+ChestFlags 翻转+精灵重建 |
 | Chest_BuildSprite | 0x08008FD0 | 宝箱 OAM 链 (开/关两形态) |
 | ChestFlags_ClearAll | 0x08009168 | gChestFlags[0x20] 清零 |

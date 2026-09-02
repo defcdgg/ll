@@ -43,7 +43,7 @@
 | 0x08015F14 | ✅C | `SaveUi_DrawSlots` | 3 槽存档信息绘制 (Save_FillSlot3 + 0x08010F10) |
 | 0x08015F74/8015F94 | ✅C | `SaveFlag_Set/Get` | gUnk_03004DC8 位图 |
 | 0x08014554* | ❌ | `SaveUi_Main` | 0x08011454 = 存档菜单主控 (1855 行, F3b 主体) |
-| 0x08012790 | ❌ | `SaveUi_LoadScreen` | 2083 行 读档/存档确认界面 |
+| 0x08012790 | ❌ asm | `SaveUi_LoadScreen` | 存档/场景选择 UI 主状态机；扫描 `gSaveMapUnlockFlags` 并用 `SaveFlag_Get` 判断场景解锁，确认后调用 `MapScene_Load` |
 | 0x08013934/13B0C/13C00/13870/12530/1114C/11268/113CC | ❌ | 存档 UI 辅助 + 文本界面 (1114C=技能菜单绘制, 附 C 注释) |
 | 0x08016A14 | ❌ | `Save_SyncShadow` | 0x02027000 影子同步 (Save_LoadSlot0 调用) |
 

@@ -50,13 +50,14 @@
 
 ### ScreenIdleIcons 画面收藏系统 (开场图回想)
 
-进入地图 `MapGroup_Lookup` 后由地图装载 `sub_800661C` 置位 `gScreenIdleEventFlags[mapId>>3]` 的对应 bit
+进入地图 `MapGroup_Lookup` 后由地图装载 `MapScene_Load` 置位 `gScreenIdleEventFlags[mapId>>3]` 的对应 bit
 (特例: 地图 0x78 的 bit13 由事件标志 0xFD 解锁, `ScreenIdleIcons_BuildList` 里合并)。
 菜单场景初始化 `sub_800ACC8` 调 `ScreenIdleIcons_BuildList` 打包成列表;
 
 | 符号/函数 | 地址/位置 | 语义 |
 |---|---|---|
 | `gScreenIdleIconPageMap` | 0x080870DC, 16B | bit→地图 ID 对照表: {1,4,8,0x10,0x17,0x18,0x1B,0x1D,0x20,0x3D,0x21,0x28,0x2C,0x78,0x2F}, [15]=0 结束符 |
+| `gMenuEntityPaletteTable` | 0x0808A234, 3968B | 124 项 × 0x20B 的 OBJ 调色板记录; 每项首半字保留, VBlank 刷新从 +2 DMA 15 色 |
 | `gScreenIdleEventFlags` | 0x03004624, 2B | 已看地图位图 (bit 0..14); 引擎启动清零 (code_80002A0.c) |
 | `gScreenIdleIconIds` | 0x030001F0, 16B | 列表产物: 已看地点 ID (0 补满), 0 结尾 |
 | `gScreenIdleIconCursor` | 0x03000200 | 菜单内游标 (sub_800C2F8 B/↓ 翻动, ≤9) |
@@ -66,7 +67,7 @@
 | sub_8016758 | 0x08016758 ✅C | 图块绘制 (Id 作为页选择, 已名) |
 
 图像数据: 每个地点 ID ↔ `gIntroBgMaps`/`gIntroBgPalettes`/`gIntroBgTiles` 的 19 张 256x160 整屏图 (见 IntroBg 节)。
-| 0x08008F28 | ❌ | (待匹配) | 地图 NPC 描述符装载 (1354 调用) |
+| 0x08008F28 | ❌ | `ChestObjects_LoadForMap` | 按 mapId 扫描 0x08088400 的 256×8B 宝箱表，装载最多 16 个宝箱对象 |
 | 0x08008E44 | ✅C | `BgMap_FillRow` | 0x020053A8 填 0xA200 行 (arg0 选值) + gViewportFlags[13]=1 |
 | 0x08008D18 | ✅C | `BgTile_PatchFlush` | LZ77 gUnk_030047CC→0x0600D000+(n-1)/2*0x800 + 调色板 DMA |
 | 0x08008D78 | ✅C | `Camera_GetDrawOffset` | 按 gCameraDrawMode 返回绘制偏移 |
@@ -81,8 +82,11 @@
 | 0x080091C4 | ❌ | (待匹配) | (VBlank 调用族) |
 | 0x08005020 | ❌ | `VBlank_UpdateSpriteAndWindow` | VBlank 精灵/调色板传输后，推进 WIN0H 虹膜过渡并生成 81 行边界表 |
 | 0x080051D0/52F8/53B4/55E8/5C70 | ❌ | 51D0=`ScreenTransition_UpdateBlend`, 55E8=`MovePlayer`(#define 别名已应用), 5C70=精灵帧辅助; 其余待匹配 | MovePlayer(&gCameraTargetX,&gCameraTargetY,dirCode,speed): 按 `gWalkDirVectors`(0x080871C6, dir 0..8→s16 (dx,dy) 单位向量, 1=上顺时针) 步进, MapTile_At/CollisionBits 碰撞 + 8 方向滑动 switch + Actor[2..19]/ChestObject[16] 重叠检查; 命中区域时 MapZone_FindAt→MapZone_Trigger |
-| 0x08007ADC/7BD0 | 7BD0 ✅C / 7ADC ⏸ | `MapZone_FindAt` / `MapZone_Trigger` | 地图区域触发系统: FindAt 算 (x,y) 16×16 足迹的 ≤4 个瓦片坐标 (gZoneCheckTileXs/Ys) 并在 `gMapZoneHeader`[0] 的 cells 表 {count, [4B]{xTile,yTile,type,entryIdx}} 查命中 → gMapZoneType/gMapZoneEntryIdx; Trigger 按 type 0..4 分发 header[1..5] 记录表: 0=换图(gMapNpcSetId/gSpawnTileX/Y/gSpawnFacingDir/gMoveCmdSetId, state=3, SwitchFlags_ClearRange) 1=图内传送(state=4) 2=state=8(gChoiceGroupIdx/gChoiceSubIdx) 3=首次进入跑脚本(2B 记录, SwitchFlags_Test 门) 4=A键+朝向触发脚本(4B 记录). 头表来源: sub_800661C 装载 `0x087EBB20[mapIdx]`. **Trigger 已真C匹配** (fncheck 396B OK); FindAt 指令流全对仅剩 home (progress.md) |
-| 0x0800661C/71EC/7350 | ❌ | 661C=NPC 描述符装载入口 | |
+| 0x08007ADC/7BD0 | 7BD0 ✅C / 7ADC ⏸ | `MapZone_FindAt` / `MapZone_Trigger` | 地图区域触发系统: FindAt 算 (x,y) 16×16 足迹的 ≤4 个瓦片坐标 (gZoneCheckTileXs/Ys) 并在 `gMapZoneHeader`[0] 的 cells 表 {count, [4B]{xTile,yTile,type,entryIdx}} 查命中 → gMapZoneType/gMapZoneEntryIdx; Trigger 按 type 0..4 分发 header[1..5] 记录表: 0=换图(gMapNpcSetId/gSpawnTileX/Y/gSpawnFacingDir/gMoveCmdSetId, state=3, SwitchFlags_ClearRange) 1=图内传送(state=4) 2=state=8(gChoiceGroupIdx/gChoiceSubIdx) 3=首次进入跑脚本(2B 记录, SwitchFlags_Test 门) 4=A键+朝向触发脚本(4B 记录). 头表来源: MapScene_Load 装载 `0x087EBB20[mapIdx]`. **Trigger 已真C匹配** (fncheck 396B OK); FindAt 指令流全对仅剩 home (progress.md) |
+| 0x0800661C | ❌ | `MapScene_Load` | 地图场景资源/状态装载入口: 查 `gMapSceneDescriptors[arg0]`，装载 BG/OBJ 资源、窗口/调色板及菜单实体状态 |
+| 0x080071EC | ❌ | `MapScene_LoadNpcSlotIds` | 按场景描述符的 `npcSlotGroupId` 选择 NPC 槽组，写入槽 2..9 的图形/调色板 ID |
+| 0x08007350 | ❌ | (待匹配) | 整组装入动画组 |
+| 0x08009370 | ❌ | `MenuEnt_FlushPalettes` (建议名) | VBlank 调色板刷新: 遍历 4 个菜单实体, 按 0x20B 调色板索引从 `gMenuEntityPaletteTable + 2` DMA 到 OBJ PLTT |
 
 ### IntroBg 开场/过场整屏图数据 (与 IntroBg_Load 配套)
 
@@ -141,6 +145,10 @@
 
 | 地址 | 状态 | 语义名 | 语义 |
 |---|---|---|---|
+| 0x08088400 | — | `gChestSpawnTable` | 256 项 × 8B：mapId/itemId/specialFlag/pad/tileX/tileY；场景切换时筛选当前地图 |
+| 0x08088C00 | — | `gDigitFontObjPalettes` | 2 组 × 16 色 OBJ 调色板，供数字字体装载到槽 14/15 |
+| 0x08088C40 | — | `gDigitFontObjTiles` | 10 个 4bpp 8x8 数字字形 tile，供数字字体装载到 OBJ 槽 150~159 |
+| 0x08088D80 | — | `gMapSceneDescriptors` | 180 项 × 0x14 字节：场景资源/显示参数、NPC 槽组及 BG 数据索引 |
 | 0x08008FD0 | ✅C | `Chest_BuildSprite` | 宝箱精灵 OAM 链 (开/关两形态, 调色板按 field_0 bit7) |
 | 0x0800908C | ✅C | `Chest_Open` | 开宝箱: 音效(8/9)、gUnk_03004870 位翻转、重建精灵 |
 | 0x08009114 | ✅C | `LoadDigitFontObjTiles` (已有名) | 数字字形+调色板装载 |
@@ -160,7 +168,7 @@
 ## 其余未匹配 (46 个中已判定 12 个)
 
 8005020(MOD-01 帧辅助), 8051D0, 80052F8, 80053B4, 80055E8(MovePlayer), 8005C70,
-800661C(NPC 装载入口), 80071EC, 8007350(动画组装载), 8007ADC, 8007BD0, 8008254(菜单按键),
+800661C(MapScene_Load), 80071EC(MapScene_LoadNpcSlotIds), 8007350(动画组装载), 8007ADC, 8007BD0, 8008254(菜单按键),
 8008620, 8008F28(NPC 描述符), 80091C4, 8009370, 80094FC, 8009600, 8009F70, 800A048,
 800A1B4(Stats 重置), 800A3C8, 800A534, 800A664(角色初始化), 800AC08, 800ACC8(菜单主控),
 800B374, 800BFF8, 800C194(对话框帧), 800C2F8(存档触发), 800E244, 800E8F8, 800EAE4,
@@ -172,6 +180,7 @@
 | 语义名 | 地址 | 大小 | 语义摘要 |
 |---|---|---|---|
 | `MapBg_LoadFull` (sub_8006520) | 0x08006520 | 252B | 场景整背景装载 (tile 最多5块→CBB, 调色板 0x082893EC 子表, tilemap→SBB) |
+| `MapScene_Load` | 0x0800661C | 3024B | 地图场景入口: 清状态、查场景描述符, 按资源集装载 BG/OBJ/菜单资源并设置显示状态 |
 | `MapScene_InitSprites` (sub_800729C) | 0x0800729C | 180B | 槽0=主角模型, 槽1=11号; NPC 槽2..9 重载 (gSlotGfxId/PalId) |
 | `MapBg_LoadInterior` (sub_8007D5C) | 0x08007D5C | 604B | 选项场景整资源装载 (Huff/LZ77 + BG 寄存器 + 文本块 + 水波) |
 | `BgScroll_LoadFromTable` (sub_8008B14) | 0x08008B14 | 72B | 场景 BG 滚动参数表 gUnk_08089BC4[arg]<<6 → 03004650/464C/47C4/47EC |

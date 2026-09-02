@@ -10,6 +10,7 @@
 #include "save.h"
 #include "sound.h"
 
+// @ 0x08010F10
 INCLUDE_ASM("asm/nonmatchings", sub_8010F10);
 
 extern u8 gUnk_08095828[][8];
@@ -72,6 +73,7 @@ void sub_801114C(void)
 
 
 }
+// @ 0x08011268
 INCLUDE_ASM("asm/nonmatchings", sub_8011268);
 
 /* 在 16 页道具表 gInvPageItemIds[] 中, 从 gSkillMenuPage+1 页向后找第一个
@@ -104,12 +106,19 @@ u8 sub_80113CC(void)
     return 0xFF;
 }
 
+// @ 0x08011454
 INCLUDE_ASM("asm/nonmatchings", sub_8011454);
+// @ 0x08012530
 INCLUDE_ASM("asm/nonmatchings", sub_8012530);
+// @ 0x08012790
 INCLUDE_ASM("asm/nonmatchings", SaveUi_LoadScreen);
+// @ 0x08013870
 INCLUDE_ASM("asm/nonmatchings", sub_8013870);
+// @ 0x08013934
 INCLUDE_ASM("asm/nonmatchings", sub_8013934);
+// @ 0x08013B0C
 INCLUDE_ASM("asm/nonmatchings", sub_8013B0C);
+// @ 0x08013C00
 INCLUDE_ASM("asm/nonmatchings", sub_8013C00);
 extern u16 gUnk_03004D48;
 extern u16 gUnk_03004DE8;
@@ -306,6 +315,7 @@ void SaveTimer_Dec(u8 arg0)
     gSaveTimers[arg0 >> 1] = byte;
 }
 
+// @ 0x0801417C
 INCLUDE_ASM("asm/nonmatchings", sub_801417C);
 /* 把存档菜单的精灵挂进渲染队列: 先追加固定节点 gSpriteNodePool[112],
    再把 15 个菜单 UI 实体中 (statusFlags & 0xC0) == 0x80 的挂进队列下一个空槽。
@@ -410,7 +420,9 @@ void sub_801455C(void)
         }
     }
 }
+// @ 0x080146A8
 INCLUDE_ASM("asm/nonmatchings", sub_80146A8);
+// @ 0x08014A68
 INCLUDE_ASM("asm/nonmatchings", sub_8014A68);
 
 extern u8 *D_87EB2A8[];
@@ -479,9 +491,12 @@ void sub_801543C(u8 arg0) {
     }
 }
 
+// @ 0x080154E8
 INCLUDE_ASM("asm/nonmatchings", sub_80154E8);
+// @ 0x08015658
 INCLUDE_ASM("asm/nonmatchings", sub_8015658);
 
+// @ 0x08015AF0
 INCLUDE_ASM("asm/matchings", sub_8015AF0);
 // ⏸ 无候选; 逻辑已全解(见 progress.md): 两处 tilemap 写(0x020059AA/0x02005BEA)+gUnk_08093550 查表;
 //   卡在 GCC2 调度: 目标把 store 基址 ldr 插在 (bit|0x826) 之后, 我方版本提前物化基址 → +0xd 起错位。
@@ -510,7 +525,9 @@ void InvUi_DrawCursors(void)
         SetBgUnknown1((u16 *)0x02005BD2, 0xB27F);
     }
 }
+// @ 0x08015C18
 INCLUDE_ASM("asm/nonmatchings", InvUi_Main);
+// @ 0x08015E1C
 INCLUDE_ASM("asm/nonmatchings", sub_8015E1C);
 // @ 0x08015E88
 void Save_ResetReadState(void)
@@ -1523,7 +1540,9 @@ void sub_8016C44(void)
     gSpriteRenderQueue[0] = ptr;
     sub_800E668(0);
 }
+// @ 0x08016C88
 INCLUDE_ASM("asm/nonmatchings", sub_8016C88);
+// @ 0x08016D24
 INCLUDE_ASM("asm/nonmatchings", sub_8016D24);
 // @ 0x08016E30
 void Sio_BuildPacket(u8 *src)
@@ -1548,6 +1567,7 @@ void Sio_BuildPacket(u8 *src)
     *(u16 *)(*(u8 * volatile *)(state + 0x1C) + 2) = ~checksum - 0x10;
     state[4] = 1;
 }
+// @ 0x08016E80
 INCLUDE_ASM("asm/nonmatchings", sub_8016E80);
 // @ 0x08016F30
 void sub_8016F30(void)
@@ -1599,6 +1619,7 @@ void sub_8016F30(void)
         state[9] = mode;
     }
 }
+// @ 0x08016FC0
 INCLUDE_ASM("asm/nonmatchings", sub_8016FC0);
 // @ 0x080170BC
 void Sio_SetReady(void)
@@ -1620,7 +1641,9 @@ void Sio_Shutdown(void)
     REG_IF = 0xC0;
     gSioState[6] = 0;
 }
+// @ 0x08017120
 INCLUDE_ASM("asm/nonmatchings", sub_8017120);
+// @ 0x080171E4
 INCLUDE_ASM("asm/nonmatchings", sub_80171E4);
 // @ 0x08017588
 u32 Sio_IsHost(void)
@@ -1694,12 +1717,19 @@ void sub_8017640(void *dst, void *src, s32 count)
         while (count != -1) { *(u32 *)dst = *(u32 *)src; dst = (u8 *)dst + 4; src = (u8 *)src + 4; count--; }
     }
 }
+// @ 0x0801768C
 INCLUDE_ASM("asm/nonmatchings", sub_801768C);
+// @ 0x080177AC
 INCLUDE_ASM("asm/nonmatchings", BattleTask_Run);
+// @ 0x08017FA4
 INCLUDE_ASM("asm/nonmatchings", sub_8017FA4);
+// @ 0x08018070
 INCLUDE_ASM("asm/nonmatchings", sub_8018070);
+// @ 0x080182A8
 INCLUDE_ASM("asm/nonmatchings", sub_80182A8);
+// @ 0x080184A8
 INCLUDE_ASM("asm/nonmatchings", sub_80184A8);
+// @ 0x0801869C
 INCLUDE_ASM("asm/nonmatchings", sub_801869C);
 // @ 0x08018744
 void sub_8018744(void)
@@ -1872,8 +1902,11 @@ clear:
 tail:
     sub_80182A8(gUnk_03000310, gGstate330);
 }
+// @ 0x08018928
 INCLUDE_ASM("asm/nonmatchings", sub_8018928);
+// @ 0x08018A58
 INCLUDE_ASM("asm/nonmatchings", sub_8018A58);
+// @ 0x08018BF8
 INCLUDE_ASM("asm/nonmatchings", sub_8018BF8);
 /* 战斗场景 tilemap 缓冲(0x020352C0 + 错位视图 0x020352C2)的第 0x221/0x241 项:
  * 按 gGstate324 bit14 选 0x92A2..5(战斗 UI 边框)或 0x92C0(空), 见调用点 sub_8018928。 */
@@ -1903,8 +1936,11 @@ void sub_8018D9C(void)
         q[0x241] = 0x92C0;
     }
 }
+// @ 0x08018E34
 INCLUDE_ASM("asm/nonmatchings", sub_8018E34);
+// @ 0x08018EA8
 INCLUDE_ASM("asm/nonmatchings", sub_8018EA8);
+// @ 0x08018FC0
 INCLUDE_ASM("asm/nonmatchings", sub_8018FC0);
 // @ 0x08019148
 void Bg0_InitClear(s32 a, s32 b, s32 c, s32 d) {
@@ -1932,6 +1968,7 @@ void Bg0_InitClear(s32 a, s32 b, s32 c, s32 d) {
     do { d &= ~0xC000; } while (0);
     REG_BG0CNT = d;
 }
+// @ 0x080191CC
 INCLUDE_ASM("asm/nonmatchings", sub_80191CC);
 /* 清空 gDialogCtx[0..2] 共 3 个表项。
  * 注意必须用结构体成员形式逐个写: 目标是对同一基址取 11 个 `strb [r0,#N]`
@@ -1963,7 +2000,9 @@ void DialogCtx_Clear3(void)
     }
 }
 
+// @ 0x0801933C
 INCLUDE_ASM("asm/nonmatchings", sub_801933C);
+// @ 0x080196D4
 INCLUDE_ASM("asm/nonmatchings", sub_80196D4);
 // @ 0x08019748
 void DialogCtx_SetPair(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
@@ -1992,9 +2031,13 @@ void DialogCtx_SetPair(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
     ptr[6] = d;
     ptr[7] = e;
 }
+// @ 0x08019784
 INCLUDE_ASM("asm/nonmatchings", sub_8019784);
+// @ 0x080199E0
 INCLUDE_ASM("asm/nonmatchings", sub_80199E0);
+// @ 0x08019AD0
 INCLUDE_ASM("asm/nonmatchings", sub_8019AD0);
+// @ 0x08019B98
 INCLUDE_ASM("asm/nonmatchings", sub_8019B98);
 // @ 0x08019DF8
 void BattleUiFlag_Clear()
@@ -2097,6 +2140,7 @@ void sub_8019F08(u16 *tilemap, u16 addVal, u8 startCol, u8 startRow, u8 width, u
         p += 32;
     }
 }
+// @ 0x08019F78
 INCLUDE_ASM("asm/nonmatchings", sub_8019F78);
 // @ 0x0801A05C
 u8 DialogCtx_GetField_C(u8 index)
@@ -2207,6 +2251,7 @@ void sub_801A270(void)
     DmaWait(3);
 }
 
+// @ 0x0801A2AC
 INCLUDE_ASM("asm/matchings", sub_801A2AC);
 // void sub_801A2AC(u16 arg0, u8 arg1, u8 arg2)   // ⏸ 逻辑正确(v3), 卡在寄存器分配: 见 progress.md
 // {

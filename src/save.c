@@ -115,7 +115,11 @@ s32 Save_Fsm(u8 arg0)
     }
 }
 
+// @ 0x08010BEC
 INCLUDE_ASM("asm/matchings", Save_FillSlot0);
+// @ 0x08010CCC
 INCLUDE_ASM("asm/matchings", Save_FillSlot1);
+// @ 0x08010D80
 INCLUDE_ASM("asm/matchings", Save_FillSlot2);
+// @ 0x08010E58
 INCLUDE_ASM("asm/matchings", Save_FillSlot3);

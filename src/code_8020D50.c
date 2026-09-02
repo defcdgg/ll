@@ -250,8 +250,11 @@ void sub_8021130(void)
     }
     gUnk_030007BA = 0;
 }
+// @ 0x08021184
 INCLUDE_ASM("asm/nonmatchings", sub_8021184);
+// @ 0x080212B4
 INCLUDE_ASM("asm/nonmatchings", sub_80212B4);
+// @ 0x0802151C
 INCLUDE_ASM("asm/nonmatchings", sub_802151C);
 // @ 0x08021700
 u8 sub_8021700(void) {
@@ -275,27 +278,44 @@ u8 sub_8021700(void) {
     }
     return ret;
 }
+// @ 0x08021788
 INCLUDE_ASM("asm/nonmatchings", sub_8021788);
+// @ 0x0802181C
 INCLUDE_ASM("asm/nonmatchings", sub_802181C);
+// @ 0x0802192C
 INCLUDE_ASM("asm/nonmatchings", sub_802192C);
+// @ 0x08022458
 INCLUDE_ASM("asm/nonmatchings", sub_8022458);
+// @ 0x08022550
 INCLUDE_ASM("asm/nonmatchings", sub_8022550);
+// @ 0x08022710
 INCLUDE_ASM("asm/nonmatchings", sub_8022710);
+// @ 0x08022F2C
 INCLUDE_ASM("asm/nonmatchings", sub_8022F2C);
+// @ 0x080230BC
 INCLUDE_ASM("asm/nonmatchings", sub_80230BC);
+// @ 0x08023320
 INCLUDE_ASM("asm/nonmatchings", sub_8023320);
+// @ 0x08023414
 INCLUDE_ASM("asm/nonmatchings", sub_8023414);
+// @ 0x08023820
 INCLUDE_ASM("asm/nonmatchings", sub_8023820);
+// @ 0x080244BC
 INCLUDE_ASM("asm/nonmatchings", sub_80244BC);
+// @ 0x08024618
 INCLUDE_ASM("asm/nonmatchings", sub_8024618);
+// @ 0x080246E8
 INCLUDE_ASM("asm/nonmatchings", sub_80246E8);
+// @ 0x08024820
 INCLUDE_ASM("asm/nonmatchings", sub_8024820);
+// @ 0x08024940
 INCLUDE_ASM("asm/nonmatchings", sub_8024940);
 // @ 0x0802550C
 void sub_802550C(u8 value)
 {
     gUnk_03000816 = value;
 }
+// @ 0x08025518
 INCLUDE_ASM("asm/nonmatchings", sub_8025518);
 // @ 0x08025638
 void sub_8025638(void)
@@ -303,6 +323,7 @@ void sub_8025638(void)
     gUnk_03000814 = -1;
     gUnk_03000815 = -1;
 }
+// @ 0x08025650
 INCLUDE_ASM("asm/nonmatchings", sub_8025650);
 // @ 0x080256E4
 void sub_80256E4(u16 *base)
@@ -342,7 +363,11 @@ void sub_802576C(u8 *obj)
                     (i - gUnk_03000809) * 2 + 8, 9, 2);
     }
 }
+// @ 0x080257D8
 INCLUDE_ASM("asm/nonmatchings", sub_80257D8);
+// @ 0x08025994
 INCLUDE_ASM("asm/nonmatchings", sub_8025994);
+// @ 0x08025DA8
 INCLUDE_ASM("asm/nonmatchings", sub_8025DA8);
+// @ 0x080260BC
 INCLUDE_ASM("asm/nonmatchings", sub_80260BC);

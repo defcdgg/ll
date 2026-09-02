@@ -9,7 +9,9 @@
 #include "save.h"
 #include "sound.h"
 
+// @ 0x0801A3C4
 INCLUDE_ASM("asm/nonmatchings", sub_801A3C4);
+// @ 0x0801A5EC
 INCLUDE_ASM("asm/nonmatchings", sub_801A5EC);
 // @ 0x0801A684
 void sub_801A684(u8 *arg0)
@@ -57,12 +59,18 @@ void sub_801A684(u8 *arg0)
         sub_804C2FC(ptr14, b29, sub_801B954((void **)arg0));
     }
 }
+// @ 0x0801A6F4
 INCLUDE_ASM("asm/nonmatchings", sub_801A6F4);
+// @ 0x0801A884
 INCLUDE_ASM("asm/nonmatchings", sub_801A884);
+// @ 0x0801AD0C
 INCLUDE_ASM("asm/nonmatchings", sub_801AD0C);
+// @ 0x0801B0B8
 INCLUDE_ASM("asm/nonmatchings", sub_801B0B8);
+// @ 0x0801B570
 INCLUDE_ASM("asm/nonmatchings", sub_801B570);
 
+// @ 0x0801B688
 INCLUDE_ASM("asm/matchings", sub_801B688);
 
 // @ 0x0801B760
@@ -242,12 +250,19 @@ u16 sub_801B95C(void **ptr)
     void *p = *(ptr + 1); // ptr偏移4字节（一个指针大小），等价于ptr[1]
     return *(u16 *)((u8 *)p + 2);
 }
+// @ 0x0801B964
 INCLUDE_ASM("asm/nonmatchings", sub_801B964);
+// @ 0x0801BE34
 INCLUDE_ASM("asm/nonmatchings", sub_801BE34);
+// @ 0x0801C484
 INCLUDE_ASM("asm/nonmatchings", sub_801C484);
+// @ 0x0801CA08
 INCLUDE_ASM("asm/nonmatchings", sub_801CA08);
+// @ 0x0801CBA4
 INCLUDE_ASM("asm/nonmatchings", sub_801CBA4);
+// @ 0x0801CE80
 INCLUDE_ASM("asm/nonmatchings", sub_801CE80);
+// @ 0x0801CF90
 INCLUDE_ASM("asm/nonmatchings", sub_801CF90);
 // @ 0x0801D12C
 void sub_801D12C(u8 *obj, u8 state)
@@ -308,17 +323,29 @@ void sub_801D12C(u8 *obj, u8 state)
         obj[0xA2] = state;
     }
 }
+// @ 0x0801D19C
 INCLUDE_ASM("asm/nonmatchings", sub_801D19C);
+// @ 0x0801D214
 INCLUDE_ASM("asm/nonmatchings", sub_801D214);
+// @ 0x0801D378
 INCLUDE_ASM("asm/nonmatchings", sub_801D378);
+// @ 0x0801D468
 INCLUDE_ASM("asm/nonmatchings", sub_801D468);
+// @ 0x0801D568
 INCLUDE_ASM("asm/nonmatchings", sub_801D568);
+// @ 0x0801D710
 INCLUDE_ASM("asm/nonmatchings", sub_801D710);
+// @ 0x0801D984
 INCLUDE_ASM("asm/nonmatchings", sub_801D984);
+// @ 0x0801DAA0
 INCLUDE_ASM("asm/nonmatchings", sub_801DAA0);
+// @ 0x0801DB3C
 INCLUDE_ASM("asm/nonmatchings", sub_801DB3C);
+// @ 0x0801DC20
 INCLUDE_ASM("asm/nonmatchings", sub_801DC20);
+// @ 0x0801DD04
 INCLUDE_ASM("asm/nonmatchings", sub_801DD04);
+// @ 0x0801DDB0
 INCLUDE_ASM("asm/nonmatchings", sub_801DDB0);
 typedef struct Unk_8021064 {
     u16 field_0;
@@ -357,16 +384,27 @@ void sub_801DE44(void)
         sub_801D710(ptr + (gUnk_03000730_arr[j] & 0xF) * 0xC8, flag);
     }
 }
+// @ 0x0801DEDC
 INCLUDE_ASM("asm/nonmatchings", sub_801DEDC);
+// @ 0x0801DF90
 INCLUDE_ASM("asm/nonmatchings", sub_801DF90);
+// @ 0x0801E040
 INCLUDE_ASM("asm/nonmatchings", sub_801E040);
+// @ 0x0801E1D8
 INCLUDE_ASM("asm/nonmatchings", sub_801E1D8);
+// @ 0x0801E30C
 INCLUDE_ASM("asm/nonmatchings", sub_801E30C);
+// @ 0x0801E4D4
 INCLUDE_ASM("asm/nonmatchings", sub_801E4D4);
+// @ 0x0801E690
 INCLUDE_ASM("asm/nonmatchings", sub_801E690);
+// @ 0x0801E848
 INCLUDE_ASM("asm/nonmatchings", sub_801E848);
+// @ 0x0801EA70
 INCLUDE_ASM("asm/nonmatchings", sub_801EA70);
+// @ 0x0801EC3C
 INCLUDE_ASM("asm/nonmatchings", sub_801EC3C);
+// @ 0x0801ED40
 INCLUDE_ASM("asm/nonmatchings", sub_801ED40);
 // @ 0x0801EE6C
 void sub_801EE6C(u8 *ptr)
@@ -392,17 +430,29 @@ void sub_801EE6C(u8 *ptr)
     if (ptr[0xBE] == 0x77)
         sub_804B834(ptr[0x35], 1, 3, -11, 5);
 }
+// @ 0x0801EEE4
 INCLUDE_ASM("asm/nonmatchings", sub_801EEE4);
+// @ 0x0801F3FC
 INCLUDE_ASM("asm/nonmatchings", sub_801F3FC);
+// @ 0x0801F76C
 INCLUDE_ASM("asm/nonmatchings", sub_801F76C);
+// @ 0x0801F884
 INCLUDE_ASM("asm/nonmatchings", sub_801F884);
+// @ 0x0801FA10
 INCLUDE_ASM("asm/nonmatchings", sub_801FA10);
+// @ 0x0801FAB8
 INCLUDE_ASM("asm/nonmatchings", sub_801FAB8);
+// @ 0x0801FEBC
 INCLUDE_ASM("asm/nonmatchings", sub_801FEBC);
+// @ 0x0801FF40
 INCLUDE_ASM("asm/nonmatchings", sub_801FF40);
+// @ 0x080200E8
 INCLUDE_ASM("asm/nonmatchings", sub_80200E8);
+// @ 0x08020228
 INCLUDE_ASM("asm/nonmatchings", sub_8020228);
+// @ 0x0802031C
 INCLUDE_ASM("asm/nonmatchings", sub_802031C);
+// @ 0x08020648
 INCLUDE_ASM("asm/nonmatchings", sub_8020648);
 // @ 0x08020798
 u8 sub_8020798(void)

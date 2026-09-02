@@ -143,6 +143,7 @@
 | sub_804F0B8 → **CheckObjectKindSlot** | 0x0804F0B8 | 0x804F簇 | code_1c.c | 功能: `arg1=(u8)arg1; ret=0; a=arg0[0x91]; b=arg0[0x92]; if(a==0&&b==0) return 0; if(arg1<0\|\|arg1<=5\|\|arg1!=6) return ret; if(sub_804DD90(a,6)) ret=1; else if(sub_804DD90(b,6)) ret=2; return ret;`。**全 ROM 无调用点(死代码)**。三个坑(规律65/66): ① 目标入口有 `lsls/lsrs r1,#0x18` 零扩展**又**有 `cmp r1,#0; blt` ⇒ 形参不能是 u8(u8 的 `<0` 被 GCC2 当恒假整条删掉), 唯一写法是 **形参 s32 + 函数体第一句 `arg1 = (u8)arg1;`**; s8/char 形参会在每个有符号比较前多插一对 `lsls/asrs`。② 需要**两个** `do {} while(0)` 屏障(一个包 `a==0&&b==0` 早退, 一个包三条测试): 只留后者差 7 字节(ret 落 r4 不是 r5), 只留前者差 48, 全去掉差 51。③ 三条测试必须写成**三个独立 if**, 合并成 `\|\|` 链会被代数折叠(`x<=5 \|\| x!=6` ≡ `x!=6`)只剩一条。解法靠脚本穷举"语句顺序×屏障位置"6×4 组合命中。顺带把 `sub_804DD90` 原型从 `void()` 升级为 `u8(u8,u8)`(定义处双 u8 入口截断 + 6 个调用点返回值 `lsls #0x18` 截断) |
 | sub_804F10C | 0x0804F10C | 0x804F簇 | code_804F0B8.c | 搜索函数: `GetObjPool` 的 `sub_80489E8(pool, values, 0, 0x1FF)` 先筛出 5 个空闲/可用槽下标 (sub_8045F10(slot, 0x1FF)==2), 然后遍历, 对每个槽 `sub_804E76C(pool+values[i]*0xC8, arg0, arg1)` 找匹配, 首个 >=0 的结果就是返回值 (0..5), 否则 -1。**两个人工中间变量必要**: `int idx = values[i] * 0xC8` (把乘法提前) + `s8 tmp = result; if (tmp >= 0)` (使截断 `lsls r0,#0x18; lsrs r1,#0x18` 排在 `cmp r0,#0` 之前, 否则在 branch 之后出货 `lsrs r7,#0x18`)。注: 本函数用 r8/r9(sb/sl) ⇒ 有 GCC2 泄漏风险。permuter 从 score=400 搜到 score=0 (迭代 ~11400 找到)。fncheck OK 110B|
 | sub_804F17C | 0x0804F17C | 0x804F簇 | code_804F0B8.c | 姊妹收集版: 清 arg0[0..4], 筛 GetObjPool 空闲槽, 全命中 sub_804E76C 的槽下标写入 arg0[] 并返数量; 首试逐字节全等; 代码零调用点(死代码, 同 sub_804F0B8); 用 r8/r9/sl 三高位寄存器; fncheck OK 148B|
+| sub_804F974 | 0x0804F974 | 0x804F簇 | code_804F0B8.c | ⏸ **条件跳转 opcode**: 遍历 `data[1]>>1` 个 u16 flag 号, 全部置位 → `*ptr = gUnk_02016200 + gUnk_02016000[data[2]]`, 任一未置 → `*ptr += data[1]+3`。与 sub_80532DC(清位)/sub_804FA04(同族跳转) 同骨架。**已解**: 入口 peel(`cmp r0,#0; bls`, 规则 108 的 n>i 写法)、分支极性(`if (res != 0) jump; else advance;` 才让 jump 落 fall-through + beq 去 advance)、`t`(u8→r8)/`n=t>>1`/`i`(u16)/`v`(u16) 类型与 sub_80532DC 逐字对齐。**剩 13B 卡点 = 尾部 cross-jump**: 跳转路径 `ldr r2,=0x02016200; adds r0,r0,r2; b 80` 应使 base2 落 r2, 但编译器重用死寄存器 r1(base1 在 `adds r0,r0,r1` 后死亡) → `ldr r1; b 7e` 与推进路径的 `adds r0,r0,r1`(t+3 在 r1) 尾合并。穷举 15+ 变体(表达式序 / off=u32 独立变量 / `*ptr+=t+3` / 指针算术 `(u8*)gUnk_02016200+...` / b1+idx 拆分 / val 局部 / newptr 局部 / 提前算 off) 全撞 13B 地板, 与 sub_804FA04 的"r1/r2双基址"同族墙。候选 permuter/sub_804F974/base.c (cand_f974f, 13B)。下一步: 破坏寄存器重用(如让 r1 在 base2 加载点仍 live, 或 do-while 屏障拆调度) |
 | sub_80532DC | 0x080532DC | 0x8053簇 | code_1c.c | 脚本 opcode: 遍历 `data[1]>>1` 个 u16 标志号(小端两字节拼装 `data[2+2k] \| data[3+2k]<<8`), 号<=0x1FF → `sub_8001070(号)` 清 0x03001C60 位图, 否则 `sub_80010EC(号-0x200)` 清 0x030018F0 位图; 末尾 `*ptr += t+2`。两个坑: ① 循环条件必须写成 **`n > i`(界在左)**, 否则 GCC2 不把 i=0 代入入口测试, 得到 `cmp r4,r0; bcs` 而非目标的 `cmp r0,#0; bls`(差 22 字节); ② 结尾必须 `off = t + 2; *ptr = *ptr + off;` 两句(规律30), 写 `*ptr + t + 2` 会被重结合成 `ldr; adds #2; add r8`。⚠ 本函数用 r8/r9(sb/sl) ⇒ 有 GCC2 泄漏风险。**另踩并发坑**: 他人把 `sub_804DD90` 原型从 `u8(u8,u8)` 改回 K&R `u32()`(理由: 全原型会让 sub_8045EB8 把 0x6C+0x21 折叠成 0x8D), 导致我上一轮的 sub_804F0B8 少了返回值 u8 截断 → 改用调用点显式 `(u8)sub_804DD90(...)` 修复(规律41: 只测零时 `lsls #0x18` 无配对 lsrs) |
 | Op_IfMoneyJump | 0x08053360 | 0x8053簇 | code_804F0B8.c | asm-match 转真C, **首试逐字节全等(64B)**。脚本 opcode「金额条件跳转」: `data=(u8*)*ptr; if (gSilverAmount > data[2] + (data[3]<<8)) *ptr = *(u16*)((u32)gUnk_02016000 + data[1]*2) + (u32)gUnk_02016200; else *ptr = (u32)(data+4); return 1;`。**纠正草稿两处**: ① 参数不是 `ScriptContext*` —— 本文件所有 `Op_*` 都是 `u32 Op_xxx(u32 *ptr)`, ptr 指向脚本指针本身, 与邻居 `Op_IfEventFlagJump` 完全同形可直接抄; ② 返回 `s32` → `u32`。另: else 分支必须写 `*ptr = (u32)(data + 4)` 而非 `*ptr += 4` —— 目标是一条 `adds r0,r3,#4`(复用已缓存的 r3=data), 用 `+=` 会多一条 `ldr r0,[r4]` |
 
@@ -2375,3 +2376,57 @@ id≤0x1FF 测 EventFlags_Test(id), >0x1FF 测 SwitchFlags_Test(id-0x200); 若�
 **收尾**: fncheck OK 252B @0x080454A4 (1 池重定位, 6 bl 槽忽略); 原型 `void sub_80454A4()`
 → `u8 sub_80454A4(u16)` (code_0.h, 规则 93; 无 C 调用方, 安全)。全 ROM SHA1 仍红 =
 并发 agent 的 in-progress 改动 (+4 整体位移, sound_data 等), 非本函数。
+
+## 2026-09-02 `sub_80488CC` 匹配 (Actor 技能槽查询, code_8044394)
+
+函数按技能 ID 查询 Actor 的 8 个技能槽，返回可用槽索引；普通技能 ID
+扫描 `obj+0x99`，特殊 ID（大于 `0x2F`）则从 `obj+0x88/0x8A` 读取结果。
+命中普通技能后调用 `sub_8045A10` 检查技能资源是否足够，不足时返回 `0xFF`。
+关键写法是将首槽读值保存为独立的 `first`，再建立 `skills = obj + 0x99`，从而
+复现目标的 `r5/r6/r7` 寄存器分配。源码和原型已合入，`fncheck` OK（104B）。
+
+## 2026-09-02 数据地址复核与状态命名
+
+按 `scripts/data.json` 复核选项菜单相邻数据后，确认 `0x0808823A..0x080882E2`
+是连续的 84 项 × 2B `gChoiceGroupPairTable`。虽然只有项 0 有独立字面池引用，
+`ChoiceMenu_HandleInput` 随后以表基址每次前进 2B 扫描项 1..83，不能把后续项当作
+未使用数据。`0x080882E2..0x08088400` 重命名为 `gChoiceMapSpawnRecordStream`：
+这是按五组目的地选择地图出生位置的 8B 记录流，不是任意 blob；5 组记录数为
+5/7/9/9/5，组终止字节为 `0xFF`，整体末尾再以 `0x00` 收尾。
+
+为调色板特效状态补充统一名称：`gPaletteFxMode` (`0x03004910`)、
+`gPaletteFxPending` (`0x03004914`) 和 `gPaletteFxTimer` (`0x03004918`)。
+其中 Pending 由 `PaletteFx_Transform` 置位、由 `PaletteFx_Step` 清除；本轮只改名和
+注释，不改变 ROM 数据及函数机器码。旧的 `gUnk_08087648`、`gUnk_08088D80` 仅剩
+linker 绝对声明，已移除，源码分别使用 `gChoiceDestTable`、`gMapSceneDescriptors`。
+
+## 2026-09-02 sub_805008C 匹配记录 (脚本泵逐帧后台服务, 300B exact)
+
+函数语义: `ScriptPump_Run` 的帧级姊妹服务, 由 `VBlank_UpdateGameScreen` 末尾
+(`gLogoEffectState == 0` 时) 每帧调用。前半在 VM 活动 (`E70&1` 且非 `&0x200`) 时
+处理窗口 BG: 当前 opcode ∈ {0x00, 0x17} 且无 bit4 请求时, 主动做一次
+`REG_BG0HOFS/REG_BG0VOFS = 0` + `DmaCopy16(3, 0x02005800 → 0x0600F800, 0x800)`
+(窗口缓冲整屏上屏); 若 bit4 置位 (Op_OpenWindow 请求) 则再做一次。后半为四个
+独立的请求位消费者: bit6 → `FlushTileDma() < 0` 时清位; bit8 → `BgTiles_LoadSet(0)`
+后清位; bit9 → `LZ_UncompressChunk() == 0` (流式解压完成) 时, 若 bit10 置位则
+`gUnk_03000E6C = gUnk_02016200 + gUnk_02016000[gUnk_03000E69]` (脚本 PC 跳入解压
+缓冲的入口表项) 并清 bit10, 再清 bit9。
+
+非平凡发现:
+- **0x04000010 是 `REG_BG0HOFS` 不是 BG2PA**。目标里 `ldr =0x04000010; strh; adds
+  r0,#2; strh` 极易凭记忆误判成 BG2PA/PB (0x04000020); 实为 BG0HOFS/VOFS。
+  与 `VBlank_UpdateScreenSimple` 开头八连清同族, 寄存器地址必须查 io.h。
+- **条件值 u16 局部 + 同寄存器复用**: 目标在 bit4 测试处有 `ands r0,r2; lsls #16;
+  lsrs #16` (uxth) 且随后 `strh r1` 复用同一寄存器, 说明源码把条件值存进了 u16
+  局部并在写 IO 时复用 (`u16 bgRequest = gUnk_03000E70 & 0x10; ... REG_BG0HOFS =
+  bgRequest;`)。写成常量 `REG_BG0HOFS = 0` 大概率也可 (该分支 r1 恒 0), 但 u16
+  局部形状与目标逐指令一致, 一次通过。
+- 新符号登记: `gUnk_03000E69` (u8, IWRAM, 脚本槽/场景索引, 选 gUnk_02016000[]
+  入口偏移表项) + `LZ_UncompressChunk` 跨 TU 原型 (此前无任何声明, 定义在
+  code_80002A0.c)。
+- 本轮全 ROM SHA1 红, 经 `fncheck --blame` + worktree 对照归责: 并行 agent 的
+  数据侧 WIP (data_805769C de-blob / 调色板符号改名) 使数据布局 +2/+4 位移,
+  代码区差异均为池常量中指向被移数据的指针 (fncheck 池重定位归一后单函数全 OK),
+  与本函数无关, 照常提交。另: HEAD 上 functions.tsv 的 sub_804F974 note 曾断行
+  成无列首行, 会让 gen_asm.py 解析崩溃 (fresh checkout 无法构建), 本次提交附带
+  修复该行。

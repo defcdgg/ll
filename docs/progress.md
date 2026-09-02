@@ -2023,8 +2023,10 @@ gUnk_03004910/gSceneSubState; 计数器到 4 时窗口全开 (WIN0V=0x100, WININ
    才有无符号 bhi (u8 会加 lsls/lsrs 截断, s32 变 bgt)。`default: break` 写法会
    落进 add, 错。
 2. 13 字节残留 = 纯 home (tbl r2↔r3, val r3↔r2) + val 装载/subs 顺序。
-   `register u8 val; register u32 v;` 定 val→r2/v→r0 home; permuter 200 分发现
-   第一分支 `bonusVal = val` 副本补齐 home。
+   先试 `register` 定 val→r2/v→r0 + 第一分支 `bonusVal = val` 副本补齐 home;
+   应 reviewer 要求弃 register (编译器扩展), 改成第一分支内 **重读**
+   `u8 bonusVal = tbl[6]` (CSE 合并成 val 副本, 不增指令) —— 同样把 val 生命周期
+   缩短到 switch 之前, 使 val 全局分配优先级反超基址 → val 落 r2/基址落 r3, 仍是 0 分。
 3. 最后 8 字节 = 调度顺序: 目标 `ands; ldrb val; subs` vs mine `ands; subs; ldrb`。
    **正解 (规则112)**: `v = tbl[8]&0xF; val = tbl[6]; if (v-1 <= 6) switch(v-1)`
    —— 把 -1 拆到守卫表达式, val 装载落进 ands→subs 空隙, 逐字节命中。

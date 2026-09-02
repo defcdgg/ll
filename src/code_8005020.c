@@ -1993,16 +1993,16 @@ extern u8 gUnk_087EA580[];
  *                     高 4 位 -1 选一个装备加成栏 += 表项 +7 (攻击)。
  *  7 个加成栏映射: 0=AtkBase 1=Def2 2=Agl 3=Men 4=Res 5=Noa 6=Luc。
  *  最后 ID 落在 [0x22,0x2B] 或 [0x37,0x3E] 时 Noa 额外 +1。
- * 匹配要点: `v = tbl[8] & 0xF; if (v - 1 <= 6) switch (v - 1)` 的写法让
- *  val 装载落在 ands 与 subs 之间; `register` 定 v/val 的 r0/r2 home;
- *  第一分支的 `bonusVal = val` 副本微调 val 的伪寄存器分配 (permuter 200 分探索出)。 */
+ * 匹配要点: `v = entry[8] & 0xF; if (v - 1 <= 6) switch (v - 1)` 的写法让
+ *  val 装载落在 ands 与 subs 之间。第一分支的 `u8 bonusVal = entry[6]` 重读被
+ *  CSE 合并成 val 的副本 (不增指令), 作用是缩短 val 的伪寄存器生命周期, 使
+ *  其全局分配优先级高于 entry 基址 → val 落 r2/基址落 r3 (规则 112)。 */
 void sub_800A534(u8 arg0)
 {
     u8 *entry;
-    u8 bonusVal;
     u8 *dst;
-    register u8 val;
-    register u32 v;
+    u8 val;
+    u32 v;
 
     if (arg0 == 0)
         return;
@@ -2012,7 +2012,7 @@ void sub_800A534(u8 arg0)
     v = entry[8] & 0xF;
     val = entry[6];
     if (v - 1 <= 6) {
-        bonusVal = val;
+        u8 bonusVal = entry[6];
         switch (v - 1) {
         case 0: dst = &gEquipBonusAtkBase; break;
         case 1: dst = &gEquipBonusDef2; break;

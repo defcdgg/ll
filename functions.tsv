@@ -195,7 +195,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x0800a0e4	Chara_GetFormGfx	
 0	thumb	code_8005020	0x0800a1b4	sub_800A1B4	
 0	thumb	code_8005020	0x0800a3c8	sub_800A3C8	
-1	thumb	code_8005020	0x0800a534	sub_800A534	✅ 2026-09-02 opencode: 装备加成结算(表+8低4位-1选加成栏+=+6HP, 高4位-1选栏+=+7攻击, ID[0x22..2B]/[0x37..3E]→Noa+1); 关键=v拆两步(先&0xF再if(v-1<=6)switch(v-1))让val装载落ands与subs之间 + register定home + 分支内val副本; fncheck OK
+1	thumb	code_8005020	0x0800a534	sub_800A534	✅ 2026-09-02 opencode: 装备加成结算(表+8低4位-1选加成栏+=+6HP, 高4位-1选栏+=+7攻击, ID[0x22..2B]/[0x37..3E]→Noa+1); 关键=v拆两步(先&0xF再if(v-1<=6)switch(v-1))让val装载落ands与subs之间 + 第一分支u8 bonusVal=entry[6]重读(CSE合并)缩短val生命周期使val落r2/基址落r3; 规则112; fncheck OK
 0	thumb	code_8005020	0x0800a664	sub_800A664	
 1	thumb	code_8005020	0x0800a79c	Stats_RecalcEquip	
 1	thumb	code_8005020	0x0800a86c	ExpToLevel	

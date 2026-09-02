@@ -2047,3 +2047,18 @@ gUnk_03004910/gSceneSubState; 计数器到 4 时窗口全开 (WIN0V=0x100, WININ
   与本改动无关 (stash 本改动后依旧红, 对方提交 efd9039 后恢复)。fncheck 定论为准。
 
 **验证**: 三函数 fncheck OK; `make`+SHA1 在无并发干扰时全绿。
+
+## sub_804C728 (0x0804C728, code_8044394) — ✅ 2026-09-02 sound-agent (逐字节 OK 100B)
+0x03000BE8 16B entry 表批量更新: 对 [arg0, arg0+arg1) 每项, 若 `(field_0 & 0xF) == 3`
+则 `field_0 |= 0x40; field_2 = arg2; field_3 = 0`。
+
+**要点**:
+- 与已匹配 sub_804C4D8 完全同构 (r8/ip/sb 高寄存器逐条一致), 仅基址 0x03000BE8 vs 0x03000AE8;
+  直接套用其结构体成员写法即可, 天然规避规则 11/67 (IOR 目的寄存器选错)。
+- 零 bl 调用, bytecmp 100B 完全一致 (含池重定位)。
+- code_0.h 原型 `()` → `(u8,u8,u8)` (同 sub_804C4D8 约定; 无 C 调用点, asm 调用点字节固定不受影响)。
+
+**事故**: 第一次 edit 后 source 被并发 agent 恢复为 INCLUDE_ASM (编辑前读到的是其改动前版本),
+第二次重读+重放编辑成功。教训: 多人共改 code_8044394.c 时 edit 后立即 grep 确认。
+
+**验证**: fncheck OK 100B; 全 ROM make+SHA1 绿 (612/1065)。

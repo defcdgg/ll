@@ -485,7 +485,7 @@ status	isa	module	addr	name	note
 0	thumb	code_801A3C4	0x0801ea70	sub_801EA70	
 0	thumb	code_801A3C4	0x0801ec3c	sub_801EC3C	
 0	thumb	code_801A3C4	0x0801ed40	sub_801ED40	
-0	thumb	code_801A3C4	0x0801ee6c	sub_801EE6C	
+1	thumb	code_801A3C4	0x0801ee6c	sub_801EE6C	✅ 2026-09-02 opencode: 战斗单位指针字段分支读gUnk_03000744或[0x35]; 调用sub_801B954(&ptr[0xC])+sub_804B7B0(v,u8); 清理bit15; BE==0x77时sub_804B834(...,-11需s32)另5参; fncheck OK	
 0	thumb	code_801A3C4	0x0801eee4	sub_801EEE4	
 0	thumb	code_801A3C4	0x0801f3fc	sub_801F3FC	
 0	thumb	code_801A3C4	0x0801f76c	sub_801F76C	

@@ -354,7 +354,29 @@ INCLUDE_ASM("asm/nonmatchings", sub_801E848);
 INCLUDE_ASM("asm/nonmatchings", sub_801EA70);
 INCLUDE_ASM("asm/nonmatchings", sub_801EC3C);
 INCLUDE_ASM("asm/nonmatchings", sub_801ED40);
-INCLUDE_ASM("asm/nonmatchings", sub_801EE6C);
+void sub_801EE6C(u8 *ptr)
+{
+    u8 v;
+    u8 b;
+
+    if (ptr[0xBE] > 0x0B && ptr[0xAB] == 4)
+    {
+        v = gUnk_03000744;
+    }
+    else
+    {
+        v = ptr[0x35];
+    }
+
+    b = sub_801B954((void **)(ptr + 0xC));
+    sub_804B7B0(v, b);
+
+    if (*(u16 *)&ptr[0x24] & 0x8000)
+        *(u16 *)&ptr[0x24] &= 0x7FFF;
+
+    if (ptr[0xBE] == 0x77)
+        sub_804B834(ptr[0x35], 1, 3, -11, 5);
+}
 INCLUDE_ASM("asm/nonmatchings", sub_801EEE4);
 INCLUDE_ASM("asm/nonmatchings", sub_801F3FC);
 INCLUDE_ASM("asm/nonmatchings", sub_801F76C);

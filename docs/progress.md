@@ -1928,3 +1928,15 @@ rematerializable → 每处重取 `ldr [pc]` → 分配命中目标 (bytecmp min
 才复现两条。另: `gUnk_03000884` 用**命名符号**才对 (裸地址 `*(u8*)0x03000884` 反让 GCC2 把地址留 r6 多 push, 与 sub_8052AE8 相反 —— 那处裸地址才对, 视压力而定)。
 新登记 ROM 绝对符号 `gUnk_0839DBF6 = 0x0839DBF6` (linker.ld) + 本文件 `extern u16 gUnk_0839DBF6[][4];`。
 bytecmp 4B(仅 bl Sfx_Play 槽) → fncheck OK 108B, 全 ROM SHA1 绿。
+
+## 2026-09-02 `sub_801EE6C` 匹配 (战斗单位字段处理, code_801A3C4)
+
+120 字节: 读取 (u8*ptr) 字段。`ptr[0xBE] > 0x0B && ptr[0xAB] == 4` 时 v=gUnk_03000744 否则
+v=ptr[0x35]; 然后 `sub_801B954(&ptr[0xC])` 结果 u8 给 `sub_804B7B0(v, u8)`; 清 `ptr[0x24]` 的
+bit15 (0x8000 → 0x7FFF); 若 `ptr[0xBE]==0x77` 则 `sub_804B834(ptr[0x35], 1, 3, -11, 5)`。
+
+**卡点与解法**: sub_804B834 第 4 参 `-11` 若声明为 u8 会直接写 `movs r3,#0xf5`, 目标要
+`movs r3,#0xb; negs r3` → 必须声明为 s32 (带符号才会生成 negs)。bytecmp 后仅剩 3 个 bl
+重定位槽 (伪差), 逐字节命中。
+
+fncheck OK (120 bytes, 3 bl 槽忽略)。全 ROM SHA1 绿 (57.0%)。

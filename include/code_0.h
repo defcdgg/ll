@@ -907,7 +907,7 @@ void sub_804C5F8(u8, u8);
 void sub_804C638(u8);
 void sub_804C674(u8);
 void sub_804C6B0(void);
-void sub_804C728();
+void sub_804C728(u8, u8, u8);   // 三个形参入口均 lsls/lsrs #0x18 → u8
 void sub_804C78C();
 void sub_804C890();
 void sub_804C8E0();

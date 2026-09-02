@@ -1281,7 +1281,22 @@ void sub_804C6B0(void)
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_804C728);
+void sub_804C728(u8 arg0, u8 arg1, u8 arg2)
+{
+    u8 i;
+    Unk_03000AE8 *entry;
+
+    for (i = 0; i < arg1; i++)
+    {
+        entry = (Unk_03000AE8 *)&gUnk_03000BE8[(arg0 + i) * 16];
+        if ((entry->field_0 & 0xF) == 3)
+        {
+            entry->field_0 |= 0x40;
+            entry->field_2 = arg2;
+            entry->field_3 = 0;
+        }
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_804C78C);
 INCLUDE_ASM("asm/nonmatchings", sub_804C890);
 INCLUDE_ASM("asm/nonmatchings", sub_804C8E0);

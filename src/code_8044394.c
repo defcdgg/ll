@@ -1353,7 +1353,31 @@ void sub_804C78C(void)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_804C890);
 INCLUDE_ASM("asm/nonmatchings", sub_804C8E0);
-INCLUDE_ASM("asm/nonmatchings", sub_804C9B4);
+void sub_804C9B4(void)
+{
+    u8 values[8];
+    u8 count;
+    u8 i;
+    u8 value;
+    u8 *pool;
+    u8 *obj;
+
+    pool = GetObjPool();
+    count = sub_80489E8(pool, values, 0, 0x7F);
+    for (i = 0; i < count; i++)
+    {
+        obj = pool + values[i] * 0xC8;
+        if (obj[0xBE] == 9)
+        {
+            obj[0xBC] = 0;
+            pool = GetObjPool();
+            count = sub_80489E8(pool, values, 1, 0x7F);
+            value = values[((s32 (*)(void))Rng_LcgNext)() % count];
+            obj[0xBD] = value;
+            break;
+        }
+    }
+}
 void sub_804CA2C(u8 *obj)
 {
     u8 values[16];

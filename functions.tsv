@@ -515,7 +515,7 @@ status	isa	module	addr	name	note
 1	thumb	code_801A3C4	0x08020ae4	sub_8020AE4	
 1	thumb	code_801A3C4	0x08020b04	sub_8020B04	
 1	thumb	code_801A3C4	0x08020b48	sub_8020B48	
-0	thumb	code_801A3C4	0x08020b54	sub_8020B54	⏸ 三sym=0存储寄存器轮换r5/r6/r4; 6排列全试; 规则17
+0	thumb	code_801A3C4	0x08020b54	sub_8020B54	⏸规则17未解: 6字节差纯是三个 sym=0 地址伪寄存器轮换(目标0x714→r5/0x715→r6/0x716→r4, 池序与我的r4/r5/r6一致, 只差3条ldr+3条strb的dest reg); ~40种写法(循环for/while/do/!=/递减、6种存储序、提前算地址的指针局部、u8*/u32/void*类型、加删局部改regno)全部稳定给r4/r5/r6; egcs把提前指针copy-prop回原位; agbcc -dl 显示 reg39/40/41 统计完全相同(n_refs=2,pri相等)→local_alloc qsort 对等优先级 tiebreak 产物, 非语句序可控; 候选 permuter/sub_8020B54/base.c(6B差)
 1	thumb	code_801A3C4	0x08020b90	sub_8020B90	
 1	thumb	code_801A3C4	0x08020bc0	sub_8020BC0	
 1	thumb	code_801A3C4	0x08020bf0	sub_8020BF0	

@@ -1743,3 +1743,25 @@ fncheck OK (36B, 1 池重定位, 0 bl 槽)。全 ROM SHA1 绿。
 **挂起 sub_80462E4** (231 指令, 见 functions.tsv note): obj 池筛选器。首版候选 (permuter/sub_80462E4/v1.c)
 差 320/456B —— 寄存器分配 (r8/sb/sl 三连) 与循环 peel 全不同。且它现由 asm/matchings 保字节绿,
 真 C 若用 r8/sb/sl 有坑1 (GCC2 泄漏破同 TU 其他函数) 风险。判定为需专项逐块攻, 不在本次批量内强推。
+
+## 2026-09-02 `sub_8020B54` 再攻 (规则17 寄存器轮换, 仍挂起)
+
+函数本身简单: `for(i=0;i<7;i++) gUnk_030006F8[i]=0;` (u8* 队列清 7 项) + `gUnk_03000714/715/716=0`。
+朴素真 C 只差 **6 字节**, 且经 objdump 逐条核对: 字面池顺序 (0x714,0x715,0x716,0x6F8) 与目标**完全一致**,
+唯一差异是三条 `ldr` 的 dest 与三条 `strb` 的 base —— 目标把三个地址伪寄存器分配成 0x714→r5 / 0x715→r6 /
+0x716→r4, 我的恒为 r4/r5/r6。即纯 register rotation, 非语义/非寻址/非调度问题。
+
+**本轮 ~40 种写法全部撞在 6B 地板**:
+- 循环形: `for(i<7)` / `while` / `do-while(++i<7)` / `i!=7` / 递减 `for(i=7;i--)` / 拆 `i<6`+末项 —— 全 6B。
+- 存储序: 6 种排列 —— 改变的是 **strb 发射序**(egcs 不重排 store), 得 8~9B, 更差。
+- 提前算地址的指针局部 (`u8*c=&gUnk_03000716; ... *c=0;`): egcs **copy-prop** 把 c 折回 store 原位, 分配不变。
+- 类型: `u8*[]` / `u32[]` / `(void*)0` / 显式字节指针 —— 全 6B。
+- 加/删局部改伪寄存器编号 (期望扰动 qsort): 引入的额外指令又破坏字节, 两难。
+
+**根因定位** (agbcc `-dl` → gccdump.lreg): 三个地址 reg 39/40/41 统计**逐字段相同**
+(`used 2 times across 30 insns; set 1 time; pointer`), n_refs=2 → floor_log2=1, size=4, life=30 →
+QTY_CMP_PRI 完全相等。egcs `local_alloc` 用 **非稳定 qsort** 按优先级排 qty, 等值时次序由 qsort 分区决定,
+对当前 qty 数组恰好产出 39→r4,40→r5,41→r6; 目标 ROM 那次编译产出 41→r4,39→r5,40→r6。
+这是**编译器版本/周边 qty 集合的 tiebreak 产物, 无法用等价 C 稳定复现** —— 规则17 判定成立, 继续挂起。
+候选留 `permuter/sub_8020B54/base.c` (6B)。若将来要收: 需改 agbcc local_alloc 的等值排序 (改编译器, 破全局一致性)
+或找到能改变 qty 数组组成又不增删指令的写法 (本轮未找到)。

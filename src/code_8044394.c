@@ -660,7 +660,48 @@ u8 sub_8048868(u8 objectIndex, u8 skill)
     return 1;
 }
 // @ 0x080488CC
-INCLUDE_ASM("asm/nonmatchings", sub_80488CC);
+u8 sub_80488CC(u8 *obj, u8 skill)
+{
+    u8 i;
+    u8 found;
+    u8 first;
+    u8 val;
+    u8 *skills;
+    u8 result;
+
+    result = 0xFF;
+    found = 0;
+    if (skill <= 0x2F)
+    {
+        i = 0;
+        first = *(obj + 0x99);
+        skills = obj + 0x99;
+        if (first == 0xFF || first != skill)
+        {
+            for (;;)
+            {
+                i++;
+                if (i > 7)
+                    break;
+                val = skills[i];
+                if (val == 0xFF || val != skill)
+                    continue;
+                found = 1;
+                break;
+            }
+            if (found == 0)
+                return result;
+        }
+        if (sub_8045A10(obj, i) != 0)
+            result = i;
+    }
+    else
+    {
+        if (*(u16 *)(obj + 0x88) > 0x1F)
+            result = *(obj + 0x8A);
+    }
+    return result;
+}
 
 // @ 0x08048934
 u8 sub_8048934(u8 *arg0, u8 arg1)

@@ -794,7 +794,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x080487cc	sub_80487CC	
 1	thumb	code_8044394	0x08048818	sub_8048818	
 1	thumb	code_8044394	0x08048868	sub_8048868	
-0	thumb	code_8044394	0x080488cc	sub_80488CC	⏸ 2026-09-02 opencode: 技能查找(if id>0x2F查obj+0x88/0x8A else 查obj+0x99技能表, 命中调sub_8045A10); 语义已全解重写(v6: result/found双变量+do-while(1)+goto check), 布局/循环/池序全对, 剩22B=skills基址home(r5 vs r2)+result/found轮换(r7/r6 vs r6/r5), 纯global-alloc; 已试-g/register/声明序/链式/死引用/&obj[0x99]/cast 全无效; 候选permuter/sub_80488CC/base.c
+1	thumb	code_8044394	0x080488cc	sub_80488CC	✅ 2026-09-02 codex: 按技能ID查找Actor技能槽并经sub_8045A10检查资源是否足够；普通ID扫描obj+0x99的8槽，特殊ID读取obj+0x88/0x8A；first独立读取决定r5/r6/r7寄存器home；fncheck OK 104B | 2026-09-03 zai 修复合入遗漏: 真C补入src(code_0.h原型void→u8(u8*,u8)); bytecmp指令级一致
 1	thumb	code_8044394	0x08048934	sub_8048934	
 1	thumb	code_8044394	0x08048984	sub_8048984	✅ 2026-09-02 qwen: obj[0x99+arg1]→gUnk_08093418[id*5+2]&0xF (家族同 sub_8048934); fncheck OK 32B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x080489a4	sub_80489A4	✅ 2026-09-02 qwen: arg1<=7 时取 obj[0x99+arg1] 否则原值 → gUnk_08093418[id*5+1]&0xF (家族同 sub_8048934/8984); fncheck OK 36B; 全ROM SHA1 绿

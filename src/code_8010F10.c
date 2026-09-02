@@ -1854,16 +1854,16 @@ INCLUDE_ASM("asm/matchings", sub_801A2AC);
 //         REG_BLDY = arg1;
 //     }
 // }
-INCLUDE_ASM("asm/matchings", sub_801A2EC);
-// extern u8* gUnk_087EBDF0[];
-// void sub_801A2EC(void)
-// {
-//     if (gUnk_030004F8 <= 3)
-//     {
-//         LZ77UnCompVram(gUnk_087EBDF0[gUnk_030004F8], (void *)(0x06008000 + gUnk_030004F8 * 0x1000));
-//         gUnk_030004F8++;
-//     }
-// }
+extern u8 *gUnk_087EBDF0[];
+
+void sub_801A2EC(void)
+{
+    if (gUnk_030004F8 <= 3)
+    {
+        LZ77UnCompVram(gUnk_087EBDF0[gUnk_030004F8], (void *)(0x06008000 + gUnk_030004F8 * 0x1000));
+        gUnk_030004F8++;
+    }
+}
 void BgLoad_Reset(void)
 {
     gUnk_030004F8 = 0;

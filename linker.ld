@@ -68,6 +68,7 @@ gUnk_080981E6 = 0x080981E6;    /* u16[] 存档块长度表 {2, 0x5A, 8, 0} */
 gUnk_087EB1E8 = 0x087EB1E8;    /* 存档块指针表 {&gUnk_03004D48, gSaveTimers, gSaveFlags, ...} */
 gDialogPortraitTilemapPtrs = 0x087E9818; /* four dialog portrait tilemap positions */
 gUnk_087EB2E0 = 0x087EB2E0;    /* 角色头像 LZ77 指针表 (存档/队伍菜单用) */
+gUnk_087EBDF0 = 0x087EBDF0;    /* BG tileset LZ77 指针表[4] → VRAM 0x06008000 + idx*0x1000 */
 
 SECTIONS {
     ewram (NOLOAD) : ALIGN(4) {

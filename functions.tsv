@@ -425,7 +425,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x0801a218	BattleFx_DispOff	
 1	thumb	code_8010F10	0x0801a270	sub_801A270	
 1	thumb	code_8010F10	0x0801a2ac	sub_801A2AC	
-1	thumb	code_8010F10	0x0801a2ec	sub_801A2EC	
+1	thumb	code_8010F10	0x0801a2ec	sub_801A2EC	✅ 2026-09-02 qwen: BG tileset 流式解压 gUnk_030004F8<=3 → LZ77UnCompVram(gUnk_087EBDF0[pos], 0x06008000+pos*0x1000); pos++ (全局不缓存→调用后重读); 新登记 ROM 符号 gUnk_087EBDF0@0x087EBDF0 (linker.ld SECTIONS 外); fncheck OK 56B; 全ROM SHA1 绿
 1	thumb	code_8010F10	0x0801a324	BgLoad_Reset	
 1	thumb	code_8010F10	0x0801a330	BgLoad_Finish	
 1	thumb	code_8010F10	0x0801a33c	BgLoad_GetPos	

@@ -891,7 +891,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804c728	sub_804C728	✅ 2026-09-02 sound-agent: 与 sub_804C4D8 同构孪生 (仅基址 0x03000BE8 vs 0x03000AE8); 结构体成员形式规避规则11/67; fncheck OK 100B
 1	thumb	code_8044394	0x0804c78c	sub_804C78C	✅ 2026-09-02 sound-agent: obj池遍历+obj[0xBE]跳表分派CA2C..CE48; 目标函数用函数指针强转传冗余2参; fncheck OK 260B
 0	thumb	code_8044394	0x0804c890	sub_804C890	⏸ movs r1,#0被外提到r7; long long阻外提仍差1条调度; 75分
-0	thumb	code_8044394	0x0804c8e0	sub_804C8E0	
+1	thumb	code_8044394	0x0804c8e0	sub_804C8E0	✅ 2026-09-02 sound-agent: obj池槽位移除元素+随机取回; 关键=count--后置+for(j=i;j<count-1)绑定序(定r8 obj/r7移位基址); fncheck OK 210B
 1	thumb	code_8044394	0x0804c9b4	sub_804C9B4	✅ 2026-09-02 sound-agent: obj[0xBE]==9 时重取池+换歌并 break; value临时变量迫使 RHS先于地址计算(定r4/r5分配); fncheck OK 120B
 1	thumb	code_8044394	0x0804ca2c	sub_804CA2C	
 1	thumb	code_8044394	0x0804caa0	sub_804CAA0	

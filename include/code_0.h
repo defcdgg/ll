@@ -910,7 +910,7 @@ void sub_804C6B0(void);
 void sub_804C728(u8, u8, u8);   // 三个形参入口均 lsls/lsrs #0x18 → u8
 void sub_804C78C();
 void sub_804C890();
-void sub_804C8E0();
+u8 sub_804C8E0(u8 *, u8);   // obj池槽位移除元素+随机取回 (返回 u8)
 void sub_804C9B4();
 void sub_804CA2C(u8 *);
 void sub_804CAA0(u8 *);

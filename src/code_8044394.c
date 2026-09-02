@@ -1352,7 +1352,46 @@ void sub_804C78C(void)
     sub_804EF50();
 }
 INCLUDE_ASM("asm/nonmatchings", sub_804C890);
-INCLUDE_ASM("asm/nonmatchings", sub_804C8E0);
+u8 sub_804C8E0(u8 *obj, u8 arg1)
+{
+    u8 values[8];
+    u8 count;
+    u8 i;
+    u8 j;
+    u8 slot;
+
+    slot = 0;
+    count = sub_80489E8(obj, values, 0, 0x7F);
+    for (i = 0; i < count; i++)
+    {
+        if (values[i] == arg1)
+        {
+            for (j = i; j < count - 1; j++)
+                values[j] = values[j + 1];
+            count--;
+            break;
+        }
+    }
+    if (count == 0)
+    {
+        if (slot == 0)
+            slot = 1;
+        else
+            slot = 0;
+        count = sub_80489E8(obj, values, slot, 0x6F);
+        for (i = 0; i < count; i++)
+        {
+            if (values[i] == arg1)
+            {
+                for (j = i; j < count - 1; j++)
+                    values[j] = values[j + 1];
+                count--;
+                break;
+            }
+        }
+    }
+    return values[((s32 (*)(void))Rng_LcgNext)() % count];
+}
 void sub_804C9B4(void)
 {
     u8 values[8];

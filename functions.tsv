@@ -913,7 +913,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x0804d4fc	sub_804D4FC	⏸ 2026-09-02 sound-agent: 语义全解(switch((s8)obj[0xBC]) case1: obj[0xC2]=flag&Rng, entry=...[8+obj[0xC2]*2]); 卡点=switch值home: 目标movs r4,#0;ldrsb r4,[r1,r4]单次装载r4(callee-saved跨Rng存活)供case1复用ands r4,r0; 我恒r0+地址外提, case1重读obj[0xBC]; flag/s8指针/if-elseif变体全双装载1585-2530; permuter best 835; 候选permuter/sub_804D4FC/base.c(835)
 0	thumb	code_8044394	0x0804d5b4	sub_804D5B4	
 1	thumb	code_8044394	0x0804d708	sub_804D708	✅ 2026-09-02 opencode: 概率判定+drop道具, 姊妹sub_804D1B4(D260)同族但obj[0xBC]恒0无switch
-1	thumb	code_8044394	0x0804d798	sub_804D798	✅ 2026-09-02 opencode: 概率判定+随机槽位道具, 姊妹sub_804D708同族(obj[0xBC]恒1+obj[0xC2]选offset); fncheck OK
+1	thumb	code_8044394	0x0804d798	sub_804D798	⏸ 2026-09-02 opencode: 概率判定+随机槽道具, 姊妹sub_804D708同族但obj[0xBC]恒1+obj[0xC2]=(Rng&3)选offset; standalone fncheck过但全TU编译ands r0,r1 vs r1,r0+&obj[0xC2]调度差; 候选permuter/sub_804D798/
 0	thumb	code_8044394	0x0804d840	sub_804D840	
 0	thumb	code_8044394	0x0804d8f4	sub_804D8F4	
 0	thumb	code_8044394	0x0804da04	sub_804DA04	

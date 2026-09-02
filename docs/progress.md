@@ -1775,3 +1775,26 @@ f2a=`*(u16*)(obj+0x2A)`、f35=`obj[0x35]` 内联, 第 5 参 0 上栈。与已匹
 **要点**: 直接照搬兄弟函数的 `if/else if (obj[0xBE]<=0xA) ... else if ((u8)(obj[0xBE]-0x71)<=0x8D)` 惯用法,
 一次成型 —— bytecmp 与 target .text 逐字节 0 差异 (仅 4 个 bl 槽未重定位), fncheck OK。被调函数保持
 code_0.h 里的 K&R `void f();` 原型即可传 5 参 (第 5 个自动上栈), 无需补全原型。
+
+## 2026-09-02 `sub_80196D4` 挂起 (code_8010F10, dialogCtx 槽位初始化)
+
+9 参数函数 (u8 index, ...arg1..arg8), 把 arg5-8 写入 gDialogCtx[index].padding0[0..3],
+arg3→field_8, arg4→field_A, field_C=1, field_E=arg2, field_10=arg1。index*20 定槽位, 末尾
+`field_10` 用 `0x03000358 + off` (index*20) 重算, 强制 off 存活。
+
+**卡点**: 目标 prologue 是 agbcc **栈参数提升** (9 参导致):
+`push {r4-r7,lr}; mov r7,sl; mov r6,r9; mov r5,r8; push {r5,r6,r7}; sub sp,#4;
+ldr r4,[sp,#36]; str r4,[sp]; ldr r7,[sp,#40]; mov r8,r7; ldr r4,[sp,#44]; mov r9,r4;
+ldr r7,[sp,#48]; mov sl,r7; ldr r4,[sp,#52]; mov ip,r4`
+= 5 个栈参: arg4→[sp] 局部槽, arg5→r8, arg6→r9, arg7→sl, arg8→ip。
+
+穷举记录:
+- 全 u8 (v15): 无提升 (prologue 直接 push {r4-r6,lr}, 92/108)
+- 全 u32/s32 (v17/v26/v34): 无提升; 全 s32+m2c sp0 结构 (v28/v31): 82-84/108
+- 混合 u32/u8 (v19): **触发提升**但 arg4 进 r7 而非 [sp] 局部, 且寄存器映射 (arg5→r4,r6→r8...)
+  与目标 (arg4→[sp], arg5→r8...) 错位 → 89/104
+- struct 指针 + member 访问 (v25/v29/v32): 95/100 → 反而更差
+- u16 栈参 (v39): 无提升
+结论: 这是 global-alloc 域参数提升的固定分配, "穷举等价 C 写法" 改不动寄存器 home。
+待攻方向: ① 参照 sub_801B81C (10 参同族已匹配) 找其 C 触发提升的"参数数量+类型"精确组合;
+② 规则 102 的路子: 检查 `arg1`(0x02035AC0) 是否需要声明为指针以改变 home; ③ 已留 v19/v35/v38 候选。

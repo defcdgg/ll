@@ -264,7 +264,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8010F10	0x08010f10	sub_8010F10	
 1	thumb	code_8010F10	0x0801114c	sub_801114C	
 0	thumb	code_8010F10	0x08011268	sub_8011268	
-0	thumb	code_8010F10	0x080113cc	sub_80113CC	
+1	thumb	code_8010F10	0x080113cc	sub_80113CC	✅ 2026-09-02 op1: 手写 while(页号<=15 && 未持有) 旋转循环 + for 计数后续持有>=2 页; 首候选 fncheck 136B 全等; 语义=向后找"其后仍有>=2 持有页"的有效页号 (0=无页, 0xFF=不足)
 0	thumb	code_8010F10	0x08011454	sub_8011454	
 0	thumb	code_8010F10	0x08012530	sub_8012530	
 0	thumb	code_8010F10	0x08012790	sub_8012790	
@@ -397,7 +397,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8010F10	0x080191cc	sub_80191CC	
 1	thumb	code_8010F10	0x08019304	DialogCtx_Clear3	
 0	thumb	code_8010F10	0x0801933c	sub_801933C	
-0	thumb	code_8010F10	0x080196d4	sub_80196D4	
+0	thumb	code_8010F10	0x080196d4	sub_80196D4	⏸ agbcc栈参数提升(r8-r11)深度决策; 9参(dialogCtx索引+8), 目标prologue: push{r4-r7,lr}+存sl/sb/r8+sub sp,#4, arg4→[sp]局部(字段A最后写则spill), arg5-8→r8/r9/sl/ip提升; v19(混合u32/u8参)已触发提升但arg4分配差异(89/104); 穷举u8/u16/u32/%15组合均未映射; 见progress §sub_80196D4	
 1	thumb	code_8010F10	0x08019748	DialogCtx_SetPair	
 0	thumb	code_8010F10	0x08019784	sub_8019784	
 0	thumb	code_8010F10	0x080199e0	sub_80199E0	
@@ -754,7 +754,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x080457ac	sub_80457AC	
 0	thumb	code_8044394	0x08045860	sub_8045860	
 0	thumb	code_8044394	0x08045940	sub_8045940	
-0	thumb	code_8044394	0x08045a10	sub_8045A10	
+0	thumb	code_8044394	0x08045a10	sub_8045A10	⏸ 2026-09-02 gpnux: tile动画帧; 头部/主体已逐字节对(表gUnk_08093418[b*5+4], 两次sub_804E76C条件改val), 差尾部~22B(含8bl槽): 目标 lsls r6,#16;asrs#16(s16扩t); adds r1,r4(复制v); subs r0,r0,r1; lsls r0,#0x10(s16归一化); cmp;blt 20+变体(s16t/v16/diff/tbl/off拆分)未出此序, 属寄存器home; 候选permuter/sub_8045A10/c5.c 30B	
 0	thumb	code_8044394	0x08045a74	sub_8045A74	
 1	thumb	code_8044394	0x08045b90	sub_8045B90	
 0	thumb	code_8044394	0x08045bf4	sub_8045BF4	

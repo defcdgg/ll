@@ -733,7 +733,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x080445e8	sub_80445E8	
 1	thumb	code_8044394	0x08044680	sub_8044680	
 1	thumb	code_8044394	0x080446a4	sub_80446A4	
-0	thumb	code_8044394	0x080446bc	sub_80446BC	
+1	thumb	code_8044394	0x080446bc	sub_80446BC	✅ 2026-09-02 opencode: obj kind>11 且 !gUnk_03000884 时, 按 (s8)arg0[0xBC] 选列(==1→列2/3 否则0/1), 查 gUnk_0839DBF6[kind-0xc][col] 阈值门限 obj[0x28], 过则 Sfx_Play(表值,2,0)+置 gUnk_03000884=1; 关键坑=arg0[0xBC] 判定须 switch{case0;case1}(或 !=0&&==1) 才出目标两条 cmp(==0/==1), 单 if(==1) 只一条; gUnk_03000884 用命名符号(非裸地址, 裸地址反致 r6 保留); 新登记 ROM 表 gUnk_0839DBF6[][4]; fncheck OK 108B
 1	thumb	code_8044394	0x08044728	sub_8044728	
 1	thumb	code_8044394	0x0804472c	sub_804472C	
 1	thumb	code_8044394	0x08044730	sub_8044730	

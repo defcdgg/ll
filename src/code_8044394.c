@@ -178,7 +178,41 @@ u8 sub_80446A4(u8 *arg0)
 
     return 0;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_80446BC);
+extern u16 gUnk_0839DBF6[][4];
+
+void sub_80446BC(u8 *arg0)
+{
+    u8 r5;
+    u8 r1;
+    u16 threshold;
+
+    r5 = 0;
+    r1 = 1;
+    if (arg0[0xBE] <= 11)
+    {
+        return;
+    }
+    if (gUnk_03000884 != 0)
+    {
+        return;
+    }
+    switch ((s8)arg0[0xBC])
+    {
+    case 0:
+        break;
+    case 1:
+        r5 = 2;
+        r1 = 3;
+        break;
+    }
+    threshold = gUnk_0839DBF6[arg0[0xBE] - 0xc][r1];
+    if (*(u16 *)(arg0 + 0x28) < threshold)
+    {
+        return;
+    }
+    Sfx_Play(gUnk_0839DBF6[arg0[0xBE] - 0xc][r5], 2, 0);
+    gUnk_03000884 = 1;
+}
 s32 sub_8044728()
 {
     return 2;

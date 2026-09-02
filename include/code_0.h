@@ -741,7 +741,7 @@ u8 *sub_80445E0();
 void sub_80445E8();
 u8 sub_8044680(u8 *);
 u8 sub_80446A4(u8 *);
-void sub_80446BC();
+void sub_80446BC(u8 *);
 s32 sub_8044728();
 s32 sub_804472C();
 s32 sub_8044730();

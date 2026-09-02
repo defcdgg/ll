@@ -1898,7 +1898,8 @@ rematerializable → 每处重取 `ldr [pc]` → 分配命中目标 (bytecmp min
 调用链、`MapScene_InitSprites` 以及 `Sprites_LoadMapNPCs` 的 NPC 槽组字段。
 `MapScene_Load` 和 `MapScene_LoadNpcSlotIds` 已完成语义命名但仍保留原始 asm，
 对应台账 note 标为挂起；四个相关函数 fncheck 均 OK，场景表 `0xE10` 字节比较通过，
-整 ROM `make && sha1sum -c ll.sha1` 通过。
+场景相关函数与数据在独立核验中通过；整 ROM 在当时无并行改动时 `make && sha1sum -c ll.sha1` 通过。
+当前共享工作树另有 `sub_8015AF0` 改动导致整体布局偏移，最终红差异由并行改动负责。
 
 ## 2026-09-02 code_8010F10.c matchings 批量 (qwen): 8 命中 + 2 挂起
 
@@ -1915,3 +1916,15 @@ rematerializable → 每处重取 `ldr [pc]` → 分配命中目标 (bytecmp min
 **挂起 1 — sub_801A2AC** (BLEND 寄存器设置): 逻辑 = `REG_BLDCNT=arg0; REG_BLDALPHA=arg1|(arg2<<8); if((arg0>>6)&2 落在[2,3]) REG_BLDY=arg1;`。range-check 形状来自 `switch((arg0>>6)&2){case 2:case 3:}` (v3 逻辑完全正确)。**卡点**: 目标 `strh r0,[r1]` 把 arg0 留在 r0、`arg0<<16` 放 r3; GCC2 对我方任意写法都 `lsls r0,r0,#16` 先 clobber r0 再 `lsrs r3,r0,#16` 恢复 → 寄存器错位。RTL 转储显示 arg0 的伪寄存器在 <<16 后即 REG_DEAD。permuter 语句序探索平台期 score=240 (非0)。候选文件 `permuter/sub_801A2AC/` (base.c=v3)。待攻方向: 换 arg0 用法让 GCC2 保留 r0 (如把 BLDCNT store 与 mode 计算解耦到不同中间量), 或深挖 -dl 调度。
 
 **挂起 2 — sub_8015AF0** (背包 UI 光标 tile 写入): 无候选, 逻辑已全解 (见上 TSV note)。两处 tilemap 写 (0x020059AA / 0x02005BEA) + `gUnk_08093550[gSaveUiParam*8 + gUnk_03000228 + 4]` 查表。**卡点**: GCC2 把 store 基址 `ldr r2,=0x020059AA` 的调度位置 —— 目标插在 `(bit|0x826)` 之后, 我方版本提前物化基址 → +0xd 起错位。需先登记 gUnk_03000228(IWRAM)/gUnk_08093550(ROM) 符号 (本次为尝试已加又回退, 保持绿)。待攻: 逐条对齐两条 store 的基址/常量物化顺序。
+
+## 2026-09-02 `sub_80446BC` 匹配 (obj kind 音效触发, code_8044394)
+
+108 字节: obj kind(`arg0[0xBE]`)>11 且 `gUnk_03000884==0` 时, 按 `(s8)arg0[0xBC]` 选表列
+(==1 → 列 2/3, 否则 0/1), 查 `gUnk_0839DBF6[kind-0xc][col]` 作阈值, `arg0[0x28] >= 阈值` 则
+`Sfx_Play(表值, 2, 0)` 并置 `gUnk_03000884=1`。表是 `u16[][4]` (行字节偏移 (kind-0xc)*8 复用一次)。
+
+**关键坑**: `arg0[0xBC]` 的判定目标出**两条** cmp (`==0` beq / `==1` bne), 单写 `if (bc==1)` 只出一条
+(差在缺 `cmp #0`)。用 `switch((s8)arg0[0xBC]){case 0:break; case 1:...}` (或 `if(bc!=0){if(bc==1)..}`)
+才复现两条。另: `gUnk_03000884` 用**命名符号**才对 (裸地址 `*(u8*)0x03000884` 反让 GCC2 把地址留 r6 多 push, 与 sub_8052AE8 相反 —— 那处裸地址才对, 视压力而定)。
+新登记 ROM 绝对符号 `gUnk_0839DBF6 = 0x0839DBF6` (linker.ld) + 本文件 `extern u16 gUnk_0839DBF6[][4];`。
+bytecmp 4B(仅 bl Sfx_Play 槽) → fncheck OK 108B, 全 ROM SHA1 绿。

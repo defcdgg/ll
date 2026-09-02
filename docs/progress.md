@@ -2143,3 +2143,18 @@ obj 池槽位操作: 从 sub_80489E8 收集的 values 中删除 arg1 (移位), �
 - 两段扫描-移除逻辑完全同构 (槽0→槽1), 直接复制结构。
 
 **验证**: fncheck OK 210B (4 bl 槽); 全 ROM make+SHA1 绿 (615/1065)。
+
+## sub_804D0F8 (0x0804D0F8, code_8044394) — ✅ 2026-09-02 sound-agent (fncheck OK 188B)
+obj 槽位填充: 守卫 `*(u32*)(*(u32*)(obj+0x88)+0x1C)==0` 时, obj[0xBC]=0, 取池收集
+values (slot=1, 若 count<=1 换 slot=0 重收), 移除首个 `obj[0xAC]` 匹配的池条目
+(移除-移位循环, 规则115), obj[0xBD]=values[(u32)(u8)Rng%count]; 否则 obj[0xBC]=3。
+
+**要点**:
+- 直写 score 215, 唯一差异是目标把 `movs r4,#0` 外提到守卫指针解引用之前
+  (r4=count home, 供 obj[0xBC]=0 使用), 我的 0 从守卫已知零值 r1 复用。
+  **正解: 声明 `u8 count = 0;`** —— 初始化把 0 装进 count 的 home 寄存器并提前调度, score 0。
+- 取模是 `__umodsi3` (无符号): 需 `(u32)(u8)Rng_LcgNext() % count` 形式
+  (`(u8)` 截断 + `(u32)` 强制无符号), 否则 u16%u8 提升成有符号出 __modsi3。
+- count<=1 的槽切换: `cmp r4,#1; bhi` (u8 无符号>1 跳过换槽)。
+
+**验证**: fncheck OK 188B (5 bl 槽); 全 ROM make+SHA1 绿 (616/1065)。

@@ -1020,7 +1020,7 @@ u32 Op_BgmFadeOut(u32 *);
 u32 Op_SfxPlay(u32 *);
 u32 Op_SfxStop(u32 *);
 u32 sub_8052AE8(u32 *);
-u32 sub_8052B34(u8 **);
+u32 sub_8052B34(u32 *);
 u32 Op_WaitCharsStop(u32 *);
 u32 Op_LoadCharaGfx(u32 *);
 u32 Op_LoadCharaPal(u32 *);

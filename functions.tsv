@@ -682,7 +682,6 @@ status	isa	module	addr	name	note
 0	thumb	code_80264C0	0x080393e0	sub_80393E0	
 0	thumb	code_80264C0	0x08039724	sub_8039724	
 0	thumb	code_80264C0	0x08039c38	sub_8039C38	⏸ .s被跳转表截断, 需先补全反汇编
-0	thumb	code_80264C0	0x08039c6c	sub_8039C6C	
 0	thumb	code_80264C0	0x0803a478	sub_803A478	
 0	thumb	code_80264C0	0x0803a8d0	sub_803A8D0	
 0	thumb	code_80264C0	0x0803af60	sub_803AF60	
@@ -957,7 +956,7 @@ status	isa	module	addr	name	note
 0	thumb	code_804F0B8	0x0804f7f8	sub_804F7F8	
 0	thumb	code_804F0B8	0x0804f8d8	sub_804F8D8	
 0	thumb	code_804F0B8	0x0804f974	sub_804F974	
-0	thumb	code_804F0B8	0x0804fa04	sub_804FA04	
+0	thumb	code_804F0B8	0x0804fa04	sub_804FA04	⏸ 2026-09-02 sound-agent: 语义全解(条件跳转opcode: 循环测event/switch flags, 全0跳gUnk_02016200+[data[2]]表, 命中*ptr+=b+3); 循环旋转已解(规则116: count>i); 卡点=尾部寄存器分配+调度(not-found体lsl前/后加载base1 + r1/r2双基址, found体b+3先算); 穷举temp/换序/-g/permuter全撞1475; 候选permuter/sub_804FA04/base.c
 0	thumb	code_804F0B8	0x0804fa94	sub_804FA94	
 0	thumb	code_804F0B8	0x0804fb24	sub_804FB24	
 1	thumb	code_804F0B8	0x08050014	ScriptPump_Run	

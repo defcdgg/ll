@@ -778,8 +778,16 @@
       **正解**: `for (j=i; j<count-1; j++) values[j]=values[j+1]; count--;`
       —— for-init(j=i) 先出, 界表达式 count-1 算进 r4 并复制 r3 作界, count-- 延迟到循环后
       才以 (u8) 写回; 此形态下编译器把 obj 分配 r8 (r7 要让给移位基址 `mov r7, sp`)。
-      判定: 目标移位循环用 `mov r7, sp` 基址 + bound 副本 + 循环后 `lsls/lsrs` 截断。
-      关联: 规则 12 (调度器吊闩), 规则 10/33/47 (伪寄存器生命周期 ↔ 写法)。
+       判定: 目标移位循环用 `mov r7, sp` 基址 + bound 副本 + 循环后 `lsls/lsrs` 截断。
+       关联: 规则 12 (调度器吊闩), 规则 10/33/47 (伪寄存器生命周期 ↔ 写法)。
+
+ 116. **`for` 循环写成 `count > i` (界在左) 才触发 GCC 的循环旋转**（案例 `sub_804FA04`, 2026-09-02）。
+      `for (i=0; i<count; i++)`(标准写法) 生成**未旋转**形态: 顶部守卫 `cmp i,count; bcs skip`,
+      循环回边 `cmp i,count; bcc` (i 在左)。目标若为**旋转**形态 (guard `cmp count,#0; bls skip`
+      测试界本身, 回边 `cmp count,i; bhi`, 循环体无前跳即 do-while 风格), 写成 `count > i`:
+      `for (i=0; count>i; i++)` 会触发循环旋转, guard 变 `cmp count,#0` —— 逐字节命中。
+      判定: 目标循环入口前有 `cmp <界>,#0; bls/bhi` 且回边是 `<界> <循环变量>` 方向。
+      关联: 规则 115 (界表达式顺序), 规则 3 (分支极性)。
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 

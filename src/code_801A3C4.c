@@ -409,7 +409,18 @@ void sub_8020840(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
         sub_801CE80(obj, 0, f2a, f35, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_80208A4);
+/* 场景对象按 field_BE 分派 (sub_80207DC/840 变体): 先 sub_801D12C(obj,0), 再
+ * <=0xA→sub_801CBA4(,2,), <=0x70→sub_801CA08(,1,), 否则 (field_BE-0x71<=0x8D)→sub_801CE80(,2,)。 */
+void sub_80208A4(u8 *obj)
+{
+    sub_801D12C(obj, 0);
+    if (obj[0xBE] <= 0xA)
+        sub_801CBA4(obj, 2, *(u16 *)(obj + 0x2A), obj[0x35], 0);
+    else if (obj[0xBE] <= 0x70)
+        sub_801CA08(obj, 1, *(u16 *)(obj + 0x2A), obj[0x35], 0);
+    else if ((u8)(obj[0xBE] - 0x71) <= 0x8D)
+        sub_801CE80(obj, 2, *(u16 *)(obj + 0x2A), obj[0x35], 0);
+}
 void sub_8020914(u8 *arg0)
 {
     if (arg0[0xBE] <= 10)

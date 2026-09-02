@@ -123,7 +123,7 @@ void Viewport_UpdateScroll();
 void BgMap_FillPattern(u16);
 void MapBg_LoadFull(u8);
 void MapScene_Load(u8);
-void sub_80071EC();
+void MapScene_LoadNpcSlotIds(u8);
 void MapScene_InitSprites(u8);
 void sub_8007350();
 u8 *AnimSlot_Parse(u16, u8 *);
@@ -511,7 +511,7 @@ void sub_80207A4();
 u8 sub_80207B4(void *);
 void sub_80207DC(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35);
 void sub_8020840(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35);
-void sub_80208A4();
+void sub_80208A4(u8 *);
 void sub_8020914(u8 *);
 void sub_802093C(u8 *);
 void sub_8020974(u8 *, u16, u16, u8, u16);   // 入口截断定类: r1/r2/栈参 u16, r3 u8, r0 = 对象指针

@@ -503,7 +503,7 @@ status	isa	module	addr	name	note
 1	thumb	code_801A3C4	0x080207b4	sub_80207B4	✅ 2026-09-02 qwen: sub_80187B4()&0x20 ? sub_801C484(arg0) : sub_801BE34(arg0); ⚠ 候选注释分支映射反了(写成 set→BE34), 按 bne 目标核对实为 set→C484; fncheck OK 40B(3 bl 槽); 全ROM SHA1 绿
 1	thumb	code_801A3C4	0x080207dc	sub_80207DC	✅ 2026-09-02 gpnux: 场景对象按field_BE分派三行为(sub_801CBA4/CA08/CE80, 均传(obj,0,f2a,f35,0)); 关键=v不落局部直接obj[0xBE]三次(落局部则ldrb进r1, 直接则进r0+adds r1拷贝); fncheck OK 100B	
 1	thumb	code_801A3C4	0x08020840	sub_8020840	✅ 2026-09-02 gpnux: sub_80207DC孪生(仅第一/二分派r1常量=0xA/5), 同款"obj[0xBE]不落局部三次直访"; fncheck OK 100B	
-0	thumb	code_801A3C4	0x080208a4	sub_80208A4	
+1	thumb	code_801A3C4	0x080208a4	sub_80208A4	✅ 2026-09-02 opencode: obj-kind 分派 sub_80207DC/840 家族变体; 先 sub_801D12C(obj,0) 再 <=0xA/<=0x70/(u8)(x-0x71)<=0x8D 分派 CBA4(2)/CA08(1)/CE80(2), f2a/f35 内联; 被调 K&R void f() 传5参(第5个上栈); bytecmp 与 target .text 逐字节 0 差(仅 bl 槽); fncheck OK 112B
 1	thumb	code_801A3C4	0x08020914	sub_8020914	✅ 2026-09-02 qwen: obj[0xBE]<=10 → sub_801CBA4(obj,3,*(u16*)(obj+0x2A),obj[0x35],0) (5参,第5个入栈); 家族同 sub_80207DC/840 调用式; fncheck OK 40B; 全ROM SHA1 绿
 1	thumb	code_801A3C4	0x0802093c	sub_802093C	
 1	thumb	code_801A3C4	0x08020974	sub_8020974	

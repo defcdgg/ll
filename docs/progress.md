@@ -1765,3 +1765,13 @@ QTY_CMP_PRI 完全相等。egcs `local_alloc` 用 **非稳定 qsort** 按优先�
 这是**编译器版本/周边 qty 集合的 tiebreak 产物, 无法用等价 C 稳定复现** —— 规则17 判定成立, 继续挂起。
 候选留 `permuter/sub_8020B54/base.c` (6B)。若将来要收: 需改 agbcc local_alloc 的等值排序 (改编译器, 破全局一致性)
 或找到能改变 qty 数组组成又不增删指令的写法 (本轮未找到)。
+
+## 2026-09-02 `sub_80208A4` 匹配 (obj-kind 分派家族变体, code_801A3C4)
+
+112 字节: `sub_801D12C(obj,0)` 后按 `obj[0xBE]` 三段分派 `sub_801CBA4(,2,)/CA08(,1,)/CE80(,2,)`,
+f2a=`*(u16*)(obj+0x2A)`、f35=`obj[0x35]` 内联, 第 5 参 0 上栈。与已匹配的 `sub_80207DC`/`sub_8020840`
+同族 (那两把 f2a/f35 作形参, 本函数从 obj 现取 + 多一次 sub_801D12C 前置调用)。
+
+**要点**: 直接照搬兄弟函数的 `if/else if (obj[0xBE]<=0xA) ... else if ((u8)(obj[0xBE]-0x71)<=0x8D)` 惯用法,
+一次成型 —— bytecmp 与 target .text 逐字节 0 差异 (仅 4 个 bl 槽未重定位), fncheck OK。被调函数保持
+code_0.h 里的 K&R `void f();` 原型即可传 5 参 (第 5 个自动上栈), 无需补全原型。

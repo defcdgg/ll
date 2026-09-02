@@ -746,7 +746,7 @@ void sub_8041EDC();
 u8 sub_8042200(u8 *);
 void sub_80422B8();
 void sub_8042784();
-void sub_8042AB4();
+u8 sub_8042AB4(u8 *);
 void sub_8042B90();
 void sub_8042E70();
 void sub_8043554();

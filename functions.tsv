@@ -711,7 +711,7 @@ status	isa	module	addr	name	note
 1	thumb	code_80264C0	0x08042200	sub_8042200	✅ 2026-09-03 zai: 状态机(gUnk_03000820 switch 0/2/9): 0=存obj[0x35]/0x2A到0824/0822+sub_801CA08(obj,3,0x1B4,0xD,result)置2; 2=等obj+0x24 bit0x1000→sub_804C3A4+清位+sub_80207DC(obj[0xBF],obj[0xC0],0822,0824)置9; 9=返2; 新符号gUnk_03000822(u16)/0824(u8); fncheck OK 184B
 0	thumb	code_80264C0	0x080422b8	sub_80422B8	
 0	thumb	code_80264C0	0x08042784	sub_8042784	
-0	thumb	code_80264C0	0x08042ab4	sub_8042AB4	
+1	thumb	code_80264C0	0x08042ab4	sub_8042AB4	✅ 2026-09-03 zai: 状态机(switch 0/2/9/0x12): 0=存0824/0822/0828/0829/0825清零+sub_80187B4()&0x200判0x12或|0x20置2; 2=0825<=0x13时sub_801768C(0828,-0828,0x14,0825,0820)渐变写obj[0xBF]否则置9; 9=sub_80207A4+obj[0xAB]=7+obj[0xBE]=0xFF返2; 关键=块内u16 f2a=mem|0x20初始化声明(常量寄存器当orrs目标)+else块前向分支; 新符号gUnk_03000828/0829; fncheck OK 220B
 0	thumb	code_80264C0	0x08042b90	sub_8042B90	
 0	thumb	code_80264C0	0x08042e70	sub_8042E70	
 0	thumb	code_80264C0	0x08043554	sub_8043554	

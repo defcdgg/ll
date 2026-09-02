@@ -262,7 +262,30 @@ INCLUDE_ASM("asm/nonmatchings", sub_803F328);
 // @ 0x0803F444
 INCLUDE_ASM("asm/nonmatchings", sub_803F444);
 // @ 0x0803F5B4
-INCLUDE_ASM("asm/nonmatchings", sub_803F5B4);
+void sub_803F5B4(u8 *obj)
+{
+    u32 pool;
+    u8 i;
+    u8 *buf;
+    u32 result;
+
+    pool = GetObjPool();
+    sub_8020DF0(obj);
+    gUnk_0300083D = sub_8020E5C();
+    buf = (u8 *)sub_8020E54();
+    gUnk_03000840 = buf;
+    gUnk_03000858 = 0;
+    for (i = 0; i < gUnk_0300083D; i++)
+    {
+        if ((gUnk_03000840[i] & 0xF0) == 0x10)
+        {
+            result = sub_804473C(obj, pool + (gUnk_03000840[i] & 0xF) * 0xC8);
+            result += *(u16 *)(pool + (gUnk_03000840[i] & 0xF) * 0xC8 + 0xB2);
+            *(u16 *)(pool + (gUnk_03000840[i] & 0xF) * 0xC8 + 0xB2) = result;
+            gUnk_03000858++;
+        }
+    }
+}
 // @ 0x0803F658
 INCLUDE_ASM("asm/nonmatchings", sub_803F658);
 // @ 0x0803FF54

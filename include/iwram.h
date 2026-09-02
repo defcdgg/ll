@@ -210,6 +210,7 @@ extern u8 gUnk_03000844;
 extern u8 gUnk_03000845;
 extern u8 gUnk_03000856;
 extern u8 gUnk_03000857;
+extern u8 gUnk_03000858;
 extern u16 gUnk_0300085A;
 extern u8 gUnk_0300085C;
 extern u8 gUnk_03000865;
@@ -766,7 +767,9 @@ typedef struct
 
 extern ChestObject gChestObjects[16]; /* 0x03004890, 16 个场景宝箱记录 */
 
-extern u8 gUnk_03004910;
+extern u8 gPaletteFxMode;    /* 0x03004910: palette effect mode + 1 */
+extern u8 gPaletteFxPending; /* 0x03004914: pending palette upload flag */
+extern u8 gPaletteFxTimer;   /* 0x03004918: palette effect frame counter */
 extern u8 gMapObjGfxSetId;
 
 typedef struct

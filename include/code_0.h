@@ -773,7 +773,7 @@ s32 sub_804472C();
 s32 sub_8044730();
 s32 sub_8044734();
 s32 sub_8044738();
-void sub_804473C();
+u32 sub_804473C();
 void sub_80448A8();
 void sub_8044A40();
 void sub_8044F4C();

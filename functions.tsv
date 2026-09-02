@@ -492,7 +492,7 @@ status	isa	module	addr	name	note
 0	thumb	code_801A3C4	0x0801f884	sub_801F884	
 0	thumb	code_801A3C4	0x0801fa10	sub_801FA10	
 0	thumb	code_801A3C4	0x0801fab8	sub_801FAB8	
-0	thumb	code_801A3C4	0x0801febc	sub_801FEBC	
+0	thumb	code_801A3C4	0x0801febc	sub_801FEBC	⏸ agbcc寄存器home深度分配; 目标value→r3/zero→r3/ptr+0x37→r4 subs复用; 尝试v7(76/152)穷举C不可破; 待攻方向: v8表达+permuter; 见progress	
 0	thumb	code_801A3C4	0x0801ff40	sub_801FF40	
 0	thumb	code_801A3C4	0x080200e8	sub_80200E8	
 0	thumb	code_801A3C4	0x08020228	sub_8020228	

@@ -2228,3 +2228,21 @@ palette 用 r9(spill) 而非目标 r3+栈槽。穷举声明序/类型/循环形/
 4. BgMap_PalFillRect 保持 K&R 无原型调用 (被调截断由定义侧提供)。
 
 fncheck OK (136 bytes, 1 bl 槽忽略)。全 ROM SHA1 绿 (58.3%)。
+
+## sub_804FA04 (0x0804FA04, code_804F0B8) — ⏸ 挂起 (loop rotation 已解, 尾部寄存器分配)
+条件跳转 script opcode: 数据块 = [1]字节数(>>1 个条件), 每条件 u16 id 于 data+3+i*2;
+id≤0x1FF 测 EventFlags_Test(id), >0x1FF 测 SwitchFlags_Test(id-0x200); 若任一命中 → 
+`*ptr += b+3`(跳过本命令), 若全 0 (或 count==0) → `*ptr = gUnk_02016200+gUnk_02016000[data[2]]`
+(跳转表)。返回 1。
+
+**匹配历程 (3215→2395→1895→1475)**:
+1. id 需**逐字节装载** `data[3+i*2] | data[4+i*2]<<8` (偏移 3+2i 为奇数, u16 cast 会 ldrh 误对齐)。
+2. 结果块序: 目标 `if (result == 0) {notfound} else {found}` (notfound 直落), 反写会调块。
+3. **循环旋转 (规则116)**: `for(i=0; i<count; i++)` 生成未旋转 `cmp i,count;bcs`; 写成
+   `for(i=0; count>i; i++)` 触发旋转 → `cmp count,#0;bls` + do-while 回边, guard 逐字节命中 (1895→1475)。
+4. result 不初始化 (count==0 路径读 r1 垃圾, 目标如此, 是原始 UB 伪影)。
+5. **残余卡点 (~30B, 尾部两体)**: not-found 体目标 lsl 先于 base1 ldr 且 base2 用 r2 (我 ldr 先 + r1 复用);
+   found 体目标先算 `b+3`(r8→r1→adds#3) 再读 *ptr (我 (*ptr+3)+b)。穷举 temp/slot/显式括号/换 if 序/-g/
+   permuter 全撞 1475-2050。属调度+寄存器分配耦合, 候选 permuter/sub_804FA04/base.c。
+
+**验证**: 无 (fncheck 未达 0)。

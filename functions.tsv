@@ -933,7 +933,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x0804e2ac	sub_804E2AC	
 0	thumb	code_8044394	0x0804e6dc	sub_804E6DC	
 1	thumb	code_8044394	0x0804e76c	sub_804E76C	
-0	thumb	code_8044394	0x0804e7ec	sub_804E7EC	
+0	thumb	code_8044394	0x0804e7ec	sub_804E7EC	⏸规则17类寄存器轮换: 语义全解(obj 双字段 0x91/0x92 各过 sub_804DD90(,6) 判定→r6=1/2, 命中则清 arg0[r6+0x90] 并把 obj 入队 gUnk_03000DF0[gUnk_03000E04++] ); 卡点=callee-saved r4/r5/r6 分配 (目标 arg0→r5/v92→r4/计数→r6, 我恒 arg0→r4/v92→r6/计数→r5 的轮换)+ || 第二支极性(bne vs beq); v1-v5 结构已对(3 callee reg)但 reg 字段全错位(~90B); 需 fndiff 长磨; 候选 permuter/sub_804E7EC/v2.c
 0	thumb	code_8044394	0x0804e85c	sub_804E85C	
 0	thumb	code_8044394	0x0804e9dc	sub_804E9DC	
 0	thumb	code_8044394	0x0804ec04	sub_804EC04	

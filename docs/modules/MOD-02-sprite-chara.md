@@ -132,6 +132,7 @@
 | 0x0800A924 | ✅C | `Party_InitStats` | 10 人 Stats 初始化 + 背包清空 |
 | 0x0800A86C | ✅C | `ExpToLevel` | 经验→等级 (gUnk_08092248 经验表, 上限 9999999) |
 | 0x0800A8A0 | ✅C | `LevelToExp` | 等级→累计经验 |
+| 0x08009F70 | ✅C | `sub_8009F70` (待改名) | 属性成长查询 (职业/等级/属性序号→属性值); 表 gClassStatCurveTable@0x080921F0 (9×8) + gStatGrowthCurveTables@0x080923D8 (每曲线100B逐级增量); 调用方 sub_800A3C8 / sub_8048818 |
 | 0x0800A8D0 | ✅C | `ItemFindSlot` | gUnk_08093418 道具表查找 (type+sub type) |
 | 0x0800A958 | ✅C | `ItemGetValue` | 道具表 field_4 |
 | 0x0800A970/978 | ✅ | `SaveCopyHpMp` ×2 | 存档结构内 HP/MP 备份 |

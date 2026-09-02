@@ -1868,7 +1868,77 @@ void StaticObjs_Reset(void)
         gStaticMapObjects[i].field_0 = 0;
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8009F70);
+/* 0x080921F0: 9 行 × 8 字节 — 职业(formation)× 八维属性 → 成长曲线号 (t, 0-40) */
+extern const u8 gClassStatCurveTable[];
+/* 0x080923D8: 按曲线号 t 划分的 100B/段成长表, 每段 [0]=段长, [1..] 逐级增量 */
+extern const u8 gStatGrowthCurveTables[];
+
+/* 属性成长查询: 按 (职业 classId, 等级 lv, 属性序号 statIdx) 返回该等级属性值。
+ * - statIdx >= 8 && classId <= 10  → 10
+ * - classId > 8: 特殊职业的固定值 (999 / 0 / 1 / 3 / 0xFF)
+ * - 常规: t = gClassStatCurveTable[classId*8 + statIdx]; 累加
+ *   gStatGrowthCurveTables[t*100 + 0..lv] (level+1 项), 全 0 且 statIdx==7 → 1
+ * 调用点: sub_800A3C8 (队伍角色逐属性), sub_8048818 (战斗对象 formation)
+ * 代码生成要点: ① switch(a) 每个 case 独立写 `return 10;`(合并成 case0..10 会被
+ *   折叠成范围测试, 丢失跳表); ② `stride = t*100` 提前命名变量 (规则 30 分步形式);
+ *   ③ while 循环比 do-while 更能复现 `cmp r2,r1; bhi` 入口守卫; ④ 首格条件必须
+ *   写 `c >= 8` (u8 归一化成 `cmp r4,#7; bls`);
+ *   ⑤ 定义必须用 K&R 旧式风格 (与头文件 `u16 sub_8009F70();` 空形参声明配套):
+ *      改成全原型会触发 GCC2 的 default-promotion 冲突报错, 且会让已匹配的
+ *      调用方 sub_8048818 的 formation 寄存器分配从 r2 漂到 r3 (规则 7 的坑) */
+u16 sub_8009F70(classId, lv, statIdx)
+u8 classId;
+u8 lv;
+u8 statIdx;
+{
+    u8 t;
+    u16 sum;
+    u16 i;
+    u16 stride;
+
+    if (statIdx >= 8 && classId <= 10) {
+        switch (classId) {
+        case 0: return 10;
+        case 1: return 10;
+        case 2: return 10;
+        case 3: return 10;
+        case 4: return 10;
+        case 5: return 10;
+        case 6: return 10;
+        case 7: return 10;
+        case 8: return 10;
+        case 9: return 10;
+        case 10: return 10;
+        }
+    }
+    if (classId > 8) {
+        switch (statIdx) {
+        case 0:
+            return 0x3E7;
+        case 1:
+            if (classId == 9)
+                return 0x3E7;
+            return 0;
+        case 7:
+            if (classId == 9)
+                return 1;
+            return 3;
+        }
+        return 0xFF;
+    }
+
+    t = gClassStatCurveTable[classId * 8 + statIdx];
+    stride = t * 100;
+    sum = 0;
+    i = 0;
+    while (i <= lv) {
+        sum = (u16)(sum + gStatGrowthCurveTables[stride + i]);
+        i = (u16)(i + 1);
+    }
+    if (sum == 0 && statIdx == 7)
+        sum = 1;
+    return sum;
+}
 /* 0x08093418: 48 项 × 5 字节的表 (在 data/data.s 的 blob 里, 尚无独立符号) —— **名字未定**:
  *   [1] 高 4 位 = 分组号 (实测分布 0:8 2:6 3:8 4:8 5:8 6:4 7:2 15:4 项), 低 4 位含义未定
  *   [4] = 一个数值 (`ItemGetValue` 直接返回它)

@@ -2097,3 +2097,34 @@ SFX 换歌: 遍历 obj 池收集 id, 对 obj=pool+id*0xC8, 若 obj[0xBE]==9 则�
   构建验证 (HEAD+自己=绿), 提交只 `git add` 该文件, 事后恢复他人 WIP。
 
 **验证**: fncheck sub_804C9B4 OK 120B (6 bl 槽); 与 sub_804C78C 同 build 时全 ROM 绿。
+
+## sub_8009F70 (0x08009F70, code_8005020) — ✅ 2026-09-02 opencode (fncheck OK 216B)
+属性成长查询: `(职业 classId, 等级 lv, 属性序号 statIdx)` → 该等级属性值 (u16)。
+调用点 sub_800A3C8 (队伍角色逐属性, c=0..8) 与 sub_8048818 (战斗对象 formation, 返回
+`gPartyStats[idx].lv` 属性)。三张数据表: gClassStatCurveTable (9×8 职业×属性→曲线号 t,
+0x080921F0) + gStatGrowthCurveTables (每曲线 100B 逐级增量, 0x080923D8)。
+
+**要点 (全部逐字节验证)**:
+- **跳表复现**: 首格 `statIdx>=8 && classId<=10` 内 switch(classId) 若把 11 个 case 写成
+  `case 0: case 1: ... case 10: return 10;` 会被 GCC2 折叠成范围测试 (cmp/bgt/blt + 单
+  return), 丢跳表。**必须每个 case 独立写 `return 10;`** 才生成 11 项跳表 (全部指向同一块)。
+  (对比 sub_8048BD0: 只要有两个不同目标就会出跳表; 本函数 11 个目标相同, 靠独立语句强出。)
+- **分步索引**: `stride = t*100` 命名变量提前算 → `movs r0,#100; adds r5,r1; muls r5` 落
+  在 sum/i 初始化之前 (规则 30 分步形式); 直接写 `tbl2[t*100+i]` 会把 tbl2 基址提前
+  hoist 到 r7 (多 push, 差 r4/r2 分配)。
+- **循环守卫**: `while (i <= lv)` 比 do-while 更能复现入口 `cmp r2,r1; bhi` 守卫 (r2=sum
+  恰为 0); 配合 u16 累加/自增 (lsls/lsrs 掩码)。
+- **首格条件**: 必须写 `statIdx >= 8` (u8 归一化成 `cmp r4,#7; bls`); 写 `== 8` 变
+  `cmp #8; bne` 不匹配。
+- **定义必须 K&R 旧式**: 头文件保持 `u16 sub_8009F70();` (空形参), 定义用
+  `u16 sub_8009F70(a,b,c) u8 a; u8 b; u8 c; { ... }`。理由: ① 全原型与 `()` 声明触发
+  GCC2 default-promotion 冲突报错; ② 就算改成全原型能编译, 会让已匹配的调用方
+  sub_8048818 的 formation 从 r2 漂到 r3 (规则 7 的坑, 差 12B)。K&R 定义字节与原型完全一致。
+
+**验证**: fncheck OK 216B (14 池重定位); 全 ROM make+SHA1 绿 (615/1065)。
+
+**事故**: 验证 `git checkout HEAD --` 复原 sub_8048818 时, 连带把并发 agent gpnux
+(sub_804C890, 进行中) 在 src/code_8044394.c 的未提交真 C 转回 INCLUDE_ASM。其 WIP
+(76B≠baserom 80B) 造成整 ROM 红, 复原后 ROM 反而转绿; WIP 副本完好保存在
+permuter/sub_804C890/{base.c,v2.c}, functions.tsv 仍 status=0。见 INCIDENTS.md 新增行。
+

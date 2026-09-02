@@ -190,7 +190,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x08009d34	StaticObjs_StepAll	
 1	thumb	code_8005020	0x08009e80	StaticObj_BuildChain	
 1	thumb	code_8005020	0x08009f48	StaticObjs_Reset	
-0	thumb	code_8005020	0x08009f70	sub_8009F70	
+1	thumb	code_8005020	0x08009f70	sub_8009F70	✅ 2026-09-02 opencode: 属性成长查询(职业/等级/属性序号); 跳表=每case独立return10; stride命名变量+while守卫; fncheck OK
 1	thumb	code_8005020	0x0800a048	Stats_BuildSkillList	✅ flag赋值替代goto(规则87); u8形参+1=移位域加法(规则88)
 1	thumb	code_8005020	0x0800a0e4	Chara_GetFormGfx	
 0	thumb	code_8005020	0x0800a1b4	sub_800A1B4	

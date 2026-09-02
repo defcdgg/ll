@@ -10,6 +10,8 @@ MEMORY {
 }
 
 gUnk_08093418 = 0x08093418;
+gClassStatCurveTable = 0x080921F0;
+gStatGrowthCurveTables = 0x080923D8;
 gUnk_08092248 = 0x08092248;
 gUnk_08095028 = 0x08095028;
 gUnk_08095828 = 0x08095828;

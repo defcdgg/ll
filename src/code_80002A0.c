@@ -898,7 +898,7 @@ void SceneTransition_Load(void)
     MapScene_InitSprites(gMapNpcSetId);
     Sprites_LoadMapNPCs(gMapNpcSetId);
     BgScroll_LoadFromTable(gMoveCmdSetId);
-    ChestObjects_LoadForMap(gMapNpcSetId);
+    Chest_LoadForMap(gMapNpcSetId);
     StaticObjGfx_LoadPair(gMapObjGfxSetId);
     StaticObjs_Spawn(gMapObjGfxSetId);
 
@@ -1538,7 +1538,7 @@ void Sprites_UpdateFrame(void)
     u16 i;
     u16 ret0;
     Actor *ptr03002E80;
-    ChestObject *ptr03004890;
+    Chest *ptr03004890;
 
     Viewport_UpdateScroll();
     AnimSlots_StepAll();
@@ -1628,9 +1628,9 @@ void Sprites_UpdateFrame(void)
 
         for (i = 0; i < 16; i++)
         {
-            if (gChestObjects[i].sprNodeIdx)
+            if (gChests[i].spriteNodeIdx)
             {
-                Sprite_EnqueueRender(gChestObjects[i].x, gChestObjects[i].y, gChestObjects[i].sprNodeIdx, 0, 255);
+                Sprite_EnqueueRender(gChests[i].x, gChests[i].y, gChests[i].spriteNodeIdx, 0, 255);
             }
         }
     }

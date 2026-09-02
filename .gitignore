@@ -9,6 +9,8 @@ tools/agbcc/
 
 *.dump
 
+*.json
+
 scripts/ida/
 scripts/data/
 data/raw_data

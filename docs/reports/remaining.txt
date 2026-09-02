@@ -1,4 +1,4 @@
-未匹配 456 个
+未匹配 441 个
 
 [code_80002A0] 4
   0x08003958  Chara_SetWalkPath
@@ -6,7 +6,7 @@
   0x080040e4  Party_FollowAnim
   0x0800478c  CutsceneAnim_PlayFrame
 
-[code_8005020] 41
+[code_8005020] 37
   0x08005020  sub_8005020
   0x080052f8  sub_80052F8
   0x080053b4  sub_80053B4
@@ -17,15 +17,11 @@
   0x08007350  sub_8007350
   0x08007adc  sub_8007ADC  ⏸ ⏸ 指令流100%一致剩27B纯home(i/mask,tx/ty/fx,count/j); 候选permuter/su
   0x08008254  ChoiceMenu_HandleInput
-  0x08008620  sub_8008620
   0x08008f28  ChestObjects_LoadForMap  ⏸ ⏸ 2026-09-02 gpnux: 扫描 256×8B 地图宝箱表，装载当前地图至 16 个 gChestObjec
   0x080091c4  sub_80091C4
-  0x080094fc  sub_80094FC
   0x08009600  sub_8009600
-  0x08009f70  sub_8009F70
   0x0800a1b4  sub_800A1B4
   0x0800a3c8  sub_800A3C8
-  0x0800a534  sub_800A534
   0x0800a664  sub_800A664
   0x0800acc8  sub_800ACC8
   0x0800b374  sub_800B374
@@ -51,11 +47,11 @@
 
 [code_8010F10] 43
   0x08010f10  sub_8010F10
-  0x08011268  sub_8011268
+  0x08011268  sub_8011268  ⏸ ⏸ 2026-09-02 opencode: 技能菜单物品页绘制=ClearBuffer(0x02005AA0,8,6)
   0x08011454  sub_8011454
   0x08012530  sub_8012530
   0x08012790  SaveUi_LoadScreen  ⏸ ⏸ 2026-09-02 gpnux: 存档/场景选择 UI 主状态机；扫描 gSaveMapUnlockFlags 并
-  0x08013870  sub_8013870
+  0x08013870  sub_8013870  ⏸ ⏸ 2026-09-02 opencode: 文本块绘制=ClearBuffer内联填0xB001(0x14×0x1E)
   0x08013934  sub_8013934
   0x08013b0c  sub_8013B0C
   0x08013c00  sub_8013C00
@@ -138,7 +134,7 @@
   0x0801f884  sub_801F884
   0x0801fa10  sub_801FA10
   0x0801fab8  sub_801FAB8
-  0x0801febc  sub_801FEBC
+  0x0801febc  sub_801FEBC  ⏸ ⏸ agbcc寄存器home深度分配; 目标value→r3/zero→r3/ptr+0x37→r4 subs复用; 尝
   0x0801ff40  sub_801FF40
   0x080200e8  sub_80200E8
   0x08020228  sub_8020228
@@ -146,7 +142,7 @@
   0x08020648  sub_8020648
   0x08020b54  sub_8020B54  ⏸ ⏸规则17未解: 6字节差纯是三个 sym=0 地址伪寄存器轮换(目标0x714→r5/0x715→r6/0x716→r
 
-[code_8020D50] 26
+[code_8020D50] 25
   0x08021184  sub_8021184  ⏸ ⏸ 头部块b/idx/ptr/val四级home; permuter 905; 见progress
   0x080212b4  sub_80212B4
   0x0802151c  sub_802151C
@@ -168,13 +164,12 @@
   0x08024940  sub_8024940
   0x08025518  sub_8025518
   0x08025650  sub_8025650
-  0x080256e4  sub_80256E4
   0x080257d8  sub_80257D8
   0x08025994  sub_8025994
   0x08025da8  sub_8025DA8
   0x080260bc  sub_80260BC
 
-[code_80264C0] 148
+[code_80264C0] 147
   0x080264c0  sub_80264C0
   0x0802698c  sub_802698C
   0x08026d08  sub_8026D08
@@ -286,7 +281,6 @@
   0x080393e0  sub_80393E0
   0x08039724  sub_8039724
   0x08039c38  sub_8039C38  ⏸ ⏸ .s被跳转表截断, 需先补全反汇编
-  0x08039c6c  sub_8039C6C
   0x0803a478  sub_803A478
   0x0803a8d0  sub_803A8D0
   0x0803af60  sub_803AF60
@@ -324,7 +318,7 @@
   0x08043b5c  sub_8043B5C
   0x08043f90  sub_8043F90
 
-[code_8044394] 118
+[code_8044394] 109
   0x080445e8  sub_80445E8
   0x0804473c  sub_804473C
   0x080448a8  sub_80448A8
@@ -374,7 +368,7 @@
   0x08048690  sub_8048690
   0x080488cc  sub_80488CC
   0x08048c30  sub_8048C30
-  0x08048c80  sub_8048C80
+  0x08048c80  sub_8048C80  ⏸ ⏸概率判定, 语义全解: threshold=switch(arg0[0xAB]{2→5,3→0x14,5→0xa,el
   0x08048da4  sub_8048DA4
   0x08048f0c  sub_8048F0C
   0x08048fb8  sub_8048FB8
@@ -410,19 +404,10 @@
   0x0804bdd8  sub_804BDD8
   0x0804be90  sub_804BE90  ⏸ ⏸ 已定性=global-alloc域(qtydump: 14 qty最长life仅8, 2块0qty, 基址vs-1谁
   0x0804bf14  sub_804BF14
-  0x0804c728  sub_804C728
-  0x0804c78c  sub_804C78C
   0x0804c890  sub_804C890  ⏸ ⏸ movs r1,#0被外提到r7; long long阻外提仍差1条调度; 75分
-  0x0804c8e0  sub_804C8E0
-  0x0804c9b4  sub_804C9B4
   0x0804cee0  sub_804CEE0
-  0x0804d0f8  sub_804D0F8
-  0x0804d1b4  sub_804D1B4
-  0x0804d260  sub_804D260
-  0x0804d310  sub_804D310
-  0x0804d3a0  sub_804D3A0
-  0x0804d44c  sub_804D44C
-  0x0804d4fc  sub_804D4FC
+  0x0804d310  sub_804D310  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(D260孪生无switch, 死存储obj[0xBC]=0
+  0x0804d4fc  sub_804D4FC  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(switch((s8)obj[0xBC]) case1: 
   0x0804d5b4  sub_804D5B4
   0x0804d708  sub_804D708
   0x0804d798  sub_804D798
@@ -438,7 +423,7 @@
   0x0804e0e4  sub_804E0E4
   0x0804e2ac  sub_804E2AC
   0x0804e6dc  sub_804E6DC
-  0x0804e7ec  sub_804E7EC
+  0x0804e7ec  sub_804E7EC  ⏸ ⏸规则17类寄存器轮换: 语义全解(obj 双字段 0x91/0x92 各过 sub_804DD90(,6) 判定→r6
   0x0804e85c  sub_804E85C
   0x0804e9dc  sub_804E9DC
   0x0804ec04  sub_804EC04
@@ -452,7 +437,7 @@
   0x0804f7f8  sub_804F7F8
   0x0804f8d8  sub_804F8D8
   0x0804f974  sub_804F974
-  0x0804fa04  sub_804FA04
+  0x0804fa04  sub_804FA04  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(条件跳转opcode: 循环测event/switch f
   0x0804fa94  sub_804FA94
   0x0804fb24  sub_804FB24
   0x0805008c  sub_805008C

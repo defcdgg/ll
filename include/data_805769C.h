@@ -74,7 +74,7 @@ typedef struct{
 
 extern const CutsceneAnimConfig gCutsceneAnimConfigTable[];
 
-extern const u16 gUnk_08059794[];
+extern const u16 gFacingEventOffsets[];
 
 // extern const u8 unk_80A1314[];
 
@@ -215,6 +215,18 @@ extern const MapSceneDescriptor gMapSceneDescriptors[];
 /* 场景选择项对应的存档解锁标志编号表 (0x08089B90)，前 49 项由存档 UI
  * 扫描，末尾 3 个零为表尾填充。 */
 extern const u8 gSaveMapUnlockFlags[];
+
+/* 地图视口边界表 (0x08089BC4): 每项对应一个移动命令集。
+ * 四个值均以 64 像素为单位，依次为摄像机 X/Y 最小坐标和地图宽/高。 */
+typedef struct
+{
+    /* 0x00 */ u8 cameraMinXBlocks;
+    /* 0x01 */ u8 cameraMinYBlocks;
+    /* 0x02 */ u8 mapWidthBlocks;
+    /* 0x03 */ u8 mapHeightBlocks;
+} MapViewportBounds;
+
+extern const MapViewportBounds gMapViewportBoundsTable[290];
 
 /* 数字字体 OBJ 调色板 (0x08088C00): 2 组 × 16 色 BGR555，分别装入 OBJ
  * 调色板槽 14 和 15；LoadDigitFontObjTiles 从每组起始处 DMA 0x20 字节。 */

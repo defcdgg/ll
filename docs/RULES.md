@@ -48,9 +48,11 @@
     (beq 正跳转进 case 体), 而 if/else-if 生成 bne 跳过形状 —— 目标是 beq 链时改写 switch
     (sub_802093C 案例)。case 体只算地址/赋公共变量, store 放 switch 后, 载入值用命名临时
     (new_var) 才能落在独立寄存器
-17. **三个连续 `sym = 0` 字节存储的寄存器轮换未解**: sub_8020B54 目标把三个地址分配成
+17. **三个连续 `sym = 0` 字节存储的寄存器轮换未解 → 已解**: sub_8020B54 目标把三个地址分配成
     r5/r6/r4 (池序不变), 任何语句顺序变体都得到 r4/r5/r6; agbcc local_alloc 按 QTY_CMP_PRI
-    (=floor_log2(n_refs)*n_refs*size/life) 排序, 全 0 权重按 qty 序 —— 待用 m2c/其他写法再攻
+    (=floor_log2(n_refs)*n_refs*size/life) 排序, 全 0 权重按 qty 序。
+    ✅ **2026-09-02 解**: `do { gUnk_03000716 = 0; } while (0);` 屏障 (规则 113) 打破等优先级 tiebreak,
+    最后一条 strb 的 qty 因屏障多一条 insn 的 life 变化, 权重不再相等, 分配轮换归位。
 18. **permuter 高分解可能语义错误**: 置换可能把索引换成别的变量/把加法挪过分支,
     分数低但行为错 (案例: sub_8053138 的 70 分版用检查字节当索引、sub_805321C 的 45 分版
     在 if 路径引用未初始化 r6)。凡 permuter 改动过数据流的解, 合入前必须人工核对每条访存
@@ -787,7 +789,18 @@
       测试界本身, 回边 `cmp count,i; bhi`, 循环体无前跳即 do-while 风格), 写成 `count > i`:
       `for (i=0; count>i; i++)` 会触发循环旋转, guard 变 `cmp count,#0` —— 逐字节命中。
       判定: 目标循环入口前有 `cmp <界>,#0; bls/bhi` 且回边是 `<界> <循环变量>` 方向。
-      关联: 规则 115 (界表达式顺序), 规则 3 (分支极性)。
+       关联: 规则 115 (界表达式顺序), 规则 3 (分支极性)。
+
+116. **三个及以上等权重 RAM 地址复位 (`=0`) 卡寄存器轮换时, 用 `do { X = 0; } while (0);` 屏障包住其中一个, 打破 local_alloc 的平手 tiebreak**（案例 `sub_8020B54`, 2026-09-02）。
+     QTY_CMP_PRI 全等 (n_refs=2/size=4/life=30) 的三个地址伪寄存器, 平手时按 qty 号小者先拿
+     r4/r5/r6, 目标却是 r5/r6/r4 轮换 —— 之前穷举 40+ 写法 (语句序/链式/指针/类型) 全撞 6B 地板。
+     给**最后一条**存储加 `do { } while (0)` 屏障后, 该 qty 因屏障多包一条 insn, life 微变,
+     权重不再全等, qsort 次序翻转, 三条 ldr + 三条 strb 全部归位, 逐字节命中 (fncheck OK, 60B)。
+     **注意**: 屏障必须只包**最后一个** `=0` (包中间的会把中间 qty 单独拎出, 反而破坏存储序)。
+     判定: 目标三条 strb 顺序 714,715,716 而 C 得 714,716,715 (链式) / r4,r5,r6 (散写) 时,
+     先试"最后一个存储加 do-while 屏障", 比链式赋值更精准 —— 链式还会搅乱池序 (规则 110)。
+     关联: 规则 17 (同题已解)、规则 25 (do-while 屏障定槽)、规则 110 (链式=地址伪寄存器压缩)。
+
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 
@@ -1055,6 +1068,29 @@ arm-none-eabi-ld -r -T /tmp/wrap.ld /tmp/b1.o -o baserom.o
 见规则 29。典型现象: diff.py 逐行全绿但 score=400~600,
 差异行集中在池常量地址(被 objdump 解码成 `movs r0, r0` 之类的假指令)。
 用部分链接 + cmp 一次就能定性, 别去调写法。
+
+### 10. 分节注释 `/* ==== 标题 ====` 漏写 `*/` → 吞掉紧跟的那一行 extern
+
+`iwram.h` 里追加的 `/* ==== 视口/摄像机滚动 ... ====` 没有闭合, C 注释在**下一个** `*/`
+处才结束 —— 也就是下一行 `extern s16 gCameraMinY;        /* 0x0300464C ... */` 的**行尾注释符**
+把它关掉, 于是 `extern` 声明整行被注释掉, 使用者报 `'gCameraMinY' undeclared`。
+症状: 只有紧跟分节标题的**第一行**声明消失, 后面的都正常 → 极易误判成"谁删了声明"。
+
+→ 分节标题一律写 `/* ==== 标题 ==== */`; 排查用注释配对扫描:
+```bash
+python3 -c "import glob
+for f in glob.glob('include/*.h')+glob.glob('src/*.c'):
+    s=open(f,errors='replace').read(); i=0
+    while True:
+        a=s.find('/*',i)
+        if a<0: break
+        b=s.find('*/',a+2)
+        if b<0: print(f,'UNTERMINATED line',s[:a].count(chr(10))+1); break
+        i=b+2"
+```
+→ 同一坑的另一面: 往已被 `#include` 的头文件里搬 typedef/extern 时, 必须**同时删掉** .c 里的
+本地重复声明 (agbcc 对 typedef 重复报 `conflicting types` 且是**错误**), 且要逐字段核对
+两边布局一致再删, 否则改了类型 = 改了 codegen。
 
 ## 工具与命令补充 (速查见 AGENTS.md §4)
 | 工具 | 位置 | 用途 |

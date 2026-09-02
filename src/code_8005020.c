@@ -1,4 +1,5 @@
 #include "code_0.h"
+#include "data_805769C.h"
 #include "gba/defines.h"
 #include "gba/gba.h"
 #include "gba/macro.h"
@@ -230,27 +231,7 @@ void BgMap_FillPattern(u16 arg0)
 extern u8* gUnk_087EA020[];
 extern u8 gUnk_082893EC[][0x140];
 
-typedef struct
-{
-    u8 bgLoadMode;
-    u8 gfxSetId;
-    u8 hBlankMode;
-    u8 sceneSubState;
-    u8 bgScrollMode;
-    u8 reserved_5;
-    u8 menuEntitySetId;
-    u8 spriteAnimSetId;
-    u8 bg3Mode;
-    u8 npcSlotGroupId;
-    u8 bg2Mode;
-    u8 sceneFlag;
-    u16 collisionTileMax;
-    u16 tilemapId;
-    u16 tileSetId;
-    u16 bgPaletteId;
-} MapSceneDescriptor;
-
-extern const MapSceneDescriptor gMapSceneDescriptors[];
+/* MapSceneDescriptor / gMapSceneDescriptors 见 include/data_805769C.h */
 
 extern u8* gUnk_087E9AA0[];
 
@@ -704,14 +685,14 @@ void Logo_LoadAssets(u8 arg0)
         gUnk_0300000A[1] = 0;
     }
 }
-extern u8 gChoiceDataBase[];
+/* gChoiceDataBase 声明见 include/data_805769C.h (const u8[]) */
 
 u32 sub_8008124(void)
 {
     u8 *p;
     u8 i;
 
-    p = gChoiceDataBase;
+    p = (u8 *)gChoiceDataBase;
     /* 跳过 gChoiceGroupIdx 组记录: 每组含两个以 0xFF 结尾的字段 */
     for (i = 0; i != gChoiceGroupIdx; i = (u8)(i + 1))
     {
@@ -782,7 +763,50 @@ void BattleIntro_Cursor(void)
     }
 }
 INCLUDE_ASM("asm/nonmatchings", ChoiceMenu_HandleInput);
-INCLUDE_ASM("asm/nonmatchings", sub_8008620);
+/* Select one of the 88 portrait assets and seed its 8x8 dialogue tilemap. */
+void DialogPortrait_Set(u8 portraitId, u8 position)
+{
+    u16 *dst;
+    u16 tile;
+    u16 row;
+    u16 offset;
+    u16 col;
+
+    if (portraitId != 0)
+    {
+        if (portraitId > 0x58)
+            portraitId = 0;
+        portraitId--;
+        gPendingPortraitSlot = position + 1;
+        gPendingPortraitGfx = (u8 *)gDialogPortraitGfxTable[portraitId];
+        gPendingPortraitPalette = (u16 *)&gDialogPortraitPalettes[gDialogPortraitPaletteIds[portraitId] * 16];
+        if (position & 2)
+            tile = 0xF2C0;
+        else
+            tile = 0xE280;
+        dst = (u16 *)gDialogPortraitTilemapPtrs[position];
+        offset = 0;
+        for (row = 0; row < 8; row++)
+        {
+            for (col = 0; col < 8; col++)
+            {
+                *dst++ = tile + offset;
+                offset++;
+            }
+            dst += 0x18;
+        }
+        return;
+    }
+
+    dst = (u16 *)gDialogPortraitTilemapPtrs[position];
+    for (row = 0; row < 8; row++)
+    {
+        for (col = 0; col < 8; col++)
+            *dst++ = 0;
+        dst += 0x18;
+    }
+    gPendingPortraitSlot = 0;
+}
 
 void sub_80086FC(void)
 {
@@ -979,25 +1003,15 @@ void BgTiles_LoadUiSet(u8 arg0)
 
     nullsub_5();
 }
-/* BG 滚动/窗口参数表 (0x08089BC4): 每场景一条 {a,b,c,d},
- * a<<6 → 0x03004650, b<<6 → 0x0300464C, 0x030047C4 = a<<6 + c<<6, 0x030047EC = b<<6 + d<<6 */
-typedef struct{
-    u8 field_0;
-    u8 field_1;
-    u8 field_2;
-    u8 field_3;
-}Unk_08089BC4;
-extern const Unk_08089BC4 gUnk_08089BC4[];
-
 void BgScroll_LoadFromTable(u16 arg0) {
 
-    gUnk_03004650 = gUnk_08089BC4[arg0].field_0 << 6;
+    gCameraMinX = gMapViewportBoundsTable[arg0].cameraMinXBlocks << 6;
 
-    gUnk_0300464C = gUnk_08089BC4[arg0].field_1 << 6;
+    gCameraMinY = gMapViewportBoundsTable[arg0].cameraMinYBlocks << 6;
 
-    gUnk_030047C4 = gUnk_03004650 + (gUnk_08089BC4[arg0].field_2 << 6);
+    gMapWidthPx = gCameraMinX + (gMapViewportBoundsTable[arg0].mapWidthBlocks << 6);
 
-    gUnk_030047EC = gUnk_0300464C + (gUnk_08089BC4[arg0].field_3 << 6);
+    gMapHeightPx = gCameraMinY + (gMapViewportBoundsTable[arg0].mapHeightBlocks << 6);
 }
 void PlayerSheets_Load(void)
 {
@@ -1255,7 +1269,51 @@ void MapBg_FlushPending(void)
     }
 }
 /* 按当前地图从 0x08088400 的 256 项表中装载宝箱对象；见 ChestMapEntry。 */
-INCLUDE_ASM("asm/nonmatchings", ChestObjects_LoadForMap);
+void Chest_LoadForMap(u8 mapId)
+{
+    u8 slot;
+    u8 recordIndex;
+    const ChestMapEntry *entry;
+    Chest *chest;
+    Chest *chestBase;
+    u8 flags;
+
+    slot = 0;
+    recordIndex = 0;
+    entry = gChestSpawnTable;
+    while (1)
+    {
+        if (mapId == entry->mapId)
+        {
+            chestBase = gChests;
+            chest = &chestBase[slot];
+            chest->mapEntryIndex = recordIndex;
+            chest->x = entry->tileX << 3;
+            chest->y = (entry->tileY << 3) + 8;
+            chest->interactionId = entry->itemId;
+            flags = gChestFlags[recordIndex >> 3];
+            chest->flags = (flags >> (recordIndex & 7)) & 1;
+            if (entry->specialFlag != 0)
+                chest->flags |= 0x80;
+            Chest_BuildSprite(slot);
+            slot++;
+        }
+
+        entry++;
+        if (recordIndex == 0xFF)
+            break;
+        recordIndex++;
+        if (slot > 0xF)
+            break;
+    }
+
+    while (slot <= 0xF)
+    {
+        gChests[slot].flags |= 0xFF;
+        gChests[slot].spriteNodeIdx = 0;
+        slot++;
+    }
+}
 void Chest_BuildSprite(u8 arg0)
 {
     struct SpriteNode *sprNode;
@@ -1267,12 +1325,12 @@ void Chest_BuildSprite(u8 arg0)
     u16 attr2;
 
     objIdx = Sprite_AllocNode();
-    gChestObjects[arg0].sprNodeIdx = objIdx;
+    gChests[arg0].spriteNodeIdx = objIdx;
     sprNode = &gSpriteNodePool[objIdx];
 
-    chestColor = 0x80 & gChestObjects[arg0].field_0 ? 0xF : 0xE;
+    chestColor = 0x80 & gChests[arg0].flags ? 0xF : 0xE;
 
-    if ((0x7F & gChestObjects[arg0].field_0) == 0)
+    if ((0x7F & gChests[arg0].flags) == 0)
     {
 
         attr0 = 0;
@@ -1306,7 +1364,7 @@ void Chest_Open(u8 arg0)
 {
     u8 idx;
 
-    if (gChestObjects[arg0].field_0 & 1)
+    if (gChests[arg0].flags & 1)
     {
         Sfx_Play(9, 0, 0);
     }
@@ -1315,13 +1373,13 @@ void Chest_Open(u8 arg0)
         Sfx_Play(8, 0, 0);
     }
 
-    gChestObjects[arg0].field_0 ^= 1;
+    gChests[arg0].flags ^= 1;
 
-    idx = gChestObjects[arg0].field_1;
+    idx = gChests[arg0].mapEntryIndex;
 
     gChestFlags[idx >> 3] ^= (1 << (idx & 7));
 
-    Sprite_FreeChain(&gSpriteNodePool[gChestObjects[arg0].sprNodeIdx]);
+    Sprite_FreeChain(&gSpriteNodePool[gChests[arg0].spriteNodeIdx]);
     Chest_BuildSprite(arg0);
     gUnk_03004860 = arg0;
 }

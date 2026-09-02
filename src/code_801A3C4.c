@@ -635,7 +635,16 @@ u32 sub_8020B48(void)
 {
     return gUnk_03000718;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8020B54);
+void sub_8020B54(void)
+{
+    u8 i;
+    for (i = 0; i < 7; i++)
+        gUnk_030006F8[i] = 0;
+    gUnk_03000714 = 0;
+    gUnk_03000715 = 0;
+    do { gUnk_03000716 = 0; } while (0);
+}
+
 void sub_8020B90(u8 *arg0) {
     gUnk_030006F8[gUnk_03000714] = arg0;
     gUnk_03000714++;

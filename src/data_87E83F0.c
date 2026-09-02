@@ -729,7 +729,7 @@ const u32 gDialogPortraitTilemapPtrs[] = {0x2005840, 0x200586C, 0x2005B00, 0x200
  * 三张连续的 ROM 指针表。表项写成对目标符号的引用 (重定位), 链接后与原字节完全一致,
  * 好处: 目标资产改名/移动由链接器保证一致, 不再依赖硬写地址。*/
 
-/* 对话框头像 LZ77 图形表 (88 项, 每项解压成 0x800 B), 由 sub_8008620 按索引取用。
+/* 对话框头像 LZ77 图形表 (88 项, 每项解压成 0x800 B), 由 DialogPortrait_Set 按索引取用。
  * 目标资产都在 src/data_805769C.c; 表项写成真重定位, 不再依赖 linker.ld 的绝对符号。*/
 const u32 gDialogPortraitGfxTable[] = {
     (u32)gUnk_080597D8, (u32)gUnk_08059D48, (u32)gUnk_0805A2B4, (u32)gUnk_0805A830,

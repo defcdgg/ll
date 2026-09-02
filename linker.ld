@@ -19,7 +19,7 @@ gUnk_080987C4 = 0x080987C4;
 gUnk_08087648 = 0x08087648;
 gUnk_08088D80 = 0x08088D80;
 gMapSceneDescriptors = 0x08088D80;
-gUnk_08089BC4 = 0x08089BC4;
+gMapViewportBoundsTable = 0x08089BC4;
 gUnk_0808EA0C = 0x0808EA0C;
 gUnk_080BABA0 = 0x080BABA0;
 gUnk_082893EC = 0x082893EC;
@@ -464,7 +464,7 @@ SECTIONS {
         . = 0x00004854; gCameraSnapFlag = .;
         . = 0x00004860; gUnk_03004860 = .;
         . = 0x00004870; gChestFlags = .;
-        . = 0x00004890; gChestObjects = .;
+        . = 0x00004890; gChests = .;
         . = 0x00004910; gUnk_03004910 = .;
         . = 0x00004914; gUnk_03004914 = .;
         . = 0x00004918; gUnk_03004918 = .;

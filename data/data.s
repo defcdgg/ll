@@ -14,11 +14,11 @@
 @	.incbin "baserom.gba", 0x59794, 0x6AF214 - 0x59794
 
 rom_data:
-	/* 0x0808760C..0x08089BC4 (9660 B) 已搬到 src/data_805769C.c:
+	/* 0x0808760C..0x0808A04C (10820 B) 已搬到 src/data_805769C.c:
 	   gCharNameTextBlock_* + gCharaCmdStream_* + gChestSpawnTable +
 	   gDigitFontObjPalettes + gDigitFontObjTiles + gMapSceneDescriptors +
-	   gSaveMapUnlockFlags */
-	.incbin "baserom.gba", 0x89BC4, 0x38EEF4 - 0x89BC4
+	   gSaveMapUnlockFlags + gMapViewportBoundsTable */
+	.incbin "baserom.gba", 0x8A04C, 0x38EEF4 - 0x8A04C
 
 	.global gUnk_0838EEF4
 gUnk_0838EEF4:

@@ -1504,14 +1504,16 @@ permuter 探索出: 把常量 0 存入独立变量 `zero = 0;`, 让指针经 `&g
 
 `0x08088400` 只有一个直接代码引用：`ChestObjects_LoadForMap`（原 `sub_8008F28`，
 0x08008F28）。函数以 `gMapNpcSetId` 为参数，从该地址开始按 8 字节步长扫描 256 条记录；
-首字节相等时依次建立 `gChestObjects[0..15]`，记录序号写入对象的 `field_1`，用于索引
+首字节相等时依次建立 `gChests[0..15]`，记录序号写入对象的 `mapEntryIndex`，用于索引
 `gChestFlags`，坐标半字分别左移 3 后写入对象 `x/y`（Y 额外加 8），并调用
-`Chest_BuildSprite`。未命中的剩余对象被填成 `field_0=0xFF`、`sprNodeIdx=0`。
+`Chest_BuildSprite`。未命中的剩余对象被填成 `flags=0xFF`、`spriteNodeIdx=0`。
 
 表项已确认是 `ChestMapEntry`：`mapId`、`itemId`、`specialFlag`、保留字节、地图 tile
 坐标 `tileX/tileY`。`itemId` 被写入宝箱对象的 `field_3`；`CheckFacingEvent`（原
 `sub_8003F40`）在面向宝箱时返回 `field_3 + 1`，再由探索主循环转换为脚本事件号。
 `specialFlag` 设置对象状态位 7，面向交互时额外要求事件标志 `0x40`。
+
+已将 `ChestObjects_LoadForMap` 还原为 C。逐字节匹配确认：记录扫描确实覆盖索引 0..255，命中项按记录序号写入 `mapEntryIndex`，`tileX/tileY` 分别转换为 `x=tileX<<3`、`y=(tileY<<3)+8`，未使用槽以 `flags|=0xFF`、`spriteNodeIdx=0` 清空；`fncheck` 为 168B OK。
 
 已将 256 × 8B 原始数据结构化写入 `src/data_805769C.c` 的 `gChestSpawnTable`，并将
 `data/data.s` 的连续 blob 起点从 `0x08088400` 调整为 `0x08088C00`。表区与后续 64 字节
@@ -1764,6 +1766,32 @@ QTY_CMP_PRI 完全相等。egcs `local_alloc` 用 **非稳定 qsort** 按优先�
 对当前 qty 数组恰好产出 39→r4,40→r5,41→r6; 目标 ROM 那次编译产出 41→r4,39→r5,40→r6。
 这是**编译器版本/周边 qty 集合的 tiebreak 产物, 无法用等价 C 稳定复现** —— 规则17 判定成立, 继续挂起。
 候选留 `permuter/sub_8020B54/base.c` (6B)。若将来要收: 需改 agbcc local_alloc 的等值排序 (改编译器, 破全局一致性)
+
+## 2026-09-02 `sub_8020B54` 攻破 (do-while 屏障打破 tiebreak, 规则 116)
+
+前一轮 40+ 写法 (语句序/链式/指针/类型) 全撞 6B 地板后, 本轮**只差最后一条 strb 的存储序** (714,716,715 vs 714,715,716):
+
+- **链式赋值突破口**: `gUnk_03000714 = 0; gUnk_03000715 = (gUnk_03000716 = 0);` 让
+  寄存器分配**完全归位** (r5=0x714 / r6=0x715 / r4=0x716, 池序 [714,715,716,6F8] 不变) ——
+  规则 110 的"链式=地址伪寄存器压缩"把三 qty 变成 2 伪寄存器+1 依赖, 平手被打破。
+  但链式把存储序搅成 714,716,715 (链内先存内层), 仍差 2 条 strb 的字节 (4B)。
+- **屏障定序**: 在**最后一个** `=0` 外包 `do { gUnk_03000716 = 0; } while (0);` (规则 25/116),
+  使第三条存储的 qty 多一条 insn 的 life, 权重不再全等 → 分配轮换归位 + 存储序恢复 714,715,716。
+- 最终写法:
+  ```c
+  void sub_8020B54(void) {
+      u8 i;
+      for (i = 0; i < 7; i++) gUnk_030006F8[i] = 0;
+      gUnk_03000714 = 0;
+      gUnk_03000715 = 0;
+      do { gUnk_03000716 = 0; } while (0);
+  }
+  ```
+- 验证: 单函数 .o 与 ROM 0x08020B54..0x2C 逐字节一致 (池区为待解析重定位, 链接后 = ROM 值), fncheck OK (60B), make+sha1 全绿。
+- **教训**: "local_alloc tiebreak 不可控"的结论下早了 —— 平手权重不是只能靠编译器, `do-while` 屏障
+  能让 qty 的 life 差一条 insn, 从而可控地打破平手。规则 116 收编; 规则 17 已改标「已解」。
+- 合入: src/code_801A3C4.c 真 C, functions.tsv status 0→1。
+
 或找到能改变 qty 数组组成又不增删指令的写法 (本轮未找到)。
 
 ## 2026-09-02 `sub_80208A4` 匹配 (obj-kind 分派家族变体, code_801A3C4)
@@ -2246,3 +2274,16 @@ id≤0x1FF 测 EventFlags_Test(id), >0x1FF 测 SwitchFlags_Test(id-0x200); 若�
    permuter 全撞 1475-2050。属调度+寄存器分配耦合, 候选 permuter/sub_804FA04/base.c。
 
 **验证**: 无 (fncheck 未达 0)。
+
+## 2026-09-02 `DialogPortrait_Set` (0x08008620, code_8005020)
+
+按 `scripts/data.json` 地址回溯确认：`0x087E9554` 是 88 项头像图形指针表，
+`0x0808716D` 是头像到调色板的 89 项索引，`0x080798A8` 是 16 色头像调色板，
+`0x087E9818` 是 4 个对话框 tilemap 目标指针。函数的 `portraitId=1..0x58`
+选择资源并设置待上传的图形/调色板，按 `position&2` 选择 `0xE280` 或 `0xF2C0`
+的 tile 起点，写入 8×8 tilemap（行跨度 0x30 字节）；`portraitId=0` 则清空对应窗口。
+反汇编未匹配段已替换为 `DialogPortrait_Set`，220B `fncheck` 通过。
+
+同区域字节边界复核发现：`0x08058864` 的方向映射实际为 24B，`0x0805887C`
+从下一字节开始是独立的 16B OAM tile 数表。修正 `gWalkDirectionMapping` 的 C 定义，
+移除多出的尾部 `0`，使源码与 `data.json` 的 24B/16B 分割一致；`make` 与 SHA1 均通过。

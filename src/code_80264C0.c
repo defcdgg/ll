@@ -120,7 +120,6 @@ INCLUDE_ASM("asm/nonmatchings", sub_80392C0);
 INCLUDE_ASM("asm/nonmatchings", sub_80393E0);
 INCLUDE_ASM("asm/nonmatchings", sub_8039724);
 INCLUDE_ASM("asm/nonmatchings", sub_8039C38);
-INCLUDE_ASM("asm/nonmatchings", sub_8039C6C);
 INCLUDE_ASM("asm/nonmatchings", sub_803A478);
 INCLUDE_ASM("asm/nonmatchings", sub_803A8D0);
 INCLUDE_ASM("asm/nonmatchings", sub_803AF60);

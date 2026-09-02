@@ -138,7 +138,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x08008124	sub_8008124	
 1	thumb	code_8005020	0x080081c0	BattleIntro_Cursor	
 0	thumb	code_8005020	0x08008254	ChoiceMenu_HandleInput	
-0	thumb	code_8005020	0x08008620	sub_8008620	
+1	thumb	code_8005020	0x08008620	DialogPortrait_Set	✅ 2026-09-02 codex: 88项头像资源选择、调色板绑定及4窗口8×8 tilemap初始化; fncheck OK (220B)
 1	thumb	code_8005020	0x080086fc	sub_80086FC	
 1	thumb	code_8005020	0x08008788	IntroBg_Load	
 1	thumb	code_8005020	0x080088b4	ScreenFade_Start	✅ 2026-09-01 codex: 初始化 fade flags、signed step、起始扫描线进度及参数; fncheck 64B OK
@@ -164,7 +164,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x08008df8	AnimSlot_PlayOnce	
 1	thumb	code_8005020	0x08008e44	BgMap_FillRow	
 1	thumb	code_8005020	0x08008e94	MapBg_FlushPending	
-0	thumb	code_8005020	0x08008f28	ChestObjects_LoadForMap	⏸ 2026-09-02 gpnux: 扫描 256×8B 地图宝箱表，装载当前地图至 16 个 gChestObjects；语义已解，待匹配；fncheck OK
+1	thumb	code_8005020	0x08008f28	Chest_LoadForMap	✅ 2026-09-02 codex: 扫描 256×8B gChestSpawnTable，按 mapId 装载对象并补齐 16 槽；fncheck OK (168B)
 1	thumb	code_8005020	0x08008fd0	Chest_BuildSprite	
 1	thumb	code_8005020	0x0800908c	Chest_Open	
 1	thumb	code_8005020	0x08009114	LoadDigitFontObjTiles	
@@ -515,7 +515,7 @@ status	isa	module	addr	name	note
 1	thumb	code_801A3C4	0x08020ae4	sub_8020AE4	
 1	thumb	code_801A3C4	0x08020b04	sub_8020B04	
 1	thumb	code_801A3C4	0x08020b48	sub_8020B48	
-0	thumb	code_801A3C4	0x08020b54	sub_8020B54	⏸规则17未解: 6字节差纯是三个 sym=0 地址伪寄存器轮换(目标0x714→r5/0x715→r6/0x716→r4, 池序与我的r4/r5/r6一致, 只差3条ldr+3条strb的dest reg); ~40种写法(循环for/while/do/!=/递减、6种存储序、提前算地址的指针局部、u8*/u32/void*类型、加删局部改regno)全部稳定给r4/r5/r6; egcs把提前指针copy-prop回原位; agbcc -dl 显示 reg39/40/41 统计完全相同(n_refs=2,pri相等)→local_alloc qsort 对等优先级 tiebreak 产物, 非语句序可控; 候选 permuter/sub_8020B54/base.c(6B差)
+1	thumb	code_801A3C4	0x08020b54	sub_8020B54	✅ 2026-09-02 opencode: do-while(0)屏障打破local_alloc tiebreak(RULES 25+110); fncheck OK
 1	thumb	code_801A3C4	0x08020b90	sub_8020B90	
 1	thumb	code_801A3C4	0x08020bc0	sub_8020BC0	
 1	thumb	code_801A3C4	0x08020bf0	sub_8020BF0	

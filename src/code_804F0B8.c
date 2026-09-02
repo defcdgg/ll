@@ -243,6 +243,45 @@ void Script_ResetVM(void)
 INCLUDE_ASM("asm/nonmatchings", sub_80525E8);
 INCLUDE_ASM("asm/nonmatchings", sub_80526A0);
 
+// 脚本 VM 启动/跳转: 按 arg1 模式设置脚本指针 gUnk_03000E6C, 然后清局部槽并置运行标志。
+//   arg1==2 -> 跳到脚本区第 arg0 项入口 (gUnk_02016200 + gUnk_02016000[arg0])
+//   arg1==3 -> 保持脚本指针不变
+//   其它    -> 复位到脚本区基址 gUnk_02016200
+// 之后把 8 个 u16 局部槽 (gUnk_03000ED8) 全置 0xFFFF, 置运行标志 bit0, 清 gUnk_03000E72。
+// void sub_80526A0(u8 arg0, u8 arg1)
+// {
+//     u8 i;
+//     u16 mask = 0xFFFF;
+
+//     if (arg1 != 2)
+//     {
+//         if (arg1 <= 2)
+//         {
+//             gUnk_03000E6C = (u32)gUnk_02016200;
+//         }
+//         else if (arg1 == 3)
+//         {
+//         }
+//         else
+//         {
+//             gUnk_03000E6C = (u32)gUnk_02016200;
+//         }
+//     }
+//     else
+//     {
+//         gUnk_03000E6C = (u32)(gUnk_02016200 + gUnk_02016000[arg0]);
+//     }
+
+//     for (i = 0; i <= 7; i++)
+//     {
+//         u16 v = ((u16 *)&gUnk_03000ED8)[i];
+//         v |= mask;
+//         ((u16 *)&gUnk_03000ED8)[i] = v;
+//     }
+//     gUnk_03000E70 |= 1;
+//     gUnk_03000E72 = 0;
+// }
+
 void Script_Abort(u8 arg0)
 {
 
@@ -259,7 +298,7 @@ void Script_Abort(u8 arg0)
     }
 }
 
-extern u32 gUnk_087ED904[];
+extern u8 *gUnk_087ED904[];
 
 /* 注意: 原代码里这个 if 是个空转 —— 两个分支结果都是 arg0 = 0。
  * 不能删: 删了 GCC2 就不会生成 cmp/beq + movs 这三条,

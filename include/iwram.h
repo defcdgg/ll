@@ -330,7 +330,7 @@ extern u32 gIntrMainBuf[512];
  * (RPG 属性在另一个结构体 PlayerStats @0x40, 含 lv/hp/atc/skills/equip_slotN),
  * 而是脚本可寻址的**可绘制实体**: 玩家/NPC/宝箱/对话箭头/特效/敌人共用同一格式。
  *   证据: gActors[data[1]] 直接由脚本 opcode 参数索引 (src/code_804F0B8.c);
- *         宝箱用 gChestObjects[i].x/.y/.sprNodeIdx; 特效/箭头各占一个固定槽 (见下方槽位图)。
+ *         宝箱用 gChests[i].x/.y/.spriteNodeIdx; 特效/箭头各占一个固定槽 (见下方槽位图)。
  * 字段构成 = 位置 + 朝向 + 动画 + 调色板 + 精灵链句柄, 无一项是 RPG 数值。
  */
 typedef struct
@@ -752,15 +752,15 @@ extern u8 gChestFlags[32];
 
 typedef struct
 {
-    u8 field_0;
-    u8 field_1;
-    u8 sprNodeIdx;
-    u8 field_3;
+    u8 flags;          /* bit0 = opened; bit7 = special chest gate */
+    u8 mapEntryIndex;  /* index into gChestFlags */
+    u8 spriteNodeIdx;  /* head of the chest's sprite chain */
+    u8 interactionId;  /* item/script interaction identifier */
     u16 x;
     u16 y;
-} ChestObject;
+} Chest;
 
-extern ChestObject gChestObjects[16];
+extern Chest gChests[16];
 
 extern u8 gUnk_03004910;
 extern u8 gMapObjGfxSetId;
@@ -931,7 +931,7 @@ typedef struct SaveInfo
     /** 0x15F6 */ u8 field_030025B0; // 1
     /** 0x15F7 */ u8 field_03004A88[6]; // 6
     /** 0x15FD */ u8 field_03004870[32]; // 0x20
-    /** 0x161D */ ChestObject field_03004890[16]; // 0x80 (16 * 8)
+    /** 0x161D */ Chest chests[16]; // 0x80 (16 * 8)
     /** 0x169D */ u8 field_03004670[12]; // 0xC
     /** 0x16A9 */ u8 field_030047D0[12]; // 0xC
     /** 0x16B5 */ u8 field_03004850; // 1
@@ -939,7 +939,7 @@ typedef struct SaveInfo
 } SaveInfo; // 总大小: 0x16B7 字节
 
 
-/* ==== 视口/摄像机滚动 (Viewport_UpdateScroll, 原 sub_8005C70) ====
+/* ==== 视口/摄像机滚动 (Viewport_UpdateScroll, 原 sub_8005C70) ==== */
 extern s16 gCameraMinY;        /* 0x0300464C: 摄像机 Y 下界 */
 extern s16 gCameraMinX;        /* 0x03004650: 摄像机 X 下界 */
 extern u8  gDrawCamEaseActive; /* 0x03004680: 缓动进行中; gDrawCamY += gScrollEaseDeltas[gDrawCamX++] */
@@ -949,7 +949,7 @@ extern u16 gMapWidthPx;        /* 0x030047C4: 地图宽(像素); 摄像机 X 上
 extern u16 gMapHeightPx;       /* 0x030047EC: 地图高(像素); 摄像机 Y 上界 = 本值 - 160 */
 
 
-/* ==== 分层选项数据库 (gChoiceDataBase @0x080876A2) ====
+/* ==== 分层选项数据库 (gChoiceDataBase @0x080876A2) ==== */
 /* 组/子组索引 -> 一个 0xFF 结尾的选项列表; 见 ChoiceMenu_BuildList / ChoiceMenu_HandleInput */
 extern u8  gChoiceGroupIdx;  /* 0x030047BC */
 extern u8  gChoiceSubIdx;    /* 0x030047E0 */
@@ -992,7 +992,7 @@ typedef struct
 } EnemyCharaStat;
 extern const EnemyCharaStat gCharaBaseData[];
 
-/* ==== 视口/摄像机滚动 (Viewport_UpdateScroll, 原 sub_8005C70) ====
+/* ==== 视口/摄像机滚动 (Viewport_UpdateScroll, 原 sub_8005C70) ==== */
 extern s16 gCameraMinY;        /* 0x0300464C: 摄像机 Y 下界 */
 extern s16 gCameraMinX;        /* 0x03004650: 摄像机 X 下界 */
 extern u8  gDrawCamEaseActive; /* 0x03004680: 缓动进行中; gDrawCamY += gScrollEaseDeltas[gDrawCamX++] */
@@ -1002,7 +1002,7 @@ extern u16 gMapWidthPx;        /* 0x030047C4: 地图宽(像素); 摄像机 X 上
 extern u16 gMapHeightPx;       /* 0x030047EC: 地图高(像素); 摄像机 Y 上界 = 本值 - 160 */
 
 
-/* ==== 分层选项数据库 (gChoiceDataBase @0x080876A2) ====
+/* ==== 分层选项数据库 (gChoiceDataBase @0x080876A2) ==== */
 /* 组/子组索引 -> 一个 0xFF 结尾的选项列表; 见 ChoiceMenu_BuildList / ChoiceMenu_HandleInput */
 extern u8  gChoiceGroupIdx;  /* 0x030047BC */
 extern u8  gChoiceSubIdx;    /* 0x030047E0 */

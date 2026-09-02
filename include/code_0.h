@@ -139,8 +139,7 @@ void Logo_LoadAssets(u8);
 u32 sub_8008124();  // 返回类型非 void 但体内无 return —— 原 ROM 即如此(占住 r0 使寄存器整体上移)
 void BattleIntro_Cursor();
 void ChoiceMenu_HandleInput(u16);
-void sub_8008620(u8 portraitId, u8 position);
-#define DialogPortrait_Set sub_8008620
+void DialogPortrait_Set(u8 portraitId, u8 position);
 void sub_80086FC();
 void IntroBg_Load(u8);
 void ScreenFade_Start(u16, s16, s16);
@@ -170,7 +169,7 @@ void BgPal_ResetFirst();
 void AnimSlot_PlayOnce(u16, u8 *);
 void BgMap_FillRow(u8);
 void MapBg_FlushPending();
-void ChestObjects_LoadForMap(u8);
+void Chest_LoadForMap(u8);
 void Chest_BuildSprite(u8);
 void Chest_Open(u8);
 void LoadDigitFontObjTiles();   // 10 个数字字形 → OBJ 图块槽 150, + 2 组 OBJ 调色板

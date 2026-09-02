@@ -25,37 +25,37 @@
   "size": 1112
  },
  {
-  "name": "gUnk_0805881C",
+  "name": "gWalkMoveDirLut",
   "address": "0x0805881C",
   "size": 16
  },
  {
-  "name": "byte_805882C",
+  "name": "gWalkAnimFrameMapping",
   "address": "0x0805882C",
   "size": 8
  },
  {
-  "name": "byte_8058834",
+  "name": "gWalkAnimDimTable",
   "address": "0x08058834",
   "size": 48
  },
  {
-  "name": "byte_8058864",
+  "name": "gWalkDirectionMapping",
   "address": "0x08058864",
   "size": 24
  },
  {
-  "name": "byte_805887C",
+  "name": "gSpriteTileCountTable",
   "address": "0x0805887C",
   "size": 16
  },
  {
-  "name": "word_805888C",
+  "name": "gCutsceneAnimConfigTable",
   "address": "0x0805888C",
   "size": 3848
  },
  {
-  "name": "word_8059794",
+  "name": "gFacingEventOffsets",
   "address": "0x08059794",
   "size": 68
  },
@@ -500,7 +500,7 @@
   "size": 1556
  },
  {
-  "name": "unk_80798A8",
+  "name": "gDialogPortraitPalettes",
   "address": "0x080798A8",
   "size": 932
  },
@@ -755,9 +755,14 @@
   "size": 129
  },
  {
-  "name": "unk_808716D",
+  "name": "gDialogPortraitPaletteIds",
   "address": "0x0808716D",
-  "size": 89
+  "size": 88
+ },
+ {
+  "name": "gDialogPortraitPaletteIdsPadding",
+  "address": "0x080871C5",
+  "size": 1
  },
  {
   "name": "word_80871C6",
@@ -772,7 +777,12 @@
  {
   "name": "gBgPalBackdropWhite",
   "address": "0x08087216",
-  "size": 6
+  "size": 2
+ },
+ {
+  "name": "gBgPalBackdropPadding",
+  "address": "0x08087218",
+  "size": 4
  },
  {
   "name": "unk_808721C",
@@ -1305,7 +1315,7 @@
   "size": 52
  },
  {
-  "name": "unk_8089BC4",
+  "name": "gMapViewportBoundsTable",
   "address": "0x08089BC4",
   "size": 1160
  },
@@ -20515,7 +20525,7 @@
   "size": 88
  },
  {
-  "name": "off_87E9554",
+  "name": "gDialogPortraitGfxTable",
   "address": "0x087E9554",
   "size": 352
  },
@@ -20530,7 +20540,7 @@
   "size": 336
  },
  {
-  "name": "dword_87E9818",
+  "name": "gDialogPortraitTilemapPtrs",
   "address": "0x087E9818",
   "size": 16
  },

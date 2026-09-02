@@ -9,6 +9,7 @@
 extern struct MusicPlayerInfo *gMPlayInfos2[];
 extern struct SongHeader *gSongHeaderTable[];
 
+// @ 0x080533F0
 void SoundMain_Frame(void)
 {
     u16 volume;
@@ -43,6 +44,7 @@ void SoundMain_Frame(void)
     SoundTracks_Frame();
 }
 
+// @ 0x080534B4
 void SoundTracks_Frame(void)
 {
     u8 i;
@@ -77,6 +79,7 @@ void SoundTracks_Frame(void)
     }
 }
 
+// @ 0x0805359C
 void Sound_Init()
 {
     m4aSoundInit();
@@ -89,23 +92,27 @@ void Sound_Init()
     gSfxTrackFadeBits = 0;
 }
 
+// @ 0x080535E8
 u16 Sound_GetFlags(void)
 {
     return gSoundTaskFlags;
 }
 
+// @ 0x080535F4
 void Sound_VSyncOff(void)
 {
     m4aSoundVSyncOff();
     gSoundTaskFlags |= 1;
 }
 
+// @ 0x0805360C
 void Sound_VSyncOn(void)
 {
     m4aSoundVSyncOn();
     gSoundTaskFlags &= 0xFFFE;
 }
 
+// @ 0x08053628
 void Bgm_Play(u8 arg0, u16 arg1)
 {
     gPlayingSongId = arg0;
@@ -126,11 +133,13 @@ void Bgm_Play(u8 arg0, u16 arg1)
     Bgm_SetVolume(arg1);
 }
 
+// @ 0x08053688
 void Bgm_Stop(void)
 {
     m4aSongNumStop(gPlayingSongId);
 }
 
+// @ 0x0805369C
 void Bgm_SetVolume(u16 volume)
 {
 
@@ -142,6 +151,7 @@ void Bgm_SetVolume(u16 volume)
     m4aMPlayVolumeControl((struct MusicPlayerInfo *)0x03005AB0, 0xFF, volume);
 }
 
+// @ 0x080536C0
 void Bgm_FadeIn(u8 arg0)
 {
     gFadeFromVolume = 0;
@@ -150,6 +160,7 @@ void Bgm_FadeIn(u8 arg0)
     gSoundTaskFlags |= 2;
 }
 
+// @ 0x080536EC
 void Bgm_FadeOut(u8 arg0)
 {
     gFadeFromVolume = gBgmVolume;
@@ -158,16 +169,19 @@ void Bgm_FadeOut(u8 arg0)
     gSoundTaskFlags |= 4;
 }
 
+// @ 0x08053720
 void Bgm_Continue(void)
 {
     m4aSongNumContinue(gPlayingSongId);
 }
 
+// @ 0x08053734
 u8 Sfx_TrackBusy(u8 arg0)
 {
     return (gSfxTrackActiveBits >> arg0) & 1;
 }
 
+// @ 0x0805374C
 void Sfx_Play(u16 arg0, u8 arg1, u8 arg2)
 {
     MPlayStart(gMPlayInfos2[arg1], gSongHeaderTable[arg0]);
@@ -180,6 +194,7 @@ void Sfx_Play(u16 arg0, u8 arg1, u8 arg2)
     gSfxTrackLoopBits |= arg2 << arg1;
 }
 
+// @ 0x080537C0
 void Sfx_PlayFade(u16 arg0, u8 arg1)
 {
     MPlayStart(gMPlayInfos2[arg1], gSongHeaderTable[arg0]);
@@ -193,6 +208,7 @@ void Sfx_PlayFade(u16 arg0, u8 arg1)
     m4aMPlayFadeOutTemporarily((struct MusicPlayerInfo *)0x03005AB0, 2);
 }
 
+// @ 0x08053838
 void Sfx_StopTrack(u8 arg0)
 {
     m4aMPlayStop(gMPlayInfos2[arg0]);
@@ -205,6 +221,7 @@ void Sfx_StopTrack(u8 arg0)
     }
 }
 
+// @ 0x08053884
 s32 Sfx_GetLoopFlag(u8 arg0)
 {
     return (gSfxTrackLoopBits >> arg0) & 1;

@@ -11,6 +11,7 @@
 
 INCLUDE_ASM("asm/nonmatchings", sub_801A3C4);
 INCLUDE_ASM("asm/nonmatchings", sub_801A5EC);
+// @ 0x0801A684
 void sub_801A684(u8 *arg0)
 {
     u32 data;
@@ -64,6 +65,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_801B570);
 
 INCLUDE_ASM("asm/matchings", sub_801B688);
 
+// @ 0x0801B760
 void sub_801B760(u16 arg0)
 {
     if (sub_801B790(arg0) != 0)
@@ -73,11 +75,13 @@ void sub_801B760(u16 arg0)
     gObjFlagsA[arg0/8] |= (1 << (arg0 % 8));
 }
 
+// @ 0x0801B790
 u8 sub_801B790(u16 arg0)
 {
     if ((gObjFlagsA[arg0 / 8] >> (arg0 % 8 )) & 1) return 1;
     return 0;
 }
+// @ 0x0801B7B8
 void sub_801B7B8(void)
 {
     DmaFill32(3, 0, gObjFlagsA, 0x80);
@@ -106,6 +110,7 @@ typedef struct Unk_801B81C
     u8 field_2F;
 } Unk_801B81C;
 
+// @ 0x0801B81C
 void sub_801B81C(u8 *arg0, u8 arg1, u8 arg2, u16 arg3, u8 arg4,
                  u32 arg5, u32 arg6, u16 arg7, u16 arg8, u16 arg9)
 {
@@ -128,6 +133,7 @@ void sub_801B81C(u8 *arg0, u8 arg1, u8 arg2, u16 arg3, u8 arg4,
     obj->field_2C = arg2;
 }
 
+// @ 0x0801B878
 u8 sub_801B878(u8 *arg0, u8 arg1, u8 *arg2)
 {
     s16 kind;
@@ -144,6 +150,7 @@ u8 sub_801B878(u8 *arg0, u8 arg1, u8 *arg2)
         return sub_801A884(arg0, arg1, arg2);
     }
 }
+// @ 0x0801B8AC
 u8 sub_801B8AC(u8 *arg0, u8 arg1)
 {
     s16 kind;
@@ -161,6 +168,7 @@ u8 sub_801B8AC(u8 *arg0, u8 arg1)
         return sub_801B0B8(arg0, arg1);
     }
 }
+// @ 0x0801B8E8
 u16 *sub_801B8E8(u16 *ptr, u16 value)
 {
     u16 *current = (u16 *)((u8 *)ptr + 2);
@@ -171,6 +179,7 @@ u16 *sub_801B8E8(u16 *ptr, u16 value)
     }
     return current;
 }
+// @ 0x0801B8FC
 u16 *sub_801B8FC(u8 *arg0, u8 arg1, u16 arg2)
 {
     u16 *current;
@@ -184,6 +193,7 @@ u16 *sub_801B8FC(u8 *arg0, u8 arg1, u16 arg2)
     }
     return current;
 }
+// @ 0x0801B920
 void sub_801B920(void)
 {
     u8 i;
@@ -221,10 +231,12 @@ void sub_801B920(void)
     //     i++;
     // } while (i < 32);
 }
+// @ 0x0801B954
 u8 sub_801B954(void **ptr)
 {
     return *((u8 *)(*ptr + 2));
 }
+// @ 0x0801B95C
 u16 sub_801B95C(void **ptr)
 {
     void *p = *(ptr + 1); // ptr偏移4字节（一个指针大小），等价于ptr[1]
@@ -237,6 +249,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_801CA08);
 INCLUDE_ASM("asm/nonmatchings", sub_801CBA4);
 INCLUDE_ASM("asm/nonmatchings", sub_801CE80);
 INCLUDE_ASM("asm/nonmatchings", sub_801CF90);
+// @ 0x0801D12C
 void sub_801D12C(u8 *obj, u8 state)
 {
     s16 value;
@@ -317,6 +330,7 @@ extern Unk_8021064 gUnk_03000670[];
 extern u8 gUnk_0861C664[];
 extern u8 gUnk_03000730_arr[]; // gUnk_03000730 的字节视图
 
+// @ 0x0801DE44
 void sub_801DE44(void)
 {
     u8 i;
@@ -354,6 +368,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_801E848);
 INCLUDE_ASM("asm/nonmatchings", sub_801EA70);
 INCLUDE_ASM("asm/nonmatchings", sub_801EC3C);
 INCLUDE_ASM("asm/nonmatchings", sub_801ED40);
+// @ 0x0801EE6C
 void sub_801EE6C(u8 *ptr)
 {
     u8 v;
@@ -389,15 +404,18 @@ INCLUDE_ASM("asm/nonmatchings", sub_80200E8);
 INCLUDE_ASM("asm/nonmatchings", sub_8020228);
 INCLUDE_ASM("asm/nonmatchings", sub_802031C);
 INCLUDE_ASM("asm/nonmatchings", sub_8020648);
+// @ 0x08020798
 u8 sub_8020798(void)
 {
     return gUnk_03000744;
 }
+// @ 0x080207A4
 void sub_80207A4(void)
 {
     gUnk_03000630--;
 }
 
+// @ 0x080207B4
 u8 sub_80207B4(void *arg0)
 {
     if (sub_80187B4() & 0x20)
@@ -409,6 +427,7 @@ u8 sub_80207B4(void *arg0)
 
 /* 场景对象按 field_BE 分发到三种行为: ≤0xA → sub_801CBA4, ≤0x70 → sub_801CA08,
  * 其余 (field_BE-0x71 ≤ 0x8D) → sub_801CE80; 均传 (obj, 0, f2a, f35, 0)。 */
+// @ 0x080207DC
 void sub_80207DC(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
 {
     if (obj[0xBE] <= 0xA)
@@ -421,6 +440,7 @@ void sub_80207DC(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
 
 /* 场景对象按 field_BE 分派 (sub_80207DC 的变体): ≤0xA → sub_801CBA4(…, 0xA, …),
  * ≤0x70 → sub_801CA08(…, 5, …), 其余 (field_BE-0x71 ≤ 0x8D) → sub_801CE80(…, 0, …)。 */
+// @ 0x08020840
 void sub_8020840(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
 {
     if (obj[0xBE] <= 0xA)
@@ -433,6 +453,7 @@ void sub_8020840(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35)
 
 /* 场景对象按 field_BE 分派 (sub_80207DC/840 变体): 先 sub_801D12C(obj,0), 再
  * <=0xA→sub_801CBA4(,2,), <=0x70→sub_801CA08(,1,), 否则 (field_BE-0x71<=0x8D)→sub_801CE80(,2,)。 */
+// @ 0x080208A4
 void sub_80208A4(u8 *obj)
 {
     sub_801D12C(obj, 0);
@@ -443,6 +464,7 @@ void sub_80208A4(u8 *obj)
     else if ((u8)(obj[0xBE] - 0x71) <= 0x8D)
         sub_801CE80(obj, 2, *(u16 *)(obj + 0x2A), obj[0x35], 0);
 }
+// @ 0x08020914
 void sub_8020914(u8 *arg0)
 {
     if (arg0[0xBE] <= 10)
@@ -450,6 +472,7 @@ void sub_8020914(u8 *arg0)
         sub_801CBA4(arg0, 3, *(u16 *)(arg0 + 0x2A), arg0[0x35], 0);
     }
 }
+// @ 0x0802093C
 void sub_802093C(u8 *arg0)
 {
     u8 *ptr;
@@ -486,6 +509,7 @@ typedef struct Unk_08393B28 {
 
 extern Unk_08393B28 gUnk_08393B28[];
 
+// @ 0x08020974
 void sub_8020974(u8 *arg0, u16 arg1, u16 arg2, u8 arg3, u16 arg4)
 {
     Unk_08393B28 *entry = &gUnk_08393B28[arg1];
@@ -494,6 +518,7 @@ void sub_8020974(u8 *arg0, u16 arg1, u16 arg2, u8 arg3, u16 arg4)
                 entry->field_0, entry->field_4, entry->field_8, entry->field_A, arg4);
 }
 
+// @ 0x080209C8
 void sub_80209C8(u8 *arg0)
 {
     u16 *ptr;
@@ -521,6 +546,7 @@ typedef struct {
     u8 unk_BE;
 } MyStruct;
 
+// @ 0x080209EC
 void sub_80209EC(MyStruct *ptr) {
     if (ptr->unk_BE <= 6) {
         ptr->unk_88 = 0;
@@ -537,6 +563,7 @@ typedef struct Unk_0839B2A4 {
 
 extern Unk_0839B2A4 gUnk_0839B2A4[];
 
+// @ 0x08020A0C
 void sub_8020A0C(void *arg0, u8 arg1) {
     u16 newval;
     Unk_0839B2A4 *tbl = gUnk_0839B2A4;
@@ -554,6 +581,7 @@ void sub_8020A0C(void *arg0, u8 arg1) {
     newval = 0x2000 | *(u16 *)((u8 *)arg0 + 0xB0);
     *(u16 *)((u8 *)arg0 + 0xB0) = newval;
 }
+// @ 0x08020A7C
 u8 sub_8020A7C(u8 *arg0)
 {
     u8 i;
@@ -570,6 +598,7 @@ u8 sub_8020A7C(u8 *arg0)
 
     return ret;
 }
+// @ 0x08020AB0
 u8 sub_8020AB0(void)
 {
     u8 buf[8];
@@ -596,6 +625,7 @@ typedef struct Unk_03000690 {
     Unk_8020AE4_node *field_8;
 } Unk_03000690;
 
+// @ 0x08020AE4
 void sub_8020AE4(void) {
     Unk_8020AE4_node *node = ((Unk_03000690 *)0x03000690)->field_8;
     while (node->field_0 <= 0xFE) {
@@ -603,6 +633,7 @@ void sub_8020AE4(void) {
         node = node->field_8;
     }
 }
+// @ 0x08020B04
 void sub_8020B04(u8 *arg0) {
     u8 ids[12];
     u8 i;
@@ -616,6 +647,7 @@ void sub_8020B04(u8 *arg0) {
 extern u8 sub_80462E4(void *, u8 *, u8);
 extern void sub_801D568(void *);
 
+// @ 0x08020B04
 void sub_8020B04(void *arg0)
 {
     u8 buf[12];
@@ -631,10 +663,12 @@ void sub_8020B04(void *arg0)
     }
 }
 */
+// @ 0x08020B48
 u32 sub_8020B48(void)
 {
     return gUnk_03000718;
 }
+// @ 0x08020B54
 void sub_8020B54(void)
 {
     u8 i;
@@ -646,6 +680,7 @@ void sub_8020B54(void)
     do { gUnk_03000716 = 0; } while (0);
 }
 
+// @ 0x08020B90
 void sub_8020B90(u8 *arg0) {
     gUnk_030006F8[gUnk_03000714] = arg0;
     gUnk_03000714++;
@@ -654,6 +689,7 @@ void sub_8020B90(u8 *arg0) {
     }
 }
 
+// @ 0x08020BC0
 u8 sub_8020BC0(u8 *arg0) {
     s32 diff;
     u16 *ptr;
@@ -668,6 +704,7 @@ u8 sub_8020BC0(u8 *arg0) {
     return 0;
 }
 
+// @ 0x08020BF0
 u8 sub_8020BF0(u8 *arg0) {
     u8 value;
 
@@ -682,10 +719,12 @@ u8 sub_8020BF0(u8 *arg0) {
 typedef u8 (*UnkFunc20C2C)(u8 *);
 extern UnkFunc20C2C gUnk_0839CE7C[];
 
+// @ 0x08020C2C
 u8 sub_8020C2C(void) {
     return gUnk_0839CE7C[*(u8 *)(gUnk_030006F8[0] + 0xBE) - 0x71](gUnk_030006F8[0]);
 }
 
+// @ 0x08020C58
 void sub_8020C58(u8 *entries, u32 arg1) {
     u8 count = *(u8 *)gUnk_0300062C;
     u8 i;
@@ -700,6 +739,7 @@ void sub_8020C58(u8 *entries, u32 arg1) {
     }
 }
 
+// @ 0x08020CC4
 void sub_8020CC4(void *arg0, u8 arg1, u8 arg2, u16 arg3, u8 arg4, u16 arg5, u16 arg6) {
     u16 newval;
     sub_801B81C((u8 *)arg0 + 0x3C, arg1, arg2, arg3, arg4,

@@ -3,12 +3,14 @@
 
 const char gAgbSramLibVer[] = "SRAM_V112";
 
+// @ 0x080559B0
 static void ReadSram_Core(const u8 *src, u8 *dest, u32 size)
 {
     while (--size != -1)
         *dest++ = *src++;
 }
 
+// @ 0x080559D4
 void ReadSram(const u8 *src, u8 *dest, u32 size)
 {
     const u16 *s;
@@ -29,6 +31,7 @@ void ReadSram(const u8 *src, u8 *dest, u32 size)
     ((void (*)(const u8 *, u8 *, u32))readSramFast_Work + 1)(src, dest, size);
 }
 
+// @ 0x08055A38
 void WriteSram(const u8 *src, u8 *dest, u32 size)
 {
     REG_WAITCNT = (REG_WAITCNT & ~3) | 3;
@@ -36,6 +39,7 @@ void WriteSram(const u8 *src, u8 *dest, u32 size)
         *dest++ = *src++;
 }
 
+// @ 0x08055A78
 static u32 VerifySram_Core(const u8 *src, u8 *dest, u32 size)
 {
     while (--size != -1)
@@ -44,6 +48,7 @@ static u32 VerifySram_Core(const u8 *src, u8 *dest, u32 size)
     return 0;
 }
 
+// @ 0x08055AA8
 u32 VerifySram(const u8 *src, u8 *dest, u32 size)
 {
     const u16 *s;
@@ -64,6 +69,7 @@ u32 VerifySram(const u8 *src, u8 *dest, u32 size)
     return ((u32(*)(const u8 *, u8 *, u32))verifySramFast_Work + 1)(src, dest, size);
 }
 
+// @ 0x08055B0C
 u32 WriteSramEx(const u8 *src, u8 *dest, u32 size)
 {
     u8 i;

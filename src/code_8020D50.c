@@ -9,6 +9,7 @@
 #include "save.h"
 #include "sound.h"
 
+// @ 0x08020D50
 void sub_8020D50(void *arg0, u8 arg1) {
     u16 newval;
     if (*(u8 *)((u8 *)arg0 + 0xBE) > 0xA) return;
@@ -16,6 +17,7 @@ void sub_8020D50(void *arg0, u8 arg1) {
     newval = 0x80 | *(u16 *)((u32)arg0 + 0xB0);
     *(u16 *)((u32)arg0 + 0xB0) = newval;
 }
+// @ 0x08020DA0
 void sub_8020DA0(void *arg0, u8 arg1) {
     u16 *reg;
     if (*(u8 *)((u8 *)arg0 + 0xBE) > 0xA) return;
@@ -24,12 +26,14 @@ void sub_8020DA0(void *arg0, u8 arg1) {
     sub_804BD54(sub_801D19C(arg0, arg1), 1);
     *reg = 0xFF7F & *reg;
 }
+// @ 0x08020DE4
 void sub_8020DE4(void)
 {
     gUnk_0300071C = 0;
 }
 extern u8 gUnk_03000730_arr[];
 
+// @ 0x08020DF0
 void sub_8020DF0(u8 *arg0) {
     u8 i;
     u32 ret;
@@ -49,18 +53,22 @@ void sub_8020DF0(u8 *arg0) {
         }
     }
 }
+// @ 0x08020E54
 u32 *sub_8020E54(void)
 {
     return &gUnk_03000730;
 }
+// @ 0x08020E5C
 u8 sub_8020E5C(void)
 {
     return gUnk_0300073D;
 }
+// @ 0x08020E68
 u32 sub_8020E68(void)
 {
     return gUnk_0300062C;
 }
+// @ 0x08020E74
 void sub_8020E74(void)
 {
     u8 i;
@@ -69,6 +77,7 @@ void sub_8020E74(void)
         gUnk_03000748[i] = 0;
     }
 }
+// @ 0x08020E90
 void sub_8020E90(u8 *arg0)
 {
     if (arg0[0xBE] <= 10)
@@ -76,6 +85,7 @@ void sub_8020E90(u8 *arg0)
         gUnk_03000748[arg0[0xBE]] = 1;
     }
 }
+// @ 0x08020EAC
 u8 sub_8020EAC(u8 *arg0)
 {
     u8 result;
@@ -87,6 +97,7 @@ u8 sub_8020EAC(u8 *arg0)
     }
     return result;
 }
+// @ 0x08020EC8
 void sub_8020EC8(void)
 {
     u8 i;
@@ -97,6 +108,7 @@ void sub_8020EC8(void)
         gUnk_03000758[i] = 0;
     }
 }
+// @ 0x08020EEC
 void sub_8020EEC(u8 value)
 {
     gUnk_03000758[gUnk_03000763] = value;
@@ -104,6 +116,7 @@ void sub_8020EEC(u8 value)
 }
 extern u32 gUnk_087ED6A8[];
 
+// @ 0x08020F08
 void sub_8020F08(void) {
     u8 i;
     for (i = 0; i < gUnk_03000763; i++) {
@@ -132,6 +145,7 @@ typedef struct Unk_8020F4C {
     u8 field_C0;
 } Unk_8020F4C;
 
+// @ 0x08020F4C
 void sub_8020F4C(Unk_8020F4C *arg0) {
     arg0->field_BB = 0;
     arg0->field_BC = 0xFF;
@@ -147,6 +161,7 @@ void sub_8020F4C(Unk_8020F4C *arg0) {
     gUnk_03000624 = 0;
     sub_801FA10(arg0, 0x31);
 }
+// @ 0x08020FB8
 void sub_8020FB8(void *arg0, u16 arg1, u16 arg2, u16 arg3, u8 arg4) {
     Unk_8020F4C *ptr = (Unk_8020F4C *)arg0;
     ptr->field_B0 = ptr->field_B0 & 0xFF0F;
@@ -159,6 +174,7 @@ void sub_8020FB8(void *arg0, u16 arg1, u16 arg2, u16 arg3, u8 arg4) {
     gUnk_03000622 = arg2 - ptr->field_38;
     gUnk_03000624 = arg4;
 }
+// @ 0x0802103C
 void sub_802103C(u8 *arg0, u8 arg1, u16 arg2)
 {
     u16 *ptr;
@@ -177,6 +193,7 @@ typedef struct Unk_8021064 {
 extern Unk_8021064 gUnk_03000670[];
 extern u8 gUnk_0861C664[];
 
+// @ 0x08021064
 void sub_8021064(u8 arg0) {
     u8 i;
     gUnk_0300068C = 0;
@@ -199,6 +216,7 @@ typedef struct Unk_0839B2A4 {
 
 extern Unk_0839B2A4 gUnk_0839B2A4[];
 
+// @ 0x080210C0
 void sub_80210C0(void *arg0, u8 arg1) {
     u16 newval;
     Unk_0839B2A4 *tbl = gUnk_0839B2A4;
@@ -217,6 +235,7 @@ void sub_80210C0(void *arg0, u8 arg1) {
     *(u16 *)((u8 *)arg0 + 0xB0) = newval;
 }
 
+// @ 0x08021130
 void sub_8021130(void)
 {
     u8 i;
@@ -234,6 +253,7 @@ void sub_8021130(void)
 INCLUDE_ASM("asm/nonmatchings", sub_8021184);
 INCLUDE_ASM("asm/nonmatchings", sub_80212B4);
 INCLUDE_ASM("asm/nonmatchings", sub_802151C);
+// @ 0x08021700
 u8 sub_8021700(void) {
     u8 ret = 0;
     if (gUnk_03000812 < gUnk_03000811) {
@@ -271,17 +291,20 @@ INCLUDE_ASM("asm/nonmatchings", sub_8024618);
 INCLUDE_ASM("asm/nonmatchings", sub_80246E8);
 INCLUDE_ASM("asm/nonmatchings", sub_8024820);
 INCLUDE_ASM("asm/nonmatchings", sub_8024940);
+// @ 0x0802550C
 void sub_802550C(u8 value)
 {
     gUnk_03000816 = value;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8025518);
+// @ 0x08025638
 void sub_8025638(void)
 {
     gUnk_03000814 = -1;
     gUnk_03000815 = -1;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8025650);
+// @ 0x080256E4
 void sub_80256E4(u16 *base)
 {
     s32 palette;
@@ -300,6 +323,7 @@ void sub_80256E4(u16 *base)
         BgMap_PalFillRect(base, palette, 8, y, 9, 2);
     }
 }
+// @ 0x0802576C
 void sub_802576C(u8 *obj)
 {
     u8 i;

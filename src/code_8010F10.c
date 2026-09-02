@@ -14,6 +14,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8010F10);
 
 extern u8 gUnk_08095828[][8];
 
+// @ 0x0801114C
 void sub_801114C(void)
 {
     u16 i;
@@ -78,6 +79,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8011268);
  * 才算有效, 返回页号 i; 没有候选页返回 0, 候选不足返回 0xFF。 */
 extern u8 gUnk_03004980[];
 
+// @ 0x080113CC
 u8 sub_80113CC(void)
 {
     u8 i;
@@ -130,6 +132,7 @@ static inline s16 Save_SigCheck(u8 *p)
     return 0;
 }
 
+// @ 0x08013F3C
 void Save_LoadSlot0(void)
 {
     u16 i;
@@ -164,6 +167,7 @@ extern u8 gSaveSignature[];   /* 12B "LUNAR1_12_09" */
 
 /* 把存档状态序列化进 0x02027000 影子缓冲: 签名(12B) + 各块数据 + 校验和字节。
    签名最后才写, 保证写一半的存档校验不过 (Save_LoadSlot0 的 sigCheck)。 */
+// @ 0x08013FE8
 void Save_LoadContinue(void)
 {
     u8 *buf;
@@ -206,6 +210,7 @@ void Save_LoadContinue(void)
     }
 }
 
+// @ 0x08014084
 void SaveTimer_CountUsed(void)
 {
     u16 i;
@@ -235,6 +240,7 @@ void SaveTimer_CountUsed(void)
     }
 }
 
+// @ 0x080140D0
 void SaveTimer_Inc(u8 arg0)
 {
     u8 byte;
@@ -266,6 +272,7 @@ void SaveTimer_Inc(u8 arg0)
     gSaveTimers[arg0 >> 1] = byte;
 }
 
+// @ 0x08014124
 void SaveTimer_Dec(u8 arg0)
 {
     u8 byte;
@@ -303,6 +310,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_801417C);
 /* 把存档菜单的精灵挂进渲染队列: 先追加固定节点 gSpriteNodePool[112],
    再把 15 个菜单 UI 实体中 (statusFlags & 0xC0) == 0x80 的挂进队列下一个空槽。
    队列以 NULL 结尾, 每次都从上次落点继续向后找空槽。 */
+// @ 0x08014488
 void sub_8014488(void)
 {
     u16 i;
@@ -344,6 +352,7 @@ void sub_8014488(void)
    角色填坐标/图块), 然后建立光标精灵 + 5 个角色头像精灵的链节点并挂进渲染队列。
    attr2 一个变量同时承担两次调用的第 5 参数 —— 这样它才是跨块量, 由 global-alloc
    落在 r0; 若和 field_6 共用变量, 会被 arg2 的寄存器建议拽到 r2。 */
+// @ 0x0801455C
 void sub_801455C(void)
 {
     u16 i;
@@ -420,6 +429,7 @@ extern u8* D_87EB2A8[];
 // };
 
 // shop 
+// @ 0x0801543C
 void sub_801543C(u8 arg0) {
     u8 var_r6;
     u8 i;
@@ -477,6 +487,7 @@ INCLUDE_ASM("asm/matchings", sub_8015AF0);
 //   卡在 GCC2 调度: 目标把 store 基址 ldr 插在 (bit|0x826) 之后, 我方版本提前物化基址 → +0xd 起错位。
 //   需 gUnk_03000228(IWRAM)/gUnk_08093550(ROM) 符号 + 逐条对齐调度, 待攻。
 
+// @ 0x08015B90
 void InvUi_DrawCursors(void)
 {
 
@@ -501,11 +512,13 @@ void InvUi_DrawCursors(void)
 }
 INCLUDE_ASM("asm/nonmatchings", InvUi_Main);
 INCLUDE_ASM("asm/nonmatchings", sub_8015E1C);
+// @ 0x08015E88
 void Save_ResetReadState(void)
 {
     gUnk_03004D44 = 1;
     gUnk_03004DD0 = 0;
 }
+// @ 0x08015EA0
 void Save_StartWrite(void)
 {
     Save_LoadContinue();
@@ -515,6 +528,7 @@ void Save_StartWrite(void)
     Msg_ShowById(0x18, 0xB);
 }
 
+// @ 0x08015ED0
 s32 sub_8015ED0(u8 arg0)
 {
     u8 *p;
@@ -539,6 +553,7 @@ s32 sub_8015ED0(u8 arg0)
     return 0;
 }
 
+// @ 0x08015F14
 void SaveUi_DrawSlots(void)
 {
     u8 var_r3;
@@ -553,6 +568,7 @@ void SaveUi_DrawSlots(void)
         sub_8010F10(i, 8, i * 2 + 5, var_r3);
     }
 }
+// @ 0x08015F50
 u32 SaveTimer_Get(u8 arg0)
 {
     u8 temp_r2;
@@ -560,14 +576,17 @@ u32 SaveTimer_Get(u8 arg0)
 
     return (arg0 & 1) != 0 ? (temp_r2 >> 4) : (temp_r2 & 15);
 }
+// @ 0x08015F74
 void SaveFlag_Set(u8 x)
 {
     gSaveFlags[x >> 3] |= (1 << (x & 7));
 }
+// @ 0x08015F94
 int SaveFlag_Get(u8 arg0)
 {
     return (gSaveFlags[arg0 >> 3] >> (arg0 & 7)) & 1;
 }
+// @ 0x08015FB4
 void SaveUi_Open(u8 arg0)
 {
     gSaveUiParam = arg0;
@@ -581,6 +600,7 @@ void SaveUi_Open(u8 arg0)
 extern u8 *gUnk_087EB2E0[];
 extern u8 gUnk_0809E4E4[][32];
 
+// @ 0x08016038
 void sub_8016038(u8 arg0)
 {
     u8 temp_r0;
@@ -592,6 +612,7 @@ void sub_8016038(u8 arg0)
     }
 }
 
+// @ 0x08016068
 void sub_8016068(arg0)
 u8 arg0;
 {
@@ -605,11 +626,13 @@ u8 arg0;
     }
 }
 
+// @ 0x080160CC
 void sub_80160CC(void)
 {
     LZ77UnCompWram(gUnk_087EB2E0[11], 0x02020000);
     LZ77UnCompWram(0x080A0B58, 0x02020800);
 }
+// @ 0x080160F4
 void sub_80160F4(void)
 {
     DmaCopy32(3, 0x02020000, 0x06013800, 0x800);
@@ -620,6 +643,7 @@ void sub_80160F4(void)
 }
 #define VRAM_BUF_2005800 (u16 *)0x02005800
 
+// @ 0x08016178
 void sub_8016178(u16 arg0)
 {
     u16 rows;
@@ -659,6 +683,7 @@ void sub_8016178(u16 arg0)
 }
 extern u8 gUnk_08098308[];
 
+// @ 0x080161F4
 void sub_80161F4(arg0, x, y)
 u8 arg0;
 u8 x;
@@ -680,11 +705,13 @@ u8 y;
     }
 }
 
+// @ 0x0801624C
 void Num_Draw16(s16 arg0, u16 *dest)
 {
     sub_800BFF8(arg0, dest, 0xB000);
 }
 
+// @ 0x08016260
 void Hud_DrawLv(u8 arg0, u8 x, u8 y)
 {
     u16 *dest;
@@ -699,6 +726,7 @@ void Hud_DrawLv(u8 arg0, u8 x, u8 y)
     Num_Draw16(gPartyStats[arg0].lv + 1, dest);
 }
 
+// @ 0x080162A8
 void Hud_DrawHp(u8 arg0, u8 x, u8 y)
 {
     u16 *dest;
@@ -716,6 +744,7 @@ void Hud_DrawHp(u8 arg0, u8 x, u8 y)
     sub_800BFF8(gPartyStats[arg0].hp, dest, unk);
 }
 
+// @ 0x08016308
 void Hud_DrawMp(u8 arg0, u8 x, u8 y)
 {
     u16 *dest;
@@ -765,6 +794,7 @@ void Hud_DrawMp(u8 arg0, u8 x, u8 y)
 #define PAL_SHIFT          12    /* BG 图块项的调色板号位移 */
 #define GLYPH_BOTTOM_MASK  (GLYPH_TILES - 1)
 
+// @ 0x08016368
 void Text_PutGlyph(u16 *tilemap, u16 charCode, u8 palette)
 {
     u16 palAttr;
@@ -801,6 +831,7 @@ void Text_PutGlyph(u16 *tilemap, u16 charCode, u8 palette)
     }
 }
 
+// @ 0x080163CC
 void TextBlocks_Render(u8 *src)
 {
     u16 *dest;
@@ -831,6 +862,7 @@ void TextBlocks_Render(u8 *src)
     }
 }
 
+// @ 0x08016424
 u8 Math_DivLoop(s32 *ptr, s32 divisor)
 {
     u8 count = 0;
@@ -847,6 +879,7 @@ u8 Math_DivLoop(s32 *ptr, s32 divisor)
     return count;
 }
 
+// @ 0x08016444
 void Msg_ShowEndMark(u16 *arg0, u16 arg1, u8 arg2)
 {
     Text_PutGlyph(Msg_DrawPoolSegment(arg0, arg1, arg2), 0xC9, 0xB);
@@ -866,6 +899,7 @@ void Msg_ShowEndMark(u16 *arg0, u16 arg1, u8 arg2)
  *   - 定位循环写成 `for (i = 0; i != segIdx; ) { if (*p++ != 0xFF) continue; i++; }`
  *     即 p++ 无条件、i++ 只在命中 0xFF 时 —— 与目标的顶部测试 + 两条回边一致
  */
+// @ 0x08016460
 u16 *Msg_DrawPoolSegment(u16 *dest, u16 segIdx, u8 palette)
 {
     const u8 *p;
@@ -908,6 +942,7 @@ u16 *Msg_DrawPoolSegment(u16 *dest, u16 segIdx, u8 palette)
  *   - 且 `n = 0;` 必须夹在首次写入与 `index = ...` 之间 (决定那条 adds 的位置)
  *   - `n` 必须是 u32/int: 用 u16 会给 n++ 加上 lsls/lsrs 截断
  */
+// @ 0x080164C0
 void Msg_BuildSegmentIndex(void)
 {
     const u8 *p;
@@ -931,10 +966,12 @@ void Msg_BuildSegmentIndex(void)
             return;
     }
 }
+// @ 0x080164F8
 void Msg_Show(u16 arg0)
 {
     Msg_ShowById(arg0, 0xB);
 }
+// @ 0x08016508
 void Msg_ShowById(u16 arg0, u8 arg1)
 {
     u16 i;
@@ -956,6 +993,7 @@ void Msg_ShowById(u16 arg0, u8 arg1)
     Msg_RenderLine(ptr, arg1);
 }
 
+// @ 0x0801654C
 s32 Text_WriteOrClear(u8 *arg0, u8 arg1, u8 arg2)
 {
     u8 x, y;
@@ -992,10 +1030,12 @@ s32 Text_WriteOrClear(u8 *arg0, u8 arg1, u8 arg2)
     // No Return?
 }
 
+// @ 0x080165B8
 u8 Menu_GetFocus(void)
 {
     return gMenuCursorStack[0] - 1;
 }
+// @ 0x080165C8
 void Text_ClearRect(u8 x, u8 y, u8 width, u8 height)
 {
     u16 *temp_buf;
@@ -1012,6 +1052,7 @@ void Text_ClearRect(u8 x, u8 y, u8 width, u8 height)
         buf = temp_buf + 0x20;
     }
 }
+// @ 0x08016628
 void MenuUi_SetExclusive(u8 arg0, u8 arg1)
 {
     u8 i;
@@ -1040,6 +1081,7 @@ void MenuUi_SetExclusive(u8 arg0, u8 arg1)
     }
 }
 
+// @ 0x0801667C
 void MenuUi_HideAll(void)
 {
     u8 temp_r0;
@@ -1057,6 +1099,7 @@ void MenuUi_HideAll(void)
 }
 extern const u8 gUnk_08095028[];
 
+// @ 0x080166A4
 void Text_DrawChar(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 {
     const u8 *src;
@@ -1076,6 +1119,7 @@ void Text_DrawChar(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
         }
     }
 }
+// @ 0x080166FC
 void sub_80166FC(u8 charId, u8 x, u8 y, u8 palette)
 {
     u8 j;
@@ -1097,6 +1141,7 @@ void sub_80166FC(u8 charId, u8 x, u8 y, u8 palette)
         Text_PutGlyph(dest++, charCode, palette);
     }
 }
+// @ 0x08016758
 void sub_8016758(u8 x, u8 y, u8 kind)
 {
     int xOffset;
@@ -1128,6 +1173,7 @@ void sub_8016758(u8 x, u8 y, u8 kind)
     xOffset = x * 2;
     *(u16 *)(0x02005800 + xOffset + y * 64) = 0xB240 + tile;
 }
+// @ 0x080167D4
 void MenuUi_MoveCursor(u8 arg0, u8 arg1)
 {
     u8 ret = Menu_GetFocus();
@@ -1136,6 +1182,7 @@ void MenuUi_MoveCursor(u8 arg0, u8 arg1)
         MenuUi_SetEntityPos(arg0, arg1, ret);
     }
 }
+// @ 0x080167F8
 u8 Party_SlotOfMember(u8 arg0)
 {
     u8 i;
@@ -1153,6 +1200,7 @@ u8 Party_SlotOfMember(u8 arg0)
 
     return i;
 }
+// @ 0x0801682C
 void SkillMenu_SaveCursor(void)
 {
     u8 var_r2;
@@ -1164,10 +1212,12 @@ void SkillMenu_SaveCursor(void)
     }
     sub_800FF10(gItemUseCtx[gMenuCursorSel - 6], gMenuCursorStack[gMenuCursorGrp], var_r2);
 }
+// @ 0x08016878
 s32 ItemUse_Execute(void)
 {
     return sub_8010170(gMenuCursorStack[gMenuCursorGrp], gItemUseCtx[gMenuCursorSel - 6]);
 }
+// @ 0x080168A8
 void ItemUse_SetCtx(void)
 {
     u8 var_r0;
@@ -1183,6 +1233,7 @@ void ItemUse_SetCtx(void)
     gSkillMenuTmpB = gPartyStats[var_r0].field_unk[3];
 }
 
+// @ 0x080168EC
 void SkillMenu_RestoreCursor(void)
 {
     u8 var_r0;
@@ -1198,6 +1249,7 @@ void SkillMenu_RestoreCursor(void)
     gPartyStats[var_r0].field_unk[3] = gSkillMenuTmpB;
 }
 
+// @ 0x08016930
 u8 SkillMenu_GetSkill(u8 arg0)
 {
     s32 temp_r2;
@@ -1223,6 +1275,7 @@ u8 SkillMenu_GetSkill(u8 arg0)
 }
 // INCLUDE_ASM("asm/nonmatchings", Inv_FindFirstHeld);
 
+// @ 0x08016978
 u8 Inv_FindFirstHeld(void)
 {
     u8 i;
@@ -1239,6 +1292,7 @@ u8 Inv_FindFirstHeld(void)
 }
 // INCLUDE_ASM("asm/nonmatchings", Inv_FindPrevHeld);
 
+// @ 0x080169AC
 u8 Inv_FindPrevHeld(void)
 {
     u8 i;
@@ -1265,6 +1319,7 @@ u8 Inv_FindPrevHeld(void)
  * 多一个 qty 会让 GCC2 把表基址分到 r2 而不是目标的 r0 (实测 score 20, 只差 4 字节)。
  * 同理 gInvPageItemIds 必须是真 extern 数组, 用强转宏写法同样会换寄存器。
  */
+// @ 0x080169EC
 u8 Inv_FindHeldItemOnPage(u8 page)
 {
     if (page > 0xF)
@@ -1279,6 +1334,7 @@ u8 Inv_FindHeldItemOnPage(u8 page)
 /* 把 0x02027000 影子缓冲的存档数据拷回各真实块 (Save_LoadContinue 的逆操作)。
  * 签名校验通过后调用: 逐块按长度表 gUnk_080981E6[i] 拷 count 字节到
  * gUnk_087EB1E8[i] 指向的地址, 源偏移 offset 从 0xC 起连续递增。 */
+// @ 0x08016A14
 void Save_SyncShadow(void)
 {
     u8 *shadow = (u8 *)0x02027000;
@@ -1308,6 +1364,7 @@ void Save_SyncShadow(void)
     } while (len != 0);
 }
 
+// @ 0x08016A6C
 void Inv_SeekFirst(void)
 {
     u8 i;
@@ -1322,6 +1379,7 @@ void Inv_SeekFirst(void)
     }
     gInvCursor2 = 0;
 }
+// @ 0x08016AA0
 u8 Inv_PrevNonZero(void)
 {
     u8 index;
@@ -1339,6 +1397,7 @@ u8 Inv_PrevNonZero(void)
     }
     return 0;
 }
+// @ 0x08016AD4
 u8 Inv_NextNonZero(u8 arg0)
 {
     u8 idx;
@@ -1374,6 +1433,7 @@ u8 Inv_NextNonZero(u8 arg0)
 /* 道具使用上限检查: 遍历 gPartyMemberIds 前 5 名队员 (0xFF 终止; 表内 id 为 1 基, 先 -- 转 0 基),
  * 排除 arg0 本人, 数 gPartyStats[].field_unk[2]==2 且 field_unk[3]==arg1 的人数,
  * 已达 gInventory[arg1] 持有数则 0 (不可再挂), 否则 1。 */
+// @ 0x08016B30
 u8 sub_8016B30(u8 arg0, u8 arg1)
 {
     u8 charaId;
@@ -1414,6 +1474,7 @@ u8 sub_8016B30(u8 arg0, u8 arg1)
     }
     return 1;
 }
+// @ 0x08016BB0
 void SaveUi_OpenLoad(void)
 {
     Save_LoadContinue();
@@ -1422,6 +1483,7 @@ void SaveUi_OpenLoad(void)
     gSaveModeFlag = 0;
     Msg_ShowById(0x18U, 0xBU);
 }
+// @ 0x08016BE0
 void Text_WriteChars(u16 *dest, u8 *src, u8 arg2)
 {
 
@@ -1433,6 +1495,7 @@ void Text_WriteChars(u16 *dest, u8 *src, u8 arg2)
     }
 }
 
+// @ 0x08016C10
 void Text_FillHidden(u16 *dest, u8 *src)
 {
 
@@ -1444,11 +1507,13 @@ void Text_FillHidden(u16 *dest, u8 *src)
     }
 }
 
+// @ 0x08016C2C
 u16 *Text_TileAt(u8 x, u8 y)
 {
     return (u16 *)0x2005800 + ((y * 32) + x);
 }
 
+// @ 0x08016C44
 void sub_8016C44(void)
 {
     SpriteNode *ptr = &gSpriteNodePool[112]; // 03004380
@@ -1460,6 +1525,7 @@ void sub_8016C44(void)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8016C88);
 INCLUDE_ASM("asm/nonmatchings", sub_8016D24);
+// @ 0x08016E30
 void Sio_BuildPacket(u8 *src)
 {
     u32 checksum;
@@ -1483,6 +1549,7 @@ void Sio_BuildPacket(u8 *src)
     state[4] = 1;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8016E80);
+// @ 0x08016F30
 void sub_8016F30(void)
 {
     u8 *state;
@@ -1533,6 +1600,7 @@ void sub_8016F30(void)
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8016FC0);
+// @ 0x080170BC
 void Sio_SetReady(void)
 {
     if (gSioState[0] != 0)
@@ -1540,6 +1608,7 @@ void Sio_SetReady(void)
         gSioState[6] = 1;
     }
 }
+// @ 0x080170D0
 void Sio_Shutdown(void)
 {
     REG_IME = 0;
@@ -1553,6 +1622,7 @@ void Sio_Shutdown(void)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8017120);
 INCLUDE_ASM("asm/nonmatchings", sub_80171E4);
+// @ 0x08017588
 u32 Sio_IsHost(void)
 {
     u32 ret;
@@ -1567,6 +1637,7 @@ u32 Sio_IsHost(void)
     }
     return ret;
 }
+// @ 0x080175C0
 void sub_80175C0(void)
 {
     s32 i;
@@ -1586,6 +1657,7 @@ void sub_80175C0(void)
     } while (i >= 0);
     sub_8017120(1);
 }
+// @ 0x08017600
 void Sio_SetXferCtx(u32 *arg0, u32 *arg1, u32 arg2, u32 arg3)
 {
     gSioXferCtx.field_4 = arg0;
@@ -1594,6 +1666,7 @@ void Sio_SetXferCtx(u32 *arg0, u32 *arg1, u32 arg2, u32 arg3)
     gSioXferCtx.field_A = 0;
     gSioXferCtx.field_C = arg3;
 }
+// @ 0x0801761C
 void Sio_ClearSlot(void)
 {
     u8 index;
@@ -1602,6 +1675,7 @@ void Sio_ClearSlot(void)
     *(u16 *)((u8 *)&gSioSession + 0x18 + index * 24) = 0;
     Sio_Shutdown();
 }
+// @ 0x08017640
 void sub_8017640(void *dst, void *src, s32 count)
 {
     u8 *d;
@@ -1627,12 +1701,14 @@ INCLUDE_ASM("asm/nonmatchings", sub_8018070);
 INCLUDE_ASM("asm/nonmatchings", sub_80182A8);
 INCLUDE_ASM("asm/nonmatchings", sub_80184A8);
 INCLUDE_ASM("asm/nonmatchings", sub_801869C);
+// @ 0x08018744
 void sub_8018744(void)
 {
     gUnk_03000316 = 10;
 }
 extern u8 gUnk_080936A0[];
 
+// @ 0x08018750
 void sub_8018750(void)
 {
     u16 offset;
@@ -1653,51 +1729,62 @@ void sub_8018750(void)
     gGstate340 = (u32)&gUnk_080936A0[offset];
 }
 
+// @ 0x0801878C
 u32 sub_801878C(void)
 {
     return gGstate340;
 }
+// @ 0x08018798
 void sub_8018798(u8 index, u16 value)
 {
     gGstate330[index] = value;
 }
 
+// @ 0x080187A8
 u32 sub_80187A8()
 {
     return gGstate32E;
 }
+// @ 0x080187B4
 u16 sub_80187B4()
 {
     return gGstate324;
 }
+// @ 0x080187C0
 void sub_80187C0(u16 arg0)
 {
     gGstate324 |= arg0;
 }
+// @ 0x080187D4
 void sub_80187D4(u16 arg0)
 {
     gGstate324 &= ~arg0;
 }
+// @ 0x080187E8
 u16 sub_80187E8()
 {
     return gGstate314;
 }
+// @ 0x080187F4
 u16 sub_80187F4()
 {
     return gGstate312;
 }
+// @ 0x08018800
 void ListNode_Init(UnkNode *node)
 {
     node->prev = node;
     node->next = node;
     node->key = -1;
 }
+// @ 0x0801880C
 void ListNode_InitKey(UnkNode *node, u8 arg1)
 {
     node->prev = 0;
     node->next = 0;
     node->key = arg1;
 }
+// @ 0x08018818
 void ListNode_InsertSorted(UnkNode *head, UnkNode *new_node)
 {
     UnkNode *cur = head->next;
@@ -1711,6 +1798,7 @@ void ListNode_InsertSorted(UnkNode *head, UnkNode *new_node)
     cur->prev->next = new_node;
     cur->prev = new_node;
 }
+// @ 0x08018838
 void sub_8018838(u32 arg0)
 {
     gBattleRngSeed = arg0;
@@ -1718,6 +1806,7 @@ void sub_8018838(u32 arg0)
 /*
     LCG（linear congruential generator）线性同余算法
 */
+// @ 0x08018844
 u16 Rng_LcgNext(void)
 {
     u32 seed;
@@ -1726,19 +1815,23 @@ u16 Rng_LcgNext(void)
     return (seed / 0x10000) & 0x7FFF;
 }
 
+// @ 0x08018864
 u32 GetObjPool()
 {
     return 0x02037028;
 }
+// @ 0x0801886C
 u32 GetCtx_0248()
 {
     return 0x03000248;
 }
+// @ 0x08018874
 u32 GetBuf_37410()
 {
     return 0x02037410;
 }
 
+// @ 0x0801887C
 void sub_801887C(void)
 {
     if (!(gGstate324 & 8))
@@ -1747,6 +1840,7 @@ void sub_801887C(void)
         sub_804AF60();
     }
 }
+// @ 0x0801889C
 void sub_801889C(void)
 {
     sub_8019784();
@@ -1755,6 +1849,7 @@ void sub_801889C(void)
         sub_804AE2C();
     }
 }
+// @ 0x080188BC
 void sub_80188BC(void)
 {
     u16 keys;
@@ -1782,6 +1877,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8018A58);
 INCLUDE_ASM("asm/nonmatchings", sub_8018BF8);
 /* 战斗场景 tilemap 缓冲(0x020352C0 + 错位视图 0x020352C2)的第 0x221/0x241 项:
  * 按 gGstate324 bit14 选 0x92A2..5(战斗 UI 边框)或 0x92C0(空), 见调用点 sub_8018928。 */
+// @ 0x08018D9C
 void sub_8018D9C(void)
 {
     u16 idx;
@@ -1810,6 +1906,7 @@ void sub_8018D9C(void)
 INCLUDE_ASM("asm/nonmatchings", sub_8018E34);
 INCLUDE_ASM("asm/nonmatchings", sub_8018EA8);
 INCLUDE_ASM("asm/nonmatchings", sub_8018FC0);
+// @ 0x08019148
 void Bg0_InitClear(s32 a, s32 b, s32 c, s32 d) {
     u16 *ewram;
     u16 *vram;
@@ -1841,6 +1938,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_80191CC);
  * + 2 个 `strh [r0,#0xc/#0xe]` 位移寻址。改成 `u8 *b; b[N] = 0;` 会被 GCC2
  * 强度削减成 `adds` 连续递增, 逐指令全变(规则 11 / 67)。
  * 0xb (field_B) 不被清零; 0xe/0xf 是一条 u16 存零, 所以原代码在那里看的是 u16 字段。 */
+// @ 0x08019304
 void DialogCtx_Clear3(void)
 {
     u8 i;
@@ -1867,6 +1965,7 @@ void DialogCtx_Clear3(void)
 
 INCLUDE_ASM("asm/nonmatchings", sub_801933C);
 INCLUDE_ASM("asm/nonmatchings", sub_80196D4);
+// @ 0x08019748
 void DialogCtx_SetPair(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
 {
     u8 a;
@@ -1897,26 +1996,32 @@ INCLUDE_ASM("asm/nonmatchings", sub_8019784);
 INCLUDE_ASM("asm/nonmatchings", sub_80199E0);
 INCLUDE_ASM("asm/nonmatchings", sub_8019AD0);
 INCLUDE_ASM("asm/nonmatchings", sub_8019B98);
+// @ 0x08019DF8
 void BattleUiFlag_Clear()
 {
     gBattleUiFlags = 0;
 }
+// @ 0x08019E04
 void BattleUiFlag_Set(u16 arg0)
 {
     gBattleUiFlags |= arg0;
 }
+// @ 0x08019E18
 u16 BattleUiFlag_Get()
 {
     return gBattleUiFlags;
 }
+// @ 0x08019E24
 void BattleUiFlag_Reset(u16 mask)
 {
     gBattleUiFlags &= ~mask;
 }
+// @ 0x08019E38
 void Disp_ObjOff(void)
 {
     REG_DISPCNT &= 0xF7FF;
 }
+// @ 0x08019E4C
 void Disp_ObjOn(void)
 {
     REG_DISPCNT |= 0x800;
@@ -1927,6 +2032,7 @@ void Disp_ObjOn(void)
 // 注: attr 在原始代码里就是**未初始化**的局部 —— 目标第一条相关指令是
 //     `ands r2, r0`(r2 从未被写入), 两个调用点也都直接 `bl sub_8019E60` 不传参。
 //     写成参数或预先赋值都会多指令/少指令, 不匹配。
+// @ 0x08019E60
 void sub_8019E60(void)
 {
     u32 attr;
@@ -1960,11 +2066,13 @@ void sub_8019E60(void)
         }
     } while (0);
 }
+// @ 0x08019ECC
 void Disp_Bg1Off(void)
 {
     REG_DISPCNT &= 0xFEFF;
 }
 
+// @ 0x08019EE0
 void DialogCtx_SetHead(u8 index, u8 arg1, u8 arg2)
 {
     gDialogCtx[index].field_8 = arg1;
@@ -1972,6 +2080,7 @@ void DialogCtx_SetHead(u8 index, u8 arg1, u8 arg2)
     gDialogCtx[index].field_A = arg2;
     gDialogCtx[index].field_C = 5;
 }
+// @ 0x08019F08
 void sub_8019F08(u16 *tilemap, u16 addVal, u8 startCol, u8 startRow, u8 width, u8 height)
 {
     u16 *p;
@@ -1989,6 +2098,7 @@ void sub_8019F08(u16 *tilemap, u16 addVal, u8 startCol, u8 startRow, u8 width, u
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8019F78);
+// @ 0x0801A05C
 u8 DialogCtx_GetField_C(u8 index)
 {
     return gDialogCtx[index].field_C;
@@ -1996,6 +2106,7 @@ u8 DialogCtx_GetField_C(u8 index)
 /* BG map 矩形区域调色板覆盖: 以 (x,y) 为左上角、width×height 的半字区,
  * 每项 (tile & 0x0FFF) + palette<<12 (保留 tile 号, 替换高 4 位调色板号)。
  * 调用点: sub_8020D50.c 菜单条目高亮 (style+0xB 选调色板, x=8, y=(i-view)*2+8, w=9, h=2)。 */
+// @ 0x0801A074
 void BgMap_PalFillRect(base, palette, x, y, width, height)
 u16 *base;
 u16 palette;
@@ -2019,6 +2130,7 @@ u8 height;
         dst += 32;
     }
 }
+// @ 0x0801A0F0
 void DialogCtx_Flush(void) {
     if(gDialogCtx[0].field_C || gDialogCtx[1].field_C != 0 || gDialogCtx[2].field_C != 0)
     {
@@ -2026,18 +2138,22 @@ void DialogCtx_Flush(void) {
         DmaWait(3);
     }
 }
+// @ 0x0801A13C
 void FlashFlag_Clear()
 {
     gFlashFlags = 0;
 }
+// @ 0x0801A148
 u16 FlashFlag_Get()
 {
     return gFlashFlags;
 }
+// @ 0x0801A154
 void FlashFlag_Reset(u16 mask)
 {
     gFlashFlags &= ~mask;
 }
+// @ 0x0801A168
 void BattleFx_Init(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 {
     gFlashFlags &= 0xFFF0;
@@ -2053,6 +2169,7 @@ void BattleFx_Init(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
     gUnk_030004D6 = arg2;
     gUnk_030004D7 = arg3;
 }
+// @ 0x0801A1DC
 void BattleFx_Stop(void)
 {
     gFlashFlags &= 0xFFF0;
@@ -2065,6 +2182,7 @@ void BattleFx_Stop(void)
     gUnk_030004D7 = 0;
 }
 
+// @ 0x0801A218
 void BattleFx_DispOff(void)
 {
     REG_DISPCNT &= 0xDFFF;
@@ -2082,6 +2200,7 @@ void BattleFx_DispOff(void)
     *(u8 *)0x030004D7 = 0;
 }
 
+// @ 0x0801A270
 void sub_801A270(void)
 {
     DmaFill16(3, 100, (void *)0x020362C0, 0x800);
@@ -2098,6 +2217,7 @@ INCLUDE_ASM("asm/matchings", sub_801A2AC);
 // }
 extern u8 *gUnk_087EBDF0[];
 
+// @ 0x0801A2EC
 void sub_801A2EC(void)
 {
     if (gUnk_030004F8 <= 3)
@@ -2106,30 +2226,36 @@ void sub_801A2EC(void)
         gUnk_030004F8++;
     }
 }
+// @ 0x0801A324
 void BgLoad_Reset(void)
 {
     gUnk_030004F8 = 0;
     return;
 }
+// @ 0x0801A330
 void BgLoad_Finish(void)
 {
     gUnk_030004F8 = 4;
 }
+// @ 0x0801A33C
 u8 BgLoad_GetPos(void)
 {
     return gUnk_030004F8;
 }
+// @ 0x0801A348
 void sub_801A348(void)
 {
     gUnk_03000512 = 0;
     gUnk_03000514 = 0;
 }
+// @ 0x0801A35C
 void sub_801A35C(void)
 {
     sub_8018BF8();
     sub_80187D4(0x10);
 }
 
+// @ 0x0801A36C
 void BgScrolls_WriteAll(void)
 {
 
@@ -2146,6 +2272,7 @@ typedef union {
     u16 array[4][2];
 } U0500_arr;
 
+// @ 0x0801A3A8
 void sub_801A3A8(u8 arg0, u16 arg1, u16 arg2)
 {
     U0500_arr *u;

@@ -171,7 +171,23 @@ u8 *sub_80445E0()
     return gUnk_03004F90;
 }
 // @ 0x080445E8
-INCLUDE_ASM("asm/nonmatchings", sub_80445E8);
+void sub_80445E8(u8 *arg0, u8 arg1)
+{
+    u8 *base;
+    u8 i;
+
+    base = (u8 *)GetObjPool();
+    for (i = 0; i < gUnk_0300083D; i++)
+    {
+        u8 *obj = base + (0xF & gUnk_03000840[i]) * 0xC8;
+        if (obj[0xAC] == arg0[0xAC])
+        {
+            if (arg1 != 6 || sub_8048C30(arg0) == 1)
+                gUnk_03004F90[0xF & gUnk_03000840[i]] = arg1;
+            break;
+        }
+    }
+}
 // @ 0x08044680
 u8 sub_8044680(u8 *arg0)
 {

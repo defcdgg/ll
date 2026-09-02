@@ -203,6 +203,8 @@ extern u16 gUnk_03000818;
 extern u8 gUnk_03000820;
 extern u8 gUnk_03000825;
 extern u16 gUnk_03000826;
+extern u8 gUnk_0300083D;
+extern u8 *gUnk_03000840;
 extern u8 gUnk_03000844;
 extern u8 gUnk_03000845;
 extern u8 gUnk_03000856;
@@ -328,9 +330,9 @@ extern u32 gIntrMainBuf[512];
 
 /* 场上实体/角色记录 (0x28 = 40 B) —— 原名 CharacterObject, 已改: 它不是"角色"
  * (RPG 属性在另一个结构体 PlayerStats @0x40, 含 lv/hp/atc/skills/equip_slotN),
- * 而是脚本可寻址的**可绘制实体**: 玩家/NPC/宝箱/对话箭头/特效/敌人共用同一格式。
- *   证据: gActors[data[1]] 直接由脚本 opcode 参数索引 (src/code_804F0B8.c);
- *         宝箱用 gChests[i].x/.y/.spriteNodeIdx; 特效/箭头各占一个固定槽 (见下方槽位图)。
+ * 而是脚本可寻址的**活动可绘制实体**: 玩家/NPC/对话箭头/特效/敌人共用同一格式。
+ *   证据: gActors[data[1]] 直接由脚本 opcode 参数索引 (src/code_804F0B8.c)。
+ *         宝箱不是此格式，而是独立的 0x08 字节 ChestObject 记录 (见下方定义)。
  * 字段构成 = 位置 + 朝向 + 动画 + 调色板 + 精灵链句柄, 无一项是 RPG 数值。
  */
 typedef struct
@@ -758,9 +760,9 @@ typedef struct
     u8 interactionId;  /* item/script interaction identifier */
     u16 x;
     u16 y;
-} Chest;
+} ChestObject;
 
-extern Chest gChests[16];
+extern ChestObject gChestObjects[16]; /* 0x03004890, 16 个场景宝箱记录 */
 
 extern u8 gUnk_03004910;
 extern u8 gMapObjGfxSetId;
@@ -931,7 +933,7 @@ typedef struct SaveInfo
     /** 0x15F6 */ u8 field_030025B0; // 1
     /** 0x15F7 */ u8 field_03004A88[6]; // 6
     /** 0x15FD */ u8 field_03004870[32]; // 0x20
-    /** 0x161D */ Chest chests[16]; // 0x80 (16 * 8)
+    /** 0x161D */ ChestObject chestObjects[16]; // 0x80 (16 * 8)
     /** 0x169D */ u8 field_03004670[12]; // 0xC
     /** 0x16A9 */ u8 field_030047D0[12]; // 0xC
     /** 0x16B5 */ u8 field_03004850; // 1

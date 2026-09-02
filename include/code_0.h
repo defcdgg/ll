@@ -737,7 +737,7 @@ u8 sub_80444E8(void);
 void sub_8044514(s16);
 void sub_8044574(s16, u16, u8);
 u8 *sub_80445E0();
-void sub_80445E8();
+void sub_80445E8(u8 *, u8);
 u8 sub_8044680(u8 *);
 u8 sub_80446A4(u8 *);
 void sub_80446BC(u8 *);

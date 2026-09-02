@@ -1993,3 +1993,22 @@ ptr 变量 (vh/wk16 变大 168B)、ret 前置/后置、i/count 声明序、d=0 �
 (同 RULES.md "global-alloc 域三连" 一类, 穷举 C 写法改不动)。
 **最优候选**: permuter/sub_804AB40/base.c (= /tmp/opencode/ab40/vj.c 结构)。下一步候选:
 (a) global-alloc 转储 (RULES 88 延伸); (b) 用 -g 变体编译试; (c) 等 ACC0 先解 (同构家族互抄)。
+
+## sub_80094FC (0x080094FC, code_8005020) — ✅ 2026-09-02 opencode (逐字节 OK)
+调色板特效逐帧驱动: 若 gUnk_03004914 置位, 按 gUnk_03004918&3 选 4 个暂存区之一
+(0x0203E600/700/800/900), DMA3 拷 0x80 半字到调色板 RAM 0x05000000+idx*0x100;
+清标志、计数器+1。mode==2/7 (白闪) 且计数器超阈值 (0x40/0x20) 时重新断言 WIN0 窗口并复位
+gUnk_03004910/gSceneSubState; 计数器到 4 时窗口全开 (WIN0V=0x100, WININ/WINOUT=0x3F)。
+
+**匹配关键 (从 515 分压到 0, 非 volatile 的合法路径)**:
+1. switch 必须显式 case 0/1/2/3 + `default: break` (default 不赋值 src, 是死路径)。
+2. **零常量复用**: `src=0` 后三处复位用 src → r4 兼作零常量 (与 src 的 r4 同 home),
+   否则零落 r3 (规则87 变量兼职两值的变体)。
+3. **打破跨分支 CSE (核心, 见 RULES 111)**: 直写 `gUnk_03004910` 三次会被 CSE 成一个
+   长命伪寄存器占 r1, 计数器 c 被迫落 r0 (`adds r0,#1`) 差 103B; 把 ==7/==2 读改成
+   分支内 `u8 s2 = gUnk_03004910;` 后, 读变短命 → c 落 r1 (`adds r1,r0,#1`)、state 重读 r0, 归零。
+4. WININ/WINOUT=0 必须用字面量 (独立 r1 零), 不能复用 r4 零 —— 目标两处零不同 home。
+   permuter 3000 轮只会退化成 `volatile gUnk_03004910` (字节对但违反规则79, 且会打爆
+   PaletteFx_Apply/sub_8009370 等已匹配调用方), 弃用; 手动按 greg 诊断找到 1→3 的合法路径。
+
+**验证**: fncheck OK (260B, 0 池重定位); 整 ROM make + SHA1 绿。

@@ -174,7 +174,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8005020	0x080091c4	sub_80091C4	
 1	thumb	code_8005020	0x08009370	sub_8009370	✅ 2026-09-02 gpnux: 破global-alloc三连首例! 关键=条件直接写 `gUnk_03000010[i]!=0 && (gUnk_03000010[i]&4)==0`(不落 u8 b 局部, 否则zero_extend成SI致ands结果落错寄存器) + DMA源拆 `u8*base=gMenuEntityPaletteTable; u32 off=...; src=(u32)(base+off)`(保r8提升与+2) + DmaSet宏+预计算src变量. 语义: 调色板DMA上传/特效分支. fncheck OK 184B
 1	thumb	code_8005020	0x08009428	PaletteFx_Apply	
-0	thumb	code_8005020	0x080094fc	sub_80094FC	
+1	thumb	code_8005020	0x080094fc	sub_80094FC	✅ 2026-09-02 opencode: 调色板特效逐帧驱动(4暂存区DMA→调色板RAM+白闪WIN窗口); 关键=分支内u8局部读gUnk_03004910打破跨分支CSE→计数器落r1; fncheck OK
 0	thumb	code_8005020	0x08009600	sub_8009600	
 1	thumb	code_8005020	0x08009a5c	MenuEnt_ClearStates	
 1	thumb	code_8005020	0x08009a7c	MenuEnt_ParseAll	

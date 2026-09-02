@@ -1447,7 +1447,72 @@ void PaletteFx_Apply(u8 arg0)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_80094FC);
+/* 调色板特效逐帧驱动 (PaletteFx_Apply 之后每帧调用):
+ * 若 gUnk_03004914 置位 → 按 gUnk_03004918 & 3 选中 4 个调色板暂存区之一,
+ *   DMA3 拷贝 0x80 半字到调色板 RAM 对应 0x100 字节段 (0x05000000 + idx*0x100)。
+ * 之后清标志、计数器 +1。mode==2/7 (白闪) 且计数器超过阈值 (0x40/0x20) 时
+ *   重新断言 WIN0 窗口, 并复位 gUnk_03004910/gSceneSubState。
+ * 计数器到 4 时把窗口完全打开 (WIN0V=0x100, WININ/WINOUT=0x3F)。
+ * 注: 两个分支内的 u8 局部读取 gUnk_03004910 是**故意**的 —— 让 GCC2 不跨分支
+ *   CSE 该读, 使计数器 c 落 r1、state 落 r0 并重读, 与目标逐字节一致。 */
+void sub_80094FC(void)
+{
+    u8 counter;
+    u32 src;
+    u32 c;
+
+    if (gUnk_03004914 == 0)
+        return;
+
+    counter = gUnk_03004918 & 3;
+    switch (counter) {
+    case 0: src = 0x0203E600; break;
+    case 1: src = 0x0203E700; break;
+    case 2: src = 0x0203E800; break;
+    case 3: src = 0x0203E900; break;
+    default: break;
+    }
+
+    DmaSet(3, src, 0x05000000 + (counter << 8), 0x80000080);
+
+    gUnk_03004914 = 0;
+    c = gUnk_03004918 + 1;
+    gUnk_03004918 = c;
+
+    if (gUnk_03004910 > 6) {
+        if ((u8)c > 0x20) {
+            u8 s2 = gUnk_03004910;
+            if (s2 == 7) {
+                REG_WIN0H = 0xF0;
+                REG_WIN0V = 0xA0;
+                REG_DISPCNT |= DISPCNT_WIN0_ON;
+                REG_WININ = 0;
+                REG_WINOUT = 0;
+            }
+            gUnk_03004910 = 0;
+            gSceneSubState = 0;
+        }
+    } else if ((u8)c > 0x40) {
+        u8 s3 = gUnk_03004910;
+        if (s3 == 2) {
+            REG_WIN0H = 0xF0;
+            REG_WIN0V = 0xA0;
+            REG_DISPCNT |= DISPCNT_WIN0_ON;
+            REG_WININ = 0;
+            REG_WINOUT = 0;
+        }
+        gUnk_03004910 = 0;
+        gSceneSubState = 0;
+    }
+
+    if (gUnk_03004918 == 4) {
+        REG_WIN0H = 0xF0;
+        REG_WIN0V = 0x100;
+        REG_WININ = 0x3F;
+        REG_WINOUT = 0x3F;
+    }
+}
+
 INCLUDE_ASM("asm/nonmatchings", sub_8009600);
 void MenuEnt_ClearStates(void)
 {

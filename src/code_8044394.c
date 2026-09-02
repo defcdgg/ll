@@ -1527,7 +1527,40 @@ void sub_804CEBC(void)
     }
 }
 INCLUDE_ASM("asm/nonmatchings", sub_804CEE0);
-INCLUDE_ASM("asm/nonmatchings", sub_804D0F8);
+void sub_804D0F8(u8 *obj)
+{
+    u8 values[8];
+    u8 count = 0;
+    u8 i;
+    u8 j;
+    u8 *pool;
+
+    if (*(u32 *)(*(u32 *)(obj + 0x88) + 0x1C) == 0)
+    {
+        obj[0xBC] = 0;
+        pool = GetObjPool();
+        count = sub_80489E8(pool, values, 1, 0x6F);
+        if (count <= 1)
+        {
+            count = sub_80489E8(pool, values, 0, 0x6F);
+        }
+        for (i = 0; i < count; i++)
+        {
+            if (*(u8 *)(pool + values[i] * 0xC8 + 0xAC) == obj[0xAC])
+            {
+                for (j = i; j < count - 1; j++)
+                    values[j] = values[j + 1];
+                count--;
+                break;
+            }
+        }
+        obj[0xBD] = values[(u32)(u8)Rng_LcgNext() % count];
+    }
+    else
+    {
+        obj[0xBC] = 3;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_804D1B4);
 INCLUDE_ASM("asm/nonmatchings", sub_804D260);
 INCLUDE_ASM("asm/nonmatchings", sub_804D310);

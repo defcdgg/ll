@@ -924,7 +924,7 @@ void sub_804CDD4(u8 *);
 void sub_804CE48(u8 *);
 void sub_804CEBC();
 void sub_804CEE0();
-void sub_804D0F8();
+void sub_804D0F8(u8 *);   // obj槽位填充: 守卫+移除匹配obj[0xAC]+随机取回
 void sub_804D1B4();
 void sub_804D260();
 void sub_804D310();

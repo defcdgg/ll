@@ -905,7 +905,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804ce48	sub_804CE48	
 1	thumb	code_8044394	0x0804cebc	sub_804CEBC	
 0	thumb	code_8044394	0x0804cee0	sub_804CEE0	
-0	thumb	code_8044394	0x0804d0f8	sub_804D0F8	
+1	thumb	code_8044394	0x0804d0f8	sub_804D0F8	✅ 2026-09-02 sound-agent: obj槽位填充守卫+count<=1换槽+移除obj[0xAC]匹配+随机取回; count=0初始化外提movs r4,#0; fncheck OK 188B
 0	thumb	code_8044394	0x0804d1b4	sub_804D1B4	
 0	thumb	code_8044394	0x0804d260	sub_804D260	
 0	thumb	code_8044394	0x0804d310	sub_804D310	

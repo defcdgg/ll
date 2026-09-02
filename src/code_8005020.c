@@ -13,6 +13,7 @@
 
 
 
+// @ 0x08005020
 INCLUDE_ASM("asm/nonmatchings", sub_8005020);
 // 屏幕淡化控制: 根据当前扫描线 (REG_VCOUNT) 与目标扫描线 gScreenFadeProgress 的差值,
 // 每 16 行推进一桢渐变, 写入 REG_BLDY; 到达目标后恢复/切换 REG_BLDCNT。
@@ -98,8 +99,11 @@ void ScreenFade_Update(void)
         }
     }
 }
+// @ 0x080052F8
 INCLUDE_ASM("asm/nonmatchings", sub_80052F8);
+// @ 0x080053B4
 INCLUDE_ASM("asm/nonmatchings", sub_80053B4);
+// @ 0x080055E8
 INCLUDE_ASM("asm/nonmatchings", sub_80055E8);
 // @ 0x08005B2C
 u16 *MapTile_At(s16 x, s16 y)
@@ -201,6 +205,7 @@ u16 MapTile_CollisionBits(u16 *tiles, u16 x, u16 y)
 
     return ret;
 }
+// @ 0x08005C70
 INCLUDE_ASM("asm/nonmatchings", Viewport_UpdateScroll);
 
 // @ 0x080064AC
@@ -284,7 +289,9 @@ void MapBg_LoadFull(u8 arg0) {
     SoundMain_Frame();
 }
 
+// @ 0x0800661C
 INCLUDE_ASM("asm/nonmatchings", MapScene_Load);
+// @ 0x080071EC
 INCLUDE_ASM("asm/nonmatchings", MapScene_LoadNpcSlotIds);
 /* 地图场景精灵初始化 (进入场景时): 槽 0 = 主角 (gPartyMemberIds[0]) 图块+调色板,
  * 槽 1 = 固定 11 号模型 (跟随者/光影?); 若场景描述符 npcSlotGroupId 有 NPC 集,
@@ -324,6 +331,7 @@ void MapScene_InitSprites(u8 arg0) {
         }
     }
 }
+// @ 0x08007350
 INCLUDE_ASM("asm/nonmatchings", sub_8007350);
 // @ 0x08007964
 u8 *AnimSlot_Parse(u16 arg0, u8 *arg1)
@@ -458,6 +466,7 @@ void sub_8007A1C(s16 arg0)
         rows--;
     }
 }
+// @ 0x08007ADC
 INCLUDE_ASM("asm/nonmatchings", sub_8007ADC);
 /* 按 gMapZoneType 分发命中区域的触发动作 (记录表 = gMapZoneHeader[type+1], 记录下标 gMapZoneEntryIdx):
  * 0=换图: 装载点 5 字段 + state 3 + 清开关位图; 1=图内传送: 4 字段 + state 4;
@@ -777,6 +786,7 @@ void BattleIntro_Cursor(void)
         Sprite_EnqueueRender(0x68, 0x30, gUnk_0300000A[0], (gUnk_0300000C >> 6) + 0x10, 1);
     }
 }
+// @ 0x08008254
 INCLUDE_ASM("asm/nonmatchings", ChoiceMenu_HandleInput);
 /* Select one of the 88 portrait assets and seed its 8x8 dialogue tilemap. */
 // @ 0x08008620
@@ -1462,6 +1472,7 @@ u8 ChestFlags_Test(u8 arg0)
     val = gChestFlags[(arg0 >> 3) & 0x1F];
     return (val >> (arg0 & 7)) & 1;
 }
+// @ 0x080091C4
 INCLUDE_ASM("asm/nonmatchings", sub_80091C4);
 
 /* 调色板 DMA 上传: 平时整表刷新; 若 gUnk_03004910 非零则走特效流程 sub_80094FC。
@@ -1619,6 +1630,7 @@ void sub_80094FC(void)
     }
 }
 
+// @ 0x08009600
 INCLUDE_ASM("asm/nonmatchings", sub_8009600);
 // @ 0x08009A5C
 void MenuEnt_ClearStates(void)
@@ -2175,7 +2187,9 @@ u8 Chara_GetFormGfx(u8 arg0)
             return 0xFF;
     }
 }
+// @ 0x0800A1B4
 INCLUDE_ASM("asm/nonmatchings", sub_800A1B4);
+// @ 0x0800A3C8
 INCLUDE_ASM("asm/nonmatchings", sub_800A3C8);
 
 extern u8 gUnk_087EA580[];
@@ -2237,6 +2251,7 @@ void sub_800A534(u8 arg0)
     if ((u8)(arg0 - 0x22) <= 9 || (u8)(arg0 - 0x37) <= 7)
         gEquipBonusNoa += 1;
 }
+// @ 0x0800A664
 INCLUDE_ASM("asm/nonmatchings", sub_800A664);
 
 // @ 0x0800A79C
@@ -2584,6 +2599,7 @@ void FullHealCharacter(u8 arg0)
     ptr->mp = ptr->max_mp;
 }
 
+// @ 0x0800ACC8
 INCLUDE_ASM("asm/nonmatchings", sub_800ACC8);
 
 // @ 0x0800B14C
@@ -2700,6 +2716,7 @@ void MenuHp_Update(void)
     gUnk_03000185 = 0;
 }
 
+// @ 0x0800B374
 INCLUDE_ASM("asm/nonmatchings", sub_800B374);
 
 /* 把一条消息 (字节编码字符串) 解码成一整行瓦片, 写进单行缓冲 gMsgLineBuf (u16[29])。
@@ -2809,6 +2826,7 @@ void PartyUi_InitEntities(u8 mode)
         gUiSprites[5].statusFlags |= 8;
     }
 }
+// @ 0x0800BFF8
 INCLUDE_ASM("asm/nonmatchings", sub_800BFF8);
 
 // @ 0x0800C0D8
@@ -2843,7 +2861,9 @@ void BattleIntro_Setup(void)
         Chara_InitDialogArrow(i);
     }
 }
+// @ 0x0800C194
 INCLUDE_ASM("asm/nonmatchings", sub_800C194);
+// @ 0x0800C2F8
 INCLUDE_ASM("asm/nonmatchings", sub_800C2F8);
 
 // @ 0x0800E170
@@ -2883,6 +2903,7 @@ void MenuUi_SetEntityPos(u8 arg0, u8 arg1, u8 arg2)
     }
 }
 
+// @ 0x0800E244
 INCLUDE_ASM("asm/nonmatchings", sub_800E244);
 
 typedef struct {
@@ -2935,6 +2956,7 @@ void sub_800E668(u8 arg0) {
 
 }
 
+// @ 0x0800E71C
 INCLUDE_ASM("asm/matchings", UiSprite_BeginSlide);
 /*
 struct Vec2
@@ -3101,7 +3123,9 @@ void UiSprites_Update(void) {
         }
     }
 }
+// @ 0x0800E8F8
 INCLUDE_ASM("asm/nonmatchings", sub_800E8F8);
+// @ 0x0800EAE4
 INCLUDE_ASM("asm/nonmatchings", sub_800EAE4);
 
 extern u8* gUiSpritesAuxDesc[];
@@ -3160,11 +3184,15 @@ void MenuUi_SpawnAuxSprites(u8 arg0) {
     }
 }
 */
+// @ 0x0800EB98
 INCLUDE_ASM("asm/matchings", MenuUi_SpawnAuxSprites);
 
 
+// @ 0x0800EC54
 INCLUDE_ASM("asm/nonmatchings", sub_800EC54);
+// @ 0x0800F128
 INCLUDE_ASM("asm/nonmatchings", sub_800F128);
+// @ 0x0800F3AC
 INCLUDE_ASM("asm/nonmatchings", sub_800F3AC);
 
 extern u8 gUnk_03000199;
@@ -3354,11 +3382,17 @@ void sub_800F670(void)
     }
 }
 
+// @ 0x0800F70C
 INCLUDE_ASM("asm/nonmatchings", sub_800F70C);
+// @ 0x0800FA24
 INCLUDE_ASM("asm/nonmatchings", sub_800FA24);
+// @ 0x0800FB2C
 INCLUDE_ASM("asm/nonmatchings", sub_800FB2C);
+// @ 0x0800FDEC
 INCLUDE_ASM("asm/nonmatchings", sub_800FDEC);
+// @ 0x0800FF10
 INCLUDE_ASM("asm/nonmatchings", sub_800FF10);
+// @ 0x08010170
 INCLUDE_ASM("asm/nonmatchings", sub_8010170);
 // @ 0x0801026C
 u8 ItemGetUsePower(u8 arg0, u8 arg1)
@@ -3417,6 +3451,7 @@ u8 ItemGetUsePower(u8 arg0, u8 arg1)
     return val;
 }
 
+// @ 0x08010300
 INCLUDE_ASM("asm/nonmatchings", sub_8010300);
 u8 EventFlags_Test(u16);
 extern u8 gUnk_080987C4[];
@@ -3449,8 +3484,11 @@ u8 WarpTable_Check(void)
     return 0;
 }
 
+// @ 0x080104F8
 INCLUDE_ASM("asm/nonmatchings", sub_80104F8);
+// @ 0x08010624
 INCLUDE_ASM("asm/nonmatchings", sub_8010624);
+// @ 0x08010770
 INCLUDE_ASM("asm/nonmatchings", sub_8010770);
 
 extern const u8 gScreenIdleIconPageMap[];

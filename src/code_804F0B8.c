@@ -16,6 +16,7 @@
 // 注: 两处 do {} while(0) 都是 GCC2 调度/分配屏障, 缺一不可(去掉分别差 48 / 7 字节);
 //     `arg1 = (u8)arg1;` 必须显式写且参数声明为 s32 —— 若参数声明 u8,
 //     GCC2 会把 `arg1 < 0` 当恒假折叠掉(少两条指令)。
+// @ 0x0804F0B8
 u8 sub_804F0B8(u8 *arg0, s32 arg1)
 {
     u8 ret;
@@ -49,6 +50,7 @@ u8 sub_804F0B8(u8 *arg0, s32 arg1)
 INCLUDE_ASM("asm/nonmatchings", sub_804F10C);
 INCLUDE_ASM("asm/nonmatchings", sub_804F17C);
 // INCLUDE_ASM("asm/nonmatchings", SioBattle_ResetState);
+// @ 0x0804F210
 void SioBattle_ResetState(void)
 {
     u8 i;
@@ -61,10 +63,12 @@ void SioBattle_ResetState(void)
     gUnk_03000E04 = 0;
     gUnk_03000E05 = 0;
 }
+// @ 0x0804F244
 u8 SioBattle_GetState()
 {
     return gUnk_03000E04;
 }
+// @ 0x0804F250
 void SioBattle_ClearSlots(void)
 {
     u8 i;
@@ -79,6 +83,7 @@ void SioBattle_ClearSlots(void)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_804F280);
 INCLUDE_ASM("asm/nonmatchings", sub_804F64C);
+// @ 0x0804F768
 u32 Op_RemovePartyMember(u32 *ptr)
 {
     u8 *data;
@@ -121,6 +126,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_804FA94);
 INCLUDE_ASM("asm/nonmatchings", sub_804FB24);
 extern u16 (*gUnk_0862D434[])(u32 *);
 
+// @ 0x08050014
 void ScriptPump_Run(void)
 {
     u16 keys;
@@ -142,6 +148,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8050434);
 INCLUDE_ASM("asm/nonmatchings", sub_805063C);
 INCLUDE_ASM("asm/nonmatchings", sub_8050720);
 INCLUDE_ASM("asm/nonmatchings", sub_80511A0);
+// @ 0x08051230
 u32 Op_ScriptStop(u32 *ptr)
 {
     u8 *data;
@@ -180,6 +187,7 @@ u32 Op_ScriptStop(u32 *ptr)
 INCLUDE_ASM("asm/nonmatchings", sub_80512C4);
 INCLUDE_ASM("asm/nonmatchings", sub_80513A0);
 INCLUDE_ASM("asm/nonmatchings", sub_805144C);
+// @ 0x08051A1C
 u32 Op_OpenWindow(u32 *ptr)
 {
     u32 bgcnt;
@@ -219,11 +227,13 @@ u32 Op_OpenWindow(u32 *ptr)
 INCLUDE_ASM("asm/nonmatchings", sub_8051AEC);
 INCLUDE_ASM("asm/nonmatchings", sub_8051BE4);
 
+// @ 0x08052574
 u16 Script_GetFlags(void)
 {
     return gUnk_03000E70;
 }
 
+// @ 0x08052580
 void Script_ResetVM(void)
 {
     u8 i;
@@ -282,6 +292,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_80526A0);
 //     gUnk_03000E72 = 0;
 // }
 
+// @ 0x08052728
 void Script_Abort(u8 arg0)
 {
 
@@ -303,6 +314,7 @@ extern u8 *gUnk_087ED904[];
 /* 注意: 原代码里这个 if 是个空转 —— 两个分支结果都是 arg0 = 0。
  * 不能删: 删了 GCC2 就不会生成 cmp/beq + movs 这三条,
  * 直接 `arg0 = 0;` 只会留一条 movs。 */
+// @ 0x08052758
 void BgTiles_LoadSet(u16 arg0)
 {
     if (arg0 != 0)
@@ -313,6 +325,7 @@ void BgTiles_LoadSet(u16 arg0)
     LZ77UnCompVram(gUnk_087ED904[arg0], (void *)0x0600B800);
 }
 
+// @ 0x08052780
 void TileDma_Reset(void)
 {
     u8 i;
@@ -327,6 +340,7 @@ void TileDma_Reset(void)
 // 把待传的图块数据从 EWRAM 暂存区 0x0203DE00 用 DMA3 刷到 VRAM 0x0600B800。
 // gUnk_03000F24 = 待传块数, 每块 64 字节(= 16 个 u32); 无待传项时不发 DMA。
 // 调用方按 (s16)返回值 < 0 判定已刷新。同族写法见 DialogCtx_Flush。
+// @ 0x080527AC
 s16 sub_80527AC(void)
 {
     if (gUnk_03000F24 != 0)
@@ -336,6 +350,7 @@ s16 sub_80527AC(void)
     }
     return -1;
 }
+// @ 0x080527F4
 u32 TileDma_GetCtx(u32 *arg0)
 {
     *arg0 = 0x03000EE8;
@@ -343,6 +358,7 @@ u32 TileDma_GetCtx(u32 *arg0)
 }
 extern u8 gUnk_0862D574[];
 
+// @ 0x08052808
 u32 Op_LoadTileGfx(u8 arg0)
 {
     sub_8050434((u32)(arg0 * 18) + (u32)gUnk_0862D574 + gUnk_03000F2A * 2, 0x6F1E);
@@ -356,6 +372,7 @@ u32 Op_LoadTileGfx(u8 arg0)
 // 脚本 opcode: 无条件把脚本指针改到脚本区 0x02016200 里第 data[1] 项的入口。
 // gUnk_02016000[] = 项偏移表(u16), gUnk_02016200 = 脚本数据基址。
 // 同族写法见 Script_Call / Op_IfEventFlagJump。
+// @ 0x08052858
 u32 sub_8052858(u32 *ptr)
 {
     u8 *data;
@@ -364,6 +381,7 @@ u32 sub_8052858(u32 *ptr)
     *ptr = (u32)(gUnk_02016200 + gUnk_02016000[data[1]]);
     return 1;
 }
+// @ 0x08052878
 u32 Script_Call(u32 *ptr)
 {
     u8 *data;
@@ -383,7 +401,9 @@ u32 Script_Call(u32 *ptr)
     }
     return 1;
 }
+// @ 0x080528C4
 void nullsub_7() { }
+// @ 0x080528C8
 u32 Op_DialogSetup(u32 *ptr)
 {
     u8 *p;
@@ -404,6 +424,7 @@ u32 Op_DialogSetup(u32 *ptr)
     }
     return 1;
 }
+// @ 0x0805291C
 u32 Op_CloseWindow(u32 *ptr)
 {
     DmaFill16(3, 0xB000, gWindowBgBuf, 0x800);
@@ -430,6 +451,7 @@ u32 Op_CloseWindow(u32 *ptr)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_80529B8);
 
+// @ 0x08052A14
 u32 Op_BgmPlay(u32 *ptr)
 {
     u8 *data;
@@ -444,12 +466,14 @@ u32 Op_BgmPlay(u32 *ptr)
     return 0;
 }
 
+// @ 0x08052A38
 u32 Op_BgmStop(u32 *ptr)
 {
     Bgm_Stop();
     (*ptr)++;
     return 0;
 }
+// @ 0x08052A50
 u32 Op_BgmVolume(u32 *ptr)
 {
     u8 *data;
@@ -462,6 +486,7 @@ u32 Op_BgmVolume(u32 *ptr)
     return 0;
 }
 
+// @ 0x08052A70
 u32 Op_BgmFadeIn(u32 *ptr)
 {
 
@@ -475,6 +500,7 @@ u32 Op_BgmFadeIn(u32 *ptr)
 
     return 0;
 }
+// @ 0x08052A8C
 u32 Op_BgmFadeOut(u32 *ptr)
 {
 
@@ -489,6 +515,7 @@ u32 Op_BgmFadeOut(u32 *ptr)
     return 0;
 }
 
+// @ 0x08052AA8
 u32 Op_SfxPlay(u32 *ptr)
 {
     u8 *data;
@@ -499,6 +526,7 @@ u32 Op_SfxPlay(u32 *ptr)
     return 0;
 }
 
+// @ 0x08052ACC
 u32 Op_SfxStop(u32 *ptr)
 {
 
@@ -515,6 +543,7 @@ u32 Op_SfxStop(u32 *ptr)
 /* 从记录 rec 的 [1]..[2] 号段随机取一值查表 gUnk_02016000, 结果指针写入 *arg0。
  * 表基址/目标基址必须写成常量地址 (非数组符号): GCC2 对 SYMBOL_REF 会把基址留在 callee-saved
  * r7 不外提重取, 导致 val/max 寄存器分配错位 (差 15B); 常量地址才触发 rematerialize 命中目标。 */
+// @ 0x08052AE8
 u32 sub_8052AE8(u32 *arg0)
 {
     u8 *rec;
@@ -533,6 +562,7 @@ u32 sub_8052AE8(u32 *arg0)
     *arg0 = 0x02016200 + val;
     return 1;
 }
+// @ 0x08052B34
 u32 sub_8052B34(u32 *ptr)
 {
     u8 *data;
@@ -552,6 +582,7 @@ u32 sub_8052B34(u32 *ptr)
     }
     return 1;
 }
+// @ 0x08052B80
 u32 Op_WaitCharsStop(u32 *ptr)
 {
     if (Chara_AnyMoving() == 0)
@@ -562,6 +593,7 @@ u32 Op_WaitCharsStop(u32 *ptr)
 
     return 0;
 }
+// @ 0x08052BA0
 u32 Op_LoadCharaGfx(u32 *ptr)
 {
     u8 *data;
@@ -579,6 +611,7 @@ u32 Op_LoadCharaGfx(u32 *ptr)
     *ptr += 4;
     return 0;
 }
+// @ 0x08052BE0
 u32 Op_LoadCharaPal(u32 *ptr)
 {
     u8 *data;
@@ -588,6 +621,7 @@ u32 Op_LoadCharaPal(u32 *ptr)
     *ptr += 4;
     return 0;
 }
+// @ 0x08052C04
 u32 Op_WaitSpriteLoad(u32 *ptr)
 {
     if (GetPendingSpriteLoad() == 0)
@@ -599,6 +633,7 @@ u32 Op_WaitSpriteLoad(u32 *ptr)
     return 0;
 }
 
+// @ 0x08052C24
 u32 Op_SceneChangeFade(u32 *ptr)
 {
     u8 *data;
@@ -624,6 +659,7 @@ u32 Op_SceneChangeFade(u32 *ptr)
     *ptr += 2;
     return 1;
 }
+// @ 0x08052C90
 u32 Op_SceneChangePlain(u32 *ptr)
 {
     u8 *data;
@@ -645,6 +681,7 @@ u32 Op_SceneChangePlain(u32 *ptr)
     *ptr += 2;
     return 1;
 }
+// @ 0x08052CD0
 u32 Op_WaitSceneIdle(u32 *ptr)
 {
     if (gSceneSubState == 0)
@@ -654,6 +691,7 @@ u32 Op_WaitSceneIdle(u32 *ptr)
     }
     return 0;
 }
+// @ 0x08052CF0
 u32 Op_LoadMap(u32 *ptr)
 {
     u8 *data;
@@ -669,6 +707,7 @@ u32 Op_LoadMap(u32 *ptr)
     *ptr = (u32)(data + 7);
     return 0;
 }
+// @ 0x08052D4C
 u32 Op_IfEventFlagJump(u32 *ptr)
 {
     u8 *data;
@@ -684,6 +723,7 @@ u32 Op_IfEventFlagJump(u32 *ptr)
     }
     return 1;
 }
+// @ 0x08052D8C
 u32 Op_SetEventFlag(u32 *ptr)
 {
     u8 *data;
@@ -693,6 +733,7 @@ u32 Op_SetEventFlag(u32 *ptr)
     *ptr += 3;
     return 1;
 }
+// @ 0x08052DAC
 u32 Op_ClearEventFlag(u32 *ptr)
 {
     u8 *data;
@@ -702,6 +743,7 @@ u32 Op_ClearEventFlag(u32 *ptr)
     *ptr += 3;
     return 1;
 }
+// @ 0x08052DCC
 u32 Op_IfSwitchJump(u32 *ptr)
 {
     u8 *data;
@@ -717,6 +759,7 @@ u32 Op_IfSwitchJump(u32 *ptr)
     }
     return 1;
 }
+// @ 0x08052E0C
 u32 Op_SetSwitch(u32 *ptr)
 {
     u8 *data;
@@ -726,6 +769,7 @@ u32 Op_SetSwitch(u32 *ptr)
     *ptr += 3;
     return 1;
 }
+// @ 0x08052E2C
 u32 Op_ClearSwitch(u32 *ptr)
 {
     u8 *data;
@@ -735,6 +779,7 @@ u32 Op_ClearSwitch(u32 *ptr)
     *ptr += 3;
     return 1;
 }
+// @ 0x08052E4C
 u32 Op_CameraSnap(u32 *ptr)
 {
 
@@ -743,6 +788,7 @@ u32 Op_CameraSnap(u32 *ptr)
     (*ptr)++;
     return 1;
 }
+// @ 0x08052E6C
 s32 Op_CameraFollow(u32 *ptr)
 {
 
@@ -750,6 +796,7 @@ s32 Op_CameraFollow(u32 *ptr)
     (*ptr)++;
     return 1;
 }
+// @ 0x08052E80
 u32 Op_WaitCameraSnap(u32 *ptr)
 {
     if (gUnk_030047B4 != 0)
@@ -759,6 +806,7 @@ u32 Op_WaitCameraSnap(u32 *ptr)
     (*ptr)++;
     return 1;
 }
+// @ 0x08052E9C
 u32 Op_LoadCutsceneAnim(u32 *ptr)
 {
     u8 *data;
@@ -768,6 +816,7 @@ u32 Op_LoadCutsceneAnim(u32 *ptr)
     *ptr += 5;
     return 0;
 }
+// @ 0x08052EC0
 u32 Op_RestartCharaAnim(u32 *ptr)
 {
     u8 *data;
@@ -787,6 +836,7 @@ u32 Op_RestartCharaAnim(u32 *ptr)
     *ptr += 3;
     return 0;
 }
+// @ 0x08052F20
 u32 Op_WaitCharaAnim(u32 *ptr)
 {
     u8 *data;
@@ -801,6 +851,7 @@ u32 Op_WaitCharaAnim(u32 *ptr)
     return 0;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8052F44);
+// @ 0x08052FAC
 u32 Op_LoadAnimSet(u32 *ptr)
 {
 
@@ -816,6 +867,7 @@ u32 Op_LoadAnimSet(u32 *ptr)
     return 1;
 }
 
+// @ 0x08052FC8
 u32 Op_AnimSlotResume(u32 *ptr)
 {
 
@@ -829,6 +881,7 @@ u32 Op_AnimSlotResume(u32 *ptr)
 
     return 1;
 }
+// @ 0x08052FE4
 u32 Op_AnimSlotPause(u32 *ptr)
 {
 
@@ -843,6 +896,7 @@ u32 Op_AnimSlotPause(u32 *ptr)
     return 1;
 }
 
+// @ 0x08053000
 u32 Op_WaitAnimSlotIdle(u32 *arg0)
 {
     u8 *data = (u8 *)*arg0;
@@ -855,6 +909,7 @@ u32 Op_WaitAnimSlotIdle(u32 *arg0)
 
     return 0;
 }
+// @ 0x08053024
 u32 Op_MenuLoadAnims(u32 *ptr)
 {
 
@@ -869,6 +924,7 @@ u32 Op_MenuLoadAnims(u32 *ptr)
 
     return 1;
 }
+// @ 0x08053040
 u32 Op_MenuUnlock(u32 *ptr)
 {
 
@@ -883,6 +939,7 @@ u32 Op_MenuUnlock(u32 *ptr)
     return 1;
 }
 
+// @ 0x0805305C
 u32 Op_MenuLock(u32 *ptr)
 {
 
@@ -897,6 +954,7 @@ u32 Op_MenuLock(u32 *ptr)
     return 1;
 }
 
+// @ 0x08053078
 u32 Op_WaitMenuReady(u32 *arg0)
 {
     u8 *data = (u8 *)*arg0;
@@ -910,12 +968,14 @@ u32 Op_WaitMenuReady(u32 *arg0)
     return 0;
 }
 
+// @ 0x0805309C
 u32 Op_FullHealParty(u32 *ptr)
 {
     FullHealParty();
     (*ptr)++;
     return 1;
 }
+// @ 0x080530B4
 u32 Op_EquipItem(u32 *ptr)
 {
     u8 *data;
@@ -925,6 +985,7 @@ u32 Op_EquipItem(u32 *ptr)
     *ptr += 4;
     return 1;
 }
+// @ 0x080530D4
 u32 Op_GiveTakeItem(u32 *ptr)
 {
     u8 *data;
@@ -942,6 +1003,7 @@ u32 Op_GiveTakeItem(u32 *ptr)
     *ptr += 3;
     return 1;
 }
+// @ 0x08053104
 u32 Op_SilverAddSub(u32 *ptr)
 {
     u8 *data;
@@ -960,6 +1022,7 @@ u32 Op_SilverAddSub(u32 *ptr)
 }
 extern u8 gUnk_03004980[];
 
+// @ 0x08053138
 u32 Op_IfItemQtyJump(u32 *ptr)
 {
     u8 *data;
@@ -977,6 +1040,7 @@ u32 Op_IfItemQtyJump(u32 *ptr)
     }
     return 1;
 }
+// @ 0x0805316C
 u32 Op_ChestOpen(u32 *ptr)
 {
     // 读取外部变量的值作为参数
@@ -989,6 +1053,7 @@ u32 Op_ChestOpen(u32 *ptr)
 
     return 0;
 }
+// @ 0x0805318C
 u32 Op_SaveUiTrigger(u32 *ptr)
 {
 
@@ -1002,6 +1067,7 @@ u32 Op_SaveUiTrigger(u32 *ptr)
 
     return 0;
 }
+// @ 0x080531A8
 u32 Op_IfSaveLoadedJump(u32 *ptr)
 {
     u8 *data;
@@ -1031,6 +1097,7 @@ u32 Op_IfSaveLoadedJump(u32 *ptr)
     } while (0); } while (0); } while (0); } while (0); } while (0);
     return 0;
 }
+// @ 0x080531E4
 u32 Op_SaveTimerA(u32 *ptr)
 {
 
@@ -1044,6 +1111,7 @@ u32 Op_SaveTimerA(u32 *ptr)
 
     return 1;
 }
+// @ 0x08053200
 u32 Op_SaveTimerB(u32 *ptr)
 {
     u8 *data = (u8 *)*ptr;
@@ -1056,6 +1124,7 @@ u32 Op_SaveTimerB(u32 *ptr)
 
     return 1;
 }
+// @ 0x0805321C
 u32 Op_IfSaveFlagJump(u32 *ptr)
 {
     u8 *data;
@@ -1071,6 +1140,7 @@ u32 Op_IfSaveFlagJump(u32 *ptr)
     }
     return 1;
 }
+// @ 0x08053254
 u32 Op_SaveOp(u32 *ptr)
 {
 
@@ -1094,6 +1164,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_8053270);
 //     得到 `cmp r4,r0; bcs` 而非目标的 `cmp r0,#0; bls`。
 // 注: `off = t + 2;` 必须单独一句(规律30), 写成 `*ptr + t + 2` 会被重结合成
 //     `ldr; adds #2; add r8`。
+// @ 0x080532DC
 u32 sub_80532DC(u32 *ptr)
 {
     u8 *data;
@@ -1118,6 +1189,7 @@ u32 sub_80532DC(u32 *ptr)
     *ptr = *ptr + off;
     return 1;
 }
+// @ 0x08053348
 u32 Op_ClearSwitchTail(u32 *ptr)
 {
 
@@ -1131,6 +1203,7 @@ u32 Op_ClearSwitchTail(u32 *ptr)
 //   否则           → 跳过本指令(4 字节)
 // 注: 参数不是 ScriptContext 结构体。本文件里所有 Op_* 都是 `u32 Op_xxx(u32 *ptr)`,
 //     ptr 指向脚本指针本身(即 *ptr = scriptPtr), 与邻居 Op_IfEventFlagJump 同形。
+// @ 0x08053360
 u32 Op_IfMoneyJump(u32 *ptr)
 {
     u8 *data;
@@ -1147,6 +1220,7 @@ u32 Op_IfMoneyJump(u32 *ptr)
     return 1;
 }
 
+// @ 0x080533A0
 u32 Op_StartLogoFade(u32 *ptr)
 {
 
@@ -1154,6 +1228,7 @@ u32 Op_StartLogoFade(u32 *ptr)
     (*ptr)++;
     return 0;
 }
+// @ 0x080533B4
 u32 Op_WaitLogoFade(u32 *arg0)
 {
     if (gLogoEffectState == 0)
@@ -1163,6 +1238,7 @@ u32 Op_WaitLogoFade(u32 *arg0)
     }
     return 0;
 }
+// @ 0x080533D4
 u32 sub_80533D4(u32 *ptr)
 {
     u8 *data = (u8 *)*ptr;

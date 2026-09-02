@@ -125,7 +125,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x080064ac	BgMap_FillPattern	
 1	thumb	code_8005020	0x08006520	MapBg_LoadFull	
 0	thumb	code_8005020	0x0800661c	MapScene_Load	语义已确认: 地图场景资源/状态装载入口; fncheck OK (2026-09-02 codex)
-0	thumb	code_8005020	0x080071ec	MapScene_LoadNpcSlotIds	
+0	thumb	code_8005020	0x080071ec	sub_80071EC	
 1	thumb	code_8005020	0x0800729c	MapScene_InitSprites	
 0	thumb	code_8005020	0x08007350	sub_8007350	
 1	thumb	code_8005020	0x08007964	AnimSlot_Parse	

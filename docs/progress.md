@@ -2193,3 +2193,22 @@ case1 → obj[0xBD]=0。
 - 需要"src 早载入 r8 且不占 r0-r7"的两全分配, 穷举 20+ 变体 + permuter 三轮 (~5万次) 未果。
 
 **候选**: permuter/sub_8013870/base.c (= output-555, 53B) + cand_v13_fillmatch.c / cand_v16_strmatch.c。
+
+## sub_8011268 (0x08011268, code_8010F10) — ⏸ 2026-09-02 opencode (205字节差, 纯寄存器分配)
+技能菜单物品页绘制: ClearBuffer(0x02005AA0, 8, 6) + ClearBuffer(0x02005AB6, 2, 6) 清两块,
+再按 gSkillMenuPage 从首页起逐页 Inv_FindHeldItemOnPage 找持有物品, 最多画 3 件
+(名字 8 字形 + gInventory[item] 数量 sub_800EAE4)。
+
+**已解** (329B → 205B):
+1. slot 前置量 `slotX = slot*2` 先存再用 → 计数 dest = 0x02005AB8 + slotX*64 (不能写
+   `(slot-1)*0x80`, 会被折叠成 0x02005A38+slot*128 差基址)。
+2. x 位置是 u8(slotX+0xA), 位移在用到处 `x<<6`, 不能提前移位截断。
+3. 字形循环两写法等价 (do-while 底读 / for i<8 顶读+ch==0 break, 均 205B), MenuUi_DrawItemList
+   (已匹配孪生) 用的是 for 顶读版。
+4. page 用 u16 + 调用处 (u8)page 截断才无额外掩码。
+
+**卡点 = 主循环寄存器 home 全面偏离**: 目标 page→r4/slot→r5/item→r7/i→r6 (低位 callee-saved),
+高位 r8/r9/sl/sb 只装 page+1/&gSkillMenuPage/slot+1/slot*2 临时量; 我方 page→r8/slot→r9 反向占高位,
+palette 用 r9(spill) 而非目标 r3+栈槽。穷举声明序/类型/循环形/permuter 均停在 205B, 属规则17/88 深分配问题。
+
+**候选**: permuter/sub_8011268/base.c (= v9, 205B) + cand_v7_205B.c。

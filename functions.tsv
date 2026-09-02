@@ -263,7 +263,7 @@ status	isa	module	addr	name	note
 1	thumb	save	0x08010e58	Save_FillSlot3	
 0	thumb	code_8010F10	0x08010f10	sub_8010F10	
 1	thumb	code_8010F10	0x0801114c	sub_801114C	
-0	thumb	code_8010F10	0x08011268	sub_8011268	
+0	thumb	code_8010F10	0x08011268	sub_8011268	⏸ 2026-09-02 opencode: 技能菜单物品页绘制=ClearBuffer(0x02005AA0,8,6)+(0x02005AB6,2,6)+按gSkillMenuPage逐页Inv_FindHeldItemOnPage画≤3件物品名/数量; 结构~90%对(地址/循环/字形全对), 剩205B=纯寄存器home分配偏离(page/slot/r9/r8与目标r4/r5互换+高位r8/r9/sl/sb用法不同); 候选permuter/sub_8011268/base.c
 1	thumb	code_8010F10	0x080113cc	sub_80113CC	✅ 2026-09-02 op1: 手写 while(页号<=15 && 未持有) 旋转循环 + for 计数后续持有>=2 页; 首候选 fncheck 136B 全等; 语义=向后找"其后仍有>=2 持有页"的有效页号 (0=无页, 0xFF=不足)
 0	thumb	code_8010F10	0x08011454	sub_8011454	
 0	thumb	code_8010F10	0x08012530	sub_8012530	

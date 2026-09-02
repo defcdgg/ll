@@ -196,7 +196,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8005020	0x0800a1b4	sub_800A1B4	
 0	thumb	code_8005020	0x0800a3c8	sub_800A3C8	
 1	thumb	code_8005020	0x0800a534	sub_800A534	✅ 2026-09-02 opencode: 装备加成结算(表+8低4位-1选加成栏+=+6HP, 高4位-1选栏+=+7攻击, ID[0x22..2B]/[0x37..3E]→Noa+1); 关键=v拆两步(先&0xF再if(v-1<=6)switch(v-1))让val装载落ands与subs之间 + 第一分支u8 bonusVal=entry[6]重读(CSE合并)缩短val生命周期使val落r2/基址落r3; 规则112; fncheck OK
-0	thumb	code_8005020	0x0800a664	sub_800A664	
+1	thumb	code_8005020	0x0800a664	Stats_RebuildEquipBonuses	✅ 2026-09-02 codex: 清零九项装备加成，重算六个装备槽并按四槽形态设置团队加成；fncheck OK (310B)
 1	thumb	code_8005020	0x0800a79c	Stats_RecalcEquip	
 1	thumb	code_8005020	0x0800a86c	ExpToLevel	
 1	thumb	code_8005020	0x0800a8a0	LevelToExp	
@@ -344,7 +344,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08016c2c	Text_TileAt	
 1	thumb	code_8010F10	0x08016c44	sub_8016C44	
 1	thumb	code_8010F10	0x08016c88	sub_8016C88	✅ 2026-09-02 gpnux: SIO 联机初始化 (IME/IE/RCNT/SIOCNT 序列 + CpuFill32 清 0x130B + 五个缓冲指针); 坑: CpuFill32 必须写在 state=gSioState 之前 (否则 movs/str [sp] 与 ldr r7 顺序反, 差 4B); fncheck 152B OK; 语义名待定: Sio_InitLink (rename_fn.sh 因基线红回滚, 见 INCIDENTS)
-0	thumb	code_8010F10	0x08016d24	sub_8016D24	
+0	thumb	code_8010F10	0x08016d24	sub_8016D24	⏸ 语义全解 + 结构 ~90% 对 (132 vs 140 指令, 差 61B, 多为寄存器 home 级联)。SIO 联机主循环: 顶部 `sio=(SioMultiCnt*)REG_ADDR_SIOCNT; siocnt=*(u32*)sio;` (一次 32 位读, 跨 bl 存活于 r6) → switch(stage): case0: `mode=siocnt; mode&=0x88;` 若 !=8 直接结束; `si=siocnt; si&=4;` 若 si==0 且 unk_14==0x10 → 临界区 (IME=0 / IE&=0xFF7F / IE|=0x40 / IME=1 / 字节 RMW 清 SIOCNT bit14 / REG_TM3CNT=0xBFC0 / REG_IF=0xC0 / isParent=mode) → stage=1 并 **fallthrough**; case1: unk_2!=0 时 unk_8<=7 则 ++ 否则 stage=2 → **fallthrough**; case2: `sub_8016E80(arg0)`; default 什么都不做。末尾 `counter++` 后拼状态字返回: `status = (isParent==8?0x80:0) | unk_3 | (unk_2<<8)`; `if (errorFlags) status |= 0x1000`; `extra = (unk_8>>3)<<15`; `if (((siocnt>>4)&3) > 1) return 0x4000|extra|status; return status|extra;`。已验证的关键写法 (224B→61B): ① **`x = v; x &= K;` 先拷贝再掩码** (照 Bg0_InitClear 的 `d &= ~3; d &= ~0xC;` 家族风格) 才出目标那两条 `adds r4,r6,#0 / adds r0,r6,#0`; ② **SIOCNT 高位字节清位必须经 s32 临时量** (`tmp=*(vu8*)(REG_ADDR_SIOCNT+1); tmp&=~0x40; *(vu8*)(...)=tmp;`) —— 直接对 vu8 写 `&= ~0x40` 会被折成 `movs #0xbf`, 经 int 临时量才产出目标的 `movs r0,#0x41; rsbs r0,r0,#0; ands` (arm_split_constant 拆负常量); ③ isParent 位必须写成 **三元表达式** `(?0x80:0) | ...` 才有目标的双分支各算一遍 OR 链; ④ arg0 在目标里落 `ip`(r12) 而非 callee-saved。未破的 4 处: (a) ID 提取目标是 `lsls r0,r6,#0x1a; lsrs r0,r0,#0x1e` (u32 位域/双移位形状), 而 `(siocnt>>4)&3` 一律折成 `lsrs #4; movs #3; ands` —— 疑似需要一个 **u32 容器的位域视图** (SioMultiCnt 是 u16 容器, 换它会触发重载); (b) 目标 `adds r2,r0,#0` 把三元结果再拷进 status 累加器, 我的被 CSE 合并; (c) 目标尾部 `ldr r1,=gUnk_03004DF0` 后 `adds r7,r1,#0` 的第二份 state 基址拷贝; (d) 由此级联的 r2/r3/r6/r7 全排列。候选: permuter/sub_8016D24/base.c (61B); 定量诊断法见 RULES 规则 117, 兼职法见规则 87/120 |
 1	thumb	code_8010F10	0x08016e30	Sio_BuildPacket	
 1	thumb	code_8010F10	0x08016e80	sub_8016E80	✅ 2026-09-02 gpnux: SIO 收包; 三处变量兼职还原 home (交换临时量=packet 本身 / 循环用 st=state 第二伪寄存器 / i=0 独立语句), 末尾 return gSioState[3] 还原多出的 ldrb; CpuCopy32+CpuFill32 宏出 0x04000006/0x05000006; fncheck 176B OK
 1	thumb	code_8010F10	0x08016f30	sub_8016F30	
@@ -564,7 +564,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8020D50	0x0802550c	sub_802550C	
 0	thumb	code_8020D50	0x08025518	sub_8025518	
 1	thumb	code_8020D50	0x08025638	sub_8025638	
-0	thumb	code_8020D50	0x08025650	sub_8025650	
+0	thumb	code_8020D50	0x08025650	sub_8025650	⏸ 2026-09-02 opencode: 写tile边框(arg0+0x22C/0x36C), 计数器gUnk_0300076E=(+1)%16(asrs序列,须%16非&0xF), p=arg0+0x20E须在arg1==0检查前算; 已压到10B=arg0/r6与&gUnk/r7 home互换; 候选permuter/sub_8025650/v5.c
 1	thumb	code_8020D50	0x080256e4	sub_80256E4	✅ 2026-09-02 opencode: tilemap区域调色板覆写(BgMap_PalFillRect循环); 条件: row<奇数阈值+limit; 位掩码(gUnk_03000784)判row标记; 新符号gUnk_03000784(u16); bits中间变量强制调度掩码后置; fncheck OK	
 1	thumb	code_8020D50	0x0802576c	sub_802576C	
 0	thumb	code_8020D50	0x080257d8	sub_80257D8	
@@ -747,7 +747,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x08045328	sub_8045328	
 1	thumb	code_8044394	0x080453d8	sub_80453D8	
 1	thumb	code_8044394	0x0804542c	sub_804542C	✅ 2026-09-02 opencode: 姊妹函数sub_80453D8同构(金币积累); fncheck OK
-0	thumb	code_8044394	0x080454a4	sub_80454A4	
+1	thumb	code_8044394	0x080454a4	sub_80454A4	✅ 2026-09-02 default: 队伍EXP发放; 给party成员obj[i](obj[0xAB]∉{7,8}且obj[0xBE]!=0xFF)按sub_80487A4→gPartyStats映射加exp并升级; 首循环ldrb obj[0xBE]死读靠volatile保形(规则121); fncheck OK 252B	
 0	thumb	code_8044394	0x080455a0	sub_80455A0	
 0	thumb	code_8044394	0x08045688	sub_8045688	
 0	thumb	code_8044394	0x080457ac	sub_80457AC	

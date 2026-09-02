@@ -582,41 +582,32 @@ void SaveUi_Open(u8 arg0)
 
     ClearBuffer((u16 *)0x02005800, 30, 20);
 }
-INCLUDE_ASM("asm/matchings", sub_8016038);
-/*
+extern u8 *gUnk_087EB2E0[];
+extern u8 gUnk_0809E4E4[][32];
 
-extern u8 gUnk_03004AA0[];
-extern u8* gUnk_087EB2E0[];
-
-void sub_8016038(u8 arg0) {
+void sub_8016038(u8 arg0)
+{
     u8 temp_r0;
-    temp_r0 = gUnk_03004AA0[arg0];
-    if (temp_r0 != 0xFF) {
+
+    temp_r0 = gPartyMemberIds[arg0];
+    if (temp_r0 != 0xFF)
+    {
         LZ77UnCompWram(gUnk_087EB2E0[temp_r0], 0x02020000);
     }
 }
 
-*/
-INCLUDE_ASM("asm/matchings", sub_8016068);
-/*
-
-extern u8 gUnk_03004AA0[];
-
-extern u8 gUnk_0809E4E4[][32];
-
-void sub_8016068(u8 arg0) {
+void sub_8016068(arg0)
+u8 arg0;
+{
     u8 temp_r1;
-    temp_r1 = gUnk_03004AA0[arg0];
 
-    if (temp_r1 != 0xFF) {
+    temp_r1 = gPartyMemberIds[arg0];
+    if (temp_r1 != 0xFF)
+    {
         DmaCopy32(3, 0x02020000, (arg0 * 0x600) + 0x06014000, 0x6C0);
-        DmaCopy16(3, gUnk_0809E4E4[temp_r1],(arg0 << 5) + 0x05000260, 0x20);
-
+        DmaCopy16(3, gUnk_0809E4E4[temp_r1], (arg0 << 5) + 0x05000260, 0x20);
     }
 }
-
-*/
-extern u8 *gUnk_087EB2E0[];
 
 void sub_80160CC(void)
 {
@@ -631,29 +622,27 @@ void sub_80160F4(void)
     DmaCopy16(3, 0x080A12D0, 0x05000340, 0x40);
     DmaCopy16(3, 0x0808B7D4, 0x050001C0, 0x40);
 }
-INCLUDE_ASM("asm/matchings", sub_8016178);
+#define VRAM_BUF_2005800 (u16 *)0x02005800
 
-/*
-#define VRAM_BUF_2005800 (u16*)0x02005800
-
-void sub_8016178(u16 arg0) {
+void sub_8016178(u16 arg0)
+{
     u16 rows;
     u16 cols;
-    u16* ptr;
+    u16 *ptr;
     u16 y, x;
-    u16* temp_r5;
+    u16 *temp_r5;
 
-    if(arg0 == 0)
+    if (arg0 == 0)
         return;
 
     rows = (arg0 * (arg0 - 1) + 1);
 
-    if(rows > 10)
+    if (rows > 10)
         rows = 10;
-    
+
     cols = arg0 << 3;
 
-    if(cols > 15)
+    if (cols > 15)
         cols = 15;
 
     ptr = VRAM_BUF_2005800 + (15 - cols) + (10 - rows) * 32;
@@ -661,52 +650,36 @@ void sub_8016178(u16 arg0) {
     cols = cols * 2;
     rows = rows * 2;
 
-    for (y = 0; y < rows; y++) {
+    for (y = 0; y < rows; y++)
+    {
         temp_r5 = ptr;
-    
-        for (x = 0; x < cols; x++) {
+
+        for (x = 0; x < cols; x++)
+        {
             *ptr++ = 0xB001;
         }
         ptr = temp_r5 + 0x20;
     }
-
 }
-
-*/
-INCLUDE_ASM("asm/matchings", sub_80161F4);
-
-/*
-#define VRAM_BUF_2005800 (u16*)0x02005800
-
-typedef struct
-{
-    u8 unk0;
-    u8 unk1;
-    u8 unk2;
-    u8 unk3;
-}Unk_08098308;
-
 extern u8 gUnk_08098308[];
 
-void sub_80161F4(u8 arg0, u8 x, u8 y) {
-    u16* ptr;
+void sub_80161F4(u8 arg0, u8 x, u8 y)
+{
+    u16 *ptr;
     u16 i;
 
-    if (arg0 != 0) {
+    if (arg0 != 0)
+    {
         arg0--;
     }
     arg0 <<= 2;
     ptr = VRAM_BUF_2005800 + x + y * 32;
 
-    for( i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
     {
-        *ptr++ =   0xB240 + gUnk_08098308[arg0 + i];
-        // ptr++;
+        *ptr++ = 0xB240 + gUnk_08098308[arg0 + i];
     }
-
 }
-
-*/
 
 void Num_Draw16(s16 arg0, u16 *dest)
 {
@@ -1768,7 +1741,33 @@ tail:
 INCLUDE_ASM("asm/nonmatchings", sub_8018928);
 INCLUDE_ASM("asm/nonmatchings", sub_8018A58);
 INCLUDE_ASM("asm/nonmatchings", sub_8018BF8);
-INCLUDE_ASM("asm/nonmatchings", sub_8018D9C);
+/* 战斗场景 tilemap 缓冲(0x020352C0 + 错位视图 0x020352C2)的第 0x221/0x241 项:
+ * 按 gGstate324 bit14 选 0x92A2..5(战斗 UI 边框)或 0x92C0(空), 见调用点 sub_8018928。 */
+void sub_8018D9C(void)
+{
+    u16 idx;
+    u16 *p;
+    u16 *q;
+
+    idx = 0x221;
+    p = (u16 *)0x020352C0;
+    q = (u16 *)0x020352C2;
+
+    if (sub_80187B4() & 0x4000)
+    {
+        p[idx] = 0x92A2;
+        q[idx] = 0x92A3;
+        p[0x241] = 0x92A4;
+        q[0x241] = 0x92A5;
+    }
+    else
+    {
+        p[idx] = 0x92C0;
+        q[idx] = 0x92C0;
+        p[0x241] = 0x92C0;
+        q[0x241] = 0x92C0;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings", sub_8018E34);
 INCLUDE_ASM("asm/nonmatchings", sub_8018EA8);
 INCLUDE_ASM("asm/nonmatchings", sub_8018FC0);
@@ -2035,16 +2034,14 @@ void sub_801A270(void)
     DmaWait(3);
 }
 
-void sub_801A2AC(u16 arg0, u8 arg1, u8 arg2)
-{
-    REG_BLDCNT = arg0;
-    REG_BLDALPHA = arg1 | (arg2 << 8);
-
-    if (((arg0 >> 6) & 2) == 2)
-    {
-        REG_BLDY = arg1;
-    }
-}
+INCLUDE_ASM("asm/matchings", sub_801A2AC);
+// void sub_801A2AC(u16 arg0, u8 arg1, u8 arg2)   // ⏸ 逻辑正确(v3), 卡在寄存器分配: 见 progress.md
+// {
+//     REG_BLDCNT = arg0;
+//     REG_BLDALPHA = arg1 | (arg2 << 8);
+//     if (((arg0 >> 6) & 2) == 2)   // 目标其实是 switch(&2){case2,case3} 的 range-check 形状
+//         REG_BLDY = arg1;
+// }
 extern u8 *gUnk_087EBDF0[];
 
 void sub_801A2EC(void)

@@ -267,7 +267,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x080113cc	sub_80113CC	✅ 2026-09-02 op1: 手写 while(页号<=15 && 未持有) 旋转循环 + for 计数后续持有>=2 页; 首候选 fncheck 136B 全等; 语义=向后找"其后仍有>=2 持有页"的有效页号 (0=无页, 0xFF=不足)
 0	thumb	code_8010F10	0x08011454	sub_8011454	
 0	thumb	code_8010F10	0x08012530	sub_8012530	
-0	thumb	code_8010F10	0x08012790	SaveUi_LoadScreen	
+0	thumb	code_8010F10	0x08012790	sub_8012790	
 0	thumb	code_8010F10	0x08013870	sub_8013870	
 0	thumb	code_8010F10	0x08013934	sub_8013934	
 0	thumb	code_8010F10	0x08013b0c	sub_8013B0C	

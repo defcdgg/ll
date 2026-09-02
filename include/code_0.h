@@ -269,7 +269,7 @@ void ScreenIdleIcons_BuildList();
 void sub_8010F10(u8, u8, u8, u8);
 void sub_801114C();
 void sub_8011268();
-void sub_80113CC();
+u8 sub_80113CC(void);
 void sub_8011454();
 void sub_8012530();
 void sub_8012790();

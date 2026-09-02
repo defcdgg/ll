@@ -1297,7 +1297,60 @@ void sub_804C728(u8 arg0, u8 arg1, u8 arg2)
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings", sub_804C78C);
+void sub_804C78C(void)
+{
+    u8 values[16];
+    u8 count;
+    u8 i;
+    u8 *obj;
+    u8 *pool;
+
+    sub_804DE8C();
+    pool = GetObjPool();
+    count = sub_80489E8(pool, values, 0, 0x43);
+    for (i = 0; i < count; i++)
+    {
+        obj = pool + values[i] * 0xC8;
+        if (sub_8045F10(obj, 0x20) == 1)
+        {
+            switch (obj[0xBE])
+            {
+            case 0:
+            case 1:
+                ((void (*)(u8 *, u8))sub_804CA2C)(obj, values[i]);
+                break;
+            case 2:
+                ((void (*)(u8 *, u8))sub_804CAA0)(obj, values[i]);
+                break;
+            case 3:
+                ((void (*)(u8 *, u8))sub_804CB18)(obj, values[i]);
+                break;
+            case 4:
+                ((void (*)(u8 *, u8))sub_804CB8C)(obj, values[i]);
+                break;
+            case 5:
+                ((void (*)(u8 *, u8))sub_804CC00)(obj, values[i]);
+                break;
+            case 6:
+                ((void (*)(u8 *, u8))sub_804CC78)(obj, values[i]);
+                break;
+            case 7:
+                ((void (*)(u8 *, u8))sub_804CCEC)(obj, values[i]);
+                break;
+            case 8:
+                ((void (*)(u8 *, u8))sub_804CD60)(obj, values[i]);
+                break;
+            case 9:
+                ((void (*)(u8 *, u8))sub_804CDD4)(obj, values[i]);
+                break;
+            case 10:
+                ((void (*)(u8 *, u8))sub_804CE48)(obj, values[i]);
+                break;
+            }
+        }
+    }
+    sub_804EF50();
+}
 INCLUDE_ASM("asm/nonmatchings", sub_804C890);
 INCLUDE_ASM("asm/nonmatchings", sub_804C8E0);
 INCLUDE_ASM("asm/nonmatchings", sub_804C9B4);

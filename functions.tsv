@@ -1048,7 +1048,7 @@ status	isa	module	addr	name	note
 1	thumb	code_804F0B8	0x080533b4	Op_WaitLogoFade	
 1	thumb	code_804F0B8	0x080533d4	sub_80533D4	
 1	thumb	sound	0x080533f0	SoundMain_Frame	
-1	thumb	sound	0x080534b4	SoundTracks_Frame	
+1	thumb	sound	0x080534b4	SoundTracks_Frame	✅ 2026-09-02 sound-agent: INCLUDE_ASM 转真C; 循环4音轨状态机(r8/sb/sl); 新登记 gSfxTrackSongIds@0x03000F48, gSongHeaderTable@0x087ED910; fncheck OK 232B
 1	thumb	sound	0x0805359c	Sound_Init	
 1	thumb	sound	0x080535e8	Sound_GetFlags	
 1	thumb	sound	0x080535f4	Sound_VSyncOff	
@@ -1060,7 +1060,7 @@ status	isa	module	addr	name	note
 1	thumb	sound	0x080536ec	Bgm_FadeOut	
 1	thumb	sound	0x08053720	Bgm_Continue	
 1	thumb	sound	0x08053734	Sfx_TrackBusy	
-1	thumb	sound	0x0805374c	Sfx_Play	
-1	thumb	sound	0x080537c0	Sfx_PlayFade	
+1	thumb	sound	0x0805374c	Sfx_Play	✅ 2026-09-02 sound-agent: INCLUDE_ASM 转真C; MPlayStart+gSongHeaderTable; fncheck OK 116B
+1	thumb	sound	0x080537c0	Sfx_PlayFade	✅ 2026-09-02 sound-agent: INCLUDE_ASM 转真C; MPlayStart+m4aMPlayFadeOutTemporarily(bgm); fncheck OK 120B
 1	thumb	sound	0x08053838	Sfx_StopTrack	✅ 2026-09-02 qwen: m4aMPlayStop(gMPlayInfos2[arg0]); gSfxTrackActiveBits&=~(1<<arg0); if((gSfxTrackLoopBits>>arg0)&1) gSfxTrackLoopBits&=~(1<<arg0); 新登记 ROM 符号 gMPlayInfos2@0x087EDC80; fncheck OK 76B; 全ROM绿
 1	thumb	sound	0x08053884	Sfx_GetLoopFlag	

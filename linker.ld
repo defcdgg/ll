@@ -72,6 +72,7 @@ gDialogPortraitTilemapPtrs = 0x087E9818; /* four dialog portrait tilemap positio
 gUnk_087EB2E0 = 0x087EB2E0;    /* 角色头像 LZ77 指针表 (存档/队伍菜单用) */
 gUnk_087EBDF0 = 0x087EBDF0;    /* BG tileset LZ77 指针表[4] → VRAM 0x06008000 + idx*0x1000 */
 gMPlayInfos2 = 0x087EDC80;    /* 音轨 MusicPlayerInfo 指针表[4] (Sfx_* 用) */
+gSongHeaderTable = 0x087ED910;    /* 歌曲头指针表 (BGM/SFX 共用, MPlayStart 第二参) */
 gUnk_0809E4E4 = 0x0809E4E4;    /* 角色调色板/图形表 [N][32] (sub_8016068 DMA 源) */
 gUnk_08098308 = 0x08098308;    /* 数字/字形 tile 属性表 (sub_80161F4 VRAM 填充源) */
 gUnk_080936A0 = 0x080936A0;    /* 字节表, sub_8018750 扫描 0xFF 计数 */
@@ -292,6 +293,7 @@ SECTIONS {
         . = 0x00000F41; gFadeCounter = .;
         . = 0x00000F42; gSfxTrackActiveBits = .;
         . = 0x00000F43; gSfxTrackLoopBits = .;
+        . = 0x00000F48; gSfxTrackSongIds = .;
         . = 0x00000F50; gSfxTrackFadeBits = .;
         . = 0x00000F58; gMPlayTrack_0 = .;
         . = 0x00001408; gMPlayTrack_1 = .;

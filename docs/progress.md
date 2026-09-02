@@ -2030,3 +2030,20 @@ gUnk_03004910/gSceneSubState; 计数器到 4 时窗口全开 (WIN0V=0x100, WININ
    —— 把 -1 拆到守卫表达式, val 装载落进 ands→subs 空隙, 逐字节命中。
 
 **验证**: fncheck OK (304B, 16 池重定位); 整 ROM make + SHA1 绿 (610/1065)。
+
+## sound.c 三函数 INCLUDE_ASM→真C (SoundTracks_Frame / Sfx_Play / Sfx_PlayFade) — ✅ 2026-09-02 sound-agent
+三函数在 TSV 早已 status=1 (asm/matchings 直通), 本次把占位 INCLUDE_ASM 换成真 C 实装,
+字节级与 baserom 完全一致 (fncheck OK: 232B/116B/120B, bl 槽忽略)。
+
+**要点**:
+- SoundTracks_Frame 是 4 音轨 SFX 状态机: 每帧查 active 位, 音轨 status==0 时按 loop/fade
+  位重启或淡入。编译器用了 r8/sb/sl 高寄存器 (循环 i, &active 常量, 1 常量) — 写对
+  `(u16)status == 0` (ldrh) 与 `i <= 3` (u8) 后天然复现, 无需特殊处理。
+- Sfx_Play / Sfx_PlayFade 同构: MPlayStart + active 位置位 + song id 登记 +
+  loop/fade 位条件清位再或入; PlayFade 尾调 m4aMPlayFadeOutTemporarily(bgm player)。
+- 新登记符号: `gSfxTrackSongIds`@0x03000F48 (u16[4], linker.ld IWRAM + iwram.h),
+  `gSongHeaderTable`@0x087ED910 (ROM 绝对符号, BGM/SFX 共用歌曲头指针表)。
+- 首次 make 曾红 (+32 位移) 系并发 agent 编辑 code_8044394.c/code_8005020.c 所致;
+  与本改动无关 (stash 本改动后依旧红, 对方提交 efd9039 后恢复)。fncheck 定论为准。
+
+**验证**: 三函数 fncheck OK; `make`+SHA1 在无并发干扰时全绿。

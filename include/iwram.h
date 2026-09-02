@@ -295,6 +295,7 @@ extern u8 gFadeDuration;
 extern u8 gFadeCounter;
 extern u8 gSfxTrackActiveBits;
 extern u8 gSfxTrackLoopBits;
+extern u16 gSfxTrackSongIds[4];
 extern u8 gSfxTrackFadeBits;
 
 extern u8 gSwitchFlags[0x50];

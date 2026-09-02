@@ -6,20 +6,8 @@
 #include "include_asm.h"
 #include "m4a.h"
 
-// extern struct SongHeader sfx0;
-
-// struct SongHeader* gSfxSongHeaderTable[1] =
-// {
-//     &sfx0
-// };
-
-// const struct MusicPlayerInfo* gMPlayInfos2[4] =
-// {
-//     &gMPlayInfo_1,
-//     &gMPlayInfo_2,
-//     &gMPlayInfo_3,
-//     &gMPlayInfo_4
-// };
+extern struct MusicPlayerInfo *gMPlayInfos2[];
+extern struct SongHeader *gSongHeaderTable[];
 
 void SoundMain_Frame(void)
 {
@@ -55,45 +43,39 @@ void SoundMain_Frame(void)
     SoundTracks_Frame();
 }
 
-INCLUDE_ASM("asm/matchings", SoundTracks_Frame);
+void SoundTracks_Frame(void)
+{
+    u8 i;
+    u16 songNum;
 
-// void SoundTracks_Frame(void) {
-//     u8 i;
-//     u16 songNum;
-
-//     for(i = 0; i <= 3; i++)
-//     {
-//         if((gSfxTrackActiveBits >> i) & 1)
-//         {
-//             if((u16)gMPlayInfos2[i]->status == 0)
-//             {
-//                 gSfxTrackActiveBits &= ~(1 << (i));
-
-//                 if((gSfxTrackLoopBits >> i) & 1)
-//                 {
-//                     songNum = gSfxTrackSongIds[i];
-//                     MPlayStart(gMPlayInfos2[i], gSongHeaderTable[songNum]);
-//                     gSfxTrackActiveBits |= (1 << (i));
-//                     gSfxTrackSongIds[i] = songNum;
-
-//                     if((gSfxTrackLoopBits >> i) & 1)
-//                     {
-//                         gSfxTrackLoopBits &= ~(1 << i);
-//                     }
-//                     gSfxTrackLoopBits |= (1 << i);
-//                 }
-
-//                 if((gSfxTrackFadeBits >> i) & 1)
-//                 {
-//                     m4aMPlayFadeIn((struct MusicPlayerInfo* )0x03005AB0, 2);
-//                     gSfxTrackFadeBits &= ~(1 << (i));
-//                 }
-//             }
-//         }
-
-//     }
-
-// }
+    for (i = 0; i <= 3; i++)
+    {
+        if ((gSfxTrackActiveBits >> i) & 1)
+        {
+            if ((u16)gMPlayInfos2[i]->status == 0)
+            {
+                gSfxTrackActiveBits &= ~(1 << i);
+                if ((gSfxTrackLoopBits >> i) & 1)
+                {
+                    songNum = gSfxTrackSongIds[i];
+                    MPlayStart(gMPlayInfos2[i], gSongHeaderTable[songNum]);
+                    gSfxTrackActiveBits |= (1 << i);
+                    gSfxTrackSongIds[i] = songNum;
+                    if ((gSfxTrackLoopBits >> i) & 1)
+                    {
+                        gSfxTrackLoopBits &= ~(1 << i);
+                    }
+                    gSfxTrackLoopBits |= (1 << i);
+                }
+                if ((gSfxTrackFadeBits >> i) & 1)
+                {
+                    m4aMPlayFadeIn((struct MusicPlayerInfo *)0x03005AB0, 2);
+                    gSfxTrackFadeBits &= ~(1 << i);
+                }
+            }
+        }
+    }
+}
 
 void Sound_Init()
 {
@@ -186,36 +168,30 @@ u8 Sfx_TrackBusy(u8 arg0)
     return (gSfxTrackActiveBits >> arg0) & 1;
 }
 
-INCLUDE_ASM("asm/matchings", Sfx_Play);
-// void Sfx_Play(u16 arg0, u8 arg1, u8 arg2) {
+void Sfx_Play(u16 arg0, u8 arg1, u8 arg2)
+{
+    MPlayStart(gMPlayInfos2[arg1], gSongHeaderTable[arg0]);
+    gSfxTrackActiveBits |= 1 << arg1;
+    gSfxTrackSongIds[arg1] = arg0;
+    if ((gSfxTrackLoopBits >> arg1) & 1)
+    {
+        gSfxTrackLoopBits &= ~(1 << arg1);
+    }
+    gSfxTrackLoopBits |= arg2 << arg1;
+}
 
-//     MPlayStart(gMPlayInfos2[arg1], gSfxSongHeaderTable[arg0]);
-//     gSfxTrackActiveBits |= 1 << arg1;
-//     gSfxTrackSongIds[arg1] = arg0;
-//     if((gSfxTrackLoopBits >> arg1) & 1)
-//     {
-//         gSfxTrackLoopBits &= ~(1 << arg1);
-//     }
-//     gSfxTrackLoopBits |= arg2 << arg1;
-// }
-
-INCLUDE_ASM("asm/matchings", Sfx_PlayFade);
-// void Sfx_PlayFade(u16 arg0, u8 arg1) {
-
-//     MPlayStart(gMPlayInfos2[arg1], gSfxSongHeaderTable[arg0]);
-//     gSfxTrackActiveBits |= 1 << arg1;
-//     gSfxTrackSongIds[arg1] = arg0;
-
-//     if( (gSfxTrackFadeBits >> arg1) & 1)
-//     {
-//         gSfxTrackFadeBits &= ~(1 << arg1);
-//     }
-//     gSfxTrackFadeBits |= (1 << arg1);
-
-//     m4aMPlayFadeOutTemporarily((struct MusicPlayerInfo* )0x03005AB0, 2);
-// }
-
-extern struct MusicPlayerInfo *gMPlayInfos2[];
+void Sfx_PlayFade(u16 arg0, u8 arg1)
+{
+    MPlayStart(gMPlayInfos2[arg1], gSongHeaderTable[arg0]);
+    gSfxTrackActiveBits |= 1 << arg1;
+    gSfxTrackSongIds[arg1] = arg0;
+    if ((gSfxTrackFadeBits >> arg1) & 1)
+    {
+        gSfxTrackFadeBits &= ~(1 << arg1);
+    }
+    gSfxTrackFadeBits |= (1 << arg1);
+    m4aMPlayFadeOutTemporarily((struct MusicPlayerInfo *)0x03005AB0, 2);
+}
 
 void Sfx_StopTrack(u8 arg0)
 {

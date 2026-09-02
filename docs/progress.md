@@ -2062,3 +2062,22 @@ gUnk_03004910/gSceneSubState; 计数器到 4 时窗口全开 (WIN0V=0x100, WININ
 第二次重读+重放编辑成功。教训: 多人共改 code_8044394.c 时 edit 后立即 grep 确认。
 
 **验证**: fncheck OK 100B; 全 ROM make+SHA1 绿 (612/1065)。
+
+## sub_804C78C (0x0804C78C, code_8044394) — ✅ 2026-09-02 sound-agent (fncheck OK 260B)
+SFX 调度器: sub_804DE8C() → 遍历 obj 池 (GetObjPool + sub_80489E8 收集 count 个 id) →
+对每个 obj=pool+id*0xC8, 若 sub_8045F10(obj,0x20)==1 则按 obj[0xBE] (0..10) 跳表分派
+到 sub_804CA2C / CAA0 / CB18 / CB8C / CC00 / CC78 / CCEC / CD60 / CDD4 / CE48 → sub_804EF50()。
+
+**要点**:
+- 11 项跳表 switch 由编译器天然生成 (fndiff score 0, 含跳表数据字); bytecmp 因 VMA0 链接
+  对嵌入式跳表条目误报, 以 fndiff/fncheck 为准。
+- 目标分派函数在 code_0.h 均为 1 参原型 `(u8 *)`, 但调用点传 2 参 (冗余 values[i])。
+  用函数指针强转 `((void (*)(u8 *, u8))f)(obj, values[i])` 复现调用点字节 (同文件
+  sub_804C890 既有约定)。
+- **并发事故**: 本次改动的文件里, 另一 agent 正并行把 sub_804C890 从 INCLUDE_ASM 转真C
+  (工作区未提交), 其 WIP (两种写法) 均编译出 76B≠baserom 80B, 导致整 ROM 红。
+  处置: 用 `git checkout HEAD --` + 只插自己函数的方式构建验证 HEAD+自己=绿,
+  提交时只 `git add src/code_8044394.c` (文件已 checkout 到仅含自己改动),
+  事后把对方 WIP 副本拷回工作区, 不回退不代修。
+
+**验证**: fncheck sub_804C78C OK 260B (12 池重定位, 15 bl 槽); HEAD 全 ROM make+SHA1 绿。

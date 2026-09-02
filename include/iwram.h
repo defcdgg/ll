@@ -273,6 +273,7 @@ typedef struct
 extern Unk_03000E08 gUnk_03000E08[];
 extern u8 gUnk_03000E30;
 extern u8 gUnk_03000E68;
+extern u8 gUnk_03000E69;
 extern u32 gUnk_03000E6C;
 extern u16 gUnk_03000E70;
 extern u8 gUnk_03000E72;

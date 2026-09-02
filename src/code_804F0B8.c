@@ -209,7 +209,54 @@ void ScriptPump_Run(void)
     }
 }
 // @ 0x0805008C
-INCLUDE_ASM("asm/nonmatchings", sub_805008C);
+// 脚本泵的逐帧后台服务: 在脚本活动期间 (bit0=脚本中, bit9=暂停) 按 gUnk_03000E70 的请求位
+// 刷新 BG0 滚动/瓦片/LZ 块; LZ 解压完成后把脚本指针跳到解压缓冲 gUnk_02016200 的入口表项。
+void sub_805008C(void)
+{
+    if ((gUnk_03000E70 & 1) != 0 && (gUnk_03000E70 & 0x200) == 0)
+    {
+        u8 op = *(u8 *)gUnk_03000E6C;
+        u16 bgRequest = gUnk_03000E70 & 0x10;
+
+        if ((op == 0 || op == 0x17) && bgRequest == 0)
+        {
+            REG_BG0HOFS = bgRequest;
+            REG_BG0VOFS = bgRequest;
+            DmaCopy16(3, (void *)0x02005800, (void *)0x0600F800, 0x800);
+        }
+
+        if (gUnk_03000E70 & 0x10)
+        {
+            REG_BG0HOFS = 0;
+            REG_BG0VOFS = 0;
+            DmaCopy16(3, (void *)0x02005800, (void *)0x0600F800, 0x800);
+        }
+    }
+
+    if ((gUnk_03000E70 & 0x40) != 0 && FlushTileDma() < 0)
+    {
+        gUnk_03000E70 &= ~0x40;
+    }
+
+    if (gUnk_03000E70 & 0x100)
+    {
+        BgTiles_LoadSet(0);
+        gUnk_03000E70 &= ~0x100;
+    }
+
+    if (gUnk_03000E70 & 0x200)
+    {
+        if (LZ_UncompressChunk() == 0)
+        {
+            if (gUnk_03000E70 & 0x400)
+            {
+                gUnk_03000E6C = (u32)(gUnk_02016200 + gUnk_02016000[gUnk_03000E69]);
+                gUnk_03000E70 &= ~0x400;
+            }
+            gUnk_03000E70 &= ~0x200;
+        }
+    }
+}
 // @ 0x080501B8
 INCLUDE_ASM("asm/nonmatchings", sub_80501B8);
 // @ 0x08050434

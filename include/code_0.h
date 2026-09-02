@@ -148,6 +148,7 @@ void Win0H_WaveDmaByVCount();
 /* 逐扫描线水波效果族 (源数据 = gWaveSineTable @0x080576D0, 见 data_805769C.h) */
 void HBlankWave_BuildTables(u16 mode);
 void HBlankWave_ApplyLineScroll(u16 scanline);
+u32 LZ_UncompressChunk(void);   // @0x08000D5C 分块 LZ 流式解压 gLzContext, 返回 0 = 全部完成
 void ScreenFx_SetMode(u16);
 void AnimSlots_Release();
 void AnimSlots_StepAll();

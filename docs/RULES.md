@@ -802,6 +802,15 @@
      关联: 规则 17 (同题已解)、规则 25 (do-while 屏障定槽)、规则 110 (链式=地址伪寄存器压缩)。
 
 
+ 118. **s8 返回值截断位置: `s8 tmp = result; if (tmp >= 0)` 使 `lsls/lsrs #0x18` 排在 `cmp` 之前**（案例 `sub_804F10C`, 2026-09-02）。
+      目标: `call → lsls r0,#0x18; lsrs r1,#0x18; cmp r0,#0; blt; adds r7,r1,#0`
+      朴素写 `if (result >= 0) { found = result; break; }` 产 `lsls r0,#0x18; cmp r0,#0; blt; lsrs r7,#0x18`
+      截断 (u8)result 在 cmp 之后才出货。加 `s8 tmp = result;` 后 agbcc 把截断结果暂存 r1 (tmp 伪寄存器),
+      `cmp r0,#0` 仍用原始 r0, 截断从 "if-body 内的赋值" 提前到 "tmp 的赋值" —— 因 tmp 的赋值在 if 判别之前,
+      编译器把截断指令提前。同理, `int idx = values[i] * 0xC8` 把乘法从子表达式提升为独立伪寄存器,
+      避免内联求值时 `pool + values[i] * 0xC8` 的乘-加序列被调度器重排。
+      关联: 规则 71 (局部收窄改变生命周期)、规则 106 (中间变量决定 global-alloc)、规则 115 (截断延迟到循环后)。
+
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 
 agbcc (egcs 1.1 系) 自带 RTL 转储开关, 对定位寄存器 home 问题极其有用:

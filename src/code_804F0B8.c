@@ -48,7 +48,38 @@ u8 sub_804F0B8(u8 *arg0, s32 arg1)
     return ret;
 }
 // @ 0x0804F10C
-INCLUDE_ASM("asm/nonmatchings", sub_804F10C);
+// 在 GetObjPool 的空闲槽里找第一个能命中 sub_804E76C(slot, arg0, arg1) 的槽,
+// 返回其内部匹配下标 (0..5), 找不到返回 -1。sub_80489E8 先筛出通过
+// sub_8045F10(slot, 0x1FF)==2 的槽下标 (0..4) 填进 values。
+// 注: 需要 `int idx` 与 `s8 tmp` 两个中间变量才能复现 GCC2 的调度
+// (idx 把乘 0xC8 提前; tmp = result 使截断 lsls/lsrs 排在 cmp 之前)。
+s8 sub_804F10C(u8 arg0, u8 arg1)
+{
+    u8 i;
+    u8 count;
+    int idx;
+    u8 values[5];
+    s8 result;
+    s8 found;
+    s8 tmp;
+    u8 *pool;
+
+    found = -1;
+    pool = (u8 *)GetObjPool();
+    count = sub_80489E8(pool, values, 0, 0x1FF);
+    for (i = 0; i < count; i++)
+    {
+        idx = values[i] * 0xC8;
+        result = sub_804E76C(pool + idx, arg0, arg1);
+        tmp = result;
+        if (tmp >= 0)
+        {
+            found = result;
+            break;
+        }
+    }
+    return found;
+}
 // @ 0x0804F17C
 INCLUDE_ASM("asm/nonmatchings", sub_804F17C);
 // INCLUDE_ASM("asm/nonmatchings", SioBattle_ResetState);
@@ -1071,7 +1102,7 @@ u32 Op_ChestOpen(u32 *ptr)
     // 读取外部变量的值作为参数
     u8 param = gUnk_03004860;
 
-    Chest_Open(param);
+    ChestObject_Open(param);
 
     // 递增指针指向的值
     (*ptr)++;

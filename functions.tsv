@@ -910,7 +910,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804d260	sub_804D260	✅ 2026-09-02 sound-agent: sub_804D1B4 孪生 (仅概率 x15→x10); 复用别名 gUnk_08393B28_entries; fncheck OK 174B
 0	thumb	code_8044394	0x0804d310	sub_804D310	⏸ 2026-09-02 sound-agent: 语义全解(D260孪生无switch, 死存储obj[0xBC]=0); 卡点=常量0的home(r2 vs r0): 目标三处0全r0重载, 我CSE成r2共享致case-1少movs; 穷举if/else/ternary/value局部/指针局部/声明序/-g全490-950; permuter只出long long hack(80,obj移位); 候选permuter/sub_804D310/base.c(490)
 1	thumb	code_8044394	0x0804d3a0	sub_804D3A0	✅ 2026-09-02 sound-agent: 同族孪生 x13 (count*13 出 movs r1,#0xd;muls); 复用别名 gUnk_08393B28_entries; fncheck OK 170B
-0	thumb	code_8044394	0x0804d44c	sub_804D44C	
+1	thumb	code_8044394	0x0804d44c	sub_804D44C	✅ 2026-09-02 sound-agent: 同族孪生 x10 (与 sub_804D260 同构); 复用别名 gUnk_08393B28_entries; fncheck OK 174B
 0	thumb	code_8044394	0x0804d4fc	sub_804D4FC	
 0	thumb	code_8044394	0x0804d5b4	sub_804D5B4	
 0	thumb	code_8044394	0x0804d708	sub_804D708	

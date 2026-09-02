@@ -929,7 +929,7 @@ void sub_804D1B4(u8 *, u8 *);   // obj槽位概率填充: 守卫+表驱动随机
 void sub_804D260(u8 *, u8 *);   // obj槽位概率填充 (x10, sub_804D1B4 孪生)
 void sub_804D310();
 void sub_804D3A0(u8 *, u8 *);   // obj槽位概率填充 (x13, 同族孪生)
-void sub_804D44C();
+void sub_804D44C(u8 *, u8 *);   // obj槽位概率填充 (x10, 同族孪生)
 void sub_804D4FC();
 void sub_804D5B4();
 void sub_804D708();

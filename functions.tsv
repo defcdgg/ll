@@ -701,7 +701,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80264C0	0x0803f658	sub_803F658	
 0	thumb	code_80264C0	0x0803ff54	sub_803FF54	
 0	thumb	code_80264C0	0x080401ac	sub_80401AC	
-0	thumb	code_80264C0	0x080405a4	sub_80405A4	
+1	thumb	code_80264C0	0x080405a4	sub_80405A4	✅ 2026-09-03 zai: 状态机(0/2/9): 0=存0824/0822/0828/0829+0825清零+Rng_LcgNext()%0x64<=0x45且sub_80187B4()&0x220==0则|0x20置2否则置9; 2=同sub_8042AB4渐变但else尾部sub_80207A4+obj[0xBE]=0xFF+obj[0xAB]=7+置9; 关键=((u32(*)(void))Rng_LcgNext)()强转消u16截断+DeMorgan反转让失败块成前向目标+f2a初始化声明; fncheck OK 236B
 0	thumb	code_80264C0	0x08040690	sub_8040690	
 0	thumb	code_80264C0	0x08040ee8	sub_8040EE8	
 0	thumb	code_80264C0	0x08041308	sub_8041308	

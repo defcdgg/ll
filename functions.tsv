@@ -708,7 +708,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80264C0	0x080416f0	sub_80416F0	
 0	thumb	code_80264C0	0x080419e0	sub_80419E0	
 0	thumb	code_80264C0	0x08041edc	sub_8041EDC	
-0	thumb	code_80264C0	0x08042200	sub_8042200	
+1	thumb	code_80264C0	0x08042200	sub_8042200	✅ 2026-09-03 zai: 状态机(gUnk_03000820 switch 0/2/9): 0=存obj[0x35]/0x2A到0824/0822+sub_801CA08(obj,3,0x1B4,0xD,result)置2; 2=等obj+0x24 bit0x1000→sub_804C3A4+清位+sub_80207DC(obj[0xBF],obj[0xC0],0822,0824)置9; 9=返2; 新符号gUnk_03000822(u16)/0824(u8); fncheck OK 184B
 0	thumb	code_80264C0	0x080422b8	sub_80422B8	
 0	thumb	code_80264C0	0x08042784	sub_8042784	
 0	thumb	code_80264C0	0x08042ab4	sub_8042AB4	

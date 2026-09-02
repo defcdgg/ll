@@ -202,6 +202,8 @@ extern s8 gUnk_03000815;
 extern u8 gUnk_03000816;
 extern u16 gUnk_03000818;
 extern u8 gUnk_03000820;
+extern u16 gUnk_03000822;
+extern u8 gUnk_03000824;
 extern u8 gUnk_03000825;
 extern u16 gUnk_03000826;
 extern u8 gUnk_0300083D;

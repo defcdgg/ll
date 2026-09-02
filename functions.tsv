@@ -565,7 +565,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8020D50	0x08025518	sub_8025518	
 1	thumb	code_8020D50	0x08025638	sub_8025638	
 0	thumb	code_8020D50	0x08025650	sub_8025650	
-0	thumb	code_8020D50	0x080256e4	sub_80256E4	
+1	thumb	code_8020D50	0x080256e4	sub_80256E4	✅ 2026-09-02 opencode: tilemap区域调色板覆写(BgMap_PalFillRect循环); 条件: row<奇数阈值+limit; 位掩码(gUnk_03000784)判row标记; 新符号gUnk_03000784(u16); bits中间变量强制调度掩码后置; fncheck OK	
 1	thumb	code_8020D50	0x0802576c	sub_802576C	
 0	thumb	code_8020D50	0x080257d8	sub_80257D8	
 0	thumb	code_8020D50	0x08025994	sub_8025994	

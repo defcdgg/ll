@@ -2212,3 +2212,19 @@ case1 → obj[0xBD]=0。
 palette 用 r9(spill) 而非目标 r3+栈槽。穷举声明序/类型/循环形/permuter 均停在 205B, 属规则17/88 深分配问题。
 
 **候选**: permuter/sub_8011268/base.c (= v9, 205B) + cand_v7_205B.c。
+
+## 2026-09-02 `sub_80256E4` 匹配 (tilemap 调色板覆写循环, code_8020D50)
+
+136 字节: 遍历 row 从 `gUnk_03000781` 起, 条件 `row < (s8)gUnk_03000781+3 && row < gUnk_03000770`,
+每行调 `BgMap_PalFillRect(base, palette, 8, (row-start)*2+8, 9, 2)`。palette 依据
+`(gUnk_03000784 >> row) & 1` 和 `row == (s8)gUnk_03000782` 取 0xc/0xb/0xd。
+
+**卡点与解法**: 
+1. palette 掩码 `movs r1,#1`(与初值 1 复用) 的调度位置: 目标在 `ldr/ldrh/asrs` 后才 movs。
+   用 permuter 探索出 **中间变量 `bits = gUnk_03000784 >> row;`** 前置位提取, 再 `if (bits & 1)`
+   使掩码后置 → 逐字节命中 (score 20, bytecmp 仅剩 bl 槽)。
+2. 起始 `for` 三条件 (初值/上界/步进) 直接书写即可, 不需 do-while (for 无入口旋绕)。
+3. 新符号 `gUnk_03000784` (u16, 位掩码表) 登记 linker.ld + iwram.h。
+4. BgMap_PalFillRect 保持 K&R 无原型调用 (被调截断由定义侧提供)。
+
+fncheck OK (136 bytes, 1 bl 槽忽略)。全 ROM SHA1 绿 (58.3%)。

@@ -282,7 +282,24 @@ void sub_8025638(void)
     gUnk_03000815 = -1;
 }
 INCLUDE_ASM("asm/nonmatchings", sub_8025650);
-INCLUDE_ASM("asm/nonmatchings", sub_80256E4);
+void sub_80256E4(u16 *base)
+{
+    s32 palette;
+    u8 row;
+    s32 bits;
+    s32 y;
+
+    for (row = gUnk_03000781; row < (s8)gUnk_03000781 + 3 && row < gUnk_03000770; row = (u8)(row + 1))
+    {
+        bits = gUnk_03000784 >> row;
+        palette = 1;
+        if ((bits & 1) != 0)
+            palette = (row == (s8)gUnk_03000782) ? 2 : 0;
+        palette += 0xB;
+        y = (row - (s8)gUnk_03000781) * 2 + 8;
+        BgMap_PalFillRect(base, palette, 8, y, 9, 2);
+    }
+}
 void sub_802576C(u8 *obj)
 {
     u8 i;

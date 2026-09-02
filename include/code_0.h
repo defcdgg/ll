@@ -342,7 +342,7 @@ void Save_SyncShadow();
 void Inv_SeekFirst();
 u8 Inv_PrevNonZero();
 u8 Inv_NextNonZero(u8);
-void sub_8016B30();
+u8 sub_8016B30(u8, u8);
 void SaveUi_OpenLoad();
 void Text_WriteChars(u16 *, u8 *, u8);
 void Text_FillHidden(u16 *, u8 *);

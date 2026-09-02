@@ -1371,7 +1371,49 @@ u8 Inv_NextNonZero(u8 arg0)
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings", sub_8016B30);
+/* 道具使用上限检查: 遍历 gPartyMemberIds 前 5 名队员 (0xFF 终止; 表内 id 为 1 基, 先 -- 转 0 基),
+ * 排除 arg0 本人, 数 gPartyStats[].field_unk[2]==2 且 field_unk[3]==arg1 的人数,
+ * 已达 gInventory[arg1] 持有数则 0 (不可再挂), 否则 1。 */
+u8 sub_8016B30(u8 arg0, u8 arg1)
+{
+    u8 charaId;
+    u8 count;
+    u16 i;
+    PlayerStats *ptr;
+
+    count = (i = 0);
+    charaId = gPartyMemberIds[0];
+    for (; i < 5; i++)
+    {
+        charaId = gPartyMemberIds[i];
+        if (charaId == 0xFF)
+        {
+            break;
+        }
+        if (charaId != 0)
+        {
+            charaId--;
+        }
+        if (charaId == arg0)
+        {
+            continue;
+        }
+        ptr = &gPartyStats[charaId];
+        if (ptr->field_unk[2] == 2)
+        {
+            if (ptr->field_unk[3] == arg1)
+            {
+                count++;
+            }
+        }
+    }
+
+    if (count >= gInventory[arg1])
+    {
+        return 0;
+    }
+    return 1;
+}
 void SaveUi_OpenLoad(void)
 {
     Save_LoadContinue();

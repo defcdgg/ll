@@ -1940,3 +1940,21 @@ bit15 (0x8000 → 0x7FFF); 若 `ptr[0xBE]==0x77` 则 `sub_804B834(ptr[0x35], 1, 
 重定位槽 (伪差), 逐字节命中。
 
 fncheck OK (120 bytes, 3 bl 槽忽略)。全 ROM SHA1 绿 (57.0%)。
+
+## sub_8016B30 (0x08016B30, code_8010F10) — ✅ 2026-09-02 op1
+道具/状态挂载上限检查: `count = (i = 0); charaId = gPartyMemberIds[0]; for (; i < 5; i++)` 内
+`charaId = gPartyMemberIds[i]; 0xFF→break; 非0→charaId-- (表内 1 基转 0 基!); ==arg0→continue(排除本人);
+gPartyStats[charaId].field_unk[2]==2 && field_unk[3]==arg1 → count++`。
+尾: `count >= gInventory[arg1] ? 0 : 1` (gInventory = gUnk_03004980 别名, 下标=arg1)。
+唯一调用点 sub_800B374 (0x0800BD9C, 仍未匹配): r1 = gPartyStats[?].field_unk[3]。
+
+匹配要点 (fncheck 128B 全等, permuter 揭示初始化形状):
+1. **`count = (i = 0);` 链式赋值是本函数胜负手** — `count = 0; i = 0;` 两条语句会被 GCC2
+   "第二个拷贝第一个"(adds r3,r4,#0), `for (i = 0, count = 0; ...)` 逗号形式会把两个 movs
+   **推迟到首条 ldrb 之后**; 只有链式赋值(先 i 后 count 的求值序)能让
+   `movs r3,#0; movs r4,#0` 按目标落在 push/参数截断之后、首个池加载之前。规则 27 的反例补充。
+2. `charaId--` 前必须有 `if (charaId != 0)` 守卫 (0 保持 0), 对应目标的 cmp/skip 三条指令。
+3. 目标字面池放在 `movs r0,#1; b` 与 `movs r0,#0` 返回路径**之间** — GCC2 对该控制流的
+   自然布局, 无需手工干预; varG 全指令全等但池在尾部 = 8B 假差, permuter 语句重排后归位。
+4. code_0.h 原型 `void sub_8016B30()` → `u8 sub_8016B30(u8,u8)`: GCC2 拒绝空参数表 + 带参定义
+   ("can't match an empty parameter name list declaration"), 只能补全原型; 唯一调用者未匹配, 零风险。

@@ -337,7 +337,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08016a6c	Inv_SeekFirst	
 1	thumb	code_8010F10	0x08016aa0	Inv_PrevNonZero	
 1	thumb	code_8010F10	0x08016ad4	Inv_NextNonZero	
-0	thumb	code_8010F10	0x08016b30	sub_8016B30	
+1	thumb	code_8010F10	0x08016b30	sub_8016B30	✅ 2026-09-02 op1: 道具挂载上限检查(gPartyMemberIds 前5人 1基id先--, 排除arg0, 数 field_unk[2]==2&&[3]==arg1 对比 gInventory[arg1]); 关键=count=(i=0)链式赋值保两个movs; fncheck 128B 全等; 唯一调用者 sub_800B374 仍未匹配, 原型补 (u8,u8) 无风险
 1	thumb	code_8010F10	0x08016bb0	SaveUi_OpenLoad	
 1	thumb	code_8010F10	0x08016be0	Text_WriteChars	
 1	thumb	code_8010F10	0x08016c10	Text_FillHidden	

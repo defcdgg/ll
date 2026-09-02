@@ -1984,7 +1984,65 @@ u8 Chara_GetFormGfx(u8 arg0)
 }
 INCLUDE_ASM("asm/nonmatchings", sub_800A1B4);
 INCLUDE_ASM("asm/nonmatchings", sub_800A3C8);
-INCLUDE_ASM("asm/nonmatchings", sub_800A534);
+
+extern u8 gUnk_087EA580[];
+
+/* 装备加成结算 (按敌人/角色数据表 gUnk_087EA580 的 12B 条目):
+ *  arg0 = 角色/敌人 ID (0 直接返回)。
+ *  表项 +8 的防御字节: 低 4 位 -1 选一个装备加成栏 += 表项 +6 (HP);
+ *                     高 4 位 -1 选一个装备加成栏 += 表项 +7 (攻击)。
+ *  7 个加成栏映射: 0=AtkBase 1=Def2 2=Agl 3=Men 4=Res 5=Noa 6=Luc。
+ *  最后 ID 落在 [0x22,0x2B] 或 [0x37,0x3E] 时 Noa 额外 +1。
+ * 匹配要点: `v = tbl[8] & 0xF; if (v - 1 <= 6) switch (v - 1)` 的写法让
+ *  val 装载落在 ands 与 subs 之间; `register` 定 v/val 的 r0/r2 home;
+ *  第一分支的 `bonusVal = val` 副本微调 val 的伪寄存器分配 (permuter 200 分探索出)。 */
+void sub_800A534(u8 arg0)
+{
+    u8 *entry;
+    u8 bonusVal;
+    u8 *dst;
+    register u8 val;
+    register u32 v;
+
+    if (arg0 == 0)
+        return;
+
+    entry = &gUnk_087EA580[arg0 * 12];
+
+    v = entry[8] & 0xF;
+    val = entry[6];
+    if (v - 1 <= 6) {
+        bonusVal = val;
+        switch (v - 1) {
+        case 0: dst = &gEquipBonusAtkBase; break;
+        case 1: dst = &gEquipBonusDef2; break;
+        case 2: dst = &gEquipBonusAgl; break;
+        case 3: dst = &gEquipBonusMen; break;
+        case 4: dst = &gEquipBonusRes; break;
+        case 5: dst = &gEquipBonusNoa; break;
+        case 6: dst = &gEquipBonusLuc; break;
+        }
+        *dst += bonusVal;
+    }
+
+    v = entry[8] >> 4;
+    val = entry[7];
+    if (v - 1 <= 6) {
+        switch (v - 1) {
+        case 0: dst = &gEquipBonusAtkBase; break;
+        case 1: dst = &gEquipBonusDef2; break;
+        case 2: dst = &gEquipBonusAgl; break;
+        case 3: dst = &gEquipBonusMen; break;
+        case 4: dst = &gEquipBonusRes; break;
+        case 5: dst = &gEquipBonusNoa; break;
+        case 6: dst = &gEquipBonusLuc; break;
+        }
+        *dst += val;
+    }
+
+    if ((u8)(arg0 - 0x22) <= 9 || (u8)(arg0 - 0x37) <= 7)
+        gEquipBonusNoa += 1;
+}
 INCLUDE_ASM("asm/nonmatchings", sub_800A664);
 
 void Stats_RecalcEquip(u8 arg0)

@@ -2012,3 +2012,21 @@ gUnk_03004910/gSceneSubState; 计数器到 4 时窗口全开 (WIN0V=0x100, WININ
    PaletteFx_Apply/sub_8009370 等已匹配调用方), 弃用; 手动按 greg 诊断找到 1→3 的合法路径。
 
 **验证**: fncheck OK (260B, 0 池重定位); 整 ROM make + SHA1 绿。
+
+## sub_800A534 (0x0800A534, code_8005020) — ✅ 2026-09-02 opencode (逐字节 OK 304B)
+装备加成结算: 按 gUnk_087EA580 的 12B 角色条目, 把 +8 防御字节的低4位-1 / 高4位-1
+分别选一个装备加成栏 (0=AtkBase 1=Def2 2=Agl 3=Men 4=Res 5=Noa 6=Luc) 累加
++6(HP) / +7(攻击); ID 在 [0x22,0x2B] 或 [0x37,0x3E] 时 Noa 额外 +1。
+
+**匹配历程 (505分 → 0分)**:
+1. switch 用 `if (v <= 6) { switch(v) }` 守卫 + jump table 直接命中结构; `u32 v`
+   才有无符号 bhi (u8 会加 lsls/lsrs 截断, s32 变 bgt)。`default: break` 写法会
+   落进 add, 错。
+2. 13 字节残留 = 纯 home (tbl r2↔r3, val r3↔r2) + val 装载/subs 顺序。
+   `register u8 val; register u32 v;` 定 val→r2/v→r0 home; permuter 200 分发现
+   第一分支 `bonusVal = val` 副本补齐 home。
+3. 最后 8 字节 = 调度顺序: 目标 `ands; ldrb val; subs` vs mine `ands; subs; ldrb`。
+   **正解 (规则112)**: `v = tbl[8]&0xF; val = tbl[6]; if (v-1 <= 6) switch(v-1)`
+   —— 把 -1 拆到守卫表达式, val 装载落进 ands→subs 空隙, 逐字节命中。
+
+**验证**: fncheck OK (304B, 16 池重定位); 整 ROM make + SHA1 绿 (610/1065)。

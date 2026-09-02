@@ -724,6 +724,26 @@
      恰好阻止 CSE。两者都只为复现 GCC2 的分配行为。
      关联: 规则 88 (跨块 home 归 global-alloc, 按伪寄存器生死边界改)、规则 87、规则 97。
 
+112. **switch 守卫的分式拆分让独立 load 落进 `ands` 与 `subs` 的调度空隙**（案例 `sub_800A534`, 2026-09-02）。
+     目标形状: `ldrb [tbl,#8]; ands r0,r1; ldrb r2,[tbl,#6]; subs r0,#1; cmp r0,#6; bhi` ——
+     val(=tbl[6]) 的装载被调度在 `ands`(取低4位) 与 `subs`(-1) 之间。
+     直觉写法 `v = (tbl[8]&0xF)-1; val = tbl[6]; if (v<=6) switch(v)` 生成
+     `ands; subs; ldrb`(val 装载落在 subs 之后, 差 8 字节), 且直接交换语句序
+     (`val` 先) 会搅乱 tbl/val 的寄存器 home(差 24 字节)。
+     **正解**: 把 `-1` 从 v 的赋值里拆到守卫与 switch 的表达式:
+     ```c
+     v = tbl[8] & 0xF;          /* 只有 ands */
+     val = tbl[6];              /* 独立 load 落在中间 */
+     if (v - 1 <= 6)            /* subs 在此处生成 */
+         switch (v - 1) { ... } /* CSE 复用同一个 subs 结果 */
+     ```
+     调度器于是把 ldrb 塞进 ands→subs 之间, 逐字节命中。
+     **配套**: `register u8 val; register u32 v;` 定 r2/r0 home; 第一个分支内
+     `bonusVal = val;`(副本) 微调 val 的伪寄存器分配。这属于"把一条表达式按 RTL
+     层次拆成多语句"的调度槽位技巧, 与规则 13/25/83 同类 —— 判定: 目标出现
+     `ands ...; ldrb ...; subs ...`(装载夹在掩码与减之间) 就用分式拆分。
+     关联: 规则 25 (屏障定槽)、规则 103 (常量顺序由引用序决定)。
+
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 
 agbcc (egcs 1.1 系) 自带 RTL 转储开关, 对定位寄存器 home 问题极其有用:

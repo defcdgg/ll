@@ -201,7 +201,7 @@ void Stats_BuildSkillList(u8 *, u8, u8);
 u8 Chara_GetFormGfx(u8);
 void sub_800A1B4(u8);
 void sub_800A3C8(u8, u8);
-void sub_800A534();
+void sub_800A534(u8);
 void sub_800A664(u8);
 void Stats_RecalcEquip(u8);
 u8 ExpToLevel(s32);

@@ -125,7 +125,7 @@ void MapBg_LoadFull(u8);
 void MapScene_Load(u8);
 void MapScene_LoadNpcSlotIds(u8);
 void MapScene_InitSprites(u8);
-void sub_8007350();
+void MapScene_LoadEventAnimations(u8);
 u8 *AnimSlot_Parse(u16, u8 *);
 u8 *AnimSlot_ParseLoop(u16, u8 *);
 void sub_8007A1C(s16);   // UpdateSpriteAnim: 推进精灵动画槽帧计数, 并把当前帧图块拷进 0x02006000 图块缓存
@@ -140,7 +140,7 @@ u32 ChoiceMenu_BuildList();  // 返回类型非 void 但体内无 return —— 
 void BattleIntro_Cursor();
 void ChoiceMenu_HandleInput(u16);
 void DialogPortrait_Set(u8 portraitId, u8 position);
-void sub_80086FC();
+void Viewport_UpdateEffects();
 void IntroBg_Load(u8);
 void ScreenFade_Start(u16, s16, s16);
 void AnimSlot_BankReload();
@@ -992,7 +992,7 @@ u8 sub_804F088(u8 *, u32);
 u8 sub_804F0B8(u8 *, s32);   // CheckObjectKindSlot: 比较对象 +0x91/+0x92 两个候选 id, 返 1/2/0
 #define CheckObjectKindSlot sub_804F0B8
 s8 sub_804F10C(u8, u8);
-void sub_804F17C();
+u8 sub_804F17C(u8 *, u8, u8);
 void SioBattle_ResetState();
 u8 SioBattle_GetState();
 void SioBattle_ClearSlots();

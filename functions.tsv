@@ -946,7 +946,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804f088	sub_804F088	✅ 2026-09-02 opencode: obj[0xBE]>10返2, 否则按 obj[0xA4]>0xDC 分派 sub_804E0E4/sub_804E2AC; 被调原型须非void(u8即可,egcs对u8返回恒截断); fncheck OK 48B
 1	thumb	code_804F0B8	0x0804f0b8	sub_804F0B8	✅ 2026-08-31 pi: 形参必须 s32 + 首句 arg1=(u8)arg1 (u8形参的<0被恒假折叠,规则65) + 两个 do{}while(0) 屏障(规则66); 84B fncheck OK
 1	thumb	code_804F0B8	0x0804f10c	sub_804F10C	✅ 2026-09-02 opencode: 查GetObjPool空闲槽(筛sub_8045F10==2)里首个sub_804E76C命中者, 返内部下标或-1; 需int idx提前乘0xC8 + s8 tmp中间拷贝才复现GCC2截断调度; fncheck OK 110B
-0	thumb	code_804F0B8	0x0804f17c	sub_804F17C	
+1	thumb	code_804F0B8	0x0804f17c	sub_804F17C	✅ 2026-09-02 ll-agent: 姊妹(sub_804F10C)收集版: 清arg0[0..4], 筛GetObjPool空闲槽(sub_8045F10==2), 全命中sub_804E76C(slot,arg1,arg2)槽下标写入arg0[]并返数量; 死代码无调用点, 首试逐字节全等; 用r8/r9/sl三高位寄存器; fncheck OK 148B
 1	thumb	code_804F0B8	0x0804f210	SioBattle_ResetState	
 1	thumb	code_804F0B8	0x0804f244	SioBattle_GetState	
 1	thumb	code_804F0B8	0x0804f250	SioBattle_ClearSlots	

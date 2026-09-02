@@ -81,7 +81,32 @@ s8 sub_804F10C(u8 arg0, u8 arg1)
     return found;
 }
 // @ 0x0804F17C
-INCLUDE_ASM("asm/nonmatchings", sub_804F17C);
+// 在 GetObjPool 空闲槽中找所有通过 sub_804E76C(slot, arg1, arg2) 的槽,
+// 把槽下标写入 arg0[0..found-1], 返回命中数量。
+// 注: 用 r8/r9/sl 三个高位寄存器, 有 GCC2 泄漏风险。
+u8 sub_804F17C(u8 *arg0, u8 arg1, u8 arg2)
+{
+    u8 i;
+    u8 found;
+    u8 count;
+    u8 slots[5];
+    u8 *pool;
+
+    for (i = 0; i <= 4; i++)
+        arg0[i] = 0;
+    pool = (u8 *)GetObjPool();
+    count = sub_80489E8(pool, slots, 0, 0x1FF);
+    found = 0;
+    for (i = 0; i < count; i++)
+    {
+        if (sub_804E76C(pool + slots[i] * 0xC8, arg1, arg2) >= 0)
+        {
+            arg0[found] = slots[i];
+            found++;
+        }
+    }
+    return found;
+}
 // INCLUDE_ASM("asm/nonmatchings", SioBattle_ResetState);
 // @ 0x0804F210
 void SioBattle_ResetState(void)

@@ -268,7 +268,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8010F10	0x08011454	sub_8011454	
 0	thumb	code_8010F10	0x08012530	sub_8012530	
 0	thumb	code_8010F10	0x08012790	SaveUi_LoadScreen	⏸ 2026-09-02 gpnux: 存档/场景选择 UI 主状态机；扫描 gSaveMapUnlockFlags 并以 SaveFlag_Get 判断可用场景，确认后调用 MapScene_Load；已完成语义改名，保留原始 asm；fncheck OK (4320B)
-0	thumb	code_8010F10	0x08013870	sub_8013870	
+0	thumb	code_8010F10	0x08013870	sub_8013870	⏸ 2026-09-02 opencode: 文本块绘制=ClearBuffer内联填0xB001(0x14×0x1E)+TextBlocks_Render串+Text_WriteChars尾; 字符串段/footer已逐字节一致, 差53B=填零循环寄存器home轮换(src/值/行距/h/w/0x1E0000 六值环形置换); v13(src后赋)填零全对但src晚载使prologue差4B, v16(src顶赋)串全对但填零置换; 候选permuter/sub_8013870/base.c
 0	thumb	code_8010F10	0x08013934	sub_8013934	
 0	thumb	code_8010F10	0x08013b0c	sub_8013B0C	
 0	thumb	code_8010F10	0x08013c00	sub_8013C00	

@@ -2176,3 +2176,20 @@ case1 → obj[0xBD]=0。
 4. 尾部 obj[0xBD] 用 value 临时 (RHS 先于地址, 规则115 配套)。
 
 **验证**: fncheck OK 170B (5 bl 槽, 1 池重定位); 全 ROM make+SHA1 绿 (617/1065)。
+
+## sub_8013870 (0x08013870, code_8010F10) — ⏸ 2026-09-02 opencode (53字节差)
+文本块绘制: ClearBuffer 内联填 0xB001 空白 (0x02005800, 0x1E 宽 × 0x14 高, 行距 0x40B),
+再按 TextBlocks_Render 格式画 0x08098622 的字符串, 尾部 Text_TileAt(0xC,7)+Text_WriteChars(0x08098858)。
+
+**已解**:
+1. 填零 = 调用 inline `ClearBuffer((u16*)0x02005800, 0x1E, 0x14)` (SaveUi_Open 同款, 逐字节同构:
+   入口测试 + `0x1E0000>>16` 物化内界 + 值逐外层迭代装载)。
+2. 字符串段与 footer **逐字节一致** (与 TextBlocks_Render 结构相同, 含 0xFE 转义)。
+
+**卡点 = 填零循环的全局寄存器 home 轮换 (规则17/88类)**: 目标六值分配
+{src:r8, 值:r4, 行距:r5, h:r6, w:r9, 0x1E0000:ip}, prologue 存 r8+r9 两个高位。
+- v16/src 顶处赋 (早载): 字符串全对, 但填零 src→r4/值→r5/行距→r6/h→r9/w→ip/0x1E0000→r8 环形置换, 差 53B。
+- v13/src 后赋 (晚载): 填零 home 全对 (值→r4 等), 但 src 晚载使 prologue 少存一个高位、串段整体平移 4B, 差 ~178B。
+- 需要"src 早载入 r8 且不占 r0-r7"的两全分配, 穷举 20+ 变体 + permuter 三轮 (~5万次) 未果。
+
+**候选**: permuter/sub_8013870/base.c (= output-555, 53B) + cand_v13_fillmatch.c / cand_v16_strmatch.c。

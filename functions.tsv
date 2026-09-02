@@ -125,7 +125,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8005020	0x080064ac	BgMap_FillPattern	
 1	thumb	code_8005020	0x08006520	MapBg_LoadFull	
 0	thumb	code_8005020	0x0800661c	MapScene_Load	语义已确认: 地图场景资源/状态装载入口; fncheck OK (2026-09-02 codex)
-0	thumb	code_8005020	0x080071ec	sub_80071EC	
+0	thumb	code_8005020	0x080071ec	MapScene_LoadNpcSlotIds	
 1	thumb	code_8005020	0x0800729c	MapScene_InitSprites	
 0	thumb	code_8005020	0x08007350	sub_8007350	
 1	thumb	code_8005020	0x08007964	AnimSlot_Parse	
@@ -997,7 +997,7 @@ status	isa	module	addr	name	note
 1	thumb	code_804F0B8	0x08052a8c	Op_BgmFadeOut	
 1	thumb	code_804F0B8	0x08052aa8	Op_SfxPlay	
 1	thumb	code_804F0B8	0x08052acc	Op_SfxStop	
-0	thumb	code_804F0B8	0x08052ae8	sub_8052AE8	⏸ 双池加载+r0值链未破(1075); 15+拼法; 见progress
+1	thumb	code_804F0B8	0x08052ae8	sub_8052AE8	✅ 2026-09-02 opencode: rec=*arg0 记录, 从 [1]..[2] 号段随机(Rng_LcgNext%(max-min+1))查 gUnk_02016000 表, 结果指针 0x02016200+val 写回 *arg0, 返1; 关键坑=表基址/目标基址必须写常量地址 (u16*)0x02016000 而非数组符号 gUnk_02016000, 否则 GCC2 把 SYMBOL_REF 基址留在 callee-saved r7 不 remat → val/max 寄存器错位(差15B); 常量地址才 remat 命中; bytecmp+objdump 与 target .text 0 差, fncheck OK 76B(2 bl 忽略)
 1	thumb	code_804F0B8	0x08052b34	sub_8052B34	
 1	thumb	code_804F0B8	0x08052b80	Op_WaitCharsStop	
 1	thumb	code_804F0B8	0x08052ba0	Op_LoadCharaGfx	

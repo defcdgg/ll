@@ -1869,3 +1869,20 @@ else { p[idx]=0x92C0; q[idx]=0x92C0; p[0x241]=0x92C0; q[0x241]=0x92C0; }
 fncheck OK (112 bytes, 0 池重定位, 0 bl 槽)。
 注: 合入时 make 因**其他 agent 未提交重构** (code_8005020.c 引用不存在切片 MapScene_LoadNpcSlotIds)
 红, 本 TU 独立编译通过、fncheck OK, 照常提交。
+
+## 2026-09-02 `sub_8052AE8` 匹配 (号段随机查表, code_804F0B8)
+
+76 字节: `rec=(u8*)*arg0`, 从 `rec[1]..rec[2]` 号段用 `Rng_LcgNext() % (max-min+1)` 随机取一索引查
+`gUnk_02016000` u16 表, 把 `0x02016200 + val` 指针写回 `*arg0`, 返回 1。
+
+**关键坑 (与规则17 同族但可破)**: 表基址与目标基址**必须写成常量地址** `(u16*)0x02016000` / `0x02016200`,
+**不能**用数组符号 `gUnk_02016000` / `gUnk_02016200`。用符号时 GCC2 把 SYMBOL_REF 基址当普通值留在
+callee-saved r7 (多 push 一个 + val/max 落 r1/r0 互换), 差 15~35B; 用常量地址 GCC2 才识别为
+rematerializable → 每处重取 `ldr [pc]` → 分配命中目标 (bytecmp mine.o .text 与 target 逐字节 0 差)。
+- 其余要点: `Rng_LcgNext` 用 `((u32 (*)(void))Rng_LcgNext)()` 强制无符号 → `__umodsi3` (直接 `%` 出 `__modsi3`);
+  `diff=rec[2]-rec[1]` 须在 Rng 调用**之前**算 (否则 Rng 先 clobber caller-saved → 目标要重载 max/min, 顺序不符);
+  索引 `(u8)(...)` 截断 + `*2` 由 `lsls #0x18; lsrs #0x17` 产出。
+- 破法路径: 先朴素版差 64B → 发现 dest/base 分配问题 → 局部指针 t + 常量地址 + diff 前置 + u8 截断, 逐步 64→35→15→0。
+
+**并发提示**: 合入时工作区被另一 agent 的未完成改名 (code_8005020.c→MapScene_LoadNpcSlotIds, asm 未生成) 弄红,
+非本函数之锅; 本函数已 bytecmp + objdump 双重定性, 定向提交自己的文件。

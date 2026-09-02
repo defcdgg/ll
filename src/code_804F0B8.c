@@ -473,7 +473,27 @@ u32 Op_SfxStop(u32 *ptr)
 
     return 0;
 }
-INCLUDE_ASM("asm/nonmatchings", sub_8052AE8);
+/* 从记录 rec 的 [1]..[2] 号段随机取一值查表 gUnk_02016000, 结果指针写入 *arg0。
+ * 表基址/目标基址必须写成常量地址 (非数组符号): GCC2 对 SYMBOL_REF 会把基址留在 callee-saved
+ * r7 不外提重取, 导致 val/max 寄存器分配错位 (差 15B); 常量地址才触发 rematerialize 命中目标。 */
+u32 sub_8052AE8(u32 *arg0)
+{
+    u8 *rec;
+    u8 diff;
+    u16 val;
+    u16 *tbl;
+
+    rec = (u8 *)*arg0;
+    tbl = (u16 *)0x02016000;
+    val = tbl[rec[1]];
+    if (rec[1] < rec[2])
+    {
+        diff = rec[2] - rec[1];
+        val = tbl[(u8)(rec[1] + ((u32 (*)(void))Rng_LcgNext)() % (diff + 1))];
+    }
+    *arg0 = 0x02016200 + val;
+    return 1;
+}
 INCLUDE_ASM("asm/matchings", sub_8052B34);
 u32 Op_WaitCharsStop(u32 *ptr)
 {

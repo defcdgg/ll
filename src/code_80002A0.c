@@ -13,6 +13,7 @@ extern void IntrMain();
 
 
 
+// @ 0x080002A0
 void VBlank_UpdateGameScreen(void)
 {
     u16 val;
@@ -108,6 +109,7 @@ void VBlank_UpdateGameScreen(void)
     }
 }
 
+// @ 0x080004F8
 void VBlank_UpdateScreenSimple(void)
 {
     u16 val;
@@ -139,6 +141,7 @@ void VBlank_UpdateScreenSimple(void)
  *   索引 = (gHBlankWaveRow + scanline) & 0xFF, gHBlankWaveRow 由 VBlank 每帧推进 (相位)。
  * mode 1/2 额外叠加摄像机低 5 位, mode 3/4 纯波; mode 0 = 不动 (case 缺省不写)。
  */
+// @ 0x080005A8
 void HBlankWave_ApplyLineScroll(u16 scanline)
 {
     switch (gHBlankEffectMode)
@@ -162,6 +165,7 @@ void HBlankWave_ApplyLineScroll(u16 scanline)
 }
 
 // VBlankIntr
+// @ 0x0800065C
 void VBlankIntr(void)
 {
 
@@ -284,6 +288,7 @@ void VBlankIntr(void)
     REG_IME = 1;
 }
 
+// @ 0x080008CC
 void Display_ShutdownSequence(void)
 {
 
@@ -315,6 +320,7 @@ void Display_ShutdownSequence(void)
     REG_DISPCNT |= DISPCNT_FORCED_BLANK;
 }
 
+// @ 0x0800096C
 s32 Sio_LinkTask(void)
 {
 
@@ -425,6 +431,7 @@ s32 Sio_LinkTask(void)
     return Sio_IsHost();
 }
 
+// @ 0x08000B58
 void System_SoftReset(u32 arg0)
 {
     u16 i;
@@ -491,6 +498,7 @@ void System_SoftReset(u32 arg0)
  *   在负半周会得到一个大正数而非负偏移 (例 mode1: 0,8,0,13 循环), 靠 BG 偏移寄存器回绕
  *   出视觉效果。这是原作者的写法, 不要"顺手修正"成 s8 表 —— 会改变生成字节。
  */
+// @ 0x08000C98
 void HBlankWave_BuildTables(u16 mode)
 {
 
@@ -540,6 +548,7 @@ void HBlankWave_BuildTables(u16 mode)
     }
 }
 
+// @ 0x08000D5C
 u32 LZ_UncompressChunk(void)
 {
     u8 flag;
@@ -597,6 +606,7 @@ u32 LZ_UncompressChunk(void)
     return 0;
 }
 
+// @ 0x08000E1C
 void Intr_SetMode(u8 arg0)
 {
 
@@ -621,6 +631,7 @@ void Intr_SetMode(u8 arg0)
     REG_IME = 1;
 }
 
+// @ 0x08000ED8
 void Display_RestartAfterLoad(void)
 {
 
@@ -643,6 +654,7 @@ void Display_RestartAfterLoad(void)
     SoundMain_Frame();
 }
 
+// @ 0x08000F54
 void System_ResetToLogo(void)
 {
     gVBlankPipelineMode = 0;
@@ -656,14 +668,17 @@ void System_ResetToLogo(void)
     SoundMain_Frame();
 }
 
+// @ 0x08000F90
 void nullsub_5() { }
 
+// @ 0x08000F94
 void VBlankWait_PumpSound(void)
 {
     VBlankIntrWait();
     SoundMain_Frame();
 }
 
+// @ 0x08000FA4
 void VBlankWaitExit_PumpSound(void)
 {
     VBlankIntrWait();
@@ -672,6 +687,7 @@ void VBlankWaitExit_PumpSound(void)
     SoundMain_Frame();
 }
 
+// @ 0x08000FD0
 void LZ_InitContext(u8 *dest, struct Unk_LzData *arg1, u32 arg2)
 {
     u8 *ptr;
@@ -686,11 +702,13 @@ void LZ_InitContext(u8 *dest, struct Unk_LzData *arg1, u32 arg2)
     gLzContext.size = arg2;
 }
 
+// @ 0x08000FF8
 u8 Rand_TableNext(void)
 {
     return gRandShuffleTable[gRandCursor++];
 }
 
+// @ 0x08001014
 void EventFlags_ClearAll(void)
 {
     u16 i;
@@ -701,22 +719,26 @@ void EventFlags_ClearAll(void)
     }
 }
 
+// @ 0x08001030
 u8 EventFlags_Test(u16 arg0)
 {
     return gEventFlags[arg0 >> 3] & (1 << (arg0 & 7));
     // return gEventFlags[arg0 / 8] & (1 << (arg0 % 8));
 }
 
+// @ 0x08001050
 void EventFlags_Set(u16 arg0)
 {
     gEventFlags[arg0 >> 3] |= (1 << (arg0 & 7));
 }
 
+// @ 0x08001070
 void EventFlags_Reset(u16 arg0)
 {
     gEventFlags[arg0 >> 3] &= ~(1 << (arg0 & 7));
 }
 
+// @ 0x08001090
 void SwitchFlags_ClearAll(void)
 {
     u16 i;
@@ -727,21 +749,25 @@ void SwitchFlags_ClearAll(void)
     }
 }
 
+// @ 0x080010AC
 u8 SwitchFlags_Test(u16 arg0)
 {
     return gSwitchFlags[arg0 >> 3] & (1 << (arg0 & 7));
 }
 
+// @ 0x080010CC
 void SwitchFlags_Set(u16 arg0)
 {
     gSwitchFlags[arg0 >> 3] |= 1 << (arg0 & 7);
 }
 
+// @ 0x080010EC
 void SwitchFlags_Reset(u16 arg0)
 {
     gSwitchFlags[arg0 >> 3] &= ~(1 << (arg0 & 7));
 }
 
+// @ 0x0800110C
 void SwitchFlags_ClearRange(void)
 {
     u16 i;
@@ -752,6 +778,7 @@ void SwitchFlags_ClearRange(void)
     }
 }
 
+// @ 0x08001128
 void System_Init(void)
 {
     RegisterRamReset(3);
@@ -779,6 +806,7 @@ void System_Init(void)
     gScenePhase = 0;
 }
 
+// @ 0x080011F0
 void ReadKeysRaw(void)
 {
     u16 keyInput;
@@ -788,6 +816,7 @@ void ReadKeysRaw(void)
     gHeldKeysRaw = keyInput;
 }
 
+// @ 0x0800121C
 void ReadKeys(void)
 {
     u16 keyInput;
@@ -797,8 +826,10 @@ void ReadKeys(void)
     gHeldKeysRaw = keyInput;
 }
 
+// @ 0x08001248
 void DummyIntr3() { }
 
+// @ 0x0800124C
 void Intr_HandleHBlank(void)
 {
     switch (gVBlankPipelineMode)
@@ -813,12 +844,15 @@ void Intr_HandleHBlank(void)
     }
 }
 
+// @ 0x08001284
 void DummyIntr4() { }
 
+// @ 0x08001288
 void DummyIntr5() { }
 
 
 //AgbMain
+// @ 0x0800128C
 void AgbMain(void)
 {
     gMainTaskSlot = 0;
@@ -832,6 +866,7 @@ void AgbMain(void)
     }
 }
 
+// @ 0x080012B8
 void VBlank_UpdateScreenMode5(void)
 {
     sub_8016F30();
@@ -857,6 +892,7 @@ void VBlank_UpdateScreenMode5(void)
     }
 }
 //切换场景加载
+// @ 0x08001354
 void SceneTransition_Load(void)
 {
     u16 i;
@@ -953,6 +989,7 @@ void SceneTransition_Load(void)
 }
 
 //New Game
+// @ 0x08001538
 void NewGame_Init(void)
 {
     u8 i;
@@ -1035,6 +1072,7 @@ void NewGame_Init(void)
     gScenePhase = 0;
 }
 
+// @ 0x08001708
 void Scene_EnterMap(void)
 {
     u16 i;
@@ -1085,6 +1123,7 @@ void Scene_EnterMap(void)
     Sprites_UpdateFrame();
 }
 
+// @ 0x08001828
 void Scene_ExitToMenu(void)
 {
     u16 i;
@@ -1124,6 +1163,7 @@ void Scene_ExitToMenu(void)
     }
 }
 
+// @ 0x080018D4
 void Scene_Reload(void)
 {
     s16 i;
@@ -1202,6 +1242,7 @@ void Scene_Reload(void)
     Sprites_UpdateFrame();
 }
 
+// @ 0x08001A7C
 void Scene_EnterDoor(void)
 {
     s32 var_r4;
@@ -1258,6 +1299,7 @@ void Scene_EnterDoor(void)
 
     Sprites_UpdateFrame();
 }
+// @ 0x08001BD0
 void Scene_RestoreAfterBattle(void)
 {
     s16 i;
@@ -1314,6 +1356,7 @@ void Scene_RestoreAfterBattle(void)
 }
 
 
+// @ 0x08001D08
 void Task_MapExplore(void)
 {
     u8 eventId;
@@ -1533,6 +1576,7 @@ void Task_MapExplore(void)
     Sprites_UpdateFrame();
 }
 
+// @ 0x08002154
 void Sprites_UpdateFrame(void)
 {
     u16 i;
@@ -1640,6 +1684,7 @@ void Sprites_UpdateFrame(void)
     sub_80091C4();
 }
 
+// @ 0x08002380
 void Sprite_SetupDialogArrow(u8 charaId)
 {
     Actor *charaObj;
@@ -1682,6 +1727,7 @@ void Sprite_SetupDialogArrow(u8 charaId)
 INCLUDE_ASM("asm/matchings", Sprite_EnqueueRender);
 
 /*
+// @ 0x0800243C
 u8 Sprite_EnqueueRender(s16 x, s16 y, u8 sprNodeIdx, s16 z, u8 arg4)
 {
     SpriteNode* sprNode;
@@ -1810,6 +1856,7 @@ u8 Sprite_EnqueueRender(s16 x, s16 y, u8 sprNodeIdx, s16 z, u8 arg4)
 
 /*
 
+// @ 0x0800243C
 u8 Sprite_EnqueueRender(s16 x, s16 y, u8 arg2, s16 z, u8 arg4) {
     SpriteNode* sprNode;
     u8 num;
@@ -1948,6 +1995,7 @@ extern SpriteNode* gSpriteRenderQueue[128];
 extern Actor gActors[];
 
 
+// @ 0x0800271C
 void Sprite_UpdateCharaAnim(u8 arg0)
 {
     Actor *charaObj;
@@ -2114,6 +2162,7 @@ void Anim_BuildOamChain(u8 arg0, u8 *arg1);
 void PalTransfer_Enqueue(u8 , void* , u8 , u8 );
 
 
+// @ 0x080029D8
 void Anim_PlayCustom(u8 arg0) {
     Actor* chara;
     u8* animDataPtr;
@@ -2257,6 +2306,7 @@ void VramTransfer_Enqueue(u16 id, void* src, void* dest, u8 arg3);
 //DF 80 F4 81 00 00 DF 80 04 40 08 00
 //SpriteOamAttr[num]
 
+// @ 0x08002B54
 void Anim_BuildOamChain(u8 arg0, u8 *arg1) {
     Unk_03002E80 *ptr2E80;
     struct SpriteNode *renderObj;
@@ -2360,6 +2410,7 @@ void Anim_BuildOamChain(u8 arg0, u8 *arg1) {
 */
 
 // UpdateEncounter
+// @ 0x08002D54
 u8 CheckEncounter(void)
 {
 
@@ -2401,6 +2452,7 @@ u8 CheckEncounter(void)
     return 0;
 }
 
+// @ 0x08002DDC
 void LogoBlendEffect_Update(void)
 {
 
@@ -2478,6 +2530,7 @@ void LogoBlendEffect_Update(void)
 #define GET_TILEMAP(n) ((n) + 32)
 // INCLUDE_ASM("asm/matchings", LogoAssets_Load);
 
+// @ 0x08002F6C
 void LogoAssets_Load(void)
 {
 
@@ -2516,6 +2569,7 @@ void LogoAssets_Load(void)
 
 
 
+// @ 0x08003088
 void Task_DispatchGameState(void)
 {
     ReadKeys();
@@ -2524,6 +2578,7 @@ void Task_DispatchGameState(void)
 }
 
 //地图场景切换，加载数据精灵
+// @ 0x080030B0
 void SceneTransition_RequestMap()
 {
     if (gSceneSubState == 0 && gScenePhase == 1)
@@ -2541,6 +2596,7 @@ void SceneTransition_RequestMap()
     Sprites_UpdateFrame();
 }
 
+// @ 0x08003114
 void Task_DialogueFrame(void)
 {
     sub_800ACC8();
@@ -2548,6 +2604,7 @@ void Task_DialogueFrame(void)
     OAM_FlushFromQueue();
 }
 
+// @ 0x08003128
 void Task_BattleMenuFrame(void)
 {
     if (!(0x80 & gScreenFadeFlags) && (gSceneSubState == 0))
@@ -2560,6 +2617,7 @@ void Task_BattleMenuFrame(void)
     sub_80091C4();
 }
 
+// @ 0x08003168
 void Scene_ReloadViaMenu()
 {
     if (gSceneSubState == 0 && gScenePhase == 1)
@@ -2582,6 +2640,7 @@ void Scene_ReloadViaMenu()
     sub_80091C4();
 }
 
+// @ 0x080031E4
 void Task_SaveMenuFrame()
 {
     sub_8011454();
@@ -2589,12 +2648,14 @@ void Task_SaveMenuFrame()
     OAM_FlushFromQueue();
 }
 
+// @ 0x080031F8
 void Task_TextFrame()
 {
     sub_801417C();
     OAM_FlushFromQueue();
 }
 
+// @ 0x08003208
 void Scene_ResetResources(void)
 {
     u16 i;
@@ -2617,11 +2678,13 @@ void Scene_ResetResources(void)
     OAM_FlushFromQueue();
 }
 
+// @ 0x08003254
 void Anim_StepChara(u8 arg0)
 {
     Anim_PlayCustom(arg0);
 }
 
+// @ 0x08003264
 void PalTransfer_Flush()
 {
     u16 i;
@@ -2638,6 +2701,7 @@ void PalTransfer_Flush()
     }
 }
 
+// @ 0x080032BC
 void OAM_FlushFromQueue(void) {
     u16 i;
     SpriteNode* sprNode;
@@ -2678,6 +2742,7 @@ void OAM_FlushFromQueue(void) {
 
 }
 
+// @ 0x08003348
 void Sprites_ReleaseAll(void)
 {
     Actor *charaObj;
@@ -2752,6 +2817,7 @@ extern Unk_087EA394* gUnk_087EA394[];
 void Chara_InitFromDesc(u8, void*);
 
 
+// @ 0x080033E8
 void Sprites_LoadMapNPCs(u8 arg0) {
     Unk_087EA394* ptr2;
     u16 i;
@@ -2794,6 +2860,7 @@ typedef struct{
     u8 field_B;
     u8* field_C;
 }UnkStruct;
+// @ 0x0800345C
 void Chara_InitFromDesc(u8 arg0, UnkStruct* arg1) {
     Actor *chara;
     struct SpriteNode* renderObj;
@@ -2920,6 +2987,7 @@ void Chara_InitFromDesc(u8 arg0, UnkStruct* arg1) {
 
 
 */
+// @ 0x0800375C
 void Chara_InitDialogArrow(u8 arg0)
 {
     u8 temp_r1;
@@ -2956,6 +3024,7 @@ void Chara_InitDialogArrow(u8 arg0)
     }
 }
 
+// @ 0x080037DC
 void Chara_InitEffect(u8 arg0)
 {
     u8 idx;
@@ -2996,6 +3065,7 @@ void Chara_InitEffect(u8 arg0)
     }
 }
 
+// @ 0x0800384C
 void Chara_InitEffectAtPlayer(void)
 {
     u8 temp_r1;
@@ -3064,6 +3134,7 @@ static inline void Inl_LoadSpriteSheetPal(u8 slot, u16 palId)
     DmaCopy16(3, src, dst, 0x20);
 }
 
+// @ 0x080038CC
 void PendingSpriteLoad_Flush(void)
 {
     if (PENDING_SPRITE_GFX & gPendingSpriteLoad)
@@ -3076,6 +3147,7 @@ void PendingSpriteLoad_Flush(void)
 }
 
 INCLUDE_ASM("asm/nonmatchings", Chara_SetWalkPath);
+// @ 0x08003B08
 void Chara_ProcessCmdStream(u16 arg0)
 {
     u8 var_r5;
@@ -3177,6 +3249,7 @@ INCLUDE_ASM("asm/matchings", CheckFacingEvent);
 INCLUDE_ASM("asm/nonmatchings", Party_FollowAnim);
 // INCLUDE_ASM("asm/matchings", Followers_ResetHistory);
 
+// @ 0x08004358
 void Followers_ResetHistory(void) {
     u16 i;
 
@@ -3197,6 +3270,7 @@ void Followers_ResetHistory(void) {
 
 // INCLUDE_ASM("asm/matchings", Followers_SyncToTail);
 
+// @ 0x080043D4
 void Followers_SyncToTail(void) {
     u16 i;
 
@@ -3214,6 +3288,7 @@ void Followers_SyncToTail(void) {
 }
 INCLUDE_ASM("asm/matchings", Party_FollowStep);
 /*
+// @ 0x0800445C
 void Party_FollowStep(void) {
     Actor* chara;
     u16 i;
@@ -3343,6 +3418,7 @@ extern u8 gUnk_0838EEF4[];
  *   slot     : 0..N 缓冲槽, 每槽占 CUTSCENE_ANIM_BASE + slot*0x1000 的 4 KB VRAM 区
  *   slotSel  : 十进制编码 —— ≥100 表示 "减 100 存为动画槽号, 并额外置 flags 的 bit6"
  */
+// @ 0x080046DC
 void CutsceneAnim_Load(u16 animId, u8 slot, u8 slotSel) {
         u8 extraFlags;
     u8 animSlot;
@@ -3391,6 +3467,7 @@ extern u8* gCutsceneAnimPals[];
 #define VRAM_BASE  ((u8*)0x02020000)
 #define VRAM_STRIDE 0x1000
 
+// @ 0x080046DC
 void CutsceneAnim_Load(u16 arg0, u8 arg1, u8 arg2) {
     u8 a;
     u8 b;
@@ -3423,6 +3500,7 @@ void CutsceneAnim_Load(u16 arg0, u8 arg1, u8 arg2) {
 INCLUDE_ASM("asm/nonmatchings", CutsceneAnim_PlayFrame);
 
 
+// @ 0x08004980
 void MapGroup_Lookup(void) {
     u8 i;
 
@@ -3440,6 +3518,7 @@ void MapGroup_Lookup(void) {
 
 }
 
+// @ 0x080049C8
 void Chara_SetTilePos(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 {
 
@@ -3482,6 +3561,7 @@ INCLUDE_ASM("asm/matchings", Chara_MoveBy);
 //     }
 // }
 
+// @ 0x08004A44
 u16 VramTransfer_AllocSlot(void)
 {
     u16 i;
@@ -3496,6 +3576,7 @@ u16 VramTransfer_AllocSlot(void)
     return -1;
 }
 
+// @ 0x08004A6C
 u8 PalTransfer_AllocSlot()
 {
     u8 i;
@@ -3510,6 +3591,7 @@ u8 PalTransfer_AllocSlot()
     return -1;
 }
 
+// @ 0x08004A94
 void PalTransfer_Enqueue(u8 arg0, u32 arg1, s8 arg2, u8 arg3)
 {
 
@@ -3526,6 +3608,7 @@ void PalTransfer_Enqueue(u8 arg0, u32 arg1, s8 arg2, u8 arg3)
     }
 }
 
+// @ 0x08004AC0
 void VramTransfer_Clear(void)
 {
     u16 i;
@@ -3536,6 +3619,7 @@ void VramTransfer_Clear(void)
     }
 }
 
+// @ 0x08004ADC
 void VramTransfer_Flush(void)
 {
     u16 i;
@@ -3550,6 +3634,7 @@ void VramTransfer_Flush(void)
     }
 }
 
+// @ 0x08004B2C
 void VramTransfer_Enqueue(u16 arg0, void *arg1, void *arg2, u8 arg3)
 {
 
@@ -3561,6 +3646,7 @@ void VramTransfer_Enqueue(u16 arg0, void *arg1, void *arg2, u8 arg3)
     }
 }
 
+// @ 0x08004B60
 void PalTransfer_Clear()
 {
     u16 i;
@@ -3573,6 +3659,7 @@ void PalTransfer_Clear()
     }
 }
 
+// @ 0x08004B8C
 void SpritePool_Clear()
 {
     u16 i;
@@ -3584,6 +3671,7 @@ void SpritePool_Clear()
     }
 }
 
+// @ 0x08004BBC
 void Queue34C0_Clear(void)
 {
     u16 i;
@@ -3597,6 +3685,7 @@ void Queue34C0_Clear(void)
     }
 }
 
+// @ 0x08004BE0
 void RenderQueue_Clear(void)
 {
     u16 i;
@@ -3606,6 +3695,7 @@ void RenderQueue_Clear(void)
     }
 }
 
+// @ 0x08004BFC
 u8 Sprite_AllocNode(void)
 {
     u16 i;
@@ -3632,6 +3722,7 @@ static inline u8 findEmpty_Inl()
     return 0;
 }
 
+// @ 0x08004C28
 SpriteNode *Sprite_InitChainNode(SpriteNode *sprNode, u8 arg1, u16 arg2, u16 arg3, u16 arg4)
 {
     u8 foundIndex;
@@ -3664,6 +3755,7 @@ SpriteNode *Sprite_InitChainNode(SpriteNode *sprNode, u8 arg1, u16 arg2, u16 arg
  * GCC2 先算 src 再算 dst, 尾部多一条 `adds r0, r2, #0` 把 src 拷回 r0。 */
 extern u8 *gUnk_087E8430[];   /* 248 项 LZ77 压缩图块指针表 */
 
+// @ 0x08004C8C
 void LoadSpriteSheetGfx(u8 slot, u16 gfxId)
 {
     void *dst;
@@ -3676,6 +3768,7 @@ void LoadSpriteSheetGfx(u8 slot, u16 gfxId)
  * 目标里它是在 src/dst 之后才 `ldr r2, =0x040000D4` 的。 */
 extern u8 gUnk_080B9DFC[][32];   /* 每帧 16 色 BGR555 调色板 */
 
+// @ 0x08004CB8
 void LoadSpriteSheetPal(u8 slot, u16 palId)
 {
     const u8 *src;
@@ -3698,6 +3791,7 @@ void LoadSpriteSheetPal(u8 slot, u16 palId)
  *   bit7 = 1  → 4 块(128B), 此时 LoadDigitFontObjTiles 直接 return 不装数字
  * 注意形参必须是 s8: 目标入口只有 `lsls r0,#0x18` 而没有配对的 asrs,
  * 因为左移已把 bit7 送到符号位, 直接 `cmp r0,#0; blt` 就能完成有符号比较。 */
+// @ 0x08004CE8
 void LoadArrowObjTiles(s8 arg0)
 {
     const u8 *src;
@@ -3717,6 +3811,7 @@ void LoadArrowObjTiles(s8 arg0)
     DmaCopy16(3, src, UI_ARROW_OBJ_VRAM, size);
 }
 
+// @ 0x08004D20
 void Chara_SetGfxPal(u8 arg0, u8 arg1, u8 arg2)
 {
     Actor *p;
@@ -3729,6 +3824,7 @@ void Chara_SetGfxPal(u8 arg0, u8 arg1, u8 arg2)
     // gActors[arg0].unk3 = arg2;
 }
 
+// @ 0x08004D38
 void Chara_FreeSprite(u8 arg0)
 {
     Actor *ptr2E80;
@@ -3760,12 +3856,14 @@ void Chara_FreeSprite(u8 arg0)
 
     ptr2E80->sprNodeIdx = 0;
 }
+// @ 0x08004D8C
 void Chara_SetCmdPtr(u8 arg0, u8 *arg1)
 {
     Actor *ptr2E80;
     ptr2E80 = &gActors[arg0];
     ptr2E80->cmdStream = arg1;
 }
+// @ 0x08004DA4
 void Chara_StartMoving(u8 arg0)
 {
     Actor *ptr2E80;
@@ -3776,6 +3874,7 @@ void Chara_StartMoving(u8 arg0)
     ptr2E80->cmdPc = 0;
     ptr2E80->field_11 = 0;
 }
+// @ 0x08004DD0
 u8 Chara_AnyMoving(void)
 {
     u8 i;
@@ -3791,12 +3890,14 @@ u8 Chara_AnyMoving(void)
 
     return 0;
 }
+// @ 0x08004E04
 void Party_SetFollowMode(void)
 {
     gPartyFollowFlags |= 1;
 }
 /* 请求把 gfxId 这套图块装到精灵表槽 slot: 先记入 gSlotGfxId[], 再把单槽参数
  * (gPendingGfxSlot / gPendingGfxId) 写好并置 PENDING_SPRITE_GFX, 由 PendingSpriteLoad_Flush 延迟消费。 */
+// @ 0x08004E14
 void SetSlotGfxId(u8 slot, u16 gfxId)
 {
     gSlotGfxId[slot] = gfxId;
@@ -3807,6 +3908,7 @@ void SetSlotGfxId(u8 slot, u16 gfxId)
 }
 
 /* 同上, 调色板版本(置 PENDING_SPRITE_PAL)。 */
+// @ 0x08004E48
 void SetSlotPalId(u8 slot, u16 palId)
 {
     gSlotPalId[slot] = palId;
@@ -3815,10 +3917,12 @@ void SetSlotPalId(u8 slot, u16 palId)
     gPendingSpriteLoad |= PENDING_SPRITE_PAL;
 }
 /* 当前待处理的精灵装载请求位图; 调用方用 PENDING_SPRITE_GFX / PENDING_SPRITE_PAL 测位。 */
+// @ 0x08004E7C
 u8 GetPendingSpriteLoad(void)
 {
     return gPendingSpriteLoad;
 }
+// @ 0x08004E88
 void Chara_SetPosDir(u8 arg0, s32 arg1, s32 arg2, u8 arg3)
 {
     Actor *ptr2E80;
@@ -3831,6 +3935,7 @@ void Chara_SetPosDir(u8 arg0, s32 arg1, s32 arg2, u8 arg3)
     ptr2E80->targetFacing = arg3;
 }
 
+// @ 0x08004EB8
 u16 Chara_GetDrawZ(Actor *arg0)
 {
     if (arg0->stateFlags & 1)
@@ -3840,6 +3945,7 @@ u16 Chara_GetDrawZ(Actor *arg0)
 
     return arg0->z;
 }
+// @ 0x08004EDC
 s16 Chara_GetDrawX(Actor *arg0)
 {
     if (arg0->stateFlags & 1)
@@ -3854,6 +3960,7 @@ s16 Chara_GetDrawX(Actor *arg0)
     }
     return arg0->x;
 }
+// @ 0x08004F3C
 void Sprite_FreeChain(struct SpriteNode *arg0)
 {
 
@@ -3914,6 +4021,7 @@ INCLUDE_ASM("asm/matchings", Sprite_WriteOam);
  *   volatile 在这里纯粹是代码生成工具 -> 不合入, 保留 INCLUDE_ASM。
  */
 
+// @ 0x08004FA8
 void Chara_StartScriptAnim(u8 arg0, u8 arg1)
 {
     Actor *ptr2E80;
@@ -3922,6 +4030,7 @@ void Chara_StartScriptAnim(u8 arg0, u8 arg1)
     ptr2E80->field_14 = 0;
     ptr2E80->animIdx = arg1;
 }
+// @ 0x08004FD0
 s32 Chara_AnimWaitDone(u8 arg0)
 {
     Actor *ptr;

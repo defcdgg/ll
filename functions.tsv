@@ -288,7 +288,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x08015af0	sub_8015AF0	
 1	thumb	code_8010F10	0x08015b90	InvUi_DrawCursors	
 0	thumb	code_8010F10	0x08015c18	InvUi_Main	
-0	thumb	code_8010F10	0x08015e1c	sub_8015E1C	
+0	thumb	code_8010F10	0x08015e1c	sub_8015E1C	⏸规则17类寄存器分配硬骨头: 语义已全解(Text_PutGlyph 内联版+0xFF终止循环, dest=gWindowBgBuf/2+arg0+arg1*32, attr=arg2<<12 每分支各写, b==0空白/0xFE→0x280/else b*2, dest[0]=attr+tile & dest[0x20]=attr|(tile+1)); 但 8 版候选(v1-v8)最好仍差70/104B —— egcs 把 dest 放 ip(r12)、arg2<<28 放 r5 每轮>>16、指针放 r4、base 放 r3 的分配无法用等价C复现(我恒得 ptr→r3/arg2→r4/base→r2 的循环置换); 需 fndiff 逐指令长磨或改编译器; 最佳候选 permuter/sub_8015E1C/v8.c
 1	thumb	code_8010F10	0x08015e88	Save_ResetReadState	
 1	thumb	code_8010F10	0x08015ea0	Save_StartWrite	
 1	thumb	code_8010F10	0x08015ed0	sub_8015ED0	

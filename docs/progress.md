@@ -1818,3 +1818,17 @@ return 0xFF;
 - 内层命中计数用 `if (count == 2) return i;` 直接对应 `cmp r3, #2; beq → movs r0,#i` 的提前出口。
 - `gUnk_03004980` 在本 TU 原先没有 extern, 已按惯例放函数上方局部 extern (与 code_8005020/8044394/804F0B8 一致)。
 - code_0.h:272 原型已是 `u8 sub_80113CC(void)`, 本函数没有 K&R 原型坑。
+
+## 2026-09-02 `sub_8015E1C` 尝试 (Text_PutGlyph 内联 + 0xFF 循环, 挂起)
+
+语义完全解出 (借同文件已匹配的 `Text_PutGlyph`/`TextBlocks_Render` 及其 codegen 注释):
+`dest=(u16*)gWindowBgBuf + arg0 + arg1*32`, 遍历 `*p != 0xFF`, 每字节按 `b==0`(空白→两格 attr+1)/
+`b==0xFE`(tile=0x280)/`else`(tile=b*2) 写 `dest[0]=attr+tile` 与 `dest[0x20]=attr|(tile+1)`, attr=arg2<<12。
+
+**卡在寄存器分配 (规则17 同类)**: 8 版候选 (v1-v8) 最好 70/104B 差。目标是高寄存器压力函数:
+dest 落 **ip(r12)** (故每格 `mov r2,ip; strh[r2]` 而非直接 strh)、`arg2<<28` 落 r5 且**每轮 `lsrs r1,r5,#0x10` 重算 attr**
+(非整体外提)、指针落 r4、base 落 r3。我所有等价写法恒得到 {r2,r3,r4} 的**循环置换** (ptr→r3/arg2→r4/base→r2),
+且 egcs 在循环内把 `arg2<<12` 整体 CSE 外提 (与 standalone 的 Text_PutGlyph 行为不同)。
+- 试过: 每分支各写 attr、`(arg2<<28)>>16` 字面分解、dest 先/后算、直接走 arg3、局部 b 变量 —— 均不翻转分配。
+- 结论: 需 fndiff 逐指令长磨 (Text_PutGlyph 作者当年 2435→2610→0 才收, 且它更简单) 或改编译器; 非一次可下。
+最佳候选留 `permuter/sub_8015E1C/base.c` (=v8, 70B)。claim 转挂起。

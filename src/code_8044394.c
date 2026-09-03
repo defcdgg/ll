@@ -402,11 +402,43 @@ INCLUDE_ASM("asm/nonmatchings", sub_8045860);
 // @ 0x08045940
 INCLUDE_ASM("asm/nonmatchings", sub_8045940);
 // @ 0x08045A10
-INCLUDE_ASM("asm/nonmatchings", sub_8045A10);
-// @ 0x08045A74
-INCLUDE_ASM("asm/nonmatchings", sub_8045A74);
 extern u8 gUnk_08093418[];
 
+INCLUDE_ASM("asm/nonmatchings", sub_8045A10);
+
+// u8 sub_8045A10(u8 *obj, u8 arg1)
+// {
+//     u8 *slot;
+//     u8 *bptr;
+//     u8 b;
+//     u8 val;
+//     u8 *tbl;
+//     int off;
+//     s16 t;
+//     u8 v;
+//     s16 diff;
+
+//     slot = obj + 0x70;
+//     t = *(u16 *)slot;
+//     bptr = slot + 0x29;
+//     b = bptr[arg1];
+//     tbl = gUnk_08093418;
+//     off = b * 5 + 4;
+//     val = *(u8 *)(off + tbl);
+//     v = b;
+
+//     if (sub_804E76C(obj, 3, 1) >= 0)
+//         val = val - 2;
+//     if (sub_804E76C(obj, 3, 2) >= 0)
+//         val = val / 2;
+
+//     diff = t - val;
+//     if (diff < 0)
+//         return 0;
+//     return 1;
+// }
+// @ 0x08045A74
+INCLUDE_ASM("asm/nonmatchings", sub_8045A74);
 // @ 0x08045B90
 void sub_8045B90(u8 *obj, u8 index)
 {
@@ -485,7 +517,86 @@ void sub_8045EB8(u8 *obj)
     *flags |= extra;
 }
 // @ 0x08045F10
-INCLUDE_ASM("asm/nonmatchings", sub_8045F10);
+u8 sub_8045F10(u8 *obj, u16 dirMask)
+{
+    u8 result;
+    u8 dir;
+    result = 0;
+    if (obj[0xBE] != 0xFF)
+    {
+        result = 1;
+        dir = obj[0xAB];
+        if (dir <= 8)
+        {
+            switch (dir)
+            {
+                case 0:
+                    if (1 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+
+                case 1:
+                    if (2 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+
+                case 2:
+                    if (4 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+
+                case 3:
+                    if (8 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+
+                case 4:
+                    if (16 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+
+                case 5:
+                    if (32 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+
+                case 6:
+                    if (0x40 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+
+                case 7:
+                    if (0x80 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+
+                case 8:
+                    if (0x100 & dirMask)
+                    {
+                        result = 2;
+                    }
+                    break;
+            }
+        }
+    }
+    return result;
+}
 // @ 0x08045F94
 INCLUDE_ASM("asm/nonmatchings", sub_8045F94);
 // @ 0x08046060
@@ -495,7 +606,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_804612C);
 // @ 0x0804621C
 INCLUDE_ASM("asm/nonmatchings", sub_804621C);
 // @ 0x080462E4
-INCLUDE_ASM("asm/matchings", sub_80462E4); /* 台账修正: yaml=[1] 且 .s 已在 matchings/ (坑7) */
+INCLUDE_ASM("asm/matchings", sub_80462E4); /* 函数清单修正: yaml=[1] 且 .s 已在 matchings/ (坑7) */
 // @ 0x08046480
 INCLUDE_ASM("asm/nonmatchings", sub_8046480);
 // @ 0x08046558
@@ -1741,7 +1852,30 @@ void sub_804C78C(void)
     sub_804EF50();
 }
 // @ 0x0804C890
-INCLUDE_ASM("asm/nonmatchings", sub_804C890);
+void sub_804C890(u8 *obj)
+{
+    u8 i;
+
+    sub_804DE8C();
+    for (i = 0; i <= 4; i++)
+    {
+        u8 *o = obj + i * 0xC8;
+        if (sub_8045F10(o, 0x20) == 2)
+        {
+            u8 r;
+            u8 t = i;
+            u8 *p;
+
+            Rng_LcgNext();
+            r = sub_804C8E0(obj, t);
+            p = o + 0xBD;
+            t = 0;
+            *p = r;
+            o[0xBC] = t;
+        }
+    }
+    sub_804EF50();
+}
 // @ 0x0804C8E0
 u8 sub_804C8E0(u8 *obj, u8 arg1)
 {
@@ -2039,7 +2173,33 @@ void sub_804D260(u8 *obj, u8 *arg1)
     }
 }
 // @ 0x0804D310
-INCLUDE_ASM("asm/nonmatchings", sub_804D310);
+void sub_804D310(u8 *obj, u8 *arg1)
+{
+    u8 values[8];
+    u8 count;
+    u8 value;
+    u8 zero;
+    Unk_804D1B4_Entry *entry;
+
+    count = sub_80489E8(arg1, values, 0, 0x6F);
+    if (((u32 (*)(void))Rng_LcgNext)() % 0x65 < count * 10)
+        obj[0xBC] = 1;
+    else
+        obj[0xBC] = 0;
+    obj[0xBC] = 0;
+    entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
+    zero = 0;
+    switch (entry->field_10)
+    {
+    case 0:
+        value = values[(u32)(u8)Rng_LcgNext() % count];
+        obj[0xBD] = value;
+        break;
+    case 1:
+        obj[0xBD] = zero;
+        break;
+    }
+}
 // @ 0x0804D3A0
 void sub_804D3A0(u8 *obj, u8 *arg1)
 {
@@ -2118,7 +2278,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_804D5B4);
 // 直接导致全局 +4 位移 bug。待用 do-while 屏障/中间变量复现死 store 后重匹配。
 INCLUDE_ASM("asm/nonmatchings", sub_804D708);
 // @ 0x0804D798
-INCLUDE_ASM("asm/matchings", sub_804D798); /* 台账修正: tsv=1 且 .s 已在 matchings/ (坑7); 见 INCIDENTS.md */
+INCLUDE_ASM("asm/matchings", sub_804D798); /* 函数清单修正: tsv=1 且 .s 已在 matchings/ (坑7); 见 INCIDENTS.md */
 // @ 0x0804D840
 INCLUDE_ASM("asm/nonmatchings", sub_804D840);
 // @ 0x0804D8F4

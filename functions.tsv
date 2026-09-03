@@ -468,7 +468,7 @@ status	isa	module	addr	name	note
 0	thumb	code_801A3C4	0x0801d568	sub_801D568	
 0	thumb	code_801A3C4	0x0801d710	sub_801D710	
 0	thumb	code_801A3C4	0x0801d984	sub_801D984	
-0	thumb	code_801A3C4	0x0801daa0	sub_801DAA0	
+1	thumb	code_801A3C4	0x0801daa0	sub_801DAA0	✅ 2026-09-03 agent_0447: 场景倒计时状态机; permuter平台期30=规则29池假象, bytecmp字节定论; extern上移+原型u32; fncheck 156B OK
 0	thumb	code_801A3C4	0x0801db3c	sub_801DB3C	
 0	thumb	code_801A3C4	0x0801dc20	sub_801DC20	
 0	thumb	code_801A3C4	0x0801dd04	sub_801DD04	
@@ -678,7 +678,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80264C0	0x08038c84	sub_8038C84	
 0	thumb	code_80264C0	0x08038e44	sub_8038E44	
 0	thumb	code_80264C0	0x08039024	sub_8039024	
-0	thumb	code_80264C0	0x080392c0	sub_80392C0	
+1	thumb	code_80264C0	0x080392c0	sub_80392C0	✅ 2026-09-04 agent_glm: 状态机(gUnk_03000820 switch 0/19/20/6/9), 同族 sub_8032D74 模板仅 case0 第三参恒 0x3CB; case序=ROM序(规则124); 关键=permuter base.c 用 __asm__(".set gUnk_x,0x03XXXXXX")+extern 兼得真实符号语义(入口指针物化r2跨switch供case6写)与无重定位假差异; 原型 void→u8(同族先例,无C调用者); fncheck OK 288B, sha1 绿
 0	thumb	code_80264C0	0x080393e0	sub_80393E0	
 0	thumb	code_80264C0	0x08039724	sub_8039724	
 0	thumb	code_80264C0	0x08039c38	sub_8039C38	⏸ .s被跳转表截断, 需先补全反汇编
@@ -753,13 +753,13 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x080457ac	sub_80457AC	
 0	thumb	code_8044394	0x08045860	sub_8045860	
 0	thumb	code_8044394	0x08045940	sub_8045940	
-0	thumb	code_8044394	0x08045a10	sub_8045A10	⏸ 2026-09-02 gpnux: tile动画帧; 头部/主体已逐字节对(表gUnk_08093418[b*5+4], 两次sub_804E76C条件改val), 差尾部~22B(含8bl槽): 目标 lsls r6,#16;asrs#16(s16扩t); adds r1,r4(复制v); subs r0,r0,r1; lsls r0,#0x10(s16归一化); cmp;blt 20+变体(s16t/v16/diff/tbl/off拆分)未出此序, 属寄存器home; 候选permuter/sub_8045A10/c5.c 30B	
+0	thumb	code_8044394	0x08045a10	sub_8045A10	⏸ 已合入真C (src/code_8044394.c 0x08045A10) 但字节 FAIL 96B 差~22B: 目标尾部 adds r1,r4 #0(拷val)+asrs #0x10(s16扩展t) 出不来 — 穷举20+写法(x=x/守卫/别名/改s16 t/复用b/off/v提前)全不触发, permuter 280s 平台期220分; 注: 语义等价(s16 vs u16 仅 t>=0x8000 时分支), 但铁律禁语义合入; 头部 ldr 偏移差已按规则77定性为双字面池(无解,不影响); 真实根因疑 t 非同槽 u16 读取(sibling sub_8045B90 同表同调用形状, 需对照其 home); 基线本身红(见 INCIDENTS 2026-09-03) 注意甄别; mk脚本 .scratch/gpnux/45a10/
 0	thumb	code_8044394	0x08045a74	sub_8045A74	
 1	thumb	code_8044394	0x08045b90	sub_8045B90	
 0	thumb	code_8044394	0x08045bf4	sub_8045BF4	
 0	thumb	code_8044394	0x08045d00	sub_8045D00	
 1	thumb	code_8044394	0x08045eb8	sub_8045EB8	✅ 2026-09-02 gpnux: Sub6C{pad[0x21],ids[6]} 视图还原 (p+0x21)+i 取址树 + u8(u8,u8) 原型触发返回值截断; 末尾 `*flags |= extra(恒0)` 被 CSE 折叠但保住 movs r7,#0 (坑11); fncheck 88B OK
-0	thumb	code_8044394	0x08045f10	sub_8045F10	⏸ 指令流 100% 对 (132B 逐条一致), 只差 3 个 global-alloc home (obj↔dirMask 互换, 8 字节)。语义: obj[0xBE]!=0xFF→result=1; dir=obj[0xAB]<=8 时 switch(dir) 查 1<<dir 九项跳转表→bit, (bit & (u16)dirMask) 非零→result=2; 返回 0/1/2 (0=未激活 1=激活不朝向 2=激活且朝向)。已定死形状: ① 守卫必须写成 `dir = obj[0xAB]; if (dir <= 8) { switch (dir) ... }` (直接 `if (obj[0xAB] <= 8)` 会留两条 cmp r0,#8 且 dirMask 掉进 r5; 无守卫的 `default: return result;` 会被 tail-dup 成 movs r0,#1 多 4 字节)。② 原型必须 `u8 f(u8 *, u16)` 才在入口产生 lsls/lsrs #0x10 截断。定量卡点见 RULES 规则 117: 需 pri(dirMask)>pri(obj)=0.231 即 refs≥5 或 (refs=4 且 live≤34), 而一切"刷引用"写法都被 tree/CSE 折掉; 唯一达 0 分的 `case: dirMask++; dirMask--;` ×2 是伪造语句 (铁律 4 禁), 不合入。候选: permuter/sub_8045F10/base.c (score 8) 与 output-20-1 (score 4, 含伪造语句, 仅作机制证明); 诊断脚本 .scratch/gpnux/45eb8/probe_rtl.py
+1	thumb	code_8044394	0x08045f10	sub_8045F10	✅ 2026-09-03 gpnux: src 注释里的候选直接合入即 132B 全等(fncheck OK, make+SHA1 绿) — 旧 3-home 卡点未复现(旧 score 系过期评分环境, 接手先跑字节判定); 语义=obj[0xBE]!=0xFF→1, dir=obj[0xAB]<=8 查 1<<dir&dirMask→2; 形状分析见 progress.md
 0	thumb	code_8044394	0x08045f94	sub_8045F94	
 0	thumb	code_8044394	0x08046060	sub_8046060	
 0	thumb	code_8044394	0x0804612c	sub_804612C	
@@ -822,7 +822,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x080497b0	sub_80497B0	
 1	thumb	code_8044394	0x080498e0	sub_80498E0	✅ 2026-09-03 gpnux: 磁盘动画帧写入器; 关键=扁平一维索引 tbl[byte*8+frame] + u16 ofs=byte*8 独立语句(避免u8截断且让frame载入落在lsls之后, 破4B调度地板); 规则17/87寄存器轮换靠 const u8*tbl 局部首载归位; 120B exact
 0	thumb	code_8044394	0x08049958	sub_8049958	
-0	thumb	code_8044394	0x08049ad8	sub_8049AD8	
+0	thumb	code_8044394	0x08049ad8	sub_8049AD8	⏸ 2026-09-04 opencode: 语义全解(battle stat成长: 遍历idx=(i+251+s)&0xff, diff=sub_8048818-sub_80455A0, (s16)diff>0则sub_8045688加值返回s+i否则13); 卡diff区LRA live-range-split: 目标 subs r0/adds r2(纯拷贝)/strh r0/lsls r0 需 int diff home在r0+拷贝到r2给call第3参; 标准agbcc下 separate store→int diff home r2(subs r2无拷贝), combined store(t6)→subs r0但diff成u16→call截断lsrs#0x10(差6字节); permuter最优output-10(差2字节)用diff=a重赋值偷改数据流不可读; 候选存permuter/sub_8049AD8/candidates/; 详情progress.md
 0	thumb	code_8044394	0x08049b70	sub_8049B70	
 0	thumb	code_8044394	0x08049c1c	sub_8049C1C	
 0	thumb	code_8044394	0x08049d58	sub_8049D58	
@@ -889,7 +889,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804c6b0	sub_804C6B0	
 1	thumb	code_8044394	0x0804c728	sub_804C728	✅ 2026-09-02 sound-agent: 与 sub_804C4D8 同构孪生 (仅基址 0x03000BE8 vs 0x03000AE8); 结构体成员形式规避规则11/67; fncheck OK 100B
 1	thumb	code_8044394	0x0804c78c	sub_804C78C	✅ 2026-09-02 sound-agent: obj池遍历+obj[0xBE]跳表分派CA2C..CE48; 目标函数用函数指针强转传冗余2参; fncheck OK 260B
-0	thumb	code_8044394	0x0804c890	sub_804C890	⏸ movs r1,#0被外提到r7; long long阻外提仍差1条调度; 75分
+1	thumb	code_8044394	0x0804c890	sub_804C890	✅ 2026-09-03 gpnux: 磁盘动画帧写入循环; 破34B地板→0: t=i作C8E0实参占r1→t=0复用r1作零(规则87兼职)+p=o+0xBD指针提前算地址逼首地址进r2(零life短拿r1); permuter score0; fncheck OK 78B
 1	thumb	code_8044394	0x0804c8e0	sub_804C8E0	✅ 2026-09-02 sound-agent: obj池槽位移除元素+随机取回; 关键=count--后置+for(j=i;j<count-1)绑定序(定r8 obj/r7移位基址); fncheck OK 210B
 1	thumb	code_8044394	0x0804c9b4	sub_804C9B4	✅ 2026-09-02 sound-agent: obj[0xBE]==9 时重取池+换歌并 break; value临时变量迫使 RHS先于地址计算(定r4/r5分配); fncheck OK 120B
 1	thumb	code_8044394	0x0804ca2c	sub_804CA2C	

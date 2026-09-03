@@ -932,7 +932,15 @@
        独立语句让 shift 紧贴 byte 载入, frame 读取(下一语句)落到 shift 之后 → 逐指令一致。
        **必须 u16/int**: 若 `u8 ofs = byte*8` 会多出 u8 截断 (`lsls#27;lsrs#24` 两条, 反增 8B)。
        判定: 目标"载入→移位→独立载入→加"序列, 而 C 得"载入→独立载入→移位→加"时, 移位拆宽类型独立语句。
-       关联: 规则 33 (死 store 改 home)、规则 25 (do-while 定槽)、规则 116 (屏障破 tiebreak)。
+        关联: 规则 33 (死 store 改 home)、规则 25 (do-while 定槽)、规则 116 (屏障破 tiebreak)。
+129. **循环内常量 0 被 LICM 外提到 callee-saved 时, 让该 0 复用"call 实参寄存器变量"兼两职: 既作实参占低号 caller-saved, 又置 0 复用同寄存器**（案例 `sub_804C890`, 2026-09-03, 34B地板→0）。
+       目标 `o[0xBC]=0` 的字面量 0 被 LICM 提到 r7 (多 push), 且字面量 0 触发 `subs r1,#1` 地址折叠。
+       解 = 声明 `u8 t=i;` 把循环变量 i 复制进 t 作 `sub_804C8E0(obj,t)` 实参 (t 落 r1), 再 `t=0; o[0xBC]=t;`
+       —— t 兼职"实参"与"零", 零复用 r1 (call 后死寄存器) 不触发外提, 且变量(非字面量)避免 subs 折叠。
+       再叠规则 87: 首地址 `p=o+0xBD` 提成指针变量 (life 变长→global-alloc 优先级降→让出 r1 给零、自取 r2),
+       零 life 短→优先级高→拿 r1, 逐指令命中。判定: 目标"call 后 movs rX,#0 + 该 rX 是刚死的实参寄存器"时,
+       用实参变量复用置 0; 首地址寄存器被零抢占时, 地址提指针变量延长 life。
+       关联: 规则 87 (变量兼职买 home)、规则 33 (死 store)、规则 88 (global-alloc life 定优先级)。
 
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
@@ -1024,6 +1032,22 @@ pri = (int)(((double)(floor_log2(n_refs) * n_refs * size) / (death - birth)) * 1
 → 真实原始写法必然带某种我们还没识别出的 ptr 引用形式; 下一步应当给 agbcc 打补丁
 打印完整 qty 优先级表(而非只看 flow 摘要), 或拿同族函数(sub_8053138/sub_805321C)
 交叉比对找共性。
+
+### sub_8049AD8 —— diff 区 int 值 home r0 + 纯拷贝到 r2, 干净 C 不可复现 (2026-09-04)
+
+目标 diff 区 `subs r0,r0,r4 / adds r2,r0,#0 / strh r0,[r1] / lsls r0,r0,#0x10 / cmp`:
+int `diff=b-a` home 在 **r0** (供 strh+cmp), 另 `adds r2,r0,#0` **纯拷贝**到 r2 供 call 第3参
+(obj reload 在分支后复用 r0 → 须提前存 r2)。这是 LRA 的 live-range-split (短命 r0 + 长命 r2 拷贝)。
+标准 agbcc 从等价 C **产不出**: separate store → int diff home r2 (`subs r2`, 无拷贝);
+combined store `diff=(*X=b-a)` → 得 `subs r0`+`strh r0` 但赋值表达式类型 u16 → call 处
+`lsrs r2,r0,#0x10` 截断而非纯拷贝 (差 6 真实字节)。**与 sub_80531A8 同族: home/拷贝是 global-alloc 决策, 非写法层。**
+
+已穷举无效 (别再重复): ~55 变体 = {int/u16/u32/long diff} × {combined/separate/chained/comma/
+u16*ptr/extern store} × {obj-var/inline obj} × {int-split/a251/inline idx} × {显式拷贝变量 save/dc/
+callval/raw=reassign} × do-while 屏障; permuter 5 次 (base/t6/t1/output-10/e70 种子)。
+permuter 最优 output-10 差 2 真实字节但靠 `diff=a; b-diff` 偷改数据流 (不可读, 清洗即退回 subs r2)。
+候选存 `permuter/sub_8049AD8/candidates/`。下一步同 sub_80531A8: 补 global-alloc 转储看 diff 的候选/优先级,
+或找能触发"短命值进 r0 + 长命拷贝进 r2 且不被 CSE 合并"的引用形式。
 
 ### 其他已确认的死路
 

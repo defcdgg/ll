@@ -310,7 +310,38 @@ INCLUDE_ASM("asm/nonmatchings", sub_8038E44);
 // @ 0x08039024
 INCLUDE_ASM("asm/nonmatchings", sub_8039024);
 // @ 0x080392C0
-INCLUDE_ASM("asm/nonmatchings", sub_80392C0);
+u8 sub_80392C0(u8 *obj)
+{
+    u8 result;
+
+    result = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = obj[0x35];
+            gUnk_03000822 = *(u16 *)(obj + 0x2A);
+            sub_8048B30(0, 0x1E, 0x3CB);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_8047B1C(obj) == 1)
+                gUnk_03000820 = 0x14;
+            break;
+        case 20:
+            sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 6;
+            break;
+        case 6:
+            if (!(*(u16 *)(obj + 0x24) & 0x800))
+                gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(obj, obj[0xA1]);
+            result = 2;
+            break;
+    }
+    return result;
+}
 // @ 0x080393E0
 INCLUDE_ASM("asm/nonmatchings", sub_80393E0);
 // @ 0x08039724

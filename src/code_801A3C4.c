@@ -123,6 +123,15 @@ void sub_801B7B8(void)
     DmaFill32(3, 0, gObjFlagsB, 0x80);
     DmaWait(3);
 }
+typedef struct Unk_8021064
+{
+    u16 field_0;
+    u8 field_2;
+    u8 field_3;
+} Unk_8021064;
+
+extern Unk_8021064 gUnk_03000670[];
+extern u8 gUnk_0861C664[];
 typedef struct Unk_801B81C
 {
     u8 pad_00[0x10];
@@ -416,7 +425,39 @@ INCLUDE_ASM("asm/nonmatchings", sub_801D710);
 // @ 0x0801D984
 INCLUDE_ASM("asm/nonmatchings", sub_801D984);
 // @ 0x0801DAA0
-INCLUDE_ASM("asm/nonmatchings", sub_801DAA0);
+u32 sub_801DAA0(void)
+{
+    u32 ret;
+    u8 i;
+
+    ret = 0;
+    if (gUnk_0300068E < 3)
+    {
+        gUnk_0300068D = (gUnk_0300068D + 1) % (10 - gUnk_0300068E);
+        if (gUnk_0300068D >= 9 - gUnk_0300068E)
+            gUnk_0300068E = gUnk_0300068E + 1;
+    }
+    else if (gUnk_0300068E <= 0x22)
+    {
+        gUnk_0300068E = gUnk_0300068E + 1;
+    }
+    else
+    {
+        ret = 1;
+        gUnk_0300068C = 0;
+        gUnk_0300068E = 1;
+        gUnk_0300068D = 0;
+        for (i = 0; i < 7; i++)
+        {
+            gUnk_03000670[i].field_0 = 0;
+            gUnk_03000670[i].field_2 = 0;
+            gUnk_03000670[i].field_3 = 0;
+        }
+        sub_804C2FC((u32)gUnk_0861C664, 0xF, 1);
+        sub_804C3A4(0xF, 1);
+    }
+    return ret;
+}
 // @ 0x0801DB3C
 INCLUDE_ASM("asm/nonmatchings", sub_801DB3C);
 // @ 0x0801DC20
@@ -425,15 +466,6 @@ INCLUDE_ASM("asm/nonmatchings", sub_801DC20);
 INCLUDE_ASM("asm/nonmatchings", sub_801DD04);
 // @ 0x0801DDB0
 INCLUDE_ASM("asm/nonmatchings", sub_801DDB0);
-typedef struct Unk_8021064
-{
-    u16 field_0;
-    u8 field_2;
-    u8 field_3;
-} Unk_8021064;
-
-extern Unk_8021064 gUnk_03000670[];
-extern u8 gUnk_0861C664[];
 extern u8 gUnk_03000730_arr[]; // gUnk_03000730 的字节视图
 
 // @ 0x0801DE44

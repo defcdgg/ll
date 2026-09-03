@@ -641,7 +641,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80264C0	0x08032548	sub_8032548	
 0	thumb	code_80264C0	0x0803272c	sub_803272C	
 0	thumb	code_80264C0	0x08032948	sub_8032948	
-0	thumb	code_80264C0	0x08032d74	sub_8032D74	
+1	thumb	code_80264C0	0x08032d74	sub_8032D74	✅ 2026-09-03 claude-c: 状态机switch (0/19/20/6/9); 2要点: ①case块源码顺序须按ROM序重排(0,19,20,6,9); ②三目写成 cond==0?A:B 方向(基值0x371为0时subs#0xF→0x362); 首轮bytecmp 16B差全为bl槽veneer伪影(未匹配被调者fncheck自动忽略); fncheck OK 292B
 0	thumb	code_80264C0	0x08032ea0	sub_8032EA0	
 0	thumb	code_80264C0	0x080334b8	sub_80334B8	
 0	thumb	code_80264C0	0x08033988	sub_8033988	
@@ -695,7 +695,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80264C0	0x0803e58c	sub_803E58C	
 0	thumb	code_80264C0	0x0803ed34	sub_803ED34	
 0	thumb	code_80264C0	0x0803f21c	sub_803F21C	
-0	thumb	code_80264C0	0x0803f328	sub_803F328	
+1	thumb	code_80264C0	0x0803f328	sub_803F328	✅ 2026-09-03 opencode: 对话框状态机(gUnk_0300086A switch 0-5): 0=返1; 1=DialogCtx_Clear3+Bg0_InitClear+sub_80196D4(0,0x02035AC0,0xB,...)9参+0825清零置v=2; 2=DialogCtx_GetField_C(0)==4→sub_803F21C(0x02035AC0,arg0)+sub_80187C0(0x400)置3; 3=sub_80187B4()&0x400==0置4; 4=0825<=0x27自增否则DialogCtx_SetHead(0,2,2)置5; 5=GetField_C(0)==0→Disp_Bg1Off置v; 关键=base(int)局部先物化池0x02035AC0再movs r4(规则44); 尾sub_801933C; fncheck OK 284B
 0	thumb	code_80264C0	0x0803f444	sub_803F444	
 1	thumb	code_80264C0	0x0803f5b4	sub_803F5B4	✅ 2026-09-03 zai: 遍历出生点表0x1X项调sub_804473C累加池entry+0xB2 u16并计数0858++; 关键=buf两步存储阻地址物化被sched提到call前+result累加器形态+循环内重读全局指针; 新符号gUnk_03000858(iwram+linker); sub_804473C原型void→u32; fncheck OK 164B
 0	thumb	code_80264C0	0x0803f658	sub_803F658	
@@ -960,7 +960,7 @@ status	isa	module	addr	name	note
 0	thumb	code_804F0B8	0x0804fa94	sub_804FA94	⏸ 2026-09-02 ll-agent: 任一flag置位版(跳转若真, 全假则推进), 镜像sub_804F974; goto+u16 idx已解布局, 剩32B=同族cross-jump(LC1落r1非r2+advance调度); 候选permuter/sub_804FA94/base.c; 建议zai一并处理(与sub_804FA04同根因)	
 0	thumb	code_804F0B8	0x0804fb24	sub_804FB24	
 1	thumb	code_804F0B8	0x08050014	ScriptPump_Run	
-0	thumb	code_804F0B8	0x0805008c	sub_805008C	⏸ 2026-09-02 zai-start-plan 匹配失败(12B真实差异), 已还原INCLUDE_ASM, 待重新匹配
+1	thumb	code_804F0B8	0x0805008c	sub_805008C	✅ 2026-09-03 ll-agent: 脚本泵后台服务; 关键=goto block2(1B)+entryTbl中间指针(4B)+bgRequest内联(1B), 12B→0; fncheck OK 300B
 0	thumb	code_804F0B8	0x080501b8	sub_80501B8	
 0	thumb	code_804F0B8	0x08050434	sub_8050434	
 0	thumb	code_804F0B8	0x0805063c	sub_805063C	

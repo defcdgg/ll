@@ -248,49 +248,60 @@ void ScriptPump_Run(void)
         }
     }
 }
+
 // @ 0x0805008C
 // 脚本泵的逐帧后台服务: 在脚本活动期间 (bit0=脚本中, bit9=暂停) 按 gUnk_03000E70 的请求位
 // 刷新 BG0 滚动/瓦片/LZ 块; LZ 解压完成后把脚本指针跳到解压缓冲 gUnk_02016200 的入口表项。
+// 注: ① op==0||0x17 且 bgRequest==0 才走第一 DMA 块, 否则(含非 0/0x17 op)重读 gUnk_03000E70
+//     若 bit4 置位走第二 DMA 块 —— `goto block2` 使编译器生成 bne 直跳 E2, 差 1B;
+//     ② LZ 表须 `u16 *entryTbl = gUnk_02016000;` 中间指针 (permuter 发现, 修池加载序, 差 4B);
+//     ③ bgRequest 必须内联 (抽变量多 1B)。fncheck OK 300B。
 void sub_805008C(void)
 {
+    u8 op;
+    u16 bgRequest;
+    u16 *entryTbl;
+
     if ((gUnk_03000E70 & 1) != 0 && (gUnk_03000E70 & 0x200) == 0)
     {
-        u8 op = *(u8 *)gUnk_03000E6C;
-        u16 bgRequest = gUnk_03000E70 & 0x10;
-
-        if ((op == 0 || op == 0x17) && bgRequest == 0)
+        op = *(u8 *)gUnk_03000E6C;
+        if (op == 0 || op == 0x17)
         {
-            REG_BG0HOFS = bgRequest;
-            REG_BG0VOFS = bgRequest;
-            DmaCopy16(3, (void *)0x02005800, (void *)0x0600F800, 0x800);
+            bgRequest = gUnk_03000E70 & 0x10;
+            if (bgRequest == 0)
+            {
+                REG_BG0HOFS = bgRequest;
+                REG_BG0VOFS = bgRequest;
+                DmaSetUnchecked(3, 0x02005800, 0x0600F800, 0x80000400);
+            }
+            else
+            {
+                goto block2;
+            }
         }
-
         if (gUnk_03000E70 & 0x10)
         {
+            block2:
             REG_BG0HOFS = 0;
             REG_BG0VOFS = 0;
-            DmaCopy16(3, (void *)0x02005800, (void *)0x0600F800, 0x800);
+            DmaSetUnchecked(3, 0x02005800, 0x0600F800, 0x80000400);
         }
     }
-
     if ((gUnk_03000E70 & 0x40) != 0 && FlushTileDma() < 0)
-    {
         gUnk_03000E70 &= ~0x40;
-    }
-
-    if (gUnk_03000E70 & 0x100)
+    if ((gUnk_03000E70 & 0x100) != 0)
     {
         BgTiles_LoadSet(0);
         gUnk_03000E70 &= ~0x100;
     }
-
-    if (gUnk_03000E70 & 0x200)
+    if ((gUnk_03000E70 & 0x200) != 0)
     {
         if (LZ_UncompressChunk() == 0)
         {
-            if (gUnk_03000E70 & 0x400)
+            if ((gUnk_03000E70 & 0x400) != 0)
             {
-                gUnk_03000E6C = (u32)(gUnk_02016200 + gUnk_02016000[gUnk_03000E69]);
+                entryTbl = gUnk_02016000;
+                gUnk_03000E6C = (u32)(gUnk_02016200 + entryTbl[gUnk_03000E69]);
                 gUnk_03000E70 &= ~0x400;
             }
             gUnk_03000E70 &= ~0x200;

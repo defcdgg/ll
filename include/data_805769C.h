@@ -172,7 +172,7 @@ extern const u8 gCharaCmdStream_88226[];
 extern const u8 gChoiceDestTable[];      /* 0x08087648 分组变长目的地表 */
 extern const u8 gChoiceDataBase[];
 extern const u8 gChoiceGroupPairTable[]; /* 0x0808823A, 84 项 × 2 B */
-extern const u8 gChoiceMenuMapRecordBlob[]; /* 0x080882E2..0x08088400 */
+extern const u8 gChoiceMapSpawnRecordStream[]; /* 0x080882E2..0x08088400 */
 
 /* 地图宝箱表 (0x08088400): 256 项 × 8B。
  * 装载器按 mapId 选出当前地图的项；itemId 作为交互脚本号，

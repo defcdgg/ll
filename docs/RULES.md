@@ -1,6 +1,6 @@
 # RULES.md — 经验库 (代码生成规律 / 坑 / 失败案例)
 
-> **开工手册在仓库根 `AGENTS.md`** (铁律/台账/工作循环/permuter/工具)。本文只放**深度经验**:
+> **开工手册在仓库根 `AGENTS.md`** (铁律/函数清单/工作循环/permuter/工具)。本文只放**深度经验**:
 > 写 C 前查同族规律、卡寄存器时查诊断与失败存档、改名/注册符号前查管线细节。持续追加。
 > 历史来源: 原 RULES.md (2026-09-01 拆分)。
 
@@ -379,10 +379,10 @@
     而 asm 占位编出来的就是原始反汇编 → 必然一致。实测 `sub_8009370`/`sub_8018E34`/`sub_804BE90`
     三个**未匹配**的挂起项 fncheck 全报 OK。所以判“是否真已匹配”要看
     `functions.tsv` 的 status 列（或 `audit.py` 的 status=1 字节核验），不能只看 fncheck。
-75. **台账会漂移，定期跑 `python3 scripts/audit.py`**。
+75. **函数清单会漂移，定期跑 `python3 scripts/audit.py`**。
     它交叉核对 `functions.tsv` × `functions.tsv note 列` × `build/*.o` 字节，
     并列出各翻译单元的 mtime（10 分钟内被人改过的自动标“避开”）。
-    本轮实测发现 **58 个函数已经匹配但台账还写“待开始”** —— 不查就是 58 个重复劳动。
+    本轮实测发现 **58 个函数已经匹配但函数清单还写“待开始”** —— 不查就是 58 个重复劳动。
     `--fix` 可自动校正（仅改已字节验证通过的行）。
 76. **`x |= 0xFF` 这类“或全 1”字面量会被 GCC2 直接折叠掉整个 RMW**（案例 sub_804BE90）。
     u8 变量 `ptr[0] |= 0xFF;` 因 `ldrb` 已零扩展、值域已知 ≤0xFF，GCC2 折成
@@ -876,7 +876,28 @@
         global-alloc 的 home 分配和 local-alloc 的调度槽位 —— 同一语义不同声明位置, 字节结果不同。
         判定: ① 函数体内所有 `u8/u16/u32/指针` 声明一律上提到函数开头统一声明; ② 中途才需要的
         临时量也先声明 (可留空初始化); ③ 循环变量 i/j 也在开头声明。
-        关联: 规则 10/33/47 (伪寄存器生命周期↔声明), 规则 106 (中间变量决定 global-alloc)。
+         关联: 规则 10/33/47 (伪寄存器生命周期↔声明), 规则 106 (中间变量决定 global-alloc)。
+ 123. **ROM 池地址常量的物化顺序, 用 `int` 局部 (赋裸地址值) 而不是 `u8*` 局部/内联 cast 控制**（案例 `sub_803F328`, 2026-09-03）。
+        目标在 `bl Bg0_InitClear` 后先 `ldr r1,=0x02035AC0`(池加载) 再 `movs r4,#2`(v=2);
+        写成 `sub_80196D4(0,(u8*)0x02035AC0,...)`(内联 cast) 或 `base=(u8*)0x02035AC0;`(指针局部)
+        都让 GCC 先物化 `movs r4,#2` 再加载池 → 0x4c 处 4B 逆序。
+        **正解**: `int base; ... base = 0x02035AC0; ... sub_80196D4(0,(u8*)base,...)` ——
+        `int` 局部赋值裸地址值, 池加载伪寄存器先于 `v=2` 的 movs 被 global-alloc 排到前面
+        (规则 44 的"池加载早=用局部"镜像: 不是表基址而是任意 ROM 地址常量同样适用)。
+        传入处再 `(u8*)base` cast。fncheck 284B OK。
+ 124. **switch 的 case 块源码顺序 = ROM 块发射顺序 (GCC2 保序), 尾块异常合并时先对齐 case 顺序**（案例 `sub_8032D74`, 2026-09-03）。
+        ROM 顺序 0→19→20→6→9 的 switch 按"习惯的数值序" 0,6,9,19,20 书写时, 相距最远的
+        case0/case19 各自的 `gUnk_03000820 = X; break;` 尾被跨块 tail-merge 成共享
+        `strb r0,[rN]; b end` (bytecmp 155B 差); 按 ROM 序重排后每处存储就近内联, 差异立降。
+        判定: 目标里同一个"写状态全局"的 strb 在多个 case 各自独立出现 (共享一个池字但
+        不共享指令), 而候选把它们合并进共享尾块 → 首先检查 case 声明顺序是否与 ROM 一致。
+        关联: 规则 16/37 (switch 分发), 近亲验证 sub_8042AB4/sub_80405A4 (均已匹配, 源序=ROM序)。
+ 125. **三目 if-conversion 的基值取 else 分支**: `cond ? A : B` (A>B) 生成 `base=B; cond真: add (A-B)`;
+        要得到 `base=A; cond真: sub` 必须写成 `!cond ? B : A` 或 `cond==0 ? B : A`（案例 `sub_8032D74`, 2026-09-03）。
+        目标: `ldr r2,=0x371; cmp r0,#0; bne skip; subs r2,#0xF` — 基值 0x371 是 cond(obj[0xBE]!=0) 为**真**时的值,
+        即 C 写法是 `obj[0xBE] == 0 ? 0x362 : 0x371` (cond 为假取 0x362, 为真取基值 0x371)。
+        写成 `obj[0xBE] != 0 ? 0x371 : 0x362` 会得 `base 0x362; beq skip; adds #0xF`, 分支极性+算术全反。
+        判定: 目标是 base=大值+subs → 三目真值分支写大值; 目标是 base=小值+adds → 真值分支写小值。
 
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
@@ -977,12 +998,12 @@ pri = (int)(((double)(floor_log2(n_refs) * n_refs * size) / (death - birth)) * 1
 
 ## 符号改名管线 (函数/数据通用) —— 数据侧批量命名必用
 
-名字有三个独立载体, **漏一个就会链接失败或台账丢状态**:
+名字有三个独立载体, **漏一个就会链接失败或函数清单丢状态**:
 
 | 载体 | 作用 | 是否进 git |
 |---|---|---|
 | `ll.cfg` | gbadisasm 的名字源, 决定 `code.s` 里所有标号与 `bl` 目标符号 | ✅ |
-| ~~`functions.yaml`~~ | **已删除 (2026-09-01)**; 台账 = `functions.tsv` (addr 主键, status 列) | ✅ |
+| ~~`functions.yaml`~~ | **已删除 (2026-09-01)**; 函数清单 = `functions.tsv` (addr 主键, status 列) | ✅ |
 | `include/*.h` + `src/*.c` | 原型/定义/调用点/`INCLUDE_ASM` 行 | ✅ |
 | `code.s` → `asm/{matchings,nonmatchings}/*.s` | **全部重生成, 禁止手改** | ❌ (gitignore) |
 
@@ -1115,10 +1136,10 @@ arm-none-eabi-ld -r -T /tmp/wrap.ld /tmp/b1.o -o baserom.o
 
 ### 7. setup.sh 相关
 
-- `scripts/gen_asm.py` / `tsv_init.py` 无第三方依赖, 系统 python3 即可 (旧 split_asm 的 pyyaml 依赖已随 yaml 台账一起移除)
+- `scripts/gen_asm.py` / `tsv_init.py` 无第三方依赖, 系统 python3 即可 (旧 split_asm 的 pyyaml 依赖已随 yaml 函数清单一起移除)
 - `data/raw_data/*.bin` 由 `scripts/dumpraw.py` 从 baserom.gba 提取 (2026-09-01 起 **setup.sh 已自动跑**;
   之前不跑, 新克隆 `make` 必报 `Failed to open "data/raw_data/byte_XXXX.bin"` —— `src/data_805769C.c` 等三处 INCBIN)
-- **`scripts/fndiff.sh` 硬编码 `.venv/bin/python`**, 所以 `.venv` 是必需品而不是可选项; 但台账侧脚本
+- **`scripts/fndiff.sh` 硬编码 `.venv/bin/python`**, 所以 `.venv` 是必需品而不是可选项; 但函数清单侧脚本
   (gen_asm/audit/fncheck/tsv_init/gen_reports) 系统 python3 就够。asm-differ 要 `colorama watchdog
   Levenshtein cxxfilt`, permuter 要 `toml`, m2c 只要 `graphviz` —— setup.sh 现在自建 venv 并装这些
   (`--skip-venv` 可跳)。**pip 失败只警告不中断**, 因为 make 不依赖它。
@@ -1228,7 +1249,7 @@ make
 
 # 重新生成 asm 目录 (functions.tsv 改后; 增量, 幂等)
 python3 scripts/gen_asm.py
-# 从 src 重新推导台账 (交叉验证/初始化)
+# 从 src 重新推导函数清单 (交叉验证/初始化)
 python3 scripts/tsv_init.py
 
 # 重新生成 m2c 上下文 (头文件改后)

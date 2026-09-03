@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-audit.py -- 台账一致性审计 (多智能体并行的必备检查)
+audit.py -- 函数清单一致性审计 (多智能体并行的必备检查)
 
-核对三件事 ((已删)ASSIGNMENTS 已冻结, 台账 = functions.tsv):
+核对三件事 ((已删)ASSIGNMENTS 已冻结, 函数清单 = functions.tsv):
   1. functions.tsv 的 name 缓存列 vs ll.cfg 当前名 (改名漂移检测; gen_asm --sync 修复)
   2. status=1 的函数, 字节是否真的匹配 (fncheck 读 build/*.o; asm-match 的验 asm/matchings)
   3. note 列卫生 + "两个人同时在改同一个文件"迹象 (mtime 新鲜度)
@@ -22,7 +22,7 @@ os.chdir(ROOT)
 
 
 def yaml_status():
-    """{name: status} from functions.tsv (权威台账; 函数名以 ll.cfg 为准, 此处按 TSV 缓存名)。"""
+    """{name: status} from functions.tsv (权威函数清单; 函数名以 ll.cfg 为准, 此处按 TSV 缓存名)。"""
     import csv
     with open("functions.tsv", errors="replace") as f:
         return {r["name"]: r["status"] for r in csv.DictReader(f, delimiter="\t")}
@@ -104,7 +104,7 @@ def main():
              and ll_addr2name[int(r["addr"], 16)] != r["name"]]
     missing = [r["addr"] + " " + r["name"] for r in rows if int(r["addr"], 16) not in ll_addr2name]
 
-    print("=== functions.tsv 台账 ===")
+    print("=== functions.tsv 函数清单 ===")
     n1 = sum(1 for r in rows if r["status"] == "1")
     print(f"共 {len(rows)} 函数 | 已匹配 {n1} ({n1*100//len(rows)}%) | 未匹配 {len(rows)-n1}")
     print(f"改名漂移: {len(drift)}" + ("" if not drift else "  (跑 python3 scripts/gen_asm.py --sync 回写)"))

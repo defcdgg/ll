@@ -1315,10 +1315,11 @@ const u8 gCharaCmdStream_88226[] = {
  *   组 0x04 (8 项):  与组 0x00 完全相同
  *   合计 42 个无序对。
  *
- * 引用情况 (已全 ROM + 全数据段扫过): 只有项 0 (0x00,0x01) 被引用一次 ——
- *   ChoiceMenu_HandleInput 用它做特例判断: if ([0x030047BC] == 0 && packedPair == 1) {...}
- *   其中 packedPair = ((x & mask) << 4) | y, 与"有序数字对"的编码一致。
- *   项 1..83 无任何按地址引用, 也没有数据指针指向本表区间。
+ * 引用情况 (已全 ROM + 全数据段扫过): ChoiceMenu_HandleInput 先读取项 0
+ *   做特例判断: if ([0x030047BC] == 0 && packedPair == 1) {...}，随后从项 1
+ *   开始按 2 B 步长扫描整表，比较 groupId 和 packedPair。因此项 1..83 虽没有
+ *   独立的按地址引用或数据指针，仍是运行时通过表基址读取的有效表项。
+ *   packedPair = ((x & mask) << 4) | y, 与"有序数字对"的编码一致。
  * 假设(未证实): 5 组 = 5 个区域, 每组是区域间连通关系的有向边表。
  *   先按已证实的用途命名为 gChoiceGroupPairTable，具体区域语义仍待输入处理器确认。*/
 const u8 gChoiceGroupPairTable[] = {
@@ -1339,7 +1340,7 @@ const u8 gChoiceGroupPairTable[] = {
  * 末尾以 0x00 结束。每条记录 8 B: mapId, tileX, tileY, facingDir,
  * moveCmdSetId (小端 u16), 以及保留字段; 各组记录数为 5/7/9/9/5,
  * 与 gChoiceDestTable 的五组目的地数量对应。*/
-const u8 gChoiceMenuMapRecordBlob[] = {
+const u8 gChoiceMapSpawnRecordStream[] = {
     0x01, 0x03, 0x43, 0x02, 0x01, 0x00, 0x00, 0x00, 0x03, 0x3C, 0x1C, 0x06, 0x02, 0x00, 0x00, 0x00,
     0x03, 0xA2, 0x1D, 0x02, 0x16, 0x00, 0x00, 0x00, 0x14, 0x85, 0x30, 0x00, 0x84, 0x00, 0x00, 0x00,
     0x04, 0x19, 0x02, 0x04, 0x05, 0x00, 0x00, 0x00, 0xFF, 0x10, 0x3B, 0x0D, 0x04, 0x18, 0x00, 0x00,

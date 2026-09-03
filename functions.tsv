@@ -576,7 +576,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80264C0	0x08026d08	sub_8026D08	
 0	thumb	code_80264C0	0x08026f88	sub_8026F88	
 0	thumb	code_80264C0	0x0802723c	sub_802723C	
-0	thumb	code_80264C0	0x0802761c	sub_802761C	
+1	thumb	code_80264C0	0x0802761c	sub_802761C	✅ 2026-09-03 gpnux: 状态机case0/1-7/9; 尾部调度需mask temp+zero变量; 规则16/37开关·467ec3b	
 0	thumb	code_80264C0	0x08027760	sub_8027760	
 0	thumb	code_80264C0	0x08027a20	sub_8027A20	
 0	thumb	code_80264C0	0x08027d9c	sub_8027D9C	
@@ -641,7 +641,7 @@ status	isa	module	addr	name	note
 0	thumb	code_80264C0	0x08032548	sub_8032548	
 0	thumb	code_80264C0	0x0803272c	sub_803272C	
 0	thumb	code_80264C0	0x08032948	sub_8032948	
-1	thumb	code_80264C0	0x08032d74	sub_8032D74	✅ 2026-09-03 claude-c: 状态机switch (0/19/20/6/9); 2要点: ①case块源码顺序须按ROM序重排(0,19,20,6,9); ②三目写成 cond==0?A:B 方向(基值0x371为0时subs#0xF→0x362); 首轮bytecmp 16B差全为bl槽veneer伪影(未匹配被调者fncheck自动忽略); fncheck OK 292B
+1	thumb	code_80264C0	0x08032d74	sub_8032D74	✅ 2026-09-03 claude-c: 状态机switch (0/19/20/6/9); 2要点: ①case块源码顺序须按ROM序重排(0,19,20,6,9); ②三目写成 cond==0?A:B 方向(基值0x371为0时subs#0xF→0x362); fncheck OK 298B, sha1 绿
 0	thumb	code_80264C0	0x08032ea0	sub_8032EA0	
 0	thumb	code_80264C0	0x080334b8	sub_80334B8	
 0	thumb	code_80264C0	0x08033988	sub_8033988	

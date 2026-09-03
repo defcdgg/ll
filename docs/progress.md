@@ -1201,7 +1201,7 @@ if (gDrawCamEaseActive) {
 而 `yaml.safe_load` 会**静默后写覆盖**, 用“重复键: 无”误导了我一次 ——
 查重复必须用文本级 `grep -oE '^  \w+:' | sort | uniq -d`。
 
-**④ 台账漂移**: `audit.py --fix` 校正 `sub_8014488` 一行, 现在 0 漂移。
+**④ 函数清单漂移**: `audit.py --fix` 校正 `sub_8014488` 一行, 现在 0 漂移。
 
 **另记**: 本轮观察到 `build/src` 在两次命令之间被清空过 (16 个 .o → 0), 说明仍有并发进程在跑 clean。
 → 验证与构建必须写在**同一条命令**里, 否则 fncheck 会因对象缺失而全体误报。
@@ -1935,7 +1935,7 @@ rematerializable → 每处重取 `ldr [pc]` → 分配命中目标 (bytecmp min
 直接消费者已统一使用 `gMapSceneDescriptors`：`MapBg_LoadFull`、`MapScene_Load` 的
 调用链、`MapScene_InitSprites` 以及 `Sprites_LoadMapNPCs` 的 NPC 槽组字段。
 `MapScene_Load` 和 `MapScene_LoadNpcSlotIds` 已完成语义命名但仍保留原始 asm，
-对应台账 note 标为挂起；四个相关函数 fncheck 均 OK，场景表 `0xE10` 字节比较通过，
+对应函数清单 note 标为挂起；四个相关函数 fncheck 均 OK，场景表 `0xE10` 字节比较通过，
 场景相关函数与数据在独立核验中通过；整 ROM 在当时无并行改动时 `make && sha1sum -c ll.sha1` 通过。
 当前共享工作树另有 `sub_8015AF0` 改动导致整体布局偏移，最终红差异由并行改动负责。
 
@@ -2009,7 +2009,7 @@ gPartyStats[charaId].field_unk[2]==2 && field_unk[3]==arg1 → count++`。
 在 `include/data_805769C.h`、`linker.ld` 与 `scripts/data.json` 登记，并将 `data/data.s`
 的 blob 起点后移到 `0x08089BC4`。`sub_8012790` 已通过改名管线统一为
 `SaveUi_LoadScreen`（`ll.cfg`、调用点、asm 切片和原型均同步），函数仍保留原始 asm，
-因此台账 status 保持 0；`fncheck` 为 4320 字节 OK，整 ROM `make` + SHA1 通过。
+因此函数清单 status 保持 0；`fncheck` 为 4320 字节 OK，整 ROM `make` + SHA1 通过。
 
 ## sub_804AB40 (0x0804AB40, code_8044394) — ⏸ 2026-09-02 opencode-1 (17字节差)
 扫 ROM 表 0x0839B2E0 数 0xF00 项至 arg0 个; 复位 gUnk_0300094A-D 四字节;
@@ -2483,7 +2483,7 @@ reg_pref 对 LC1 伪寄存器的建议值来源; ③ 同族 sub_804F974/sub_804F
 
 ## 2026-09-03 sub_80488CC 合入遗漏修复 (zai)
 
-开场 make 即红 (缺 asm/nonmatchings/sub_80488CC.s): 台账 status=1、切片在 matchings/,
+开场 make 即红 (缺 asm/nonmatchings/sub_80488CC.s): 函数清单 status=1、切片在 matchings/,
 但 src/code_4394 的 INCLUDE_ASM 从未被真 C 替换 —— 胜出候选只存在于提交说明里。
 按 matchings/.s + progress 语义描述重建: 关键结构 = ① if/else 让普通路径 fall-through
 (else 尾置特殊分支, bhi 跳末尾); ② `first = *(obj+0x99)` 独立先读、`skills = obj+0x99`
@@ -2492,3 +2492,49 @@ reg_pref 对 LC1 伪寄存器的建议值来源; ③ 同族 sub_804F974/sub_804F
 返回值按 u8 用 (void 原型改 u8 后 `lsls r0,#0x18; cmp r0,#0` 形状自现)。
 bytecmp 指令级一致 (bl 槽远地址 veneer 为 bytecmp 伪影, 以 `sym=0x近地址` 消除)。
 fncheck OK 102B。
+
+## 2026-09-03 sub_803F328 合入 (opencode)
+
+对话框状态机 (gUnk_0300086A, 0x0803F328), m2c 转出即近似 100%: jump table 0-5 case,
+只有 0x4c 处 4B 逆序 (`ldr r1,=0x02035AC0` 应在 `movs r4,#2` 前)。
+三条路对比解决:
+- 内联 `sub_80196D4(0,(u8*)0x02035AC0,...)`: 先物化 movs 再池加载 → 逆序。
+- `base=(u8*)0x02035AC0` 指针局部: 依旧逆序。
+- `int base; base=0x02035AC0;` 再传 `(u8*)base`: ✅ 池加载先于 movs。
+写入规则 123。sub_80196D4 是 9 参 (0,base,0xB,2,2,1,2,0xC,4) K&R, 实参见
+sp 布局 r0/r1/r2/r3 + 5 栈槽。sub_803F21C(0x02035AC0,arg0)。C89 顶部集中声明
+(规则 122)。fncheck OK 284B, 全量 sha1 仅剩 sub_802761C (他人进行中)。
+
+## 2026-09-03 sub_802761C 匹配 (gpnux)
+
+对话框状态机 (gUnk_03000820, 0x0802761C, code_80264C0), 324B exact。
+
+**关键词**: 规则 16/37 (switch 不带 default, 空 case 1-7 迫使决策树分发 `cmp#7;bgt;cmp#1;bge;cmp#0;beq`);
+zero 变量复用 arg2/arg5 (单个 `movs r1,#0` 同时服务 `r1` 和 `str r1,[sp]`);
+**调度槽位**: 尾部 `obj[0x24] &= 0xEFFF; zero=0; call;` 的 `movs r1,#0` 排在 `strh` 之后,
+但目标在 `ands r0,r1` 后立即物化。用 `masked = load & 0xEFFF; zero=0; store = masked;` 分解,
+让 RTL 顺序变成 `ands r0,r1; movs r1,#0; strh r0` 与目标一致。permuter 跑 4400+ 代 score=130
+未突破 (纯调度非语句排序问题)。
+
+**结构**: case 0 设置 4 个全局状态 + 调 sub_80444A4/sub_801CE80/sub_803F5B4; case 9 随机选
+10% 概率为 obj pool 槽设 collision flag; 尾部统一调用 sub_803F658 并检查 0x1000 标志位清除。
+
+## 2026-09-03 sub_8032D74 匹配 (claude-c)
+
+NPC 对话/交互状态机 (gUnk_03000820, 0x08032D74, code_80264C0), 298B exact, sub_802761C 近亲
+(同入口形状: ldr 状态指针 r2 保活, case 6 复用 `strb r0,[r2]`)。
+
+**两个关键点**:
+1. **case 块源码顺序 = ROM 块顺序** (GCC2 保序发射, 近亲 sub_8042AB4/80405A4 均如此)。
+   本函数 ROM 顺序 0→19→20→6→9, 按常规 0,6,9,19,20 书写时 case0/case19 的
+   `gUnk_03000820=X; break;` 尾被跨块 tail-merge 进共享 `strb; b end` (bytecmp 155B 差);
+   按 ROM 序重排后三处存储全部内联, 差异立降。**遇到 switch 尾块异常合并, 先对齐 case 顺序**。
+2. **三目方向不可交换**: GCC2 if-conversion 规则 = 基值取 else 分支值, cond 为真时加
+   (true-else) 差值。写 `obj[0xBE] != 0 ? 0x371 : 0x362` 得 `base 0x362; beq skip; add #0xF`;
+   目标要 `base 0x371; bne skip; subs #0xF` → 必须写 `obj[0xBE] == 0 ? 0x362 : 0x371`。
+
+**bytecmp 伪影实证**: 候选引用 4 个未匹配函数时, 若在 abs.ld 里定义
+`sub_8048B30 = 0x08048B31;` 会因超 bl 范围出 veneer (字节 00F0 4DF8), 与 target 的
+占位 F7FF FFFE 差 16B; **不定义这些符号则 ld 报 undefined**, 都不能到 OK —
+这是"未匹配被调者"的固有伪影 (规则 29 注记), 以 fncheck (自动忽略 bl 槽) 为准。
+permuter base score=40 (=4 bl 槽×10), 同属该伪影。

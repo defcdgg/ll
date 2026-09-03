@@ -1,4 +1,4 @@
-# 台账与生成管线重构计划 (TSV 化)
+# 函数清单与生成管线重构计划 (TSV 化)
 
 > 前提: 全树 `make`+SHA1 绿; 全部工作未提交 (用户已 tar 备份); **重构期间禁止 commit**, 完成后统一提交。
 > 执行方式: 每个 R 步做完过"验收门"，用户确认后才进下一步。
@@ -7,7 +7,7 @@
 > AGENTS.md 开工手册 + TSV note 列; R4 (rename_fn.sh 两轮自反演练 SHA1 绿; match_fn.sh 三场景干跑通过)。
 > 追加完成: R5 (make code.s/asm/verify/remaining 四目标 + gen_reports.py; ida_rename.py 推迟到有 i64 时)。
 > **全部完成 (R0-R7): 终验四项全过 (SHA1 绿/591 全量 fncheck OK/gen_asm 幂等/audit 0 漂移);
-> 统一提交 4 commit (工具链/台账/源码/文档) + tag post-tsv-refactor。重构收官, 可复工并行匹配。**
+> 统一提交 4 commit (工具链/函数清单/源码/文档) + tag post-tsv-refactor。重构收官, 可复工并行匹配。**
 
 ## 0. 待确认的默认决策 (逐步执行前一次性确认, 可单条否决)
 
@@ -25,7 +25,7 @@
 
 ```
 .scratch/refactor/snapshot/
-  functions.yaml ll.cfg code.s linker.ld          # 台账与生成物
+  functions.yaml ll.cfg code.s linker.ld          # 函数清单与生成物
   src/ include/ asm-listing.txt sha256sums.txt   # 全源码 + asm 目录清单+哈希
   baseline.tsv                                    # 1065 行: addr|status|kind|name|tu (重构等价性对照的"旧答案")
 ```
@@ -121,7 +121,7 @@ timeout 900 make && sha1sum -c ll.sha1  # 绿
 4. `audit.py`: 0 漂移 0 stale。
 5. 提交 (重构后首次): 按逻辑拆 3-4 个 commit —
    ① 工具链+脚本 (scripts/, .gitattributes, Makefile)
-   ② 台账 (functions.tsv + 生成物 yaml + ll.cfg/code.s 相关)
+   ② 函数清单 (functions.tsv + 生成物 yaml + ll.cfg/code.s 相关)
    ③ 源码 (src/ include/ linker.ld, 含 TU 拆分与改名)
    ④ 文档 (docs/, modules.draft.yaml) + tag `post-tsv-refactor`。
 

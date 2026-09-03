@@ -1280,7 +1280,7 @@
   "size": 168
  },
  {
-  "name": "gChoiceMenuMapRecordBlob",
+  "name": "gChoiceMapSpawnRecordStream",
   "address": "0x080882E2",
   "size": 286
  },

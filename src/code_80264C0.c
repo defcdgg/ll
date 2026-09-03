@@ -20,7 +20,62 @@ INCLUDE_ASM("asm/nonmatchings", sub_8026F88);
 // @ 0x0802723C
 INCLUDE_ASM("asm/nonmatchings", sub_802723C);
 // @ 0x0802761C
-INCLUDE_ASM("asm/nonmatchings", sub_802761C);
+u8 sub_802761C(u8 *obj)
+{
+    u8 result;
+    u8 i;
+    u32 zero;
+
+    result = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        gUnk_03000828 = obj[0xBF];
+        gUnk_03000829 = obj[0xC0];
+        gUnk_03000822 = *(u16 *)(obj + 0x2A);
+        gUnk_03000824 = obj[0x35];
+        sub_80444A4(obj);
+        sub_801CE80(obj, 5, 0x1B4, 0xD, 0);
+        sub_803F5B4(obj);
+        gUnk_03000825 = 0;
+        gUnk_03000820 = 1;
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+        break;
+    case 9:
+        if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && gUnk_03000856 == 0)
+        {
+            GetObjPool();
+            for (i = 0; i < gUnk_0300083D; i++)
+            {
+                if ((gUnk_03000840[i] & 0xF0) == 0x10)
+                {
+                    if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+                    {
+                        gUnk_03004F90[gUnk_03000840[i] & 0xF] = 1;
+                    }
+                }
+            }
+            result = 1;
+        }
+        break;
+    }
+    sub_803F658(obj);
+    if (*(u16 *)(obj + 0x24) & 0x1000)
+    {
+        u16 masked = *(u16 *)(obj + 0x24) & 0xEFFF;
+        zero = 0;
+        *(u16 *)(obj + 0x24) = masked;
+        sub_801CE80(obj, zero, gUnk_03000822, gUnk_03000824, zero);
+    }
+    return result;
+}
 // @ 0x08027760
 INCLUDE_ASM("asm/nonmatchings", sub_8027760);
 // @ 0x08027A20
@@ -150,7 +205,38 @@ INCLUDE_ASM("asm/nonmatchings", sub_803272C);
 // @ 0x08032948
 INCLUDE_ASM("asm/nonmatchings", sub_8032948);
 // @ 0x08032D74
-INCLUDE_ASM("asm/nonmatchings", sub_8032D74);
+u8 sub_8032D74(u8 *obj)
+{
+    u8 result;
+
+    result = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        gUnk_03000824 = obj[0x35];
+        gUnk_03000822 = *(u16 *)(obj + 0x2A);
+        sub_8048B30(0, 0x1E, obj[0xBE] == 0 ? 0x362 : 0x371);
+        gUnk_03000820 = 0x13;
+        break;
+    case 19:
+        if (sub_8047B1C(obj) == 1)
+            gUnk_03000820 = 0x14;
+        break;
+    case 20:
+        sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
+        gUnk_03000820 = 6;
+        break;
+    case 6:
+        if (!(*(u16 *)(obj + 0x24) & 0x800))
+            gUnk_03000820 = 9;
+        break;
+    case 9:
+        sub_8045B90(obj, obj[0xA1]);
+        result = 2;
+        break;
+    }
+    return result;
+}
 // @ 0x08032EA0
 INCLUDE_ASM("asm/nonmatchings", sub_8032EA0);
 // @ 0x080334B8
@@ -258,7 +344,60 @@ INCLUDE_ASM("asm/nonmatchings", sub_803ED34);
 // @ 0x0803F21C
 INCLUDE_ASM("asm/nonmatchings", sub_803F21C);
 // @ 0x0803F328
-INCLUDE_ASM("asm/nonmatchings", sub_803F328);
+u8 sub_803F328(u8 arg0)
+{
+    u8 result;
+    u8 v;
+    int base;
+
+    result = 0;
+    switch (gUnk_0300086A)
+    {
+    case 0:
+        result = 1;
+        break;
+    case 1:
+        DialogCtx_Clear3();
+        Bg0_InitClear();
+        base = 0x02035AC0;
+        v = 2;
+        sub_80196D4(0, (u8 *)base, 0xB, 2, 2, 1, 2, 0xC, 4);
+        gUnk_03000825 = 0;
+        gUnk_0300086A = v;
+        break;
+    case 2:
+        if (DialogCtx_GetField_C(0) == 4)
+        {
+            sub_803F21C((u8 *)0x02035AC0, arg0);
+            sub_80187C0(0x400);
+            gUnk_0300086A = 3;
+        }
+        break;
+    case 3:
+        if (!(sub_80187B4() & 0x400))
+            gUnk_0300086A = 4;
+        break;
+    case 4:
+        if (gUnk_03000825 <= 0x27)
+            gUnk_03000825 += 1;
+        else
+        {
+            DialogCtx_SetHead(0, 2, 2);
+            gUnk_0300086A = 5;
+        }
+        break;
+    case 5:
+        v = DialogCtx_GetField_C(0);
+        if (v == 0)
+        {
+            Disp_Bg1Off();
+            gUnk_0300086A = v;
+        }
+        break;
+    }
+    sub_801933C();
+    return result;
+}
 // @ 0x0803F444
 INCLUDE_ASM("asm/nonmatchings", sub_803F444);
 // @ 0x0803F5B4

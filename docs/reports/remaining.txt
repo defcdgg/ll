@@ -1,4 +1,4 @@
-未匹配 429 个
+未匹配 417 个
 
 [code_80002A0] 5
   0x08003958  Chara_SetWalkPath
@@ -7,7 +7,7 @@
   0x080040e4  Party_FollowAnim
   0x0800478c  CutsceneAnim_PlayFrame
 
-[code_8005020] 36
+[code_8005020] 35
   0x08005020  sub_8005020
   0x080052f8  sub_80052F8
   0x080053b4  sub_80053B4
@@ -18,11 +18,10 @@
   0x08007350  MapScene_LoadEventAnimations  ⏸ ⏸ 2026-09-02 codex: 按场景动画组加载并依据地图事件旗标播放一次性动画; 语义已确认, 保留 asm
   0x08007adc  sub_8007ADC  ⏸ ⏸ 指令流100%一致剩27B纯home(i/mask,tx/ty/fx,count/j); 候选permuter/su
   0x08008254  ChoiceMenu_HandleInput
-  0x080091c4  sub_80091C4
-  0x08009600  sub_8009600
+  0x080091c4  PaletteEffects_Update
+  0x08009600  PaletteFx_Transform
   0x0800a1b4  sub_800A1B4
   0x0800a3c8  sub_800A3C8
-  0x0800a664  sub_800A664
   0x0800acc8  sub_800ACC8
   0x0800b374  sub_800B374
   0x0800bff8  sub_800BFF8
@@ -45,7 +44,7 @@
   0x08010624  sub_8010624
   0x08010770  sub_8010770
 
-[code_8010F10] 41
+[code_8010F10] 40
   0x08010f10  sub_8010F10
   0x08011268  sub_8011268  ⏸ ⏸ 2026-09-02 opencode: 技能菜单物品页绘制=ClearBuffer(0x02005AA0,8,6)
   0x08011454  sub_8011454
@@ -62,8 +61,7 @@
   0x08015658  sub_8015658
   0x08015c18  InvUi_Main
   0x08015e1c  sub_8015E1C  ⏸ ⏸规则17类寄存器分配硬骨头: 语义已全解(Text_PutGlyph 内联版+0xFF终止循环, dest=gWind
-  0x08016c88  sub_8016C88
-  0x08016d24  sub_8016D24
+  0x08016d24  sub_8016D24  ⏸ ⏸ 语义全解 + 结构 ~90% 对 (132 vs 140 指令, 差 61B, 多为寄存器 home 级联)。SIO
   0x08017120  sub_8017120
   0x080171e4  sub_80171E4
   0x0801768c  sub_801768C
@@ -159,19 +157,18 @@
   0x08024820  sub_8024820
   0x08024940  sub_8024940
   0x08025518  sub_8025518
-  0x08025650  sub_8025650
+  0x08025650  sub_8025650  ⏸ ⏸ 2026-09-02 opencode: 写tile边框(arg0+0x22C/0x36C), 计数器gUnk_03
   0x080257d8  sub_80257D8
   0x08025994  sub_8025994
   0x08025da8  sub_8025DA8
   0x080260bc  sub_80260BC
 
-[code_80264C0] 147
+[code_80264C0] 140
   0x080264c0  sub_80264C0
   0x0802698c  sub_802698C
   0x08026d08  sub_8026D08
   0x08026f88  sub_8026F88
   0x0802723c  sub_802723C
-  0x0802761c  sub_802761C
   0x08027760  sub_8027760
   0x08027a20  sub_8027A20
   0x08027d9c  sub_8027D9C
@@ -236,7 +233,6 @@
   0x08032548  sub_8032548
   0x0803272c  sub_803272C
   0x08032948  sub_8032948
-  0x08032d74  sub_8032D74
   0x08032ea0  sub_8032EA0
   0x080334b8  sub_80334B8
   0x08033988  sub_8033988
@@ -290,23 +286,18 @@
   0x0803e58c  sub_803E58C
   0x0803ed34  sub_803ED34
   0x0803f21c  sub_803F21C
-  0x0803f328  sub_803F328
   0x0803f444  sub_803F444
-  0x0803f5b4  sub_803F5B4
   0x0803f658  sub_803F658
   0x0803ff54  sub_803FF54
   0x080401ac  sub_80401AC
-  0x080405a4  sub_80405A4
   0x08040690  sub_8040690
   0x08040ee8  sub_8040EE8
   0x08041308  sub_8041308
   0x080416f0  sub_80416F0
   0x080419e0  sub_80419E0
   0x08041edc  sub_8041EDC
-  0x08042200  sub_8042200
   0x080422b8  sub_80422B8
   0x08042784  sub_8042784
-  0x08042ab4  sub_8042AB4
   0x08042b90  sub_8042B90
   0x08042e70  sub_8042E70
   0x08043554  sub_8043554
@@ -314,7 +305,7 @@
   0x08043b5c  sub_8043B5C
   0x08043f90  sub_8043F90
 
-[code_8044394] 103
+[code_8044394] 102
   0x0804473c  sub_804473C
   0x080448a8  sub_80448A8
   0x08044a40  sub_8044A40
@@ -322,7 +313,6 @@
   0x08045098  sub_8045098
   0x0804519c  sub_804519C
   0x08045328  sub_8045328
-  0x080454a4  sub_80454A4
   0x080455a0  sub_80455A0
   0x08045688  sub_8045688
   0x080457ac  sub_80457AC
@@ -359,7 +349,6 @@
   0x08048458  sub_8048458
   0x080485a4  sub_80485A4
   0x08048690  sub_8048690
-  0x080488cc  sub_80488CC  ⏸ ⏸ 2026-09-02 opencode: 技能查找(if id>0x2F查obj+0x88/0x8A else 查o
   0x08048c30  sub_8048C30
   0x08048c80  sub_8048C80  ⏸ ⏸概率判定, 语义全解: threshold=switch(arg0[0xAB]{2→5,3→0x14,5→0xa,el
   0x08048da4  sub_8048DA4
@@ -388,9 +377,9 @@
   0x0804b4d0  sub_804B4D0
   0x0804b56c  sub_804B56C
   0x0804b654  sub_804B654
-  0x0804b7b0  sub_804B7B0
+  0x0804b7b0  sub_804B7B0  ⏸ ⏸ 结构 100% 对齐 (64 条指令一一对应, 只差 66B 的寄存器 home 级联)。**sub_804B8E8
   0x0804b834  sub_804B834
-  0x0804b8e8  sub_804B8E8
+  0x0804b8e8  sub_804B8E8  ⏸ ⏸ 与 sub_804B7B0 逐字节相同, 同一候选直接可用。结构 100% 对齐 (64 条指令一一对应, 只差 6
   0x0804b96c  sub_804B96C
   0x0804bbdc  sub_804BBDC
   0x0804bd54  sub_804BD54
@@ -402,13 +391,14 @@
   0x0804d310  sub_804D310  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(D260孪生无switch, 死存储obj[0xBC]=0
   0x0804d4fc  sub_804D4FC  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(switch((s8)obj[0xBC]) case1: 
   0x0804d5b4  sub_804D5B4
+  0x0804d708  sub_804D708  ⏸ ⏸ 2026-09-03 ll-agent: 死代码还原INCLUDE_ASM(原C少4字节→+4全局位移); ROM尾
   0x0804d840  sub_804D840
   0x0804d8f4  sub_804D8F4
   0x0804da04  sub_804DA04
   0x0804dabc  sub_804DABC
   0x0804db64  sub_804DB64
   0x0804dc24  sub_804DC24
-  0x0804dcd8  sub_804DCD8
+  0x0804dcd8  sub_804DCD8  ⏸ ⏸ 2026-09-02 opencode: 概率判定+掉落道具, 姊妹sub_804D1B4/D260/D708/D7
   0x0804de8c  sub_804DE8C
   0x0804dfd8  sub_804DFD8
   0x0804e0e4  sub_804E0E4
@@ -419,16 +409,14 @@
   0x0804e9dc  sub_804E9DC
   0x0804ec04  sub_804EC04
 
-[code_804F0B8] 24
+[code_804F0B8] 22
   0x0804f280  sub_804F280
   0x0804f64c  sub_804F64C
-  0x0804f7f8  sub_804F7F8
-  0x0804f8d8  sub_804F8D8
-  0x0804f974  sub_804F974
-  0x0804fa04  sub_804FA04  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(条件跳转opcode: 循环测event/switch f
-  0x0804fa94  sub_804FA94
+  0x0804f7f8  sub_804F7F8  ⏸ ⏸ 复杂队伍添加opcode(插入排序gPartyMemberIds+formation槽管理gUnk_03004A88
+  0x0804f974  sub_804F974  ⏸ ⏸ 2026-09-02 ll-agent: 条件跳转opcode(测data[3+2i]|data[4+2i]<<8的
+  0x0804fa04  sub_804FA04  ⏸ ⏸ 2026-09-02 zai: 接管sound-agent; 语义全解+循环旋转已解; 新最佳候选30B→11B(真
+  0x0804fa94  sub_804FA94  ⏸ ⏸ 2026-09-02 ll-agent: 任一flag置位版(跳转若真, 全假则推进), 镜像sub_804F974
   0x0804fb24  sub_804FB24
-  0x0805008c  sub_805008C
   0x080501b8  sub_80501B8
   0x08050434  sub_8050434
   0x0805063c  sub_805063C

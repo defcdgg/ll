@@ -251,7 +251,7 @@ gSpriteGfxPtrTable:
 | `scripts/datacov.py` | 覆盖率/一致性/逐符号字节审计 | `--bytes` 用 `ll.map`+`baserom` 对每个符号做区间 cmp; `--fix` 只改 manifest 不改生成物 |
 | `scripts/data_graph.py` | 指针表可达性、孤立项、表→资产边 | 输出 CSV 进 `docs/reports/` (重建) |
 | `scripts/lz.py` | LZ77/RLE8/RLE16/delta 解码 + 重压 round-trip | 只读; 用于识别与命名建议 |
-| `scripts/audit.py` (扩展) | 加 `--data`: 检查 blob 残留、生成物是否被手改、manifest 与生成物漂移 | 与现有台账审计同一入口 |
+| `scripts/audit.py` (扩展) | 加 `--data`: 检查 blob 残留、生成物是否被手改、manifest 与生成物漂移 | 与现有函数清单审计同一入口 |
 
 ---
 

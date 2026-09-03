@@ -1478,7 +1478,7 @@ u8 ChestFlags_Test(u8 arg0)
 // @ 0x080091C4
 INCLUDE_ASM("asm/nonmatchings", PaletteEffects_Update);
 
-/* 调色板 DMA 上传: 平时整表刷新; 若 gUnk_03004910 非零则走特效流程 PaletteFx_Step。
+/* 调色板 DMA 上传: 平时整表刷新; 若 gPaletteFxMode 非零则走特效流程 PaletteFx_Step。
  * 逐项: 标志 gUnk_03000010[i] 非零且未设 bit2 → 计算表内偏移:
  *   idx = gUnk_03000020[i] >> gUnk_03000018[i];  byte = gUnk_03000038[i][idx];
  *   src = gMenuEntityPaletteTable + (byte << 5) + 2;  → DMA3 拷贝 32 字节到 gUnk_03000028[i]。 */
@@ -1489,7 +1489,7 @@ void PaletteTransfer_Update(void)
 {
     s16 i;
 
-    if (gUnk_03004910 != 0)
+    if (gPaletteFxMode != 0)
     {
         PaletteFx_Step();
     }
@@ -1515,9 +1515,8 @@ void PaletteTransfer_Update(void)
 
 /* 调色板特效状态复位 (调色板暂存 0x0203E600, 备份 0x0203EA00):
  * mode: 1/7=白闪(开 WIN0 窗口), 3=黑闪, 5=备份当前调色板, 其他=从备份恢复。
- * 0x03004910 = mode+1 (供其他特效读取), 0x03004914/0x03004918 = 计时器清零。 */
-extern u8 gUnk_03004914;
-extern u8 gUnk_03004918;
+ * gPaletteFxMode = mode+1 (供其他特效读取), gPaletteFxPending/gPaletteFxTimer
+ * 分别是待上传标志和帧计数器。 */
 
 // @ 0x08009428
 void PaletteFx_Apply(u8 arg0)
@@ -1526,11 +1525,11 @@ void PaletteFx_Apply(u8 arg0)
     u16 fill;
     u16 *dst;
 
-    gUnk_03004914 = 0;
-    gUnk_03004910 = arg0 + 1;
-    gUnk_03004918 = 0;
+    gPaletteFxPending = 0;
+    gPaletteFxMode = arg0 + 1;
+    gPaletteFxTimer = 0;
 
-    switch (gUnk_03004910) {
+    switch (gPaletteFxMode) {
         case 1:
         case 7:
             fill =  0x7FFF;
@@ -1540,7 +1539,7 @@ void PaletteFx_Apply(u8 arg0)
             REG_WININ = 0;
             REG_WINOUT = 0;
         case 3:
-            if (gUnk_03004910 == 3)
+            if (gPaletteFxMode == 3)
                 fill = 0;
 
             i = 0x200;
@@ -1567,12 +1566,12 @@ void PaletteFx_Apply(u8 arg0)
 }
 
 /* 调色板特效逐帧驱动 (PaletteFx_Apply 之后每帧调用):
- * 若 gUnk_03004914 置位 → 按 gUnk_03004918 & 3 选中 4 个调色板暂存区之一,
+ * 若 gPaletteFxPending 置位 → 按 gPaletteFxTimer & 3 选中 4 个调色板暂存区之一,
  *   DMA3 拷贝 0x80 半字到调色板 RAM 对应 0x100 字节段 (0x05000000 + idx*0x100)。
  * 之后清标志、计数器 +1。mode==2/7 (白闪) 且计数器超过阈值 (0x40/0x20) 时
- *   重新断言 WIN0 窗口, 并复位 gUnk_03004910/gSceneSubState。
+ *   重新断言 WIN0 窗口, 并复位 gPaletteFxMode/gSceneSubState。
  * 计数器到 4 时把窗口完全打开 (WIN0V=0x100, WININ/WINOUT=0x3F)。
- * 注: 两个分支内的 u8 局部读取 gUnk_03004910 是**故意**的 —— 让 GCC2 不跨分支
+ * 注: 两个分支内的 u8 局部读取 gPaletteFxMode 是**故意**的 —— 让 GCC2 不跨分支
  *   CSE 该读, 使计数器 c 落 r1、state 落 r0 并重读, 与目标逐字节一致。 */
 // @ 0x080094FC
 void PaletteFx_Step(void)
@@ -1581,10 +1580,10 @@ void PaletteFx_Step(void)
     u32 src;
     u32 c;
 
-    if (gUnk_03004914 == 0)
+    if (gPaletteFxPending == 0)
         return;
 
-    counter = gUnk_03004918 & 3;
+    counter = gPaletteFxTimer & 3;
     switch (counter) {
     case 0: src = 0x0203E600; break;
     case 1: src = 0x0203E700; break;
@@ -1595,13 +1594,13 @@ void PaletteFx_Step(void)
 
     DmaSet(3, src, 0x05000000 + (counter << 8), 0x80000080);
 
-    gUnk_03004914 = 0;
-    c = gUnk_03004918 + 1;
-    gUnk_03004918 = c;
+    gPaletteFxPending = 0;
+    c = gPaletteFxTimer + 1;
+    gPaletteFxTimer = c;
 
-    if (gUnk_03004910 > 6) {
+    if (gPaletteFxMode > 6) {
         if ((u8)c > 0x20) {
-            u8 s2 = gUnk_03004910;
+            u8 s2 = gPaletteFxMode;
             if (s2 == 7) {
                 REG_WIN0H = 0xF0;
                 REG_WIN0V = 0xA0;
@@ -1609,11 +1608,11 @@ void PaletteFx_Step(void)
                 REG_WININ = 0;
                 REG_WINOUT = 0;
             }
-            gUnk_03004910 = 0;
+            gPaletteFxMode = 0;
             gSceneSubState = 0;
         }
     } else if ((u8)c > 0x40) {
-        u8 s3 = gUnk_03004910;
+        u8 s3 = gPaletteFxMode;
         if (s3 == 2) {
             REG_WIN0H = 0xF0;
             REG_WIN0V = 0xA0;
@@ -1621,11 +1620,11 @@ void PaletteFx_Step(void)
             REG_WININ = 0;
             REG_WINOUT = 0;
         }
-        gUnk_03004910 = 0;
+        gPaletteFxMode = 0;
         gSceneSubState = 0;
     }
 
-    if (gUnk_03004918 == 4) {
+    if (gPaletteFxTimer == 4) {
         REG_WIN0H = 0xF0;
         REG_WIN0V = 0x100;
         REG_WININ = 0x3F;

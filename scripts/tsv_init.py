@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """从 src/*.c + ll.cfg 生成 functions.tsv (重构 R1)。
 
-状态权威 = 源码本身 (functions.yaml 已删除, 本 TSV 即唯一台账):
+状态权威 = 源码本身 (functions.yaml 已删除, 本 TSV 即唯一函数清单):
   - `INCLUDE_ASM("asm/nonmatchings", name)`  -> status 0
   - `INCLUDE_ASM("asm/matchings", name)`    -> status 1 (asm 占位)
   - src 里真 C 定义 (列0 签名 + `{`)        -> status 1 (真 C)

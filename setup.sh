@@ -88,7 +88,7 @@ echo "Initializing submodules..."
 git submodule update --init
 
 # Python venv for the decomp tooling (asm-differ / decomp-permuter / m2c).
-# 台账侧脚本 (gen_asm/audit/fncheck/tsv_init/gen_reports/atlas) 无第三方依赖, 系统 python3 即可;
+# 函数清单侧脚本 (gen_asm/audit/fncheck/tsv_init/gen_reports/atlas) 无第三方依赖, 系统 python3 即可;
 # 但 scripts/fndiff.sh 硬编码 .venv/bin/python, 所以这个 venv 是必需的。
 VENV=.venv
 VENV_PKGS="colorama watchdog Levenshtein cxxfilt toml graphviz"

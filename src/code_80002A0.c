@@ -447,7 +447,7 @@ void System_SoftReset(u32 arg0)
     gGameTimer = 0;
     gPendingSpriteLoad = 0;
     gLogoEffectState = 0;
-    gUnk_03004910 = 0;
+    gPaletteFxMode = 0;
     gSceneSubState = 0;
     gScreenFadeFlags = 0;
     gSceneEntryFlag = 0xFF;

@@ -233,3 +233,11 @@
 - `StaticMapObject.x/y/z` 与 `ChestObject.x/y` 实为 **u16** (目标 ldrh 零扩展), 改 s16 会引入 ldrsh 使 ROM 红掉 8 字节。
 - `gUnk_08095028` 若在 TU 内定义为空数组会占 .data 8 字节导致 rom 溢出 — 必须 extern 引用。
 - 跨 TU 原型统一: 本批为 `sub_8009AC4(u8,u8)` / `sub_8009E80(u8,u8*)` / `EquipItem(u8,u8,u8)` 等补全了 code_0.h 原型。
+
+## 选项目的地数据分割 (2026-09-02)
+
+| 地址 | 名称 | 结构与用途 |
+|---|---|---|
+| 0x08087648 | `gChoiceDestTable` | 5 组变长目的地坐标表；每组为 `[count][count * {x, y}]`，供 `ChoiceMenu_ResolveDest` 解析。 |
+| 0x0808823A | `gChoiceGroupPairTable` | 84 项 × 2B 的 `{groupId, packedPair}` 表；`ChoiceMenu_HandleInput` 先特判第 0 项，再从第 1 项按表基址扫描，命中项索引对应 NPC 行为命令流。 |
+| 0x080882E2 | `gChoiceMapSpawnRecordStream` | 5 组地图出生记录流；每条 8B 为 `mapId/tileX/tileY/facingDir/moveCmdSetId` 及保留字段，组由 `0xFF` 分隔，末尾为 `0x00`。 |

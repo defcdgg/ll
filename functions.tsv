@@ -729,7 +729,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x08044514	sub_8044514	
 1	thumb	code_8044394	0x08044574	sub_8044574	
 1	thumb	code_8044394	0x080445e0	sub_80445E0	
-1	thumb	code_8044394	0x080445e8	sub_80445E8	✅ 2026-09-02 opencode: 按gUnk_0300083D遍历gUnk_03000840[i]&0xF索引obj, obj[0xAC]==arg0[0xAC]时写gUnk_03004F90[idx]=arg1(arg1==6需sub_8048C30==1); fncheck OK
+1	thumb	code_8044394	0x080445e8	sub_80445E8	✅ 2026-09-03 ll-agent: 遍历gUnk_03000840[i]&0xF索引GetObjPool槽, obj[0xAC]==arg0[0xAC]时写gUnk_03004F90[idx]=arg1; 关键=off+base序(1B)+0xF内联不抽mask变量(112B→8B); fncheck OK 152B
 1	thumb	code_8044394	0x08044680	sub_8044680	
 1	thumb	code_8044394	0x080446a4	sub_80446A4	
 1	thumb	code_8044394	0x080446bc	sub_80446BC	✅ 2026-09-02 opencode: obj kind>11 且 !gUnk_03000884 时, 按 (s8)arg0[0xBC] 选列(==1→列2/3 否则0/1), 查 gUnk_0839DBF6[kind-0xc][col] 阈值门限 obj[0x28], 过则 Sfx_Play(表值,2,0)+置 gUnk_03000884=1; 关键坑=arg0[0xBC] 判定须 switch{case0;case1}(或 !=0&&==1) 才出目标两条 cmp(==0/==1), 单 if(==1) 只一条; gUnk_03000884 用命名符号(非裸地址, 裸地址反致 r6 保留); 新登记 ROM 表 gUnk_0839DBF6[][4]; fncheck OK 108B
@@ -912,7 +912,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8044394	0x0804d44c	sub_804D44C	✅ 2026-09-02 sound-agent: 同族孪生 x10 (与 sub_804D260 同构); 复用别名 gUnk_08393B28_entries; fncheck OK 174B
 0	thumb	code_8044394	0x0804d4fc	sub_804D4FC	⏸ 2026-09-02 sound-agent: 语义全解(switch((s8)obj[0xBC]) case1: obj[0xC2]=flag&Rng, entry=...[8+obj[0xC2]*2]); 卡点=switch值home: 目标movs r4,#0;ldrsb r4,[r1,r4]单次装载r4(callee-saved跨Rng存活)供case1复用ands r4,r0; 我恒r0+地址外提, case1重读obj[0xBC]; flag/s8指针/if-elseif变体全双装载1585-2530; permuter best 835; 候选permuter/sub_804D4FC/base.c(835)
 0	thumb	code_8044394	0x0804d5b4	sub_804D5B4	
-1	thumb	code_8044394	0x0804d708	sub_804D708	✅ 2026-09-02 opencode: 概率判定+drop道具, 姊妹sub_804D1B4(D260)同族但obj[0xBC]恒0无switch
+0	thumb	code_8044394	0x0804d708	sub_804D708	⏸ 2026-09-03 ll-agent: 死代码还原INCLUDE_ASM(原C少4字节→+4全局位移); ROM尾部死store `movs r0,#0;strb r0,[obj+0xBC]`被C编译器优化掉; 待重匹配
 1	thumb	code_8044394	0x0804d798	sub_804D798	⏸ 2026-09-02 opencode: 概率判定+随机槽道具, 姊妹sub_804D708同族但obj[0xBC]恒1+obj[0xC2]=(Rng&3)选offset; standalone fncheck过但全TU编译ands r0,r1 vs r1,r0+&obj[0xC2]调度差; 候选permuter/sub_804D798/
 0	thumb	code_8044394	0x0804d840	sub_804D840	
 0	thumb	code_8044394	0x0804d8f4	sub_804D8F4	
@@ -960,7 +960,7 @@ status	isa	module	addr	name	note
 0	thumb	code_804F0B8	0x0804fa94	sub_804FA94	⏸ 2026-09-02 ll-agent: 任一flag置位版(跳转若真, 全假则推进), 镜像sub_804F974; goto+u16 idx已解布局, 剩32B=同族cross-jump(LC1落r1非r2+advance调度); 候选permuter/sub_804FA94/base.c; 建议zai一并处理(与sub_804FA04同根因)	
 0	thumb	code_804F0B8	0x0804fb24	sub_804FB24	
 1	thumb	code_804F0B8	0x08050014	ScriptPump_Run	
-1	thumb	code_804F0B8	0x0805008c	sub_805008C	✅ 2026-09-02 zai-start-plan: 脚本泵逐帧后台服务(E6C标志位状态机); 0x04000010=REG_BG0HOFS 非BG2PA; 条件值uxth+strh复用→u16局部bgRequest; 新符号gUnk_03000E69+LZ_UncompressChunk原型; fncheck 300B一次通过
+0	thumb	code_804F0B8	0x0805008c	sub_805008C	⏸ 2026-09-02 zai-start-plan 匹配失败(12B真实差异), 已还原INCLUDE_ASM, 待重新匹配
 0	thumb	code_804F0B8	0x080501b8	sub_80501B8	
 0	thumb	code_804F0B8	0x08050434	sub_8050434	
 0	thumb	code_804F0B8	0x0805063c	sub_805063C	

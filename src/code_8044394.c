@@ -170,16 +170,25 @@ u8 *sub_80445E0()
 {
     return gUnk_03004F90;
 }
+
+
 // @ 0x080445E8
+// 按 gUnk_0300083D 遍历 gUnk_03000840[i]&0xF 索引 GetObjPool 槽,
+// obj[0xAC]==arg0[0xAC] 命中时写 gUnk_03004F90[idx]=arg1 (arg1==6 需 sub_8048C30(arg0)==1)。
+// 注: 索引表达式须 `off + (u32)base`(off 在前) 才出目标 `adds r0,r0,r3`; 反序出 `adds r0,r3,r0` (差1B)。
+//     0xF 直接内联不可抽 mask 变量(抽了多出 sub sp 槽与调度差, 曾差 112B)。
 void sub_80445E8(u8 *arg0, u8 arg1)
 {
-    u8 *base;
     u8 i;
+    u8 *base;
+    u32 off;
+    u8 *obj;
 
     base = (u8 *)GetObjPool();
     for (i = 0; i < gUnk_0300083D; i++)
     {
-        u8 *obj = base + (0xF & gUnk_03000840[i]) * 0xC8;
+        off = (0xF & gUnk_03000840[i]) * 0xC8;
+        obj = (u8 *)(off + (u32)base);
         if (obj[0xAC] == arg0[0xAC])
         {
             if (arg1 != 6 || sub_8048C30(arg0) == 1)
@@ -2074,31 +2083,10 @@ INCLUDE_ASM("asm/nonmatchings", sub_804D4FC);
 // @ 0x0804D5B4
 INCLUDE_ASM("asm/nonmatchings", sub_804D5B4);
 // @ 0x0804D708
-void sub_804D708(u8 *obj, u8 *arg1)
-{
-    u8 values[8];
-    u8 count;
-    u8 value;
-    Unk_804D1B4_Entry *entry;
-
-    count = sub_80489E8(arg1, values, 0, 0x6F);
-    if (((u32 (*)(void))Rng_LcgNext)() % 0x65 < count * 10)
-        obj[0xBC] = 1;
-    else
-        obj[0xBC] = 0;
-    obj[0xBC] = 0;
-    entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
-    switch (entry->field_10)
-    {
-    case 0:
-        value = values[(u32)(u8)Rng_LcgNext() % count];
-        obj[0xBD] = value;
-        break;
-    case 1:
-        obj[0xBD] = 0;
-        break;
-    }
-}
+// 概率判定+drop道具。⚠ 2026-09-03 还原 INCLUDE_ASM: 原 C 代码比 ROM 少 4 字节
+// (ROM 尾部死 store `movs r0,#0; strb r0,[obj+0xBC]` 被 C 编译器优化掉),
+// 直接导致全局 +4 位移 bug。待用 do-while 屏障/中间变量复现死 store 后重匹配。
+INCLUDE_ASM("asm/nonmatchings", sub_804D708);
 // @ 0x0804D798
 INCLUDE_ASM("asm/matchings", sub_804D798);  /* 台账修正: tsv=1 且 .s 已在 matchings/ (坑7); 见 INCIDENTS.md */
 // @ 0x0804D840

@@ -942,6 +942,15 @@
        用实参变量复用置 0; 首地址寄存器被零抢占时, 地址提指针变量延长 life。
        关联: 规则 87 (变量兼职买 home)、规则 33 (死 store)、规则 88 (global-alloc life 定优先级)。
 
+130. **基址用"命名符号(重定位)"还是"裸字面量"会同时改变调度与折叠 —— 目标基址 ldr 排在 index 计算之前时, 必须用命名符号**（案例 `Sprites_LoadMapNPCs`, 2026-09-04, 真C落地）。
+       目标形如 `ldr r1,=base; <index 计算 r0>; adds r0,r0,r1; ldrb/ldr [r0,#off]` (基址先载入)。
+       裸地址 `(T*)0xbase`: GCC2 把基址 ldr 排到 index **之后**, 且把 `base + (idx-1)*scale` 代数折叠成
+       `(base-scale) + idx*scale`(读错槽!) —— permuter 修不动(非语句顺序)。
+       命名符号 `extern T arr[]`/`extern const T arr[]`: 基址是重定位(非常量)→无法折叠→`(idx-1)*scale` 显式
+       subs+lsls, 且基址 ldr 自然提前(匹配调度), 寄存器分配也对齐。判定: 目标"基址 ldr 在 index 前 + 带 -1 缩放下标"
+       → 用命名符号, 别用裸地址; 草稿里 `arr[idx-1]` 保持不拆分(命名符号下本就不折叠, 拆成 `idx=idx-1` 反致 home 互换)。
+       关联: 规则 32 (字面量 vs extern 改寄存器分配)、规则 7 (原型截断)。
+
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 agbcc (egcs 1.1 系) 自带 RTL 转储开关, 对定位寄存器 home 问题极其有用:

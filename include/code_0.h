@@ -56,7 +56,7 @@ void PalTransfer_Flush();
 void OAM_FlushFromQueue();
 void Sprites_ReleaseAll();
 void Sprites_LoadMapNPCs(u8);
-void Chara_InitFromDesc();
+void Chara_InitFromDesc(u8, void*);
 void Chara_InitDialogArrow(u8);
 void Chara_InitEffect(u8);
 void Chara_InitEffectAtPlayer();

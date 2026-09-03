@@ -2786,43 +2786,17 @@ void Sprites_ReleaseAll(void)
     }
 }
 // @ 0x080033E8
-INCLUDE_ASM("asm/matchings", Sprites_LoadMapNPCs);
-/*
-typedef struct {
-  u8 field_0;
-  u8 field_1;
-  u8 field_2;
-  u8 field_3;
-  u8 field_4;
-  u8 field_5;
-  u8 field_6;
-  u8 field_7;
-  u8 field_8;
-  u8 field_9;
-  u8 field_A;
-  u8 field_B;
-  u16 field_C;
-  u16 field_E;
-  u16 field_10;
-  u16 field_12;
-}MapSceneDescriptor;
-
-extern u8 gUnk_08091948[];
-
-extern const MapSceneDescriptor gMapSceneDescriptors[];
-
 typedef struct {
     u16 field_0;
     u8 pad[16 - 2];
-}Unk_087EA394;
-extern Unk_087EA394* gUnk_087EA394[];
+} Unk_087EA394;
 
-void Chara_InitFromDesc(u8, void*);
+extern u8 gUnk_08091948[];
+extern Unk_087EA394 *gUnk_087EA394[];
 
-
-// @ 0x080033E8
-void Sprites_LoadMapNPCs(u8 arg0) {
-    Unk_087EA394* ptr2;
+void Sprites_LoadMapNPCs(u8 arg0)
+{
+    Unk_087EA394 *ptr2;
     u16 i;
     u16 temp_r0;
     u32 temp_r3;
@@ -2839,13 +2813,11 @@ void Sprites_LoadMapNPCs(u8 arg0) {
 
     ptr2 = gUnk_087EA394[temp_r3 - 1];
 
-
-    for ( i = 2; i < arg0 + 2; i++)
+    for (i = 2; i < arg0 + 2; i++)
     {
         Chara_InitFromDesc(i, ptr2++);
     }
 }
-*/
 // @ 0x0800345C
 INCLUDE_ASM("asm/matchings", Chara_InitFromDesc);
 /*
@@ -3276,8 +3248,6 @@ void Followers_ResetHistory(void)
         gActors[1].facingDir = gActors[0].facingDir & 7;
     }
 }
-
-// INCLUDE_ASM("asm/matchings", Followers_SyncToTail);
 
 // @ 0x080043D4
 void Followers_SyncToTail(void)

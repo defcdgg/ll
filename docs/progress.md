@@ -2746,3 +2746,24 @@ sub_80455A0/sub_8045688 仅被本函数调用 (可安全定原型 `u16(u8,u8)` /
 无 C 调用者, 返回 0/2 与 sibling 同), 定义 `u8 sub_80392C0(u8 *obj)` 合法兼容 K&R 声明。
 
 **验证**: fncheck OK 288B; make 全量 + sha1sum -c ll.sha1 绿 (匹配进度 654/1064)。
+
+## 2026-09-04 Sprites_LoadMapNPCs 真C落地 (opencode, 116B exact) — 命名符号复现调度
+
+原 status=1 但仅 `INCLUDE_ASM("asm/matchings")` + 注释掉的草稿 C。任务=把草稿变成真身。
+语义: 若 `gObjGraphicsSetId & 0x80` 返回; `id=gMapSceneDescriptors[arg0].npcSlotGroupId`;
+id==0 返回; `count=gUnk_08091948[(id-1)*18]`; `ptr2=gUnk_087EA394[id-1]`;
+`for(i=2;i<count+2;i++) Chara_InitFromDesc(i, ptr2++)` (ptr2 每次 +0x10)。
+
+**关键坑: 裸地址 vs 命名符号改变调度+折叠**。
+- 用裸地址 `*(u8*)0x08088D80` 等: GCC2 把基址 `ldr` 排到 index 计算**之后**(目标在之前),
+  且把 `(temp_r3-1)*4 + 0x087EA394` 代数折叠成 `temp_r3*4 + 0x087EA390`(读错槽!),
+  permuter 也修不动(非语句顺序问题)。
+- 改用**命名符号** `gMapSceneDescriptors[]`/`gUnk_08091948[]`/`gUnk_087EA394[]`(重定位):
+  基址 ldr 自然排在 index 前(匹配目标调度), 且符号非常量→无法折叠 -4→`(id-1)*4` 显式 subs+lsls,
+  寄存器分配也对齐(arg0=r2, id=r3)。→ bytecmp 0 真实字节(仅 bl 槽, 全链接后一致)。
+- 草稿的 `ptr2 = gUnk_087EA394[temp_r3 - 1]` 保持**不拆分**(命名符号下本就不折叠; 拆成
+  `temp_r3=temp_r3-1` 反而把 arg0/id 挤到 r3/r2 互换)。
+
+**配套改动**: 新登记 `gUnk_08091948`/`gUnk_087EA394` 为 ROM 绝对符号(linker.ld SECTIONS 外, 地址序);
+`Chara_InitFromDesc` 全局原型 `void()`→`void(u8,void*)`(触发调用点 arg0 的 u8 截断; 唯一其他调用者
+sub_804F280 是 asm 不受影响)。fncheck OK 116B; make + SHA1 绿。

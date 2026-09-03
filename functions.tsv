@@ -63,7 +63,7 @@ status	isa	module	addr	name	note
 1	thumb	code_80002A0	0x08003264	PalTransfer_Flush	
 1	thumb	code_80002A0	0x080032bc	OAM_FlushFromQueue	
 1	thumb	code_80002A0	0x08003348	Sprites_ReleaseAll	
-1	thumb	code_80002A0	0x080033e8	Sprites_LoadMapNPCs	
+1	thumb	code_80002A0	0x080033e8	Sprites_LoadMapNPCs	✅ 2026-09-04 opencode: 真C落地替换INCLUDE_ASM(原仅asm/matchings); 关键=必须用命名符号(gMapSceneDescriptors/gObjGraphicsSetId/gUnk_08091948/gUnk_087EA394)才复现目标调度(基址ldr在index计算前)+寄存器分配(arg0=r2,id=r3); 裸地址会把-4折进基址且基址载入延后; Chara_InitFromDesc原型改(u8,void*)以触发arg0的u8截断; 新登记gUnk_08091948/gUnk_087EA394(linker.ld); fncheck OK 116B; make+SHA1绿
 1	thumb	code_80002A0	0x0800345c	Chara_InitFromDesc	
 1	thumb	code_80002A0	0x0800375c	Chara_InitDialogArrow	
 1	thumb	code_80002A0	0x080037dc	Chara_InitEffect	

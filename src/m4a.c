@@ -341,7 +341,7 @@ void SoundInit(struct SoundInfo *soundInfo)
     soundInfo->plynote = ply_note;
     soundInfo->CgbSound = nullsub_141;
     soundInfo->CgbOscOff = (void (*)(u8))nullsub_141;
-    soundInfo->MidiKeyToCgbFreq = (u32(*)(u8, u8, u8))nullsub_141;
+    soundInfo->MidiKeyToCgbFreq = (u32 (*)(u8, u8, u8))nullsub_141;
     soundInfo->ExtVolPit = nullsub_141;
     MPlayJumpTableCopy(gMPlayJumpTable);
     soundInfo->MPlayJumpTable = gMPlayJumpTable;

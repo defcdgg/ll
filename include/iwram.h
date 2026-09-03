@@ -64,9 +64,9 @@ typedef struct
 {
     /* 0x00 */ u8 statusFlags; // 状态标志 (bit7=激活; bit0=tile 动画模式; bit1=固定 tile+0x60;
                                //           bit2/3=attr2 变体: 4=换字块-0x5000, 4|8=-0x6000, 其他=直写)
-    /* 0x01 */ u8 animTimer;   // 动画帧计数 (bit3 翻转, 每翻转切换 +0x10 图块)
-    /* 0x02 */ u8 lerpFrame;   // 移动插值倒计时 (8 -> 0; =0 静止)
-    /* 0x03 */ u8 oamSlotId;   // 关联的渲染层 SpriteNode 池槽
+    /* 0x01 */ u8 animTimer; // 动画帧计数 (bit3 翻转, 每翻转切换 +0x10 图块)
+    /* 0x02 */ u8 lerpFrame; // 移动插值倒计时 (8 -> 0; =0 静止)
+    /* 0x03 */ u8 oamSlotId; // 关联的渲染层 SpriteNode 池槽
     /* 0x04 */ s16 x; // 当前实时显示 X 坐标
     /* 0x06 */ s16 y; // 当前实时显示 Y 坐标
     /* 0x08 */ s16 moveEndX; // 移动终点 (插值到位后贴合; 由 UiSprite_BeginSlide 写入)
@@ -79,8 +79,8 @@ typedef struct
 
 /* 0x03000058 起: UI 精灵实体数组 (15 项, 前 5 项 = 队伍成员)。
  * 旧名 Unk_03000058 与本 typedef 重复, 已合并为一个。*/
-extern UISpriteEntity gUiSprites[];        /* 实体[0..14] @0x03000058 */
-extern UISpriteEntity gUiSpritesAux[];     /* == &gUiSprites[5] (偏移 0x64, 非队伍辅助实体) */
+extern UISpriteEntity gUiSprites[]; /* 实体[0..14] @0x03000058 */
+extern UISpriteEntity gUiSpritesAux[]; /* == &gUiSprites[5] (偏移 0x64, 非队伍辅助实体) */
 
 extern u8 gUnk_03000184;
 extern u8 gUnk_03000185;
@@ -167,7 +167,7 @@ extern u8 gUnk_0300068D;
 extern u8 gUnk_0300068E;
 extern u32 gUnk_0300062C;
 extern u8 gUnk_03000630;
-extern u8* gUnk_030006F8[];
+extern u8 *gUnk_030006F8[];
 extern u8 gUnk_03000714;
 extern u8 gUnk_03000715;
 extern u8 gUnk_03000716;
@@ -193,7 +193,7 @@ extern u8 gUnk_03000809;
 extern u8 gUnk_0300080A;
 extern u8 gUnk_030007BA;
 extern u8 gUnk_030007BA;
-extern u8 gUnk_0300080C [];
+extern u8 gUnk_0300080C[];
 extern u8 gUnk_03000811;
 extern u8 gUnk_03000812;
 extern u8 gUnk_03000813;
@@ -230,6 +230,8 @@ extern u8 gUnk_0300094A;
 extern u8 gUnk_0300094B;
 extern u8 gUnk_0300094C;
 extern u8 gUnk_0300094D;
+extern s8 gUnk_030009BF;
+extern u32 gUnk_030009C0;
 extern s8 gUnk_030009C5;
 extern u32 *gUnk_030009C8;
 extern u8 gChoiceSubIdx;
@@ -344,47 +346,47 @@ extern u32 gIntrMainBuf[512];
  */
 typedef struct
 {
-    /* 0x00 */ u8 sprNodeIdx;    ///< → gSpriteNodePool[] 主精灵链句柄 (0 = 无)
-    /* 0x01 */ u8 renderFlags;   ///< bit0 = 渲染使能 (`sprNodeIdx && (renderFlags&1)` 才更新);
-                                 ///<   bit1 = 已初始化 (三个 init 路径均置 2); 还作为
-                                 ///<   Sprite_EnqueueRender 的第 5 个实参传入
-    /* 0x02 */ u8 gfxSetId;      ///< 图形集编号 (与 paletteId 同值初始化: 箭头=9 / NPC=5 / 特效=0xA),
-                                 ///<   用作瓦片基址索引 (×72)
-    /* 0x03 */ u8 paletteId;     ///< OBJ 调色板号 (→ attr2 的 bit12-15)
-    /* 0x04 */ u8 facingDir;     ///< 当前朝向 0..7 (由 gWalkMoveDirLut 从 D-pad 码映射),
-                                 ///<   也是 gWalkDirectionMapping 的下标
-    /* 0x05 */ u8 animTimer;     ///< 逐帧递增; (animTimer>>3)&3 = 动画相位 → gWalkAnimFrameMapping 下标
-    /* 0x06 */ s16 x;            ///< 像素坐标 (地图格 ×8: `x = tileX * 8`)
+    /* 0x00 */ u8 sprNodeIdx; ///< → gSpriteNodePool[] 主精灵链句柄 (0 = 无)
+    /* 0x01 */ u8 renderFlags; ///< bit0 = 渲染使能 (`sprNodeIdx && (renderFlags&1)` 才更新);
+                               ///<   bit1 = 已初始化 (三个 init 路径均置 2); 还作为
+                               ///<   Sprite_EnqueueRender 的第 5 个实参传入
+    /* 0x02 */ u8 gfxSetId; ///< 图形集编号 (与 paletteId 同值初始化: 箭头=9 / NPC=5 / 特效=0xA),
+                            ///<   用作瓦片基址索引 (×72)
+    /* 0x03 */ u8 paletteId; ///< OBJ 调色板号 (→ attr2 的 bit12-15)
+    /* 0x04 */ u8 facingDir; ///< 当前朝向 0..7 (由 gWalkMoveDirLut 从 D-pad 码映射),
+                             ///<   也是 gWalkDirectionMapping 的下标
+    /* 0x05 */ u8 animTimer; ///< 逐帧递增; (animTimer>>3)&3 = 动画相位 → gWalkAnimFrameMapping 下标
+    /* 0x06 */ s16 x; ///< 像素坐标 (地图格 ×8: `x = tileX * 8`)
     /* 0x08 */ s16 y;
-    /* 0x0A */ u8 field_A;       ///< 仅见 `= 0` 初始化; 读者在未匹配的 asm 里
-    /* 0x0B */ u8 field_B;       ///< 同上
-    /* 0x0C */ u8 field_C;       ///< 同上
-    /* 0x0D */ u8 field_D;       ///< 同上
-    /* 0x0E */ u8 targetFacing;  ///< 目标朝向 (命令/随机行走写入, 永远 `&= 7` 后
-                                 ///<   `facingDir = targetFacing` 拷回; ++/-- = 左转/右转)
-    /* 0x0F */ u8 field_F;       ///< 命令第 2 操作数 (live C 只写不读)
-    /* 0x10 */ u8 stepTimer;     ///< Chara_StepMove 返 1 且有脚本时每帧 ++; 命令里置 `op+1` / 1
-    /* 0x11 */ u8 field_11;      ///< 命令第 3 操作数; idle 分支会置 0x10 (live C 只写不读)
-    /* 0x12 */ u8 stateFlags;    ///< bit0 = z 随摄像机偏移 (Chara_GetDrawZ 判它);
-                                 ///<   bit4 (0x10) 由命令 2 与 Scene_EnterDoor 置;
-                                 ///<   bit5 (0x20) 由命令 0xFD 置;   bit6 (0x40) = 玩家正在移动;
-                                 ///<   命令 0xFD/0xFF 会 `&= 0x7F` / `&= 0x7B` 清位
-    /* 0x13 */ u8 field_13;      ///< 仅见 `= 0x80` / `= 0` 初始化
-    /* 0x14 */ u16 field_14;     ///< 计时器: `> 0xFE` 判完, 哨兵值 0xFF
-    /* 0x16 */ u8 animIdx;       ///< 当前动画编号, 0xFF = 无动画
-    /* 0x17 */ u8 cmdPc;         ///< **命令流程序计数器**: `temp = cmdStream + cmdPc; cmd = *temp++`,
-                                 ///<   各命令按长度 `cmdPc += 2/3/4`, 0xFE = 归零重播
+    /* 0x0A */ u8 field_A; ///< 仅见 `= 0` 初始化; 读者在未匹配的 asm 里
+    /* 0x0B */ u8 field_B; ///< 同上
+    /* 0x0C */ u8 field_C; ///< 同上
+    /* 0x0D */ u8 field_D; ///< 同上
+    /* 0x0E */ u8 targetFacing; ///< 目标朝向 (命令/随机行走写入, 永远 `&= 7` 后
+                                ///<   `facingDir = targetFacing` 拷回; ++/-- = 左转/右转)
+    /* 0x0F */ u8 field_F; ///< 命令第 2 操作数 (live C 只写不读)
+    /* 0x10 */ u8 stepTimer; ///< Chara_StepMove 返 1 且有脚本时每帧 ++; 命令里置 `op+1` / 1
+    /* 0x11 */ u8 field_11; ///< 命令第 3 操作数; idle 分支会置 0x10 (live C 只写不读)
+    /* 0x12 */ u8 stateFlags; ///< bit0 = z 随摄像机偏移 (Chara_GetDrawZ 判它);
+                              ///<   bit4 (0x10) 由命令 2 与 Scene_EnterDoor 置;
+                              ///<   bit5 (0x20) 由命令 0xFD 置;   bit6 (0x40) = 玩家正在移动;
+                              ///<   命令 0xFD/0xFF 会 `&= 0x7F` / `&= 0x7B` 清位
+    /* 0x13 */ u8 field_13; ///< 仅见 `= 0x80` / `= 0` 初始化
+    /* 0x14 */ u16 field_14; ///< 计时器: `> 0xFE` 判完, 哨兵值 0xFF
+    /* 0x16 */ u8 animIdx; ///< 当前动画编号, 0xFF = 无动画
+    /* 0x17 */ u8 cmdPc; ///< **命令流程序计数器**: `temp = cmdStream + cmdPc; cmd = *temp++`,
+                         ///<   各命令按长度 `cmdPc += 2/3/4`, 0xFE = 归零重播
     /* 0x18 */ u8 subSprNodeIdx; ///< **第二条精灵链句柄**: `= Sprite_AllocNode()`,
                                  ///<   `&gSpriteNodePool[subSprNodeIdx]` 用于释放/取子对象
-    /* 0x19 */ u8 field_19;      ///< 仅见 `= 0` 与 sub_804F280 的 strb 写
-    /* 0x1A */ s16 z;            ///< 深度/排序键: Chara_GetDrawZ 返回它 (bit0 时叠加摄像机偏移),
-                                 ///<   作为 Sprite_EnqueueRender 的第 4 个实参 (z)
-    /* 0x1C */ u16 field_1C;     ///< sub_804F280 用 strh 写 (= z << 4), 待定标
-    /* 0x1E */ u16 field_1E;     ///< sub_804F280 用 strh 写 (差值×16 / 表值), 待定标
-    /* 0x20 */ u16 field_20;     ///< sub_804F280 用 strh 写; CutsceneAnim_PlayFrame 用 ldrh 读
-    /* 0x22 */ u16 field_22;     ///< 全 ROM 未观察到访问
-    /* 0x24 */ u8 *cmdStream;    ///< **脚本命令流指针** (NULL = 无脚本);
-                                 ///<   非空时 Sprites_UpdateFrame 会 stepTimer++ 并调 Chara_ProcessCmdStream
+    /* 0x19 */ u8 field_19; ///< 仅见 `= 0` 与 sub_804F280 的 strb 写
+    /* 0x1A */ s16 z; ///< 深度/排序键: Chara_GetDrawZ 返回它 (bit0 时叠加摄像机偏移),
+                      ///<   作为 Sprite_EnqueueRender 的第 4 个实参 (z)
+    /* 0x1C */ u16 field_1C; ///< sub_804F280 用 strh 写 (= z << 4), 待定标
+    /* 0x1E */ u16 field_1E; ///< sub_804F280 用 strh 写 (差值×16 / 表值), 待定标
+    /* 0x20 */ u16 field_20; ///< sub_804F280 用 strh 写; CutsceneAnim_PlayFrame 用 ldrh 读
+    /* 0x22 */ u16 field_22; ///< 全 ROM 未观察到访问
+    /* 0x24 */ u8 *cmdStream; ///< **脚本命令流指针** (NULL = 无脚本);
+                              ///<   非空时 Sprites_UpdateFrame 会 stepTimer++ 并调 Chara_ProcessCmdStream
 } Actor; /* sizeof == 0x28, 已用 agbcc 实编译对账 asm 里的 idx*40 步长 */
 
 /* 与 gActors 紧邻的前一个同类型数组 (0x03001EE0, 100 项, 尾部正好 = gActors 基址)。
@@ -439,7 +441,7 @@ extern Actor gActors[];
 // extern Unk_03003150 gEffectActor;
 // extern Unk_03003150 gDialogArrowActors[];
 
-extern Actor gEffectActor;        /* == gActors[18] */
+extern Actor gEffectActor; /* == gActors[18] */
 extern Actor gDialogArrowActors[]; /* == &gActors[19] */
 extern u16 gPendingPalId;
 
@@ -451,7 +453,7 @@ extern u8 gPendingSpriteLoad;
 #define PENDING_SPRITE_GFX 1
 #define PENDING_SPRITE_PAL 2
 extern u16 gPendingGfxId;
-extern u8* gCutsceneAnimPals[];
+extern u8 *gCutsceneAnimPals[];
 
 extern u8 gVramTransferCounts[32];
 
@@ -518,40 +520,38 @@ extern Unk_030039C0 gVramTransferQueue[32];
  * 语义与目标汇编一致: 清位用 &, 写回用 + (不是 |), 与 SET_OAM_FIELD 展开对应:
  *   field = (field & ~mask) + (val & mask)
  * 生成形态: movs mask半字; ands; (val 截断); adds —— 见 UiSprites_Update */
-#define SET_OAM_FIELD(field, mask, val) \
-    ((field) = ((field) & ~(mask)) + ((val) & (mask)))
+#define SET_OAM_FIELD(field, mask, val) ((field) = ((field) & ~(mask)) + ((val) & (mask)))
 
-#define GET_OAM_FIELD(field, mask) \
-    ((field) & (mask))
+#define GET_OAM_FIELD(field, mask)      ((field) & (mask))
 
-#define OAM0_Y_MASK          0x00FF // u32 VPos:8
-#define OAM0_AFFINE_MODE     0x0300 // u32 AffineMode:2
-#define OAM0_OBJ_MODE        0x0C00 // u32 ObjMode:2
-#define OAM0_MOSAIC          0x1000 // u32 Mosaic:1
-#define OAM0_COLOR_MODE      0x2000 // u32 ColorMode:1
-#define OAM0_SHAPE           0xC000 // u32 Shape:2
+#define OAM0_Y_MASK                     0x00FF // u32 VPos:8
+#define OAM0_AFFINE_MODE                0x0300 // u32 AffineMode:2
+#define OAM0_OBJ_MODE                   0x0C00 // u32 ObjMode:2
+#define OAM0_MOSAIC                     0x1000 // u32 Mosaic:1
+#define OAM0_COLOR_MODE                 0x2000 // u32 ColorMode:1
+#define OAM0_SHAPE                      0xC000 // u32 Shape:2
 
-#define OAM1_X_MASK          0x01FF // u32 HPos:9
-#define OAM1_AFFINE_PTR      0x0E00 // u32 AffineParamNo:3 (仿射模式下)
-#define OAM1_AFFINE_OR_FLIP  0x3E00 // u32 AffineParamNo|HFlip|VFlip (bit9-13, 非仿射时含翻转位)
-#define OAM1_HFLIP           0x1000 // u32 HFlip:1
-#define OAM1_VFLIP           0x2000 // u32 VFlip:1
-#define OAM1_SIZE            0xC000 // u32 Size:2
+#define OAM1_X_MASK                     0x01FF // u32 HPos:9
+#define OAM1_AFFINE_PTR                 0x0E00 // u32 AffineParamNo:3 (仿射模式下)
+#define OAM1_AFFINE_OR_FLIP             0x3E00 // u32 AffineParamNo|HFlip|VFlip (bit9-13, 非仿射时含翻转位)
+#define OAM1_HFLIP                      0x1000 // u32 HFlip:1
+#define OAM1_VFLIP                      0x2000 // u32 VFlip:1
+#define OAM1_SIZE                       0xC000 // u32 Size:2
 
-#define OAM2_CHAR_MASK       0x03FF // u16 CharNo:10
-#define OAM2_PRIORITY        0x0C00 // u16 Priority:2
-#define OAM2_PALETTE         0xF000 // u16 Pltt:4
+#define OAM2_CHAR_MASK                  0x03FF // u16 CharNo:10
+#define OAM2_PRIORITY                   0x0C00 // u16 Priority:2
+#define OAM2_PALETTE                    0xF000 // u16 Pltt:4
 
-#define GET_OAM_Y(field)     ((field) & (OAM0_Y_MASK))
-#define CLR_OAM_Y(field)     ((field) & (~OAM0_Y_MASK))
-#define SET_OAM_Y(field, val) SET_OAM_FIELD(field, OAM0_Y_MASK, val)
+#define GET_OAM_Y(field)                ((field) & (OAM0_Y_MASK))
+#define CLR_OAM_Y(field)                ((field) & (~OAM0_Y_MASK))
+#define SET_OAM_Y(field, val)           SET_OAM_FIELD(field, OAM0_Y_MASK, val)
 
-#define GET_OAM_X(field)     ((field) & (OAM1_X_MASK))
-#define CLR_OAM_X(field)     ((field) & (~OAM1_X_MASK))
-#define SET_OAM_X(field, val) SET_OAM_FIELD(field, OAM1_X_MASK, val)
+#define GET_OAM_X(field)                ((field) & (OAM1_X_MASK))
+#define CLR_OAM_X(field)                ((field) & (~OAM1_X_MASK))
+#define SET_OAM_X(field, val)           SET_OAM_FIELD(field, OAM1_X_MASK, val)
 
 /* 定点插值: 8 步走完 dist (UiSprites_Update 的移动插值, asrs #3) */
-#define LERP_POS(start, dist, step) ((start) + (((dist) * (step)) >> 3))
+#define LERP_POS(start, dist, step)     ((start) + (((dist) * (step)) >> 3))
 
 /* 精灵链节点 (0x14 = 20 B) —— 名字保留, 它确实是 "node":
  *   gSpriteRenderQueue[128] = 链头指针数组; 本结构自带 next 字段 → 链表节点;
@@ -564,10 +564,10 @@ extern Unk_030039C0 gVramTransferQueue[32];
 typedef struct SpriteNode
 {
     /* 0x00 */ u8 flags;
-                          ///< bits 0-6: 该链的 OBJ 段数 (渲染时循环次数), 证据 `flags & 0x7F`
-                          ///< bit 7   : 隐藏/跳过渲染, 证据 sub_8004F64 的 `(s8)flags < 0` 直接返回 next
-                          ///< 值 0   : 空闲池块 (RenderQueue_Clear 用 `flags == 0` 判空闲)
-                          ///< 注: 旧注释"bit 0=active, bits 1-7=chain count" 是错的
+    ///< bits 0-6: 该链的 OBJ 段数 (渲染时循环次数), 证据 `flags & 0x7F`
+    ///< bit 7   : 隐藏/跳过渲染, 证据 sub_8004F64 的 `(s8)flags < 0` 直接返回 next
+    ///< 值 0   : 空闲池块 (RenderQueue_Clear 用 `flags == 0` 判空闲)
+    ///< 注: 旧注释"bit 0=active, bits 1-7=chain count" 是错的
     /* 0x01 */ u8 animStep;
 
     /* 0x02 */ u16 attr0; ///< GBA OAM Attribute 0 (Y pos, shape, mode, affine flags)
@@ -679,7 +679,7 @@ extern u8 gSlotGfxId[];
  * 0xFC/0xFD/0xFE/0xFF 是保留值, `<= 0xFC` 走正常分支。
  * ⚠ 这里按 u16 声明但多处只按字节读写(asm 侧是 ldrb), 改类型会影响代码生成, 不要顺手改。 */
 extern u16 gObjGraphicsSetId;
-#define GFXSET_NO_SPRITE_LOAD 0x80   /* bit7 */
+#define GFXSET_NO_SPRITE_LOAD 0x80 /* bit7 */
 extern u16 gDrawCamY;
 extern u16 gUnk_03004688;
 extern u8 gSpawnTileX;
@@ -761,19 +761,19 @@ extern u8 gChestFlags[32];
 
 typedef struct
 {
-    u8 flags;          /* bit0 = opened; bit7 = special chest gate */
-    u8 mapEntryIndex;  /* index into gChestFlags */
-    u8 spriteNodeIdx;  /* head of the chest's sprite chain */
-    u8 interactionId;  /* item/script interaction identifier */
+    u8 flags; /* bit0 = opened; bit7 = special chest gate */
+    u8 mapEntryIndex; /* index into gChestFlags */
+    u8 spriteNodeIdx; /* head of the chest's sprite chain */
+    u8 interactionId; /* item/script interaction identifier */
     u16 x;
     u16 y;
 } ChestObject;
 
 extern ChestObject gChestObjects[16]; /* 0x03004890, 16 个场景宝箱记录 */
 
-extern u8 gPaletteFxMode;    /* 0x03004910: palette effect mode + 1 */
+extern u8 gPaletteFxMode; /* 0x03004910: palette effect mode + 1 */
 extern u8 gPaletteFxPending; /* 0x03004914: pending palette upload flag */
-extern u8 gPaletteFxTimer;   /* 0x03004918: palette effect frame counter */
+extern u8 gPaletteFxTimer; /* 0x03004918: palette effect frame counter */
 extern u8 gMapObjGfxSetId;
 
 typedef struct
@@ -795,7 +795,6 @@ typedef struct
 extern StaticMapObject gStaticMapObjects[3]; // gUnk_03004930
 
 extern u8 gInventory[];
-
 
 extern u8 gEquipBonusDef;
 extern u8 gBattleFormationIds[];
@@ -871,8 +870,8 @@ extern u8 gSaveFlags[];
 extern u8 gUnk_03004DD0;
 extern u8 gSaveUiParam;
 extern u8 gSaveBusyB;
-extern u16 gSavedDispCnt;   /* 0x03004DDC 存档菜单进入前的 REG_DISPCNT */
-extern u16 gSavedBldCnt;    /* 0x03004DE0 同上, REG_BLDCNT */
+extern u16 gSavedDispCnt; /* 0x03004DDC 存档菜单进入前的 REG_DISPCNT */
+extern u16 gSavedBldCnt; /* 0x03004DE0 同上, REG_BLDCNT */
 extern u16 gUnk_03004DE4;
 
 extern u8 gSioState[];
@@ -881,27 +880,27 @@ extern u8 gSioState[];
  * 现存已匹配子函数按 u8 下标访问, 本结构供新匹配使用; 字段语义名待 SIO 族匹配后统一。 */
 typedef struct
 {
-    u8 isParent;        // 0x00 1=主机(parent) 0=从机 (Sio_IsHost/SetReady 视作 mode)
-    u8 stage;           // 0x01 连接阶段
-    u8 unk_2;           // 0x02 收包位图累积
-    u8 unk_3;           // 0x03 收到位图
-    u8 unk_4;           // 0x04 包双缓冲交换标志
-    u8 unk_5;           // 0x05 帧完成标志 (本帧有包)
-    u8 unk_6;           // 0x06 对端就绪
-    u8 errorFlags;      // 0x07 SIO Error 位
+    u8 isParent; // 0x00 1=主机(parent) 0=从机 (Sio_IsHost/SetReady 视作 mode)
+    u8 stage; // 0x01 连接阶段
+    u8 unk_2; // 0x02 收包位图累积
+    u8 unk_3; // 0x03 收到位图
+    u8 unk_4; // 0x04 包双缓冲交换标志
+    u8 unk_5; // 0x05 帧完成标志 (本帧有包)
+    u8 unk_6; // 0x06 对端就绪
+    u8 errorFlags; // 0x07 SIO Error 位
     u8 unk_8;
-    u8 sioInterrupted;  // 0x09 串行 IRQ 已处理
+    u8 sioInterrupted; // 0x09 串行 IRQ 已处理
     u8 unk_A;
-    u8 counter;         // 0x0B
+    u8 counter; // 0x0B
     u8 pad_C[0x14 - 0xC];
-    s32 unk_14;         // 0x14 发送推进计数
-    s32 unk_18;         // 0x18 接收列计数 (-1=复位换缓冲)
-    void *unk_1C;       // 0x1C 发送双缓冲 A
-    void *unk_20;       // 0x20 发送双缓冲 B
-    void *unk_24;       // 0x24 接收缓冲 A (每槽 16×u16)
-    void *unk_28;       // 0x28 接收缓冲 B
-    void *unk_2C;       // 0x2C 收包双缓冲 (sub_8016E80 交换)
-    void *unk_30;       // 0x30
+    s32 unk_14; // 0x14 发送推进计数
+    s32 unk_18; // 0x18 接收列计数 (-1=复位换缓冲)
+    void *unk_1C; // 0x1C 发送双缓冲 A
+    void *unk_20; // 0x20 发送双缓冲 B
+    void *unk_24; // 0x24 接收缓冲 A (每槽 16×u16)
+    void *unk_28; // 0x28 接收缓冲 B
+    void *unk_2C; // 0x2C 收包双缓冲 (sub_8016E80 交换)
+    void *unk_30; // 0x30
 } Unk_03004DF0;
 extern Unk_03004DF0 gUnk_03004DF0;
 
@@ -977,25 +976,23 @@ typedef struct SaveInfo
     /** 0x16B6 */ u8 field_03002C44; // 1
 } SaveInfo; // 总大小: 0x16B7 字节
 
-
 /* ==== 视口/摄像机滚动 (Viewport_UpdateScroll, 原 sub_8005C70) ==== */
-extern s16 gCameraMinY;        /* 0x0300464C: 摄像机 Y 下界 */
-extern s16 gCameraMinX;        /* 0x03004650: 摄像机 X 下界 */
-extern u8  gDrawCamEaseActive; /* 0x03004680: 缓动进行中; gDrawCamY += gScrollEaseDeltas[gDrawCamX++] */
-extern u16 gDrawCamY;          /* 0x03004684: 绘制用摄像机 Y (Chara_GetDrawY 用它算屏幕 Y) */
-extern u16 gDrawCamX;          /* 0x030047C0: 绘制用摄像机 X; 缓动时兼作帧计数器 */
-extern u16 gMapWidthPx;        /* 0x030047C4: 地图宽(像素); 摄像机 X 上界 = 本值 - 240 */
-extern u16 gMapHeightPx;       /* 0x030047EC: 地图高(像素); 摄像机 Y 上界 = 本值 - 160 */
-
+extern s16 gCameraMinY; /* 0x0300464C: 摄像机 Y 下界 */
+extern s16 gCameraMinX; /* 0x03004650: 摄像机 X 下界 */
+extern u8 gDrawCamEaseActive; /* 0x03004680: 缓动进行中; gDrawCamY += gScrollEaseDeltas[gDrawCamX++] */
+extern u16 gDrawCamY; /* 0x03004684: 绘制用摄像机 Y (Chara_GetDrawY 用它算屏幕 Y) */
+extern u16 gDrawCamX; /* 0x030047C0: 绘制用摄像机 X; 缓动时兼作帧计数器 */
+extern u16 gMapWidthPx; /* 0x030047C4: 地图宽(像素); 摄像机 X 上界 = 本值 - 240 */
+extern u16 gMapHeightPx; /* 0x030047EC: 地图高(像素); 摄像机 Y 上界 = 本值 - 160 */
 
 /* ==== 分层选项数据库 (gChoiceDataBase @0x080876A2) ==== */
 /* 组/子组索引 -> 一个 0xFF 结尾的选项列表; 见 ChoiceMenu_BuildList / ChoiceMenu_HandleInput */
-extern u8  gChoiceGroupIdx;  /* 0x030047BC */
-extern u8  gChoiceSubIdx;    /* 0x030047E0 */
-extern u8 *gChoiceListPtr;   /* 0x0300462C */
-extern u8  gChoiceListLen;   /* 0x03004640 */
-extern u8  gChoiceCursor;    /* 0x0300466C */
-extern u8  gChoiceSel;       /* 0x0300469C: 当前选中项的低 nibble */
+extern u8 gChoiceGroupIdx; /* 0x030047BC */
+extern u8 gChoiceSubIdx; /* 0x030047E0 */
+extern u8 *gChoiceListPtr; /* 0x0300462C */
+extern u8 gChoiceListLen; /* 0x03004640 */
+extern u8 gChoiceCursor; /* 0x0300466C */
+extern u8 gChoiceSel; /* 0x0300469C: 当前选中项的低 nibble */
 
 #endif
 
@@ -1020,7 +1017,7 @@ typedef struct
 {
     /* 0x00 */ u16 expReward;
     /* 0x02 */ u16 goldReward;
-    /* 0x04 */ u8 formRace;    /* 高4=外形, 低4=属性族 */
+    /* 0x04 */ u8 formRace; /* 高4=外形, 低4=属性族 */
     /* 0x05 */ u8 dropItemId;
     /* 0x06 */ u8 hp;
     /* 0x07 */ u8 attack;
@@ -1032,22 +1029,21 @@ typedef struct
 extern const EnemyCharaStat gCharaBaseData[];
 
 /* ==== 视口/摄像机滚动 (Viewport_UpdateScroll, 原 sub_8005C70) ==== */
-extern s16 gCameraMinY;        /* 0x0300464C: 摄像机 Y 下界 */
-extern s16 gCameraMinX;        /* 0x03004650: 摄像机 X 下界 */
-extern u8  gDrawCamEaseActive; /* 0x03004680: 缓动进行中; gDrawCamY += gScrollEaseDeltas[gDrawCamX++] */
-extern u16 gDrawCamY;          /* 0x03004684: 绘制用摄像机 Y (Chara_GetDrawY 用它算屏幕 Y) */
-extern u16 gDrawCamX;          /* 0x030047C0: 绘制用摄像机 X; 缓动时兼作帧计数器 */
-extern u16 gMapWidthPx;        /* 0x030047C4: 地图宽(像素); 摄像机 X 上界 = 本值 - 240 */
-extern u16 gMapHeightPx;       /* 0x030047EC: 地图高(像素); 摄像机 Y 上界 = 本值 - 160 */
-
+extern s16 gCameraMinY; /* 0x0300464C: 摄像机 Y 下界 */
+extern s16 gCameraMinX; /* 0x03004650: 摄像机 X 下界 */
+extern u8 gDrawCamEaseActive; /* 0x03004680: 缓动进行中; gDrawCamY += gScrollEaseDeltas[gDrawCamX++] */
+extern u16 gDrawCamY; /* 0x03004684: 绘制用摄像机 Y (Chara_GetDrawY 用它算屏幕 Y) */
+extern u16 gDrawCamX; /* 0x030047C0: 绘制用摄像机 X; 缓动时兼作帧计数器 */
+extern u16 gMapWidthPx; /* 0x030047C4: 地图宽(像素); 摄像机 X 上界 = 本值 - 240 */
+extern u16 gMapHeightPx; /* 0x030047EC: 地图高(像素); 摄像机 Y 上界 = 本值 - 160 */
 
 /* ==== 分层选项数据库 (gChoiceDataBase @0x080876A2) ==== */
 /* 组/子组索引 -> 一个 0xFF 结尾的选项列表; 见 ChoiceMenu_BuildList / ChoiceMenu_HandleInput */
-extern u8  gChoiceGroupIdx;  /* 0x030047BC */
-extern u8  gChoiceSubIdx;    /* 0x030047E0 */
-extern u8 *gChoiceListPtr;   /* 0x0300462C */
-extern u8  gChoiceListLen;   /* 0x03004640 */
-extern u8  gChoiceCursor;    /* 0x0300466C */
-extern u8  gChoiceSel;       /* 0x0300469C: 当前选中项的低 nibble */
+extern u8 gChoiceGroupIdx; /* 0x030047BC */
+extern u8 gChoiceSubIdx; /* 0x030047E0 */
+extern u8 *gChoiceListPtr; /* 0x0300462C */
+extern u8 gChoiceListLen; /* 0x03004640 */
+extern u8 gChoiceCursor; /* 0x0300466C */
+extern u8 gChoiceSel; /* 0x0300469C: 当前选中项的低 nibble */
 
 #endif

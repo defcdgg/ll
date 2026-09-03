@@ -442,6 +442,13 @@
 - 下一步: 找一个能“阻止 CSE 把 data 传播到尾部”的写法（例如中间插入会刷新 mem 等价项的
   存储、或目标确实用了不同的基量）
 
+**2026-09-03 已解 (gpnux, 92B exact)**:
+- 根因确认 = 规则 33 手法直接命中: 在 `idx = data[1]` 后加一条死 store `data = 0;`。
+  agbcc 会删除该 store 不发任何指令, 但它先杀死了 `data` 伪寄存器的 liveness,
+  CSE 无法再把它传播到尾部 `*ptr += 2` → 尾部被迫 `ldr r0,[r3]; adds r0,#2; str r0,[r3]`
+  重加载, 与目标逐指令一致。多占的 r7 消失 (push {r4,r5,r6,lr})。
+- 语句顺序保持 progress 早期结论 `data / ret / idx` 三段式; 末尾 if/else 链用单行花括号。
+
 ### sub_8052AE8 (0x08052AE8) — 字节池临时量 home + 双池加载 (score 1075)
 
 - 语义已破解, 最佳候选 `permuter/sub_8052AE8/w2.c`：
@@ -2538,3 +2545,100 @@ NPC 对话/交互状态机 (gUnk_03000820, 0x08032D74, code_80264C0), 298B exact
 占位 F7FF FFFE 差 16B; **不定义这些符号则 ld 报 undefined**, 都不能到 OK —
 这是"未匹配被调者"的固有伪影 (规则 29 注记), 以 fncheck (自动忽略 bl 槽) 为准。
 permuter base score=40 (=4 bl 槽×10), 同属该伪影。
+
+## 2026-09-03 sub_801869C 匹配 (gpnux)
+
+BGM 选曲状态机 (gGstate324/gGstate32E, 168B exact)。**关键**:跳表 0-16 需列全 17 个 case(规则 37),否则 GCC 生成决策树而非跳表。`default:` 必须显式写出,否则 `bhi`(越界)直接跳 epilogue 跳过 Bgm_Play。Bgm_Play 放在各分支内(switch 内每个 case 组 + else-if + else),编译器自动合并 track=2/3/4 路径为公共块, track=0 单独复制。去掉 track 变量后仍匹配(GCC 把同一 case 组的常量调用直接定位到 r0)。
+
+## 2026-09-03 sub_801A2AC 挂起更新 (gpnux)
+
+再次尝试 25 个变体 (v1-v18, s1-s4, d1-d3, 含 `u32 ext` 显式零扩展、store 用副本/mode 用 arg0 等排列), 全部差 47 字节, 卡在同一个寄存器分配: 目标 `lsls r3,r0,#0x10` 把 arg0<<16 移入 r3、arg0 保留在 r0 供 `strh r0`(BLDCNT store); 我方任意写法 GCC2 都 `lsls r0,r0,#16` 就地 clobber r0 再 `lsrs r3,r0,#16` 恢复, 导致 store 用 r3、地址用 adds 递推而非独立池加载、mode 寄存器错位。根因: GCC2 的 CSE 把 arg0 的零扩展版(为 `>>6` 准备)与 store 值合并, 使 arg0 伪寄存器在 `<<16` 后即 REG_DEAD (联用 -dl 可确认)。permuter 平台期 240 未突破。最接近候选: v9 (u32 arg0, `REG_BLDCNT=(u16)arg0`, `switch ((arg0>>6)&2)`), 保留 r0 但缺 `lsls r3,r0,#0x10` 序列和独立池加载。
+
+## 2026-09-03 sub_801D19C 匹配 (opencode)
+
+音效/状态机 getter (sub_801D12C 的"取值"版, 120B 逐字节命中, sha1 全绿 648/1064)。
+
+**流程**: 先按常规 if/switch 写出 (case 0/1/2 嵌 ab-switch, case 5 用 `if (ab>7)/(ab<1)` 区间守卫),
+permuter 平台期 875~895 (未破, 最"佳" 555 是 `v=(u32)obj` 的 rule 87 伪造, 语义全崩, 弃用)。
+
+**两个真正的坑 (规则 126 / 54)**:
+1. **>0xA 路径不写 return (rule 54)**: 最初我把 guard 写成 `if (obj[0xBE] > 0xA) return (u32)obj;`
+   (check-first) 或 wrapping 的 `return (u32)obj;` 在末尾 —— 两种 agbcc 都 0xbe 就地用 r0 (`adds r0,#0xbe`)
+   再重载 obj, 与目标差 90+ 字节。改回 **规则 54 式**: `if (obj[0xBE] <= 0xA) { ...; return v; }` 中
+   **>0xA 路径直接函数末尾掉出 (无 return)**, agbcc 锁 r0=obj (obj 就地留在 r0), 临时量上移 r1/r2
+   (`r1=obj+0xbe`, `r2=kind`), 目标前 16 条指令全部归位。
+2. **case5 区间守卫必须写成行内单侧 switch**: `switch (ab) { case 1..7: v = 1; break; }` 才出
+   `cmp #7; bgt; cmp #1; blt`; 写成 `if (ab>7) break; if (ab<1) ...` 被 agbcc 归约成 `cmp #0; ble` (差 2 字节)。
+
+**附带要点**: `ab` 声明为 `int` (有符号) 才出 bgt/blt; `u8` 出 bhi/beq。返回类型用 `u16` (与 header 一致,
+不改 code_0.h 签名即可, 但 header 原是空参 `u16 sub_801D19C();`, 加了全原型 `(u8*, u8)` 后编译通过 —
+调用方只传 (u8*, u8) 无截断, sha1 仍绿)。`fncheck` OK, `make` + `sha1sum -c` 通过。
+
+## 2026-09-03 sub_801FEBC 匹配 (opencode)
+
+场景对象滑动参数组设置 (与 MOD-05 `sub_8020FB8` Obj_StartSlide 同族, 132B 逐字节命中, sha1 全绿 649/1064)。
+TSV 原挂起 note: "agbcc寄存器home深度分配; 目标value→r3/zero→r3/ptr+0x37→r4 subs复用; 穷举C不可破"。
+
+**三个真正的坑 (规则 127 / 11 / 13 组合)**:
+
+1. **zero 提前物化进 r3 需要"两条 RMW 拆写 + 结构体成员访问"**: 目标是
+   `ldrh r3,[r4]; ldr r0,=0xFF0F; ands r0,r3; movs r3,#0; movs r6,#0x20; orrs r0,r6` ——
+   value(0xB0 值)先进 r3、`ands` 后 r3 恰好死亡, agbcc 把 `gUnk_0300061A=0` 的 0 物化进死槽 r3,
+   再用 `strh r3,[0x0300061A]`。只有写成 **两条语句** `arg0->field_B0 = arg0->field_B0 & 0xFF0F;
+   arg0->field_B0 = 0x20 | arg0->field_B0;` (规则 13) 且用**结构体成员访问** (规则 11, mov ip,r0 缓存)
+   才产生该空隙; 单条 `x = (x&0xFF0F)|0x20` 或裸指针 cast 均不产生 (差 35+ 字节)。
+
+2. **ptr+0x37 的 subs 复用 + subs 调度位置**: 目标 `subs r4,#0x79` 复用 r4(=obj+0xB0) 得 obj+0x37。
+   独立语句 `p -= 0x79;` 虽产生 subs, 但被调度到 `ldr r1,=0x0300061C` **之前** (差 8B);
+   把递减**内嵌进读取表达式** `gUnk_0300061C = *(u8 *)(p = (u16 *)((u8 *)p - 0x79));`
+   (C 的赋值表达式) 后, subs 才落到 `ldr` 之后紧贴 `ldrb` —— 与目标一致 (0 差)。
+
+3. **diff 值落 r1 (而非 r3) 靠链式赋值**: `gUnk_03000620 = (dh = 0xB4 - *(u8 *)p);`
+   写成 `dh = ...; gUnk_03000620 = dh;` 两行时 dh 落 r3、地址加载后置, 目标要 dh→r1 且
+   `ldr r3,=0x03000620` 先置 —— 链式赋值 (规则 110 同思路) 才让 qty 创建序 diff→地址, home 归位。
+   判定: 目标 `movs r1,#0xb4; subs r1,r1,r0; strh r1,[r3]` + 尾部 `cmp r1,#0` = 链式赋值标志。
+
+**附带要点**:
+- 参数必须按头文件写 `void *varg` + 函数体首行 `Unk_8020F4C *arg0 = (Unk_8020F4C *)varg;`
+  (规则 14), 直接写 `Unk_8020F4C *arg0` 与 code_0.h 的 `void *` 声明冲突 (agbcc 报 conflicting types)。
+- struct 用模块已有 `Unk_8020F4C` (0xC8 场景对象, 与 src/code_8020D50.c 同布局), 本文件也定义了
+  (各 TU 独立 typedef, 不共享头)。
+- `if (dh > 0) arg0->field_24 |= 0x20;` 复用 r6(=0x20, 已为 B0 物化) → 常数 0x20 两次使用正是
+  r6 保活跨全函数的原因。
+- `sub_801FA10(arg0, 1)` 收尾 (对象滑动状态机复用入口, 与 Obj_StartSlide 一致)。
+- fncheck OK (132B, 1 bl 槽忽略); 字节定性以 bytecmp/fncheck 为准 (permuter base score 35 是 bl 链接
+  artifact 假高, .o 层 raw 比对 0 指令差异)。
+
+## 2026-09-03 sub_80498E0 匹配 (gpnux, 120B exact)
+
+磁盘动画帧写入器 (gUnk_030009BF/9C0/94D + 表 gUnk_08095028)。原挂起 note 称"34B 地板需长磨"。
+
+**两个卡点逐一破解**:
+1. **callee-saved 寄存器轮换** (ptr→r4/BF→r5/table→r6): 用 `const u8 *tbl = gUnk_08095028;` 局部指针首载 (table 基址物化进 r6 第一条), 且 byte 表达式内联 `(u8*)gUnk_030009C0` (不声明 ptr 局部) → GCC2 自然把 ptr→r4、&gBF→r5。声明顺序 tbl 先、byte 表达式内联 gBF/gC0 是关键。
+2. **第二处 frame 载入的调度地板 (4B)**: 目标 `ldrb r0,[r0]`(byte)→`lsls r0,r0,#3`(byte*8)→`ldrb r1,[r3]`(frame)。GCC2 总把 frame 载入提前填进 byte 载入的延迟槽。解法 = 把 `byte*8` 拆成独立语句 `u16 ofs = byte * 8;` (u16 避免 u8 截断的 lsls#27/lsrs#24), 再 `tile = tbl[ofs + frame]`。独立语句让 shift 紧跟 byte 载入, frame 读取落到 shift 之后 → 逐指令一致。
+
+新符号 gUnk_030009BF(s8)/gUnk_030009C0(u32) 登记 iwram.h+linker.ld; code_0.h 原型 void→u32 (调用点忽略返回值, 安全)。
+
+## 2026-09-03 sub_8013870 更新 (opencode, 仍挂起)
+
+文本块绘制 = ClearBuffer 内联填 0xB001 (0x14×0x1E, 行距 0x20 u16) + TextBlocks_Render 式串 + Text_WriteChars 尾。
+前 agent 已确认 v13(src 后赋) / v16(src 顶赋) 两个极近候选。本次深化:
+
+**v13 = 整函数寄存器全对, 只有 prologue 差**: 目标 prologue 顺序 buf(r2)→y(r1)→src(r8)→0x1E0000(ip)→w(r9)→h(r6),
+v13 是 buf→y→0x1E0000(ip)→w(r8)→h(r6), src 在 fill 后 `ldr r4,=0x08098622` 晚载。
+差 8 字节 prologue + 全函数偏移级联 (bytecmp 53B 多是分支偏移错位)。**v13 的 fill/串循环寄存器与目标逐条一致**。
+
+**permuter 从 v13 出发跑到 490 = cand_490_best.c**: 关键技巧 `int new_var = 0xFE;` 顶赋、
+转义比较用 `charCode == new_var` → new_var 成为**低 pri 长活值** (lreg: 4 次/158 insn, pri≈506, 规则117)
+落 r8, 把 w 挤到 r9 → **填零块逐字节命中**。剩 ~21 真实字节 (bl 槽占 16B 另计):
+1. prologue r8 装的是 0xFE 而非 src (值/顺序不同);
+2. 串的 src 用 `ldr r4,=0x08098622` 而非 `mov r4,r8`;
+3. 转义比较 `cmp r1,r8` (寄存器) 而非目标 `cmp r1,#0xfe` (立即数)。
+
+**根因 (规则117定量)**: 目标把 src 基址留在 r8、迭代用 r4 拷贝 (mov r4,r8, r8 仅用一次)
+→ src 必须是**低 pri allocno** (少用/长活) 才落 r8; 但 src 作迭代器 (14 次/34 insn, pri≈12353)
+必落 r4 (v16 整块轮换), 单独拆成基址+迭代器 (p=src) 又被常量传播折叠 (probe J/p)。
+穷举 ~35 变体 (src 位置/类型、声明序、int 别名、命名 ROM 符号、双向迭代、-g flag) 均未破。
+
+**下一位接手方向**: 规则 117 算 fill 各 allocno 的 pri, 让 fill 值先占 r4 把 src 逼到 r8;
+或拆"基址+迭代器"时用非折叠用法 (如比较/寻址引用) 保 src 存活。候选: base.c=v13 式, cand_490_best.c 最近。

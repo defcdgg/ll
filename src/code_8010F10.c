@@ -23,25 +23,26 @@ void sub_801114C(void)
     u8 idx;
     PlayerStats *chara;
     u8 paletteId;
-    u8* src;
-    u16* dest;
+    u8 *src;
+    u16 *dest;
     u8 charCode;
     u8 y;
-    
+
     idx = gPartyMemberIds[gPartyMenuIdx];
-    if(idx != 0) idx--;
+    if (idx != 0)
+        idx--;
     chara = &gPartyStats[idx];
 
-    ClearBuffer( (u16* )0x02005AA0, 8, 6);
+    ClearBuffer((u16 *)0x02005AA0, 8, 6);
 
-    for(i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++)
     {
         idx = chara->skills[i + gSkillMenuPage];
 
-        if(idx == 0xFF || idx == 0x26)
+        if (idx == 0xFF || idx == 0x26)
             break;
 
-        if(i == gMenuCursorSel - 16)
+        if (i == gMenuCursorSel - 16)
         {
             gSkillMenuTmpB = idx;
             paletteId = 0xD;
@@ -53,15 +54,15 @@ void sub_801114C(void)
 
         y = (i * 2) + 10;
 
-        if(idx != 0xFF)
+        if (idx != 0xFF)
         {
             src = gUnk_08095828[(u8)(idx - 1)];
-            dest = (u16*)0x2005820  + (y * 32);
+            dest = (u16 *)0x2005820 + (y * 32);
 
-            for(j = 0; j < 8; j++)
+            for (j = 0; j < 8; j++)
             {
                 charCode = *src++;
-                if(charCode == 0 )
+                if (charCode == 0)
                 {
                     break;
                 }
@@ -69,9 +70,6 @@ void sub_801114C(void)
             }
         }
     }
-
-
-
 }
 // @ 0x08011268
 INCLUDE_ASM("asm/nonmatchings", sub_8011268);
@@ -170,9 +168,9 @@ void Save_LoadSlot0(void)
     while (i < 8)
         gSaveFlags[i++] = 0;
 }
-extern u16 gUnk_080981E6[];   /* 块长度表 {2, 0x5A, 8, 0} */
-extern u8 *gUnk_087EB1E8[];   /* 块指针表 {&gUnk_03004D48, gSaveTimers, gSaveFlags, ...} */
-extern u8 gSaveSignature[];   /* 12B "LUNAR1_12_09" */
+extern u16 gUnk_080981E6[]; /* 块长度表 {2, 0x5A, 8, 0} */
+extern u8 *gUnk_087EB1E8[]; /* 块指针表 {&gUnk_03004D48, gSaveTimers, gSaveFlags, ...} */
+extern u8 gSaveSignature[]; /* 12B "LUNAR1_12_09" */
 
 /* 把存档状态序列化进 0x02027000 影子缓冲: 签名(12B) + 各块数据 + 校验和字节。
    签名最后才写, 保证写一半的存档校验不过 (Save_LoadSlot0 的 sigCheck)。 */
@@ -427,32 +425,30 @@ INCLUDE_ASM("asm/nonmatchings", sub_8014A68);
 
 extern u8 *D_87EB2A8[];
 
-
-
-
 // const u8 m1[] = {
 //     9, 9, 0xF0, 9, 0xFF
 // };
 
-extern u8* D_87EB2A8[];
+extern u8 *D_87EB2A8[];
 
 // const u8* D_87EB2A8[] = {
-    // m1
+// m1
 // };
 
-// shop 
+// shop
 // @ 0x0801543C
-void sub_801543C(u8 arg0) {
+void sub_801543C(u8 arg0)
+{
     u8 var_r6;
     u8 i;
-    u8* src;
+    u8 *src;
     u8 x, y;
-    u16* dst;
+    u16 *dst;
     u8 count;
 
-    for(i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++)
     {
-        if (i == *(u8* )0x03000187)
+        if (i == *(u8 *)0x03000187)
         {
             var_r6 = 0xD;
         }
@@ -464,18 +460,18 @@ void sub_801543C(u8 arg0) {
         x = *src++;
         y = *src++;
 
-         dst = (u16*)0x02005800 + x + y * 32;
+        dst = (u16 *)0x02005800 + x + y * 32;
 
-        if(arg0 == 0)
+        if (arg0 == 0)
         {
             count = 0;
-            while(*src != 0xFF)
+            while (*src != 0xFF)
             {
                 src++;
                 count++;
             }
 
-            while(count != 0)
+            while (count != 0)
             {
                 Text_PutGlyph(dst++, 0, 0x0B);
                 count--;
@@ -483,7 +479,7 @@ void sub_801543C(u8 arg0) {
         }
         else
         {
-            while(*src != 0xFF)
+            while (*src != 0xFF)
             {
                 Text_PutGlyph(dst++, *src++, var_r6);
             }
@@ -630,8 +626,7 @@ void sub_8016038(u8 arg0)
 }
 
 // @ 0x08016068
-void sub_8016068(arg0)
-u8 arg0;
+void sub_8016068(arg0) u8 arg0;
 {
     u8 temp_r1;
 
@@ -701,8 +696,7 @@ void sub_8016178(u16 arg0)
 extern u8 gUnk_08098308[];
 
 // @ 0x080161F4
-void sub_80161F4(arg0, x, y)
-u8 arg0;
+void sub_80161F4(arg0, x, y) u8 arg0;
 u8 x;
 u8 y;
 {
@@ -804,11 +798,11 @@ void Hud_DrawMp(u8 arg0, u8 x, u8 y)
  *   - 两格之间用 `tilemap += 0x20` 推进, **不能**写成 tilemap[0] / tilemap[32] 下标 (1610)
  */
 #define TILEMAP_ROW_STRIDE 0x20 /* 瓦片图一行 = 32 个 u16 */
-#define GLYPH_TILES        2    /* 一个 8×16 字形占 2 个 8×8 字模瓦片 */
+#define GLYPH_TILES        2 /* 一个 8×16 字形占 2 个 8×8 字模瓦片 */
 #define EXT_GLYPH_BASE     0x280 /* 扩展字模块的瓦片基址 */
-#define ESCAPE_PREFIX      0xFE  /* charCode 低字节为此值时, 高字节索引扩展字模块 */
-#define BLANK_TILE         1     /* 空白字形瓦片 */
-#define PAL_SHIFT          12    /* BG 图块项的调色板号位移 */
+#define ESCAPE_PREFIX      0xFE /* charCode 低字节为此值时, 高字节索引扩展字模块 */
+#define BLANK_TILE         1 /* 空白字形瓦片 */
+#define PAL_SHIFT          12 /* BG 图块项的调色板号位移 */
 #define GLYPH_BOTTOM_MASK  (GLYPH_TILES - 1)
 
 // @ 0x08016368
@@ -924,7 +918,7 @@ u16 *Msg_DrawPoolSegment(u16 *dest, u16 segIdx, u8 palette)
 
     p = (const u8 *)0x0830FC04;
 
-    for (i = 0; i != segIdx; )
+    for (i = 0; i != segIdx;)
     {
         if (*p++ != 0xFF)
             continue;
@@ -1170,21 +1164,21 @@ void sub_8016758(u8 x, u8 y, u8 kind)
     bit = (state >> 3) & 1;
     switch (kind)
     {
-    case 0:
-        tile = 0x826 | bit;
-        break;
-    case 1:
-        tile = 0x26 + bit;
-        break;
-    case 2:
-        tile = 0x428 | bit;
-        break;
-    case 3:
-        tile = 0x28 + bit;
-        break;
-    default:
-        tile = 0x3F;
-        break;
+        case 0:
+            tile = 0x826 | bit;
+            break;
+        case 1:
+            tile = 0x26 + bit;
+            break;
+        case 2:
+            tile = 0x428 | bit;
+            break;
+        case 3:
+            tile = 0x28 + bit;
+            break;
+        default:
+            tile = 0x3F;
+            break;
     }
 
     xOffset = x * 2;
@@ -1583,17 +1577,17 @@ void Sio_BuildPacket(u8 *src)
 
     checksum = 0;
     state = gSioState;
-    **(u8 * volatile *)(state + 0x1C) = state[0xB];
-    (*((u8 * volatile *)(state + 0x1C)))[1] = state[2] ^ state[3];
-    *(u16 *)(*(u8 * volatile *)(state + 0x1C) + 2) = 0;
-    CpuSet(src, *(u8 * volatile *)(state + 0x1C) + 4, 0x04000006);
+    **(u8 *volatile *)(state + 0x1C) = state[0xB];
+    (*((u8 *volatile *)(state + 0x1C)))[1] = state[2] ^ state[3];
+    *(u16 *)(*(u8 *volatile *)(state + 0x1C) + 2) = 0;
+    CpuSet(src, *(u8 *volatile *)(state + 0x1C) + 4, 0x04000006);
 
     i = 0;
-    packet = *(u16 * volatile *)(state + 0x1C);
+    packet = *(u16 *volatile *)(state + 0x1C);
     for (; i <= 0xD; i++)
         checksum += *packet++;
 
-    *(u16 *)(*(u8 * volatile *)(state + 0x1C) + 2) = ~checksum - 0x10;
+    *(u16 *)(*(u8 *volatile *)(state + 0x1C) + 2) = ~checksum - 0x10;
     state[4] = 1;
 }
 // @ 0x08016E80
@@ -1625,7 +1619,7 @@ u8 sub_8016E80(u8 *arg0)
     state = gSioState;
     packet = *(u16 **)(state + 0x2C);
     *(u32 *)(state + 0x2C) = *(u32 *)(state + 0x28);
-    *(u32 *)(state + 0x28) = (u32) packet;
+    *(u32 *)(state + 0x28) = (u32)packet;
     recvFlag = state[5];
     state[5] = 0;
     REG_IME = 1;
@@ -1755,7 +1749,7 @@ void sub_8016FC0(void)
 
         for (var_r3 = 0; var_r3 < 2; var_r3++)
         {
-            ((u16 (*)[16])gUnk_03004DF0.unk_24)[var_r3][gUnk_03004DF0.unk_18] = recv[var_r3];
+            ((u16(*)[16])gUnk_03004DF0.unk_24)[var_r3][gUnk_03004DF0.unk_18] = recv[var_r3];
         }
 
         if (gUnk_03004DF0.unk_18 == 0xD)
@@ -1835,7 +1829,8 @@ void sub_80175C0(void)
     zero = 0;
     p = &gSioSession.unk18[zero];
     i = 1;
-    do {
+    do
+    {
         p->field_0 = zero;
         p->field_2 = zero;
         p++;
@@ -1872,12 +1867,22 @@ void sub_8017640(void *dst, void *src, s32 count)
         s = src;
         count = count * 4;
         count--;
-        while (count != -1) { *d++ = *s++; count--; }
+        while (count != -1)
+        {
+            *d++ = *s++;
+            count--;
+        }
     }
     else
     {
         count = count - 1;
-        while (count != -1) { *(u32 *)dst = *(u32 *)src; dst = (u8 *)dst + 4; src = (u8 *)src + 4; count--; }
+        while (count != -1)
+        {
+            *(u32 *)dst = *(u32 *)src;
+            dst = (u8 *)dst + 4;
+            src = (u8 *)src + 4;
+            count--;
+        }
     }
 }
 // @ 0x0801768C
@@ -1893,7 +1898,52 @@ INCLUDE_ASM("asm/nonmatchings", sub_80182A8);
 // @ 0x080184A8
 INCLUDE_ASM("asm/nonmatchings", sub_80184A8);
 // @ 0x0801869C
-INCLUDE_ASM("asm/nonmatchings", sub_801869C);
+void sub_801869C(void)
+{
+    if (gGstate324 & 0x20)
+    {
+        switch (gGstate32E - 0x3A)
+        {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 15:
+            case 16:
+            default:
+                Bgm_Play(2, 0);
+                Bgm_FadeIn(0x14);
+                break;
+            case 12:
+            case 13:
+                Bgm_Play(3, 0);
+                Bgm_FadeIn(0x14);
+                break;
+            case 14:
+                Bgm_Play(4, 0);
+                Bgm_FadeIn(0x14);
+                break;
+        }
+    }
+    else if (gGstate324 & 0x200)
+    {
+        Bgm_Play(2, 0);
+        Bgm_FadeIn(0x14);
+    }
+    else
+    {
+        Bgm_Play(0, 0);
+        Bgm_FadeIn(0x14);
+    }
+}
 // @ 0x08018744
 void sub_8018744(void)
 {
@@ -2106,14 +2156,16 @@ INCLUDE_ASM("asm/nonmatchings", sub_8018EA8);
 // @ 0x08018FC0
 INCLUDE_ASM("asm/nonmatchings", sub_8018FC0);
 // @ 0x08019148
-void Bg0_InitClear(s32 a, s32 b, s32 c, s32 d) {
+void Bg0_InitClear(s32 a, s32 b, s32 c, s32 d)
+{
     u16 *ewram;
     u16 *vram;
     u16 i;
-    ewram = (u16 *) 0x02035AC0;
-    vram = (u16 *) 0x06007000;
+    ewram = (u16 *)0x02035AC0;
+    vram = (u16 *)0x06007000;
     i = 0;
-    do {
+    do
+    {
         ewram[i] = 0;
         vram[i] = 0;
         i++;
@@ -2128,7 +2180,10 @@ void Bg0_InitClear(s32 a, s32 b, s32 c, s32 d) {
     d &= 0xFFFFE0FF;
     d |= 0xE00;
     d &= ~0x2000;
-    do { d &= ~0xC000; } while (0);
+    do
+    {
+        d &= ~0xC000;
+    } while (0);
     REG_BG0CNT = d;
 }
 // @ 0x080191CC
@@ -2314,8 +2369,7 @@ u8 DialogCtx_GetField_C(u8 index)
  * 每项 (tile & 0x0FFF) + palette<<12 (保留 tile 号, 替换高 4 位调色板号)。
  * 调用点: sub_8020D50.c 菜单条目高亮 (style+0xB 选调色板, x=8, y=(i-view)*2+8, w=9, h=2)。 */
 // @ 0x0801A074
-void BgMap_PalFillRect(base, palette, x, y, width, height)
-u16 *base;
+void BgMap_PalFillRect(base, palette, x, y, width, height) u16 *base;
 u16 palette;
 u8 x;
 u8 y;
@@ -2338,10 +2392,11 @@ u8 height;
     }
 }
 // @ 0x0801A0F0
-void DialogCtx_Flush(void) {
-    if(gDialogCtx[0].field_C || gDialogCtx[1].field_C != 0 || gDialogCtx[2].field_C != 0)
+void DialogCtx_Flush(void)
+{
+    if (gDialogCtx[0].field_C || gDialogCtx[1].field_C != 0 || gDialogCtx[2].field_C != 0)
     {
-        DmaCopy32(3,0x02035AC0, 0x06007000,0x800);
+        DmaCopy32(3, 0x02035AC0, 0x06007000, 0x800);
         DmaWait(3);
     }
 }
@@ -2476,7 +2531,8 @@ void BgScrolls_WriteAll(void)
     REG_BG3HOFS = gUnk_03000500.field_C;
     REG_BG3VOFS = gUnk_03000500.field_E;
 }
-typedef union {
+typedef union
+{
     u16 array[4][2];
 } U0500_arr;
 

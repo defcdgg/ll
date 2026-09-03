@@ -268,7 +268,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8010F10	0x08011454	sub_8011454	
 0	thumb	code_8010F10	0x08012530	sub_8012530	
 0	thumb	code_8010F10	0x08012790	SaveUi_LoadScreen	⏸ 2026-09-02 gpnux: 存档/场景选择 UI 主状态机；扫描 gSaveMapUnlockFlags 并以 SaveFlag_Get 判断可用场景，确认后调用 MapScene_Load；已完成语义改名，保留原始 asm；fncheck OK (4320B)
-0	thumb	code_8010F10	0x08013870	sub_8013870	⏸ 2026-09-02 opencode: 文本块绘制=ClearBuffer内联填0xB001(0x14×0x1E)+TextBlocks_Render串+Text_WriteChars尾; 字符串段/footer已逐字节一致, 差53B=填零循环寄存器home轮换(src/值/行距/h/w/0x1E0000 六值环形置换); v13(src后赋)填零全对但src晚载使prologue差4B, v16(src顶赋)串全对但填零置换; 候选permuter/sub_8013870/base.c
+0	thumb	code_8010F10	0x08013870	sub_8013870	⏸ 2026-09-03 opencode: 新进展: v13(src后赋)整函数寄存器全对, 仅prologue缺src→r8(w落r8非r9)→53B(多为偏移级联); permuter最佳490=cand_490_best.c: `int new_var=0xFE`顶赋(低pri长活值→r8, 规则117: 4次/158insn pri~506)使填零块逐字节命中, 剩~21真实字节=①prologue r8装new_var非src ②串src=ldr r4,=const非mov r4,r8 ③转义比较cmp r1,r8非立即#0xfe; 根因=目标把src基址留r8(仅mov r4,r8一次用, 需低pri allocno), 但src作迭代器(14次/34insn pri~12353)必落r4(v16轮换), 单独成变量又折叠(p=src被常量传播); 穷举~35变体(声明序/int别名/命名符/全局符/双向迭代/-g)未破; 下一步按规则117抬fill值pri或拆src基址+迭代器且防折叠
 0	thumb	code_8010F10	0x08013934	sub_8013934	
 0	thumb	code_8010F10	0x08013b0c	sub_8013B0C	
 0	thumb	code_8010F10	0x08013c00	sub_8013C00	
@@ -364,7 +364,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8010F10	0x08018070	sub_8018070	
 0	thumb	code_8010F10	0x080182a8	sub_80182A8	
 0	thumb	code_8010F10	0x080184a8	sub_80184A8	
-0	thumb	code_8010F10	0x0801869c	sub_801869C	
+1	thumb	code_8010F10	0x0801869c	sub_801869C	✅ 2026-09-03 gpnux: 跳表0-16全补+Bgm_Play分支独立调用, 168B exact	
 1	thumb	code_8010F10	0x08018744	sub_8018744	
 1	thumb	code_8010F10	0x08018750	sub_8018750	✅ 2026-09-02 qwen: 扫 gUnk_080936A0 计 0xFF 至 >0x128, gGstate340=&表[offset]; 0x03000340=gGstate340(复用); 新登记 gUnk_080936A0; fncheck OK 60B
 1	thumb	code_8010F10	0x0801878c	sub_801878C	
@@ -424,7 +424,7 @@ status	isa	module	addr	name	note
 1	thumb	code_8010F10	0x0801a1dc	BattleFx_Stop	
 1	thumb	code_8010F10	0x0801a218	BattleFx_DispOff	
 1	thumb	code_8010F10	0x0801a270	sub_801A270	
-1	thumb	code_8010F10	0x0801a2ac	sub_801A2AC	⏸ 逻辑正确(switch((arg0>>6)&2){case2,3} 产 range-check cmp#3/bgt+cmp#2/blt); 卡寄存器分配: 目标 strh r0 保 arg0 于 r0 且 arg0<<16 入 r3, GCC2 却 clobber r0 再 >>16 恢复→错位; permuter 平台期 240; 详情 progress.md
+0	thumb	code_8010F10	0x0801a2ac	sub_801A2AC	⏸ 2026-09-03 gpnux: 25变体全差47B; GCC2寄存器分配: 目标 strh r0 保 arg0 于 r0 且 arg0<<16 入 r3, 我方任意写法 lsls r0,#16 就地clobber r0 再 lsrs 恢复; v9/u32最接近; 详情 progress.md
 1	thumb	code_8010F10	0x0801a2ec	sub_801A2EC	✅ 2026-09-02 qwen: BG tileset 流式解压 gUnk_030004F8<=3 → LZ77UnCompVram(gUnk_087EBDF0[pos], 0x06008000+pos*0x1000); pos++ (全局不缓存→调用后重读); 新登记 ROM 符号 gUnk_087EBDF0@0x087EBDF0 (linker.ld SECTIONS 外); fncheck OK 56B; 全ROM SHA1 绿
 1	thumb	code_8010F10	0x0801a324	BgLoad_Reset	
 1	thumb	code_8010F10	0x0801a330	BgLoad_Finish	
@@ -461,7 +461,7 @@ status	isa	module	addr	name	note
 0	thumb	code_801A3C4	0x0801ce80	sub_801CE80	
 0	thumb	code_801A3C4	0x0801cf90	sub_801CF90	
 1	thumb	code_801A3C4	0x0801d12c	sub_801D12C	
-0	thumb	code_801A3C4	0x0801d19c	sub_801D19C	
+1	thumb	code_801A3C4	0x0801d19c	sub_801D19C	✅ 2026-09-03 opencode: rule54(>0xA路径无return→r0锁死obj,临时量上移r1/r2)+case5的1..7区间写成嵌套switch(ab)得cmp#7;bgt/#1;blt(if/ab<1会归约成#0;ble); ab用int; u16返; fncheck OK
 0	thumb	code_801A3C4	0x0801d214	sub_801D214	
 0	thumb	code_801A3C4	0x0801d378	sub_801D378	
 0	thumb	code_801A3C4	0x0801d468	sub_801D468	
@@ -492,7 +492,7 @@ status	isa	module	addr	name	note
 0	thumb	code_801A3C4	0x0801f884	sub_801F884	
 0	thumb	code_801A3C4	0x0801fa10	sub_801FA10	
 0	thumb	code_801A3C4	0x0801fab8	sub_801FAB8	
-0	thumb	code_801A3C4	0x0801febc	sub_801FEBC	⏸ agbcc寄存器home深度分配; 目标value→r3/zero→r3/ptr+0x37→r4 subs复用; 尝试v7(76/152)穷举C不可破; 待攻方向: v8表达+permuter; 见progress	
+1	thumb	code_801A3C4	0x0801febc	sub_801FEBC	✅ 2026-09-03 opencode: 场景对象滑动参数组设置 (同sub_8020FB8族); 两条RMW拆写→zero提前入r3; p=&field_B0后p-=0x79内嵌进读表达式→subs在ldr后; gUnk_03000620=(dh=0xB4-*p)链式赋值→diff落r1; fncheck OK 132B 1 bl槽; 全ROM SHA1绿
 0	thumb	code_801A3C4	0x0801ff40	sub_801FF40	
 0	thumb	code_801A3C4	0x080200e8	sub_80200E8	
 0	thumb	code_801A3C4	0x08020228	sub_8020228	
@@ -820,7 +820,7 @@ status	isa	module	addr	name	note
 0	thumb	code_8044394	0x080492c0	sub_80492C0	
 0	thumb	code_8044394	0x080494f0	sub_80494F0	
 0	thumb	code_8044394	0x080497b0	sub_80497B0	
-0	thumb	code_8044394	0x080498e0	sub_80498E0	⏸规则17类寄存器轮换: 语义全解(磁盘动画帧写入器, sub_804ABF8 同族): ptr=(u8*)gUnk_030009C0, byte=ptr[(s8)gUnk_030009BF*4], tile=gUnk_08095028[byte][gUnk_0300094D], dest[0]=tile*2-0x5000/dest[0x20]=-0x4FFF, 94D++, 重算 tile 若==0或frame>7返1否则0; 卡点=callee-saved r4/r5/r6 分配给 ptr/BF/table 的轮换(目标 ptr→r4/BF→r5/table→r6 即创建序, 我恒得 BF→r4/table→r5/ptr→r6)+重算 frame 载入序; v1-v6 全撞 34B 地板; 需 fndiff 长磨; 候选 permuter/sub_80498E0/v3.c
+1	thumb	code_8044394	0x080498e0	sub_80498E0	✅ 2026-09-03 gpnux: 磁盘动画帧写入器; 关键=扁平一维索引 tbl[byte*8+frame] + u16 ofs=byte*8 独立语句(避免u8截断且让frame载入落在lsls之后, 破4B调度地板); 规则17/87寄存器轮换靠 const u8*tbl 局部首载归位; 120B exact
 0	thumb	code_8044394	0x08049958	sub_8049958	
 0	thumb	code_8044394	0x08049ad8	sub_8049AD8	
 0	thumb	code_8044394	0x08049b70	sub_8049B70	
@@ -988,7 +988,7 @@ status	isa	module	addr	name	note
 1	thumb	code_804F0B8	0x080528c4	nullsub_7	
 1	thumb	code_804F0B8	0x080528c8	Op_DialogSetup	
 1	thumb	code_804F0B8	0x0805291c	Op_CloseWindow	
-0	thumb	code_804F0B8	0x080529b8	sub_80529B8	⏸ 序列全对多占1寄存器; 根因=尾部*ptr+=2被CSE复用data; 见progress
+1	thumb	code_804F0B8	0x080529b8	sub_80529B8	✅ 2026-09-03 gpnux: 死store data=0 断CSE链, 尾部*ptr重加载, 92B exact
 1	thumb	code_804F0B8	0x08052a14	Op_BgmPlay	
 1	thumb	code_804F0B8	0x08052a38	Op_BgmStop	
 1	thumb	code_804F0B8	0x08052a50	Op_BgmVolume	

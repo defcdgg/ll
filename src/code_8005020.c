@@ -10,9 +10,6 @@
 #include "save.h"
 #include "sound.h"
 
-
-
-
 // @ 0x08005020
 INCLUDE_ASM("asm/nonmatchings", sub_8005020);
 // 屏幕淡化控制: 根据当前扫描线 (REG_VCOUNT) 与目标扫描线 gScreenFadeProgress 的差值,
@@ -238,12 +235,12 @@ void BgMap_FillPattern(u16 arg0)
             break;
     }
 }
-extern u8* gUnk_087EA020[];
+extern u8 *gUnk_087EA020[];
 extern u8 gUnk_082893EC[][0x140];
 
 /* MapSceneDescriptor / gMapSceneDescriptors 见 include/data_805769C.h */
 
-extern u8* gUnk_087E9AA0[];
+extern u8 *gUnk_087E9AA0[];
 
 /* 地图整背景装载 (场景切换时): 按 gMapSceneDescriptors[arg0] 场景描述符
  *   - field_10 起把 gUnk_087E9AA0[] 里最多 5 块 LZ77 tile 逐块解压到 0x02020000 (每块 4KB 槽);
@@ -251,7 +248,8 @@ extern u8* gUnk_087E9AA0[];
  *   - field_12: gUnk_082893EC 子表 (0x140 半字) → BG PLTT; BgPal_ResetFirst 复位底色;
  *   - field_E: gUnk_087EA020[] 指针 (LZ77 tilemap) 解压 → 0x02005000 → 0x0600F000 (SBB)。 */
 // @ 0x08006520
-void MapBg_LoadFull(u8 arg0) {
+void MapBg_LoadFull(u8 arg0)
+{
     u8 idx;
     u16 i;
 
@@ -259,17 +257,16 @@ void MapBg_LoadFull(u8 arg0) {
     SoundMain_Frame();
     idx = gMapSceneDescriptors[arg0].tileSetId;
     i = 0;
-    while(gUnk_087E9AA0[idx] != 0)
+    while (gUnk_087E9AA0[idx] != 0)
     {
-        LZ77UnCompWram(gUnk_087E9AA0[idx], (void*)0x02020000 + (i<<12));
+        LZ77UnCompWram(gUnk_087E9AA0[idx], (void *)0x02020000 + (i << 12));
         VBlankIntrWait();
         SoundMain_Frame();
 
         idx++;
         i++;
-        if(i > 4)
+        if (i > 4)
             break;
-
     }
 
     DmaCopy32(3, 0x02020000, 0x06000000, 0x4A60);
@@ -281,7 +278,7 @@ void MapBg_LoadFull(u8 arg0) {
 
     BgPal_ResetFirst();
 
-    DmaCopy16(3, gUnk_087EA020[gMapSceneDescriptors[arg0].tilemapId], 0x02005000, 0x280*2);
+    DmaCopy16(3, gUnk_087EA020[gMapSceneDescriptors[arg0].tilemapId], 0x02005000, 0x280 * 2);
 
     DmaCopy16(3, 0x02005000, 0x0600F000, 0x800);
 
@@ -298,10 +295,11 @@ INCLUDE_ASM("asm/nonmatchings", MapScene_LoadNpcSlotIds);
  * 把槽 2..9 里已在用的图块/调色板模型 (gSlotGfxId/gSlotPalId, 0xFF=空) 重载进 OBJ VRAM
  * (VRAM 最多 8 种 NPC 模型, 有的模型不变只是颜色不同)。 */
 // @ 0x0800729C
-void MapScene_InitSprites(u8 arg0) {
+void MapScene_InitSprites(u8 arg0)
+{
     u16 i;
 
-    if(gObjGraphicsSetId & 0x80)
+    if (gObjGraphicsSetId & 0x80)
         return;
 
     gSlotGfxId[0] = gPartyMemberIds[0];
@@ -312,19 +310,19 @@ void MapScene_InitSprites(u8 arg0) {
     gSlotPalId[1] = 11;
     LoadSpriteSheetGfx(1, 11);
     LoadSpriteSheetPal(1, 11);
-    if(gMapSceneDescriptors[arg0].npcSlotGroupId != 0)
+    if (gMapSceneDescriptors[arg0].npcSlotGroupId != 0)
     {
-        for(i = 0; i < 8; i++)
+        for (i = 0; i < 8; i++)
         {
-            if(gSlotGfxId[i + 2] != 0xFF)
+            if (gSlotGfxId[i + 2] != 0xFF)
             {
                 LoadSpriteSheetGfx(i + 2, gSlotGfxId[i + 2]);
             }
         }
 
-        for(i = 0; i < 8; i++)
+        for (i = 0; i < 8; i++)
         {
-            if(gSlotPalId[i + 2] != 0xFF)
+            if (gSlotPalId[i + 2] != 0xFF)
             {
                 LoadSpriteSheetPal(i + 2, gSlotPalId[i + 2]);
             }
@@ -484,60 +482,60 @@ s32 MapZone_Trigger(void)
 
     switch (type)
     {
-    case 0:
-        rec += gMapZoneEntryIdx * 8;
-        gMapNpcSetId = *rec;
-        rec++;
-        gSpawnTileX = *rec;
-        rec++;
-        gSpawnTileY = *rec;
-        rec++;
-        gSpawnFacingDir = *rec;
-        rec++;
-        gMoveCmdSetId = rec[0] + (rec[1] << 8);
-        gMainGameState = 3;
-        SwitchFlags_ClearRange();
-        return 1;
-    case 1:
-        rec += gMapZoneEntryIdx * 8;
-        gSpawnTileX = *rec;
-        rec++;
-        gSpawnTileY = *rec;
-        rec++;
-        gSpawnFacingDir = *rec;
-        rec++;
-        gMoveCmdSetId = rec[0] + (rec[1] << 8);
-        gMainGameState = 4;
-        return 1;
-    case 2:
-        rec += gMapZoneEntryIdx * 4;
-        gChoiceGroupIdx = rec[0];
-        gChoiceSubIdx = rec[1];
-        gMainGameState = 8;
-        SwitchFlags_ClearRange();
-        return 1;
-    case 3:
-        rec += gMapZoneEntryIdx * 2;
-        scriptId = *rec;
-        if (SwitchFlags_Test(rec[1]) != 0)
+        case 0:
+            rec += gMapZoneEntryIdx * 8;
+            gMapNpcSetId = *rec;
+            rec++;
+            gSpawnTileX = *rec;
+            rec++;
+            gSpawnTileY = *rec;
+            rec++;
+            gSpawnFacingDir = *rec;
+            rec++;
+            gMoveCmdSetId = rec[0] + (rec[1] << 8);
+            gMainGameState = 3;
+            SwitchFlags_ClearRange();
+            return 1;
+        case 1:
+            rec += gMapZoneEntryIdx * 8;
+            gSpawnTileX = *rec;
+            rec++;
+            gSpawnTileY = *rec;
+            rec++;
+            gSpawnFacingDir = *rec;
+            rec++;
+            gMoveCmdSetId = rec[0] + (rec[1] << 8);
+            gMainGameState = 4;
+            return 1;
+        case 2:
+            rec += gMapZoneEntryIdx * 4;
+            gChoiceGroupIdx = rec[0];
+            gChoiceSubIdx = rec[1];
+            gMainGameState = 8;
+            SwitchFlags_ClearRange();
+            return 1;
+        case 3:
+            rec += gMapZoneEntryIdx * 2;
+            scriptId = *rec;
+            if (SwitchFlags_Test(rec[1]) != 0)
+                return 0;
+            sub_80526A0(scriptId, 2);
+            return 1;
+        case 4:
+            rec += gMapZoneEntryIdx * 4;
+            scriptId = *rec;
+            rec++;
+            if ((gNewKeysRaw & 1) == 0)
+                return 0;
+            dir = rec[1];
+            if (dir <= 7 && dir != gPlayerMoveDir)
+                return 0;
+            if (SwitchFlags_Test(rec[0]) != 0)
+                return 0;
+            sub_80526A0(scriptId, 2);
             return 0;
-        sub_80526A0(scriptId, 2);
-        return 1;
-    case 4:
-        rec += gMapZoneEntryIdx * 4;
-        scriptId = *rec;
-        rec++;
-        if ((gNewKeysRaw & 1) == 0)
-            return 0;
-        dir = rec[1];
-        if (dir <= 7 && dir != gPlayerMoveDir)
-            return 0;
-        if (SwitchFlags_Test(rec[0]) != 0)
-            return 0;
-        sub_80526A0(scriptId, 2);
-        return 0;
-    default:
-        return 1;
+        default:
+            return 1;
     }
 }
 /* 选项场景 (世界观/存档界面?)整屏资源装载:
@@ -547,10 +545,10 @@ s32 MapZone_Trigger(void)
  * 配置 BG0-3/混合 (0x1E41/0x1F00), BgMap_FillPattern 铺底, TextBlocks_Render 按
  * gUnk_087E96B4[gChoiceGroupIdx] 渲染文本块, HBlank 水波开启, 最后 Logo_LoadAssets(arg0)
  * 装场景标志精灵, gChoiceSel = gChoiceSubIdx。 */
-extern u8* gUnk_087EA0FC[];
-extern u8* gUnk_087EA110[];
-extern u8* gUnk_087EA124[];
-extern u8* gUnk_087E96B4[];
+extern u8 *gUnk_087EA0FC[];
+extern u8 *gUnk_087EA110[];
+extern u8 *gUnk_087EA124[];
+extern u8 *gUnk_087E96B4[];
 
 extern u8 gChoiceSel;
 extern u8 gChoiceSubIdx;
@@ -559,31 +557,32 @@ extern u8 gUnk_030047B4;
 void Logo_LoadAssets(u8 arg0);
 
 // @ 0x08007D5C
-void MapBg_LoadInterior(u8 arg0) {
-    u16* dest;
+void MapBg_LoadInterior(u8 arg0)
+{
+    u16 *dest;
     u16 i;
 
     gVBlankPipelineMode = 3;
-    HuffUnComp(gUnk_087EA0FC[arg0], (void* )0x02020000);
-    LZ77UnCompVram((void* )0x02020000, (void* )0x06000000);
-    LZ77UnCompVram(gUnk_087EA110[arg0], (void* )0x0600E000);
+    HuffUnComp(gUnk_087EA0FC[arg0], (void *)0x02020000);
+    LZ77UnCompVram((void *)0x02020000, (void *)0x06000000);
+    LZ77UnCompVram(gUnk_087EA110[arg0], (void *)0x0600E000);
     DmaCopy16(3, gUnk_087EA124[arg0], PLTT, 0x80 * 2);
-    LZ77UnCompVram((void* )0x0809CB90, (void* )0x06008000);
+    LZ77UnCompVram((void *)0x0809CB90, (void *)0x06008000);
     nullsub_5();
-    LZ77UnCompVram((void* )0x0809D198, (void* )0x06009000);
+    LZ77UnCompVram((void *)0x0809D198, (void *)0x06009000);
     nullsub_5();
-    LZ77UnCompVram((void* )0x0809D718, (void* )0x0600A000);
+    LZ77UnCompVram((void *)0x0809D718, (void *)0x0600A000);
     nullsub_5();
-    LZ77UnCompVram((void* )0x0809DCE8, (void* )0x0600B000);
+    LZ77UnCompVram((void *)0x0809DCE8, (void *)0x0600B000);
     nullsub_5();
-    DmaCopy16(3,0x0809C834, 0x05000160, 0x30 * 2);
+    DmaCopy16(3, 0x0809C834, 0x05000160, 0x30 * 2);
     nullsub_5();
-    LZ77UnCompVram((void* )0x08095A1C, (void* )0x0600D000);
-    LZ77UnCompVram((void* )0x08095C94, (void* )0x0600D400);
-    LZ77UnCompVram((void* )0x08095F14, (void* )0x0600D800);
-    LZ77UnCompVram((void* )0x0809619C, (void* )0x0600DC00);
+    LZ77UnCompVram((void *)0x08095A1C, (void *)0x0600D000);
+    LZ77UnCompVram((void *)0x08095C94, (void *)0x0600D400);
+    LZ77UnCompVram((void *)0x08095F14, (void *)0x0600D800);
+    LZ77UnCompVram((void *)0x0809619C, (void *)0x0600DC00);
 
-    DmaCopy16(3,0x08087216, PLTT, 2);
+    DmaCopy16(3, 0x08087216, PLTT, 2);
 
     REG_DISPCNT = (REG_DISPCNT & 0xE000) | 0x1560;
     REG_BG2CNT = 0x3C02;
@@ -593,20 +592,19 @@ void MapBg_LoadInterior(u8 arg0) {
     gBlendControl = 0x1E41;
     gBlendCoefficients = 0x1F00;
 
-    DmaCopy16(3,0x08393288, 0x0600C000, 0x200);
-    DmaCopy16(3,0x08393688, 0x05000140, 0x20);
+    DmaCopy16(3, 0x08393288, 0x0600C000, 0x200);
+    DmaCopy16(3, 0x08393688, 0x05000140, 0x20);
 
     BgMap_FillPattern(0);
-    DmaCopy16(3,0x02005000, 0x0600F000, 0x800);
+    DmaCopy16(3, 0x02005000, 0x0600F000, 0x800);
 
-
-    dest = (u16* )0x02005800;
-    for(i = 0; i < 0x800; i++)
+    dest = (u16 *)0x02005800;
+    for (i = 0; i < 0x800; i++)
     {
         *dest++ = 0;
     }
 
-    TextBlocks_Render(  gUnk_087E96B4[gChoiceGroupIdx] );
+    TextBlocks_Render(gUnk_087E96B4[gChoiceGroupIdx]);
     gHBlankEffectMode = 1;
     REG_BG1CNT = 0x1E0F;
     REG_DISPCNT |= 0x200;
@@ -647,7 +645,7 @@ extern const u8 gUnk_08087500[];
 // @ 0x08007FB8
 void Logo_LoadAssets(u8 arg0)
 {
-    SpriteNode* sprNode;
+    SpriteNode *sprNode;
     u8 idx;
     u16 attr0, attr1, attr2;
 
@@ -723,7 +721,8 @@ u32 ChoiceMenu_BuildList(void)
         {
             do
             {
-                while (*++p != 0xFF);
+                while (*++p != 0xFF)
+                    ;
                 p++;
             } while (*p != 0xFF);
         }
@@ -735,7 +734,8 @@ u32 ChoiceMenu_BuildList(void)
     {
         if (*p != 0xFF)
         {
-            while (*++p != 0xFF);
+            while (*++p != 0xFF)
+                ;
         }
         p++;
     }
@@ -856,8 +856,8 @@ void Viewport_UpdateEffects(void)
 }
 
 extern const u16 gBgPalBackdropWhite[];
-extern const u8* gIntroBgTiles[];    // [id*2]=3KB tile组, [id*2+1]=可选 8-tile 动画组(NULL=无)
-extern const u8* gIntroBgMaps[];     // [id] LZ77 32x20 tilemap -> SBB 3 (0x0600E000)
+extern const u8 *gIntroBgTiles[]; // [id*2]=3KB tile组, [id*2+1]=可选 8-tile 动画组(NULL=无)
+extern const u8 *gIntroBgMaps[]; // [id] LZ77 32x20 tilemap -> SBB 3 (0x0600E000)
 extern const u16 gIntroBgPalettes[][0x20];
 
 // @ 0x08008788
@@ -878,7 +878,8 @@ void IntroBg_Load(u8 arg0)
     VBlankIntrWait();
     SoundMain_Frame();
 
-    if (gIntroBgTiles[arg0 * 2 + 1] != 0) {
+    if (gIntroBgTiles[arg0 * 2 + 1] != 0)
+    {
         LZ77UnCompWram(gIntroBgTiles[arg0 * 2 + 1], (void *)0x02020000);
         gIntroBgTileSetIndex = 1;
         gIntroBgTransferStage = 1;
@@ -902,7 +903,6 @@ void IntroBg_Load(u8 arg0)
     REG_BG2CNT = 0;
     REG_BG3CNT = 0x3C03;
 }
-
 
 // @ 0x080088B4
 void ScreenFade_Start(u16 flags, s16 step, s16 param)
@@ -949,25 +949,34 @@ void AnimSlot_BankReload(void)
  *   是 REG_WIN0H (io.h: REG_OFFSET_WIN0H=0x40), 不是声音 FIFO (FIFO A/B 在 0xA0/0xAC)。
  */
 // @ 0x08008978
-void Win0H_WaveDmaByVCount(void) {
+void Win0H_WaveDmaByVCount(void)
+{
     u16 waveIdx;
     u8 subState = (u8)(gSceneSubState - 1);
-    if (subState > 1) {
+    if (subState > 1)
+    {
         return;
     }
     /* VCOUNT 低字节 (字节读 = 目标的 ldrb, 不能写 (u8)REG_VCOUNT) */
     waveIdx = *(u8 *)&REG_VCOUNT;
-    if (waveIdx > 0x9F) {           /* > 159: 屏外扫描线 */
-        if (waveIdx <= 0xE1) {
+    if (waveIdx > 0x9F)
+    { /* > 159: 屏外扫描线 */
+        if (waveIdx <= 0xE1)
+        {
             return;
         }
         waveIdx = 0;
-    } else {
+    }
+    else
+    {
         waveIdx = waveIdx + 1;
     }
-    if (waveIdx > 0x51) {           /* 三角波: 0x52 半周期 */
+    if (waveIdx > 0x51)
+    { /* 三角波: 0x52 半周期 */
         waveIdx = waveIdx - 0x52;
-    } else {
+    }
+    else
+    {
         waveIdx = 0x51 - waveIdx;
     }
     DmaSet(0, gWindowTransitionScanlineTable + (waveIdx * 2), (void *)REG_ADDR_WIN0H, 0xE0400001);
@@ -1039,7 +1048,8 @@ void BgTiles_LoadUiSet(u8 arg0)
     nullsub_5();
 }
 // @ 0x08008B14
-void BgScroll_LoadFromTable(u16 arg0) {
+void BgScroll_LoadFromTable(u16 arg0)
+{
 
     gCameraMinX = gMapViewportBoundsTable[arg0].cameraMinXBlocks << 6;
 
@@ -1529,10 +1539,11 @@ void PaletteFx_Apply(u8 arg0)
     gPaletteFxMode = arg0 + 1;
     gPaletteFxTimer = 0;
 
-    switch (gPaletteFxMode) {
+    switch (gPaletteFxMode)
+    {
         case 1:
         case 7:
-            fill =  0x7FFF;
+            fill = 0x7FFF;
             REG_WIN0H = 0xF0FF;
             REG_WIN0V = 0x00A0;
             REG_DISPCNT |= DISPCNT_WIN0_ON;
@@ -1543,13 +1554,12 @@ void PaletteFx_Apply(u8 arg0)
                 fill = 0;
 
             i = 0x200;
-            dst = (u16*)0x0203E600;
-            while(i > 0)
+            dst = (u16 *)0x0203E600;
+            while (i > 0)
             {
                 *dst++ = fill;
                 i--;
             }
-
 
             DmaCopy16(3, (void *)0x0203E600, PLTT, PLTT_SIZE);
             break;
@@ -1584,12 +1594,22 @@ void PaletteFx_Step(void)
         return;
 
     counter = gPaletteFxTimer & 3;
-    switch (counter) {
-    case 0: src = 0x0203E600; break;
-    case 1: src = 0x0203E700; break;
-    case 2: src = 0x0203E800; break;
-    case 3: src = 0x0203E900; break;
-    default: break;
+    switch (counter)
+    {
+        case 0:
+            src = 0x0203E600;
+            break;
+        case 1:
+            src = 0x0203E700;
+            break;
+        case 2:
+            src = 0x0203E800;
+            break;
+        case 3:
+            src = 0x0203E900;
+            break;
+        default:
+            break;
     }
 
     DmaSet(3, src, 0x05000000 + (counter << 8), 0x80000080);
@@ -1598,10 +1618,13 @@ void PaletteFx_Step(void)
     c = gPaletteFxTimer + 1;
     gPaletteFxTimer = c;
 
-    if (gPaletteFxMode > 6) {
-        if ((u8)c > 0x20) {
+    if (gPaletteFxMode > 6)
+    {
+        if ((u8)c > 0x20)
+        {
             u8 s2 = gPaletteFxMode;
-            if (s2 == 7) {
+            if (s2 == 7)
+            {
                 REG_WIN0H = 0xF0;
                 REG_WIN0V = 0xA0;
                 REG_DISPCNT |= DISPCNT_WIN0_ON;
@@ -1611,9 +1634,12 @@ void PaletteFx_Step(void)
             gPaletteFxMode = 0;
             gSceneSubState = 0;
         }
-    } else if ((u8)c > 0x40) {
+    }
+    else if ((u8)c > 0x40)
+    {
         u8 s3 = gPaletteFxMode;
-        if (s3 == 2) {
+        if (s3 == 2)
+        {
             REG_WIN0H = 0xF0;
             REG_WIN0V = 0xA0;
             REG_DISPCNT |= DISPCNT_WIN0_ON;
@@ -1624,7 +1650,8 @@ void PaletteFx_Step(void)
         gSceneSubState = 0;
     }
 
-    if (gPaletteFxTimer == 4) {
+    if (gPaletteFxTimer == 4)
+    {
         REG_WIN0H = 0xF0;
         REG_WIN0V = 0x100;
         REG_WININ = 0x3F;
@@ -1662,7 +1689,7 @@ void MenuEnt_ParseAll(u8 arg0)
     count = *src++;
 
     i = 0;
-    while(count != 0)
+    while (count != 0)
     {
         src = MenuEnt_ParseDesc(i, src);
 
@@ -1680,7 +1707,8 @@ void MenuEnt_ParseRange(u8 arg0, u8 arg1)
 
     end = arg0 + *src++;
     cur = arg0;
-    while (cur < end) {
+    while (cur < end)
+    {
         src = MenuEnt_ParseDesc(cur, src);
         cur++;
     }
@@ -1747,34 +1775,35 @@ extern u8 gUnk_0808EA0C[][8];
 extern u8 gUnk_0300496C[];
 extern u8 gUnk_03004970[];
 
-extern u8* gUnk_087EA33C[];
+extern u8 *gUnk_087EA33C[];
 
 extern u16 gUnk_080BABA0[][16];
 
-extern u16* gUnk_087EA38C[];
-extern u8* gUnk_087EA368[];
+extern u16 *gUnk_087EA38C[];
+extern u8 *gUnk_087EA368[];
 
 // @ 0x08009BF0
-void StaticObjGfx_LoadPair(u8 arg0) {
-    u8* var_r4;
+void StaticObjGfx_LoadPair(u8 arg0)
+{
+    u8 *var_r4;
     u8 var_r5;
 
-    if (arg0 != 0) {
+    if (arg0 != 0)
+    {
         arg0--;
         var_r4 = &gUnk_0808EA0C[arg0][0];
 
-        for(var_r5 = 0; var_r5 < 2; var_r5++)
+        for (var_r5 = 0; var_r5 < 2; var_r5++)
         {
-            if(var_r4[0] != 0xFF)
+            if (var_r4[0] != 0xFF)
             {
                 gUnk_0300496C[var_r5] = var_r4[2];
                 gUnk_03004970[var_r5] = var_r4[3];
-                LZ77UnCompVram(gUnk_087EA33C[var_r4[0]], (u16*)0x06010000 + (var_r4[2] << 4));
+                LZ77UnCompVram(gUnk_087EA33C[var_r4[0]], (u16 *)0x06010000 + (var_r4[2] << 4));
 
-                DmaCopy16(3, (u16*) gUnk_080BABA0[var_r4[1]], (u16*)0x05000380 + (var_r5 << 4), 0x20);
-
+                DmaCopy16(3, (u16 *)gUnk_080BABA0[var_r4[1]], (u16 *)0x05000380 + (var_r5 << 4), 0x20);
             }
-            var_r4+=4;
+            var_r4 += 4;
         }
     }
 }
@@ -1784,20 +1813,22 @@ void StaticObjGfx_LoadPair(u8 arg0) {
  * 填入 gStaticMapObjects[0..count-1]: field_C = 描述半字高字节, field_2/field_3(pal) = 图形槽 idx/+12,
  * dataPtr = gUnk_087EA368[palSlot] 动画描述, field_0=1 激活, 其余清零。 */
 // @ 0x08009C84
-void StaticObjs_Spawn(u8 arg0) {
+void StaticObjs_Spawn(u8 arg0)
+{
     u16 var_r5;
     u8 idx;
-    StaticMapObject* staticObj;
-    u16* src;
+    StaticMapObject *staticObj;
+    u16 *src;
 
-    if (arg0 != 0) {
+    if (arg0 != 0)
+    {
         arg0--;
         staticObj = gStaticMapObjects;
         src = gUnk_087EA38C[arg0];
         var_r5 = *src;
         src++;
 
-        while(var_r5 != 0)
+        while (var_r5 != 0)
         {
             idx = *src;
 
@@ -1821,7 +1852,6 @@ void StaticObjs_Spawn(u8 arg0) {
 
             var_r5--;
             staticObj++;
-
         }
     }
 }
@@ -1835,59 +1865,61 @@ s32 Sprite_EnqueueRender_S32(u16, u16, u8, u16, u8);
  * 每 4 字节一条帧记录, 到点后通过 Sprite_InitChainNode 链重建精灵段 (StaticObj_BuildChain)。
  * 最后用 Sprite_EnqueueRender(x, y, sprNodeIdx, z, 3) 入渲染队列, 返回值写 field_E bit3 (被遮挡)。
  * gUnk_03004D4C != 0 (菜单打开) 时整帧跳过。 */
-void StaticObj_BuildChain(u8, u8*);
+void StaticObj_BuildChain(u8, u8 *);
 
 // @ 0x08009D34
-void StaticObjs_StepAll() {
+void StaticObjs_StepAll()
+{
     s16 var_ip;
-    StaticMapObject* var_r7;
+    StaticMapObject *var_r7;
     s16 x;
-    u8* src;
-    u8* arr;
-    u8* framePtr;
+    u8 *src;
+    u8 *arr;
+    u8 *framePtr;
     u16 maxDuration;
     u16 loopCount;
-    struct SpriteNode* renderObj;
-    struct SpriteNode* nextRenderObj;
+    struct SpriteNode *renderObj;
+    struct SpriteNode *nextRenderObj;
 
-    if (gUnk_03004D4C != 0) {
+    if (gUnk_03004D4C != 0)
+    {
         return;
     }
     var_r7 = gStaticMapObjects;
 
-    for(var_ip = 0; var_ip < 3; var_ip++)
+    for (var_ip = 0; var_ip < 3; var_ip++)
     {
-        if(var_r7->field_0 != 0)
+        if (var_r7->field_0 != 0)
         {
             src = var_r7->dataPtr;
-            if(var_r7->animTimer != 0xFF)
+            if (var_r7->animTimer != 0xFF)
             {
                 framePtr = src + (src[2] + (src[3] << 8));
-                if(var_r7->animTimer == 0)
+                if (var_r7->animTimer == 0)
                 {
                     framePtr = src + src[framePtr[8] * 2 + 8] + 4;
-                    StaticObj_BuildChain(var_ip,  framePtr);
+                    StaticObj_BuildChain(var_ip, framePtr);
                     var_r7->animTimer++;
                 }
                 else
                 {
-                    if((var_r7->field_E & 8) == 0)
+                    if ((var_r7->field_E & 8) == 0)
                     {
                         maxDuration = (framePtr[2] + (framePtr[3] << 8));
-                        loopCount =  (framePtr[6] + (framePtr[7] << 8));
+                        loopCount = (framePtr[6] + (framePtr[7] << 8));
                         framePtr = framePtr + 8;
-                        if(var_r7->animTimer >= maxDuration)
+                        if (var_r7->animTimer >= maxDuration)
                         {
                             var_r7->animTimer = 0;
                         }
-                        while(loopCount != 0)
+                        while (loopCount != 0)
                         {
-                            if( var_r7->animTimer == (framePtr[2] + (framePtr[3] << 8)) || var_r7->animTimer == 0)
+                            if (var_r7->animTimer == (framePtr[2] + (framePtr[3] << 8)) || var_r7->animTimer == 0)
                             {
                                 renderObj = &gSpriteNodePool[var_r7->field_1];
                                 renderObj->flags = 0;
                                 nextRenderObj = renderObj->next;
-                                while(nextRenderObj != 0)
+                                while (nextRenderObj != 0)
                                 {
                                     renderObj->next = 0;
                                     renderObj = nextRenderObj;
@@ -1895,7 +1927,7 @@ void StaticObjs_StepAll() {
                                     nextRenderObj = renderObj->next;
                                 }
 
-                                if(var_r7->animTimer == 0)
+                                if (var_r7->animTimer == 0)
                                 {
                                     arr = src + src[framePtr[0] * 2 + 8] + 4;
                                 }
@@ -1907,7 +1939,7 @@ void StaticObjs_StepAll() {
                                 StaticObj_BuildChain(var_ip, arr);
                                 break;
                             }
-                            framePtr+=4;
+                            framePtr += 4;
                             loopCount--;
                         }
                         if (var_r7->animTimer != 0xFF)
@@ -1918,7 +1950,7 @@ void StaticObjs_StepAll() {
                 }
             }
 
-            if(Sprite_EnqueueRender_S32(var_r7->x, var_r7->y, var_r7->field_1, var_r7->z, 3) != 0)
+            if (Sprite_EnqueueRender_S32(var_r7->x, var_r7->y, var_r7->field_1, var_r7->z, 3) != 0)
             {
                 var_r7->field_E |= 8;
             }
@@ -1928,13 +1960,9 @@ void StaticObjs_StepAll() {
             }
         }
 
-
         var_r7++;
     }
-
-
 }
-
 
 /* 静态地图物件精灵段重建 (每帧动画换帧时调用):
  * var_r6 描述 = {u8 部件数相关偏移, u8, u8 部件数, u8, 之后 部件数 × 6 字节
@@ -1942,10 +1970,11 @@ void StaticObjs_StepAll() {
  * y 高字节拼进 attr0 (0x80<<7=0x4000 翻转位由 Sprite_InitChainNode 处理),
  * tileId 从 OBJ VRAM 基址 + tileOffset + 槽 field_2 选块, paletteId = field_3。 */
 // @ 0x08009E80
-void StaticObj_BuildChain(u8 arg0, u8* var_r6) {
-    struct SpriteNode* subRenderObj;
-    struct SpriteNode* renderObj;
-    StaticMapObject* staticObj;
+void StaticObj_BuildChain(u8 arg0, u8 *var_r6)
+{
+    struct SpriteNode *subRenderObj;
+    struct SpriteNode *renderObj;
+    StaticMapObject *staticObj;
     u8 temp_r4;
 
     u16 temp_r3;
@@ -1967,7 +1996,7 @@ void StaticObj_BuildChain(u8 arg0, u8* var_r6) {
     temp_sl = staticObj->field_2;
     var_r6 = var_r6 + temp_r4;
 
-    while(var_r8 != 0)
+    while (var_r8 != 0)
     {
         r6_4 = var_r6[4];
         r6_0 = var_r6[0];
@@ -1977,8 +2006,10 @@ void StaticObj_BuildChain(u8 arg0, u8* var_r6) {
         r6_1 |= r6_0;
         renderObj->tileOffsetY = r6_0;
 
-        subRenderObj = Sprite_InitChainNode(renderObj, var_r8, r6_1 , temp_r3,  ((staticObj->field_3 << 0xC) | staticObj->field_C | (r6_4 + temp_sl)));
-        if (renderObj->tileOffsetX > 0xFFU) {
+        subRenderObj = Sprite_InitChainNode(renderObj, var_r8, r6_1, temp_r3,
+                                            ((staticObj->field_3 << 0xC) | staticObj->field_C | (r6_4 + temp_sl)));
+        if (renderObj->tileOffsetX > 0xFFU)
+        {
             renderObj->tileOffsetX--;
         }
         renderObj = subRenderObj;
@@ -1987,10 +2018,7 @@ void StaticObj_BuildChain(u8 arg0, u8* var_r6) {
 
         var_r8--;
     }
-
-
 }
-
 
 // @ 0x08009F48
 void StaticObjs_Reset(void)
@@ -2031,33 +2059,48 @@ u8 statIdx;
     u16 i;
     u16 stride;
 
-    if (statIdx >= 8 && classId <= 10) {
-        switch (classId) {
-        case 0: return 10;
-        case 1: return 10;
-        case 2: return 10;
-        case 3: return 10;
-        case 4: return 10;
-        case 5: return 10;
-        case 6: return 10;
-        case 7: return 10;
-        case 8: return 10;
-        case 9: return 10;
-        case 10: return 10;
+    if (statIdx >= 8 && classId <= 10)
+    {
+        switch (classId)
+        {
+            case 0:
+                return 10;
+            case 1:
+                return 10;
+            case 2:
+                return 10;
+            case 3:
+                return 10;
+            case 4:
+                return 10;
+            case 5:
+                return 10;
+            case 6:
+                return 10;
+            case 7:
+                return 10;
+            case 8:
+                return 10;
+            case 9:
+                return 10;
+            case 10:
+                return 10;
         }
     }
-    if (classId > 8) {
-        switch (statIdx) {
-        case 0:
-            return 0x3E7;
-        case 1:
-            if (classId == 9)
+    if (classId > 8)
+    {
+        switch (statIdx)
+        {
+            case 0:
                 return 0x3E7;
-            return 0;
-        case 7:
-            if (classId == 9)
-                return 1;
-            return 3;
+            case 1:
+                if (classId == 9)
+                    return 0x3E7;
+                return 0;
+            case 7:
+                if (classId == 9)
+                    return 1;
+                return 3;
         }
         return 0xFF;
     }
@@ -2066,7 +2109,8 @@ u8 statIdx;
     stride = t * 100;
     sum = 0;
     i = 0;
-    while (i <= lv) {
+    while (i <= lv)
+    {
         sum = (u16)(sum + gStatGrowthCurveTables[stride + i]);
         i = (u16)(i + 1);
     }
@@ -2221,31 +2265,63 @@ void sub_800A534(u8 arg0)
 
     v = entry[8] & 0xF;
     val = entry[6];
-    if (v - 1 <= 6) {
+    if (v - 1 <= 6)
+    {
         u8 bonusVal = entry[6];
-        switch (v - 1) {
-        case 0: dst = &gEquipBonusAtkBase; break;
-        case 1: dst = &gEquipBonusDef2; break;
-        case 2: dst = &gEquipBonusAgl; break;
-        case 3: dst = &gEquipBonusMen; break;
-        case 4: dst = &gEquipBonusRes; break;
-        case 5: dst = &gEquipBonusNoa; break;
-        case 6: dst = &gEquipBonusLuc; break;
+        switch (v - 1)
+        {
+            case 0:
+                dst = &gEquipBonusAtkBase;
+                break;
+            case 1:
+                dst = &gEquipBonusDef2;
+                break;
+            case 2:
+                dst = &gEquipBonusAgl;
+                break;
+            case 3:
+                dst = &gEquipBonusMen;
+                break;
+            case 4:
+                dst = &gEquipBonusRes;
+                break;
+            case 5:
+                dst = &gEquipBonusNoa;
+                break;
+            case 6:
+                dst = &gEquipBonusLuc;
+                break;
         }
         *dst += bonusVal;
     }
 
     v = entry[8] >> 4;
     val = entry[7];
-    if (v - 1 <= 6) {
-        switch (v - 1) {
-        case 0: dst = &gEquipBonusAtkBase; break;
-        case 1: dst = &gEquipBonusDef2; break;
-        case 2: dst = &gEquipBonusAgl; break;
-        case 3: dst = &gEquipBonusMen; break;
-        case 4: dst = &gEquipBonusRes; break;
-        case 5: dst = &gEquipBonusNoa; break;
-        case 6: dst = &gEquipBonusLuc; break;
+    if (v - 1 <= 6)
+    {
+        switch (v - 1)
+        {
+            case 0:
+                dst = &gEquipBonusAtkBase;
+                break;
+            case 1:
+                dst = &gEquipBonusDef2;
+                break;
+            case 2:
+                dst = &gEquipBonusAgl;
+                break;
+            case 3:
+                dst = &gEquipBonusMen;
+                break;
+            case 4:
+                dst = &gEquipBonusRes;
+                break;
+            case 5:
+                dst = &gEquipBonusNoa;
+                break;
+            case 6:
+                dst = &gEquipBonusLuc;
+                break;
         }
         *dst += val;
     }
@@ -2298,20 +2374,18 @@ void Stats_RebuildEquipBonuses(u8 arg0)
     entry4 = &gUnk_087EA580[id4 * 12];
 
     val = entry1[4] & 0xF0;
-    if (val == (entry2[4] & 0xF0) &&
-        val == (entry3[4] & 0xF0) &&
-        val == (entry4[4] & 0xF0))
+    if (val == (entry2[4] & 0xF0) && val == (entry3[4] & 0xF0) && val == (entry4[4] & 0xF0))
     {
         switch (val >> 4)
         {
-        case 0xF:
-            gEquipBonusAtk = 0x22;
-            gEquipBonusDef = 0x2D;
-            break;
-        case 0xE:
-            gEquipBonusAtk = 0x3C;
-            gEquipBonusDef = 0x3F;
-            break;
+            case 0xF:
+                gEquipBonusAtk = 0x22;
+                gEquipBonusDef = 0x2D;
+                break;
+            case 0xE:
+                gEquipBonusAtk = 0x3C;
+                gEquipBonusDef = 0x3F;
+                break;
         }
     }
 }
@@ -2347,16 +2421,18 @@ void Stats_RecalcEquip(u8 arg0)
 extern u32 gUnk_08092248[];
 
 // @ 0x0800A86C
-u8 ExpToLevel(s32 value) {
+u8 ExpToLevel(s32 value)
+{
     s32 ret;
     u8 i;
 
-    if (value > 9999999) {
+    if (value > 9999999)
+    {
         value = 9999999;
     }
 
     i = 0;
-    while(value >= 0)
+    while (value >= 0)
     {
         value -= gUnk_08092248[i];
         i++;
@@ -2365,16 +2441,16 @@ u8 ExpToLevel(s32 value) {
     return i - 1;
 }
 // @ 0x0800A8A0
-u32 LevelToExp(u8 arg0) {
+u32 LevelToExp(u8 arg0)
+{
     u8 i;
     u32 sum = 0;
 
-    for ( i = 0; i <= arg0; i++)
+    for (i = 0; i <= arg0; i++)
     {
         sum += gUnk_08092248[i];
     }
     return sum;
-
 }
 
 extern u8 gUnk_08093418[];
@@ -2390,8 +2466,8 @@ u8 ItemFindSlot(u8 arg0, u8 arg1)
 
     for (i = 0; i <= 0x2F; i++)
     {
-        if ( arg1 == (gUnk_08093418[i* 5 + 1] >> 4) )
-            if( (gUnk_08093418[i * 5] ) == adjusted)
+        if (arg1 == (gUnk_08093418[i * 5 + 1] >> 4))
+            if ((gUnk_08093418[i * 5]) == adjusted)
                 return i + 1;
     }
 
@@ -2414,20 +2490,23 @@ void Party_InitStats(void)
     }
 }
 // @ 0x0800A958
-u8 ItemGetValue(u8 arg0) {
+u8 ItemGetValue(u8 arg0)
+{
     return gUnk_08093418[(arg0 - 1) * 5 + 4];
 }
 // @ 0x0800A970
-void sub_800A970(void* arg0) {
-    *((u16*)arg0+1) = *((u16*)arg0 + 9);
+void sub_800A970(void *arg0)
+{
+    *((u16 *)arg0 + 1) = *((u16 *)arg0 + 9);
 }
 // @ 0x0800A978
-void sub_800A978(void* arg0) {
-    *((u16*)arg0+2) = *((u16*)arg0 + 10);
+void sub_800A978(void *arg0)
+{
+    *((u16 *)arg0 + 2) = *((u16 *)arg0 + 10);
 }
 
-//FullHealParty
-// @ 0x0800A980
+// FullHealParty
+//  @ 0x0800A980
 void FullHealParty(void)
 {
     u8 i;
@@ -2448,15 +2527,17 @@ void FullHealParty(void)
     }
 }
 // @ 0x0800A9C0
-void EquipItem(u8 arg0, u8 newEquip, u8 equipSlotId) {
+void EquipItem(u8 arg0, u8 newEquip, u8 equipSlotId)
+{
     u8 oldEquip;
     u8 var_r0;
-    u8* equipSlot;
+    u8 *equipSlot;
 
-    PlayerStats* chara;
+    PlayerStats *chara;
 
     var_r0 = arg0;
-    if (arg0 != 0) {
+    if (arg0 != 0)
+    {
         var_r0 = arg0 - 1;
     }
 
@@ -2464,17 +2545,30 @@ void EquipItem(u8 arg0, u8 newEquip, u8 equipSlotId) {
 
     switch (equipSlotId)
     {
-        case 1: equipSlot = &chara->equip_slot2; break;
-        case 2: equipSlot = &chara->equip_slot3; break;
-        case 3: equipSlot = &chara->equip_slot4; break;
-        case 4: equipSlot = &chara->equip_slot5; break;
-        case 5: equipSlot = &chara->equip_slot6; break;
-        default: equipSlot = &chara->equip_slot1; break;
+        case 1:
+            equipSlot = &chara->equip_slot2;
+            break;
+        case 2:
+            equipSlot = &chara->equip_slot3;
+            break;
+        case 3:
+            equipSlot = &chara->equip_slot4;
+            break;
+        case 4:
+            equipSlot = &chara->equip_slot5;
+            break;
+        case 5:
+            equipSlot = &chara->equip_slot6;
+            break;
+        default:
+            equipSlot = &chara->equip_slot1;
+            break;
     }
     oldEquip = *equipSlot;
     *equipSlot = newEquip;
 
-     if (oldEquip != 0) {
+    if (oldEquip != 0)
+    {
         if (gInventory[oldEquip] < 99)
         {
             AddInventoryItem(oldEquip, 1);
@@ -2542,19 +2636,22 @@ void Silver_Sub(s32 arg0)
 extern u8 gUnk_087EA580[];
 
 // @ 0x0800AADC
-u8 sub_800AADC(u8 arg0) {
+u8 sub_800AADC(u8 arg0)
+{
     return gUnk_087EA580[arg0 * 12 + 4] & 0xF;
 }
 extern u8 gUnk_087EA580[];
 
 // @ 0x0800AAF8
-u16 sub_800AAF8(u8 arg0) {
+u16 sub_800AAF8(u8 arg0)
+{
     return gUnk_087EA580[arg0 * 12] + (gUnk_087EA580[arg0 * 12 + 1] << 8);
 }
 extern u8 gUnk_087EA580[];
 
 // @ 0x0800AB18
-u16 sub_800AB18(u8 arg0) {
+u16 sub_800AB18(u8 arg0)
+{
     return gUnk_087EA580[arg0 * 12 + 2] + (gUnk_087EA580[arg0 * 12 + 3] << 8);
 }
 
@@ -2617,7 +2714,7 @@ void Stats_ClearEquipBonus(void)
 void PartyForm_ApplyBonus(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 {
     u8 val;
-    EnemyCharaStat* p0, *p1, *p2, *p3;
+    EnemyCharaStat *p0, *p1, *p2, *p3;
     p0 = &gCharaBaseData[arg0];
     p1 = &gCharaBaseData[arg1];
     p2 = &gCharaBaseData[arg2];
@@ -2625,11 +2722,9 @@ void PartyForm_ApplyBonus(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
 
     val = p0->formRace & 0xF0;
 
-    if( val == (p1->formRace & 0xF0)
-        && val == (p2->formRace & 0xF0)
-        && val == (p3->formRace & 0xF0))
+    if (val == (p1->formRace & 0xF0) && val == (p2->formRace & 0xF0) && val == (p3->formRace & 0xF0))
     {
-        switch(val >> 4)
+        switch (val >> 4)
         {
             case 0xF:
                 gEquipBonusAtk = 0x22;
@@ -2644,9 +2739,8 @@ void PartyForm_ApplyBonus(u8 arg0, u8 arg1, u8 arg2, u8 arg3)
     }
 }
 
-
-//FullHealCharacter
-// @ 0x0800ACA4
+// FullHealCharacter
+//  @ 0x0800ACA4
 void FullHealCharacter(u8 arg0)
 {
     PlayerStats *ptr;
@@ -2667,23 +2761,28 @@ INCLUDE_ASM("asm/nonmatchings", sub_800ACC8);
 // @ 0x0800B14C
 void SceneBg_Reload(void)
 {
-    if (gUnk_03004D4C != 0) {
-        if ((u8)(gUnk_03004D4C - 7) <= 4) {
+    if (gUnk_03004D4C != 0)
+    {
+        if ((u8)(gUnk_03004D4C - 7) <= 4)
+        {
             sub_8016068();
             return;
         }
-        if (gUnk_03004D4C == 12) {
+        if (gUnk_03004D4C == 12)
+        {
             sub_80160F4();
             MenuState_Reset();
             return;
         }
-        if ((u8)(gUnk_03004D4C - 0x35) <= 7) {
+        if ((u8)(gUnk_03004D4C - 0x35) <= 7)
+        {
             ReloadSpriteSheet(gUnk_03004D4C + 0xCD);
             return;
         }
 
         DmaCopy16(3, (void *)0x02005800, (void *)0x0600F800, 0x800);
-        switch (gUnk_03004D4C) {
+        switch (gUnk_03004D4C)
+        {
             case 2:
                 LZ77UnCompVram((void *)0x08095A1C, (void *)0x0600D000);
                 break;
@@ -2700,17 +2799,26 @@ void SceneBg_Reload(void)
         return;
     }
 
-    if (gUnk_03004D40 != 0) {
-        if ((u8)(gUnk_03004D40 - 3) <= 4) {
+    if (gUnk_03004D40 != 0)
+    {
+        if ((u8)(gUnk_03004D40 - 3) <= 4)
+        {
             sub_8016068();
-        } else if (gUnk_03004D40 == 2) {
+        }
+        else if (gUnk_03004D40 == 2)
+        {
             sub_80160F4();
             MenuState_Reset();
-        } else if ((u8)(gUnk_03004D40 + 0xF) <= 7) {
+        }
+        else if ((u8)(gUnk_03004D40 + 0xF) <= 7)
+        {
             ReloadSpriteSheet(gUnk_03004D40 + 0x11);
-        } else {
+        }
+        else
+        {
             DmaCopy16(3, (void *)0x02005800, (void *)0x0600F800, 0x800);
-            switch (gUnk_03004D40) {
+            switch (gUnk_03004D40)
+            {
                 case 0x1F:
                     LZ77UnCompVram((void *)0x08095A1C, (void *)0x0600D000);
                     break;
@@ -2728,7 +2836,8 @@ void SceneBg_Reload(void)
         return;
     }
 
-    if (gObjGraphicsSetId != 0xFF) {
+    if (gObjGraphicsSetId != 0xFF)
+    {
         DmaCopy16(3, (void *)0x02004000, (void *)0x0600E000, 0x800);
         if (gObjGraphicsSetId != 0xFE)
             DmaCopy16(3, (void *)0x02004800, (void *)0x0600E800, 0x800);
@@ -2968,18 +3077,20 @@ void MenuUi_SetEntityPos(u8 arg0, u8 arg1, u8 arg2)
 // @ 0x0800E244
 INCLUDE_ASM("asm/nonmatchings", sub_800E244);
 
-typedef struct {
-u16 x;
-u16 y;
+typedef struct
+{
+    u16 x;
+    u16 y;
 } Vec2;
 
-extern Vec2* gUnk_087EB1F4[];
-extern Vec2* gUnk_087EB214[];
-extern Vec2* gUnk_087EB22C[];
+extern Vec2 *gUnk_087EB1F4[];
+extern Vec2 *gUnk_087EB214[];
+extern Vec2 *gUnk_087EB22C[];
 
 // @ 0x0800E668
-void sub_800E668(u8 arg0) {
-    Vec2* ptr;
+void sub_800E668(u8 arg0)
+{
+    Vec2 *ptr;
 
     if (arg0 != 0xFF)
     {
@@ -2993,10 +3104,9 @@ void sub_800E668(u8 arg0) {
     gUnk_03000048.field_C = gUnk_03000048.field_4;
     gUnk_03000048.field_E = gUnk_03000048.field_6;
 
-
-    if(gCutsceneActive == 0)
+    if (gCutsceneActive == 0)
     {
-        if(gUnk_03004D40 == 0)
+        if (gUnk_03004D40 == 0)
         {
             ptr = &gUnk_087EB1F4[gMenuCursorGrp][gMenuCursorSel];
         }
@@ -3015,7 +3125,6 @@ void sub_800E668(u8 arg0) {
 
     gUnk_03000048.field_2 = 8;
     gUnk_03000048.field_0 &= 0xFE;
-
 }
 
 // @ 0x0800E71C
@@ -3111,26 +3220,28 @@ void UiSprite_BeginSlide(u8 idx, u8 mode) {
  *        attr0 <- y (低 8 位), attr1 <- x-0x20 (低 9 位), attr2 <- tileId
  *        (bit2/3 变体: 从 0x5000/0x6000 窗口字库行选块, 直接清低 10 位加 tileId)。 */
 // @ 0x0800E7BC
-void UiSprites_Update(void) {
+void UiSprites_Update(void)
+{
     u8 step;
     u16 i;
 
     u16 dx, dy;
     u16 tileId;
 
-    UISpriteEntity* sprite;
-    struct SpriteNode* node;
+    UISpriteEntity *sprite;
+    struct SpriteNode *node;
 
     sprite = gUiSprites;
 
     for (i = 0; i < 15; i++, sprite++)
     {
-        if(!(sprite->statusFlags & 0x80)) continue;
+        if (!(sprite->statusFlags & 0x80))
+            continue;
 
-        if(sprite->lerpFrame != 0)
+        if (sprite->lerpFrame != 0)
         {
             sprite->lerpFrame--;
-            if(sprite->lerpFrame != 0)
+            if (sprite->lerpFrame != 0)
             {
                 dx = sprite->moveEndX - sprite->moveStartX;
                 dy = sprite->moveEndY - sprite->moveStartY;
@@ -3146,9 +3257,9 @@ void UiSprites_Update(void) {
             }
         }
 
-        if(sprite->statusFlags & 0x1)
+        if (sprite->statusFlags & 0x1)
         {
-            if(sprite->statusFlags & 0x2)
+            if (sprite->statusFlags & 0x2)
             {
                 tileId = sprite->baseTileId + 0x60;
             }
@@ -3190,7 +3301,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_800E8F8);
 // @ 0x0800EAE4
 INCLUDE_ASM("asm/nonmatchings", sub_800EAE4);
 
-extern u8* gUiSpritesAuxDesc[];
+extern u8 *gUiSpritesAuxDesc[];
 
 /* 菜单辅助精灵生成 (PartyUi_InitEntities mode==0 与 sub_800E244 调用):
  * src = gUiSpritesAuxDesc[arg0]; count = *src++;
@@ -3249,7 +3360,6 @@ void MenuUi_SpawnAuxSprites(u8 arg0) {
 // @ 0x0800EB98
 INCLUDE_ASM("asm/matchings", MenuUi_SpawnAuxSprites);
 
-
 // @ 0x0800EC54
 INCLUDE_ASM("asm/nonmatchings", sub_800EC54);
 // @ 0x0800F128
@@ -3261,86 +3371,83 @@ extern u8 gUnk_03000199;
 extern u8 gUnk_030001A0[];
 extern u8 gUnk_03004980[];
 
-
 extern const u8 gUnk_08095028[][8]; // 物品/名称字符串表 (data_805769C.c / blob), [id] = 8 字符名
 
 static inline void drawSome(u8 var_r7, u8 idx, u8 plttIdx)
 {
     u8 i;
-    u8* src;
-    u16* dst;
+    u8 *src;
+    u16 *dst;
     u8 ch;
     u8 x, y;
-    
+
     x = (var_r7 & 1) * 13 + 3;
     y = (var_r7 & 0xFE) + 6;
 
-    if(idx)
+    if (idx)
     {
         src = gUnk_08095028[idx];
-        dst = (u16*)0x2005800 + x + ( y * 32);
-        
-        for(i = 0; i < 8; i++)
+        dst = (u16 *)0x2005800 + x + (y * 32);
+
+        for (i = 0; i < 8; i++)
         {
             ch = *src++;
-            if(ch == 0 )
+            if (ch == 0)
             {
                 break;
             }
             Text_PutGlyph(dst++, ch, plttIdx);
         }
     }
-
 }
 
-
-
 // @ 0x0800F4A8
-void MenuUi_DrawItemList(void) {
+void MenuUi_DrawItemList(void)
+{
     u8 idx;
 
     u8 var_r7;
     s32 x;
     u8 y;
-    u8* src;
-    u16* dst;
+    u8 *src;
+    u16 *dst;
     u8 plttIdx;
     u8 i;
     u8 ch;
     u8 val;
     u8 x1;
-    u16* dst1;
+    u16 *dst1;
 
-    ClearBuffer((u16* )0x02005986, 0x18, 0xA);
+    ClearBuffer((u16 *)0x02005986, 0x18, 0xA);
 
     idx = gUnk_03000199;
 
-    if(idx == 0) idx = 1;
+    if (idx == 0)
+        idx = 1;
 
     var_r7 = 0;
-            
 
-    while(idx <= 0xFD)
+    while (idx <= 0xFD)
     {
         val = gUnk_03004980[idx];
-        if(val != 0)
+        if (val != 0)
         {
             gUnk_030001A0[var_r7] = idx;
 
-            if(gMenuCursorStack[gMenuCursorGrp] == var_r7)
+            if (gMenuCursorStack[gMenuCursorGrp] == var_r7)
             {
                 x = (var_r7 & 1) * 13 + 3;
                 y = (var_r7 & ~1) + 6;
 
-                if(idx)
+                if (idx)
                 {
                     src = gUnk_08095028[idx];
-                    dst = (u16*)0x2005800 + x + ( y * 32);
-                    
-                    for(i = 0; i < 8; i++)
+                    dst = (u16 *)0x2005800 + x + (y * 32);
+
+                    for (i = 0; i < 8; i++)
                     {
                         ch = *src++;
-                        if(ch == 0 )
+                        if (ch == 0)
                         {
                             break;
                         }
@@ -3351,17 +3458,17 @@ void MenuUi_DrawItemList(void) {
             else
             {
                 x = (var_r7 & 1) * 13 + 3;
-                                y = (var_r7 & ~1) + 6;
+                y = (var_r7 & ~1) + 6;
 
-                if(idx)
+                if (idx)
                 {
                     src = gUnk_08095028[idx];
-                    dst = (u16*)0x2005800 + x + ( y * 32);
-                    
-                    for(i = 0; i < 8; i++)
+                    dst = (u16 *)0x2005800 + x + (y * 32);
+
+                    for (i = 0; i < 8; i++)
                     {
                         ch = *src++;
-                        if(ch == 0 )
+                        if (ch == 0)
                         {
                             break;
                         }
@@ -3369,31 +3476,27 @@ void MenuUi_DrawItemList(void) {
                     }
                 }
             }
-                x1 = (var_r7 & 1) * 13 + 13;
-                dst1 = (u16*)0x02005980 + x1 + ((var_r7 & ~1) * 32); 
+            x1 = (var_r7 & 1) * 13 + 13;
+            dst1 = (u16 *)0x02005980 + x1 + ((var_r7 & ~1) * 32);
             sub_800EAE4(dst1, val, 12);
             var_r7++;
-            
         }
 
         idx++;
-        if(var_r7 > 9)
+        if (var_r7 > 9)
         {
             break;
         }
-
     }
-    
-    while(var_r7 <= 9)
-            {
-                gUnk_030001A0[var_r7] = 0;
-                var_r7++;
-            }
 
-  
+    while (var_r7 <= 9)
+    {
+        gUnk_030001A0[var_r7] = 0;
+        var_r7++;
+    }
+
     gUnk_03000199 = gUnk_030001A0[0];
 }
-
 
 extern u8 gInvPageUpItems[];
 extern u8 gInvPageDownItems[];
@@ -3528,14 +3631,16 @@ u8 WarpTable_Check(void)
         return 0;
 
     i = 0;
-    while ((val = gUnk_080987C4[i]) != 0) {
-        if (val == gCurrentMapId) {
+    while ((val = gUnk_080987C4[i]) != 0)
+    {
+        if (val == gCurrentMapId)
+        {
             i++;
             gMapNpcSetId = gUnk_080987C4[i++];
             gSpawnTileX = gUnk_080987C4[i++];
             gSpawnTileY = gUnk_080987C4[i++];
             gSpawnFacingDir = gUnk_080987C4[i++];
-            gMoveCmdSetId = gUnk_080987C4[i]  + (gUnk_080987C4[i+1] << 8);
+            gMoveCmdSetId = gUnk_080987C4[i] + (gUnk_080987C4[i + 1] << 8);
             gWarpAnimState = 1;
             gUnk_03004D4C = 0x34;
             return 1;
@@ -3568,7 +3673,8 @@ void ScreenIdleIcons_BuildList(void)
     if (EventFlags_Test(0xFD))
         gScreenIdleEventFlags[1] |= 0x20;
 
-    for (i = 0, i2 = 0; i <= 0xE; i++) {
+    for (i = 0, i2 = 0; i <= 0xE; i++)
+    {
         if ((gScreenIdleEventFlags[i >> 3] >> (i & 7)) & 1)
         {
             gScreenIdleIconIds[i2] = gScreenIdleIconPageMap[i];

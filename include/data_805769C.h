@@ -33,13 +33,12 @@ extern const u8 gInvPageItemIds[];
 
 extern const u16 gDialogPortraitPalettes[];
 extern const u8 gDialogPortraitPaletteIds[];
-extern const u32 gDialogPortraitGfxTable[];   /* 88 项, 定义在 src/data_87E83F0.c */
+extern const u32 gDialogPortraitGfxTable[]; /* 88 项, 定义在 src/data_87E83F0.c */
 extern const u32 gDialogPortraitTilemapPtrs[];
 
 /* 菜单实体 OBJ 调色板表 (0x0808A234): 124 项 × 0x20 字节。
  * 每项第一个半字为保留值，MenuEnt_FlushPalettes 从 +2 DMA 15 色。 */
 extern const u8 gMenuEntityPaletteTable[];
-
 
 extern const u8 pltt_08057854[];
 extern const u8 tilemap_08057874[];
@@ -50,9 +49,8 @@ extern const u8 tileset_3_080583C4[];
 extern const u8 gWalkMoveDirLut[];
 extern const u8 gWalkAnimFrameMapping[];
 extern const u8 gWalkAnimDimTable[];
-extern const u8 gWalkDirectionMapping[]; 
+extern const u8 gWalkDirectionMapping[];
 extern const u8 gSpriteTileCountTable[];
-
 
 /* 0x0805888C: 过场动画配置表, 481 条 × 8B (字节数 3848 已核) —— 全部结论已逐项验证:
  *   scriptIdx → gUnk_087E860C[帧命令流指针]      范围 0..477, **不等于**条目下标 (是真查找索引)
@@ -64,20 +62,20 @@ extern const u8 gSpriteTileCountTable[];
  *   其中 slotSel ≥ 100 时减去 100 并额外置 flags 的 bit6。
  *   脚本侧入口: code_804F0B8.c 的 opcode 处理器直接传 data[1]|(data[2]<<8), data[3], data[4]。
  */
-typedef struct{
-    /* 0x00 */ u16 scriptIdx;   ///< → gUnk_087E860C[]
-    /* 0x02 */ u16 gfxIdx;      ///< → gUnk_087E8D84[] (实测永远 == scriptIdx)
-    /* 0x04 */ u8  palIdx;      ///< 0..62, → gUnk_0838EEF4[palIdx*32]
-    /* 0x05 */ u8  loopFlag;    ///< bit7 = 循环播放 (只有 0x00 / 0x80 两种取值)
-    /* 0x06 */ u16 pad_6;       ///< 481/481 全为 0
-}CutsceneAnimConfig;
+typedef struct
+{
+    /* 0x00 */ u16 scriptIdx; ///< → gUnk_087E860C[]
+    /* 0x02 */ u16 gfxIdx; ///< → gUnk_087E8D84[] (实测永远 == scriptIdx)
+    /* 0x04 */ u8 palIdx; ///< 0..62, → gUnk_0838EEF4[palIdx*32]
+    /* 0x05 */ u8 loopFlag; ///< bit7 = 循环播放 (只有 0x00 / 0x80 两种取值)
+    /* 0x06 */ u16 pad_6; ///< 481/481 全为 0
+} CutsceneAnimConfig;
 
 extern const CutsceneAnimConfig gCutsceneAnimConfigTable[];
 
 extern const u16 gFacingEventOffsets[];
 
 // extern const u8 unk_80A1314[];
-
 
 /* ==== 从 data/data.s 的 rom_data blob 搬出的项 (见 src/data_805769C.c) ==== */
 extern const u8 gCharNameTextBlock_4[];
@@ -169,7 +167,7 @@ extern const u8 gCharaCmdStream_881DE[];
 extern const u8 gCharaCmdStream_881F6[];
 extern const u8 gCharaCmdStream_8820A[];
 extern const u8 gCharaCmdStream_88226[];
-extern const u8 gChoiceDestTable[];      /* 0x08087648 分组变长目的地表 */
+extern const u8 gChoiceDestTable[]; /* 0x08087648 分组变长目的地表 */
 extern const u8 gChoiceDataBase[];
 extern const u8 gChoiceGroupPairTable[]; /* 0x0808823A, 84 项 × 2 B */
 extern const u8 gChoiceMapSpawnRecordStream[]; /* 0x080882E2..0x08088400 */
@@ -193,22 +191,22 @@ extern const ChestSpawnEntry gChestSpawnTable[];
  * 记录场景的资源集、显示/特效参数、NPC 槽组及 BG 数据索引。 */
 typedef struct
 {
-    /* 0x00 */ u8 bgLoadMode;          /* MapScene_Load 的背景/特殊场景分支 */
-    /* 0x01 */ u8 gfxSetId;            /* OBJ 图形资源集/模式 */
-    /* 0x02 */ u8 hBlankMode;          /* HBlank 波形模式 */
-    /* 0x03 */ u8 sceneSubState;       /* 场景子状态 */
-    /* 0x04 */ u8 bgScrollMode;        /* BG1 滚动模式 */
+    /* 0x00 */ u8 bgLoadMode; /* MapScene_Load 的背景/特殊场景分支 */
+    /* 0x01 */ u8 gfxSetId; /* OBJ 图形资源集/模式 */
+    /* 0x02 */ u8 hBlankMode; /* HBlank 波形模式 */
+    /* 0x03 */ u8 sceneSubState; /* 场景子状态 */
+    /* 0x04 */ u8 bgScrollMode; /* BG1 滚动模式 */
     /* 0x05 */ u8 reserved_5;
-    /* 0x06 */ u8 menuEntitySetId;     /* 菜单实体描述集 */
-    /* 0x07 */ u8 spriteAnimSetId;     /* 场景动画组 */
-    /* 0x08 */ u8 bg3Mode;             /* BG3/显示模式参数 */
-    /* 0x09 */ u8 npcSlotGroupId;      /* NPC 图形/调色板槽组 */
-    /* 0x0A */ u8 bg2Mode;             /* BG2/场景附加模式参数 */
-    /* 0x0B */ u8 sceneFlag;           /* 场景标志 */
-    /* 0x0C */ u16 collisionTileMax;   /* 地图碰撞判定阈值 */
-    /* 0x0E */ u16 tilemapId;          /* 地图 tilemap 资源索引 */
-    /* 0x10 */ u16 tileSetId;          /* 地图 tile 资源索引 */
-    /* 0x12 */ u16 bgPaletteId;        /* BG 调色板资源索引 */
+    /* 0x06 */ u8 menuEntitySetId; /* 菜单实体描述集 */
+    /* 0x07 */ u8 spriteAnimSetId; /* 场景动画组 */
+    /* 0x08 */ u8 bg3Mode; /* BG3/显示模式参数 */
+    /* 0x09 */ u8 npcSlotGroupId; /* NPC 图形/调色板槽组 */
+    /* 0x0A */ u8 bg2Mode; /* BG2/场景附加模式参数 */
+    /* 0x0B */ u8 sceneFlag; /* 场景标志 */
+    /* 0x0C */ u16 collisionTileMax; /* 地图碰撞判定阈值 */
+    /* 0x0E */ u16 tilemapId; /* 地图 tilemap 资源索引 */
+    /* 0x10 */ u16 tileSetId; /* 地图 tile 资源索引 */
+    /* 0x12 */ u16 bgPaletteId; /* BG 调色板资源索引 */
 } MapSceneDescriptor;
 
 extern const MapSceneDescriptor gMapSceneDescriptors[];

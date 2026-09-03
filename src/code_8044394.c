@@ -22,35 +22,35 @@ void sub_8044394(u8 *obj)
     {
         switch (obj[0xBE])
         {
-        case 0x2D:
-            if (*(u16 *)(obj + 0x28) != 0)
-            {
-                value = 0x69;
-                active = 1;
-            }
-            break;
-        case 0x61:
-            if (*(u16 *)(obj + 0x28) > 0x31)
-            {
-                value = 0x4E;
-                active = 1;
-            }
-            break;
-        case 0x68:
-            if (*(u16 *)(obj + 0x28) > 0x31)
-            {
-                value = 0x4E;
-                active = 1;
-            }
-            break;
-        case 0x36:
-        case 0x6A:
-            if (*(u16 *)(obj + 0x28) > 0x22)
-            {
-                value = 0x4E;
-                active = 1;
-            }
-            break;
+            case 0x2D:
+                if (*(u16 *)(obj + 0x28) != 0)
+                {
+                    value = 0x69;
+                    active = 1;
+                }
+                break;
+            case 0x61:
+                if (*(u16 *)(obj + 0x28) > 0x31)
+                {
+                    value = 0x4E;
+                    active = 1;
+                }
+                break;
+            case 0x68:
+                if (*(u16 *)(obj + 0x28) > 0x31)
+                {
+                    value = 0x4E;
+                    active = 1;
+                }
+                break;
+            case 0x36:
+            case 0x6A:
+                if (*(u16 *)(obj + 0x28) > 0x22)
+                {
+                    value = 0x4E;
+                    active = 1;
+                }
+                break;
         }
         if (active == 1)
         {
@@ -171,7 +171,6 @@ u8 *sub_80445E0()
     return gUnk_03004F90;
 }
 
-
 // @ 0x080445E8
 // 按 gUnk_0300083D 遍历 gUnk_03000840[i]&0xF 索引 GetObjPool 槽,
 // obj[0xAC]==arg0[0xAC] 命中时写 gUnk_03004F90[idx]=arg1 (arg1==6 需 sub_8048C30(arg0)==1)。
@@ -238,12 +237,12 @@ void sub_80446BC(u8 *arg0)
     }
     switch ((s8)arg0[0xBC])
     {
-    case 0:
-        break;
-    case 1:
-        r5 = 2;
-        r1 = 3;
-        break;
+        case 0:
+            break;
+        case 1:
+            r5 = 2;
+            r1 = 3;
+            break;
     }
     threshold = gUnk_0839DBF6[arg0[0xBE] - 0xc][r1];
     if (*(u16 *)(arg0 + 0x28) < threshold)
@@ -472,15 +471,15 @@ void sub_8045EB8(u8 *obj)
     {
         switch (sub_804DD90(entry->ids[i], 1))
         {
-        case 1:
-            *flags |= 1;
-            break;
-        case 2:
-            *flags |= 2;
-            break;
-        case 3:
-            *flags |= 4;
-            break;
+            case 1:
+                *flags |= 1;
+                break;
+            case 2:
+                *flags |= 2;
+                break;
+            case 3:
+                *flags |= 4;
+                break;
         }
     }
     *flags |= extra;
@@ -496,7 +495,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_804612C);
 // @ 0x0804621C
 INCLUDE_ASM("asm/nonmatchings", sub_804621C);
 // @ 0x080462E4
-INCLUDE_ASM("asm/matchings", sub_80462E4);  /* 台账修正: yaml=[1] 且 .s 已在 matchings/ (坑7) */
+INCLUDE_ASM("asm/matchings", sub_80462E4); /* 台账修正: yaml=[1] 且 .s 已在 matchings/ (坑7) */
 // @ 0x08046480
 INCLUDE_ASM("asm/nonmatchings", sub_8046480);
 // @ 0x08046558
@@ -654,8 +653,7 @@ u8 sub_8048868(u8 objectIndex, u8 skill)
     u32 base;
 
     base = GetObjPool();
-    formation = gBattleFormationIds[
-        *(u8 *)(base + objectIndex * 0xC8 + 0xBB)];
+    formation = gBattleFormationIds[*(u8 *)(base + objectIndex * 0xC8 + 0xBB)];
     if (formation != 0)
         formation--;
 
@@ -890,7 +888,8 @@ u8 sub_8048B88(u8 *arg0)
     }
     return 0;
 }
-typedef struct {
+typedef struct
+{
     u16 unk_0;
     u8 value;
     u8 unk_3;
@@ -912,30 +911,30 @@ void sub_8048BD0(u8 *arg0)
 {
     switch (arg0[0xBE])
     {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-        arg0[0xC3] = 0x10;
-        break;
-    case 5:
-        if (arg0[0x8D] == 0)
-        {
-            arg0[0xC3] = 8;
-        }
-        else
-        {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
             arg0[0xC3] = 0x10;
-        }
-        break;
-    default:
-        return;
+            break;
+        case 5:
+            if (arg0[0x8D] == 0)
+            {
+                arg0[0xC3] = 8;
+            }
+            else
+            {
+                arg0[0xC3] = 0x10;
+            }
+            break;
+        default:
+            return;
     }
 }
 extern u8 gUnk_0839BB4C[];
@@ -943,7 +942,6 @@ extern u8 gUnk_0839D5BC[];
 
 // @ 0x08048C30
 INCLUDE_ASM("asm/nonmatchings", sub_8048C30);
-
 
 // @ 0x08048C80
 INCLUDE_ASM("asm/nonmatchings", sub_8048C80);
@@ -1022,8 +1020,36 @@ INCLUDE_ASM("asm/nonmatchings", sub_80492C0);
 INCLUDE_ASM("asm/nonmatchings", sub_80494F0);
 // @ 0x080497B0
 INCLUDE_ASM("asm/nonmatchings", sub_80497B0);
+
+INCLUDE_ASM("asm/matchings", sub_80498E0);
+
 // @ 0x080498E0
-INCLUDE_ASM("asm/nonmatchings", sub_80498E0);
+// extern const u8 gUnk_08095028[];
+// u32 sub_80498E0(u16 *dest)
+// {
+//     const u8 *tbl = gUnk_08095028;
+//     u8 byte;
+//     u8 frame;
+//     u16 ofs;
+//     u8 tile;
+
+//     byte = ((u8 *)gUnk_030009C0)[gUnk_030009BF * 4];
+//     ofs = byte * 8;
+//     frame = gUnk_0300094D;
+//     tile = tbl[ofs + frame];
+//     dest[0] = tile * 2 - 0x5000;
+//     dest[0x20] = tile * 2 - 0x4FFF;
+//     gUnk_0300094D++;
+//     byte = ((u8 *)gUnk_030009C0)[gUnk_030009BF * 4];
+//     ofs = byte * 8;
+//     frame = gUnk_0300094D;
+//     tile = tbl[ofs + frame];
+//     if (tile == 0)
+//         return 1;
+//     if (frame > 7)
+//         return 1;
+//     return 0;
+// }
 // @ 0x08049958
 INCLUDE_ASM("asm/nonmatchings", sub_8049958);
 // @ 0x08049AD8
@@ -1042,7 +1068,8 @@ INCLUDE_ASM("asm/nonmatchings", sub_804A148);
 INCLUDE_ASM("asm/nonmatchings", sub_804A368);
 // @ 0x0804AA2C
 INCLUDE_ASM("asm/nonmatchings", sub_804AA2C);
-typedef struct {
+typedef struct
+{
     u8 gap[0x35];
     u8 value;
     u8 remaining[146];
@@ -1153,8 +1180,7 @@ void sub_804AD60(void)
     u8 zero;
     u16 flags;
 
-    sub_801B81C(obj, 0xF0, 0x50, 0xDA * 2, 0xE, gUnk_08619A60,
-                 gUnk_08619430, 0xA8 * 8, 1, 0x402);
+    sub_801B81C(obj, 0xF0, 0x50, 0xDA * 2, 0xE, gUnk_08619A60, gUnk_08619430, 0xA8 * 8, 1, 0x402);
     sub_801A3C4(obj);
     flags = 0xF7FF & *(u16 *)(obj + 0x18);
     zero = 0;
@@ -1235,8 +1261,7 @@ void sub_804B458(Unk_804B458 *entry, u8 slot, u16 *src, u16 *dest)
             entry->field_6 = frames - 1;
         else
             entry->field_6--;
-        sub_804C2A0(src + (entry->field_1 << 4),
-                    dest + (slot << 4), width, frames, entry->field_6);
+        sub_804C2A0(src + (entry->field_1 << 4), dest + (slot << 4), width, frames, entry->field_6);
     }
 }
 // @ 0x0804B4D0
@@ -1386,20 +1411,21 @@ void sub_804C1E4(u8 arg0, u8 arg1, u8 arg2)
     }
 }
 // @ 0x0804C214
-u8 sub_804C214(u8 arg0, u8 arg1) {
+u8 sub_804C214(u8 arg0, u8 arg1)
+{
 
     u8 ret = 0;
 
     switch (arg0)
     {
         case 0:
-            if((gUnk_03000AE0 >> arg1) & 1)
+            if ((gUnk_03000AE0 >> arg1) & 1)
             {
                 ret = 1;
             }
             break;
         case 1:
-            if((gUnk_03000AE2 >> arg1) & 1)
+            if ((gUnk_03000AE2 >> arg1) & 1)
             {
                 ret = 1;
             }
@@ -1436,16 +1462,16 @@ void sub_804C278(u8 arg0, u8 arg1)
 }
 
 // @ 0x0804C2A0
-void sub_804C2A0(u16* arg0, u16* arg1, u8 arg2, u8 arg3, u8 arg4) {
+void sub_804C2A0(u16 *arg0, u16 *arg1, u8 arg2, u8 arg3, u8 arg4)
+{
     u8 i;
 
-    for(i = 0; i < arg3; i++)
+    for (i = 0; i < arg3; i++)
     {
-        arg0[ i+arg2 ] = arg1[arg4 + arg2];
+        arg0[i + arg2] = arg1[arg4 + arg2];
 
-        arg4 = (arg4+1) % arg3;
+        arg4 = (arg4 + 1) % arg3;
     }
-
 }
 // @ 0x0804C2F0
 u16 sub_804C2F0(void)
@@ -1453,52 +1479,57 @@ u16 sub_804C2F0(void)
     return gUnk_03000AE0;
 }
 // @ 0x0804C2FC
-void sub_804C2FC(u32 arg0, u8 arg1, u8 arg2) {
+void sub_804C2FC(u32 arg0, u8 arg1, u8 arg2)
+{
     u8 i;
-    
-    DmaCopy16(3, arg0, 0x5000200 + (arg1 << 5), arg2*0x20);
+
+    DmaCopy16(3, arg0, 0x5000200 + (arg1 << 5), arg2 * 0x20);
     DmaWait(3);
 
-    for(i = 0; i < arg2; i++)
+    for (i = 0; i < arg2; i++)
     {
-        if(!((gUnk_03000AE0 >> (arg1 + i)) & 1))
+        if (!((gUnk_03000AE0 >> (arg1 + i)) & 1))
         {
-            gUnk_03000AE0 |= (1 << (arg1+i));
+            gUnk_03000AE0 |= (1 << (arg1 + i));
         }
     }
 }
 // @ 0x0804C364
-void sub_804C364(u8 arg0, u8 arg1) {
+void sub_804C364(u8 arg0, u8 arg1)
+{
     u8 i;
 
-    for(i = 0; i < arg1; i++)
+    for (i = 0; i < arg1; i++)
     {
-        if(!((gUnk_03000AE0 >> (arg0 + i)) & 1))
+        if (!((gUnk_03000AE0 >> (arg0 + i)) & 1))
         {
-            gUnk_03000AE0 |= (1 << (arg0+i));
+            gUnk_03000AE0 |= (1 << (arg0 + i));
         }
     }
 }
 // @ 0x0804C3A4
-void sub_804C3A4(u8 arg0, u8 arg1) {
+void sub_804C3A4(u8 arg0, u8 arg1)
+{
     u8 i;
-    for(i = 0; i < arg1; i++)
+    for (i = 0; i < arg1; i++)
     {
-        if(((gUnk_03000AE0 >> (arg0 + i)) & 1))
+        if (((gUnk_03000AE0 >> (arg0 + i)) & 1))
         {
-            gUnk_03000AE0 &= ~(1 << (arg0+i));
+            gUnk_03000AE0 &= ~(1 << (arg0 + i));
         }
     }
 }
 
 // @ 0x0804C3E4
-void sub_804C3E4(u8 arg0) {
-    DmaCopy16(3, 0x05000200+(arg0<<5), 0x02036AC0+(arg0<<5),0x20);
+void sub_804C3E4(u8 arg0)
+{
+    DmaCopy16(3, 0x05000200 + (arg0 << 5), 0x02036AC0 + (arg0 << 5), 0x20);
     DmaWait(3);
 }
 
 // @ 0x0804C420
-void sub_804C420(u8 arg0) {
+void sub_804C420(u8 arg0)
+{
     DmaCopy32(3, 0x02036AC0 + (arg0 << 5), 0x05000200 + (arg0 << 5), 32);
     DmaWait(3);
 }
@@ -1514,16 +1545,15 @@ void sub_804C45C(void)
         entry = gUnk_03000AE8 + i * 16;
         switch (entry[0] & 0xF)
         {
-        case 1:
-            sub_804B3C0(entry, i, 0x05000200, 0x02036AC0);
-            break;
-        case 2:
-            sub_804B458((Unk_804B458 *)entry, i,
-                        (u16 *)0x05000200, (u16 *)0x02036AC0);
-            break;
-        case 3:
-            sub_804B4D0(entry, i, 0x05000200, 0x02036AC0);
-            break;
+            case 1:
+                sub_804B3C0(entry, i, 0x05000200, 0x02036AC0);
+                break;
+            case 2:
+                sub_804B458((Unk_804B458 *)entry, i, (u16 *)0x05000200, (u16 *)0x02036AC0);
+                break;
+            case 3:
+                sub_804B4D0(entry, i, 0x05000200, 0x02036AC0);
+                break;
         }
     }
 }
@@ -1531,7 +1561,8 @@ void sub_804C45C(void)
  * 必须用结构体成员形式: 写成 `u8 *ptr; ptr[0] |= 0x40;` 时 GCC2 会把 IOR 的
  * 目的寄存器选成常量那个 (`mov r0, ip; orrs r0, r1`), 而目标是
  * `adds r0, r1, #0; orrs r0, r7` (先拷 b 再或常量)。见规则 11 / 67。 */
-typedef struct {
+typedef struct
+{
     u8 field_0;
     u8 field_1;
     u8 field_2;
@@ -1576,37 +1607,41 @@ void sub_804C548(u32 src, u8 slot, u8 count)
     }
 }
 // @ 0x0804C5B8
-void sub_804C5B8(u8 arg0, u8 arg1) {
+void sub_804C5B8(u8 arg0, u8 arg1)
+{
     u8 i;
 
-    for(i = 0; i < arg1; i++)
+    for (i = 0; i < arg1; i++)
     {
-        if(!((gUnk_03000AE2 >> (arg0 + i)) & 1))
+        if (!((gUnk_03000AE2 >> (arg0 + i)) & 1))
         {
-            gUnk_03000AE2 |= (1 << (arg0+i));
+            gUnk_03000AE2 |= (1 << (arg0 + i));
         }
     }
 }
 
 // @ 0x0804C5F8
-void sub_804C5F8(u8 arg0, u8 arg1) {
+void sub_804C5F8(u8 arg0, u8 arg1)
+{
     u8 i;
 
-    for(i = 0; i < arg1; i++)
+    for (i = 0; i < arg1; i++)
     {
-        if(((gUnk_03000AE2 >> (arg0 + i)) & 1))
+        if (((gUnk_03000AE2 >> (arg0 + i)) & 1))
         {
-            gUnk_03000AE2 &= ~(1 << (arg0+i));
+            gUnk_03000AE2 &= ~(1 << (arg0 + i));
         }
     }
 }
 // @ 0x0804C638
-void sub_804C638(u8 arg0) {
+void sub_804C638(u8 arg0)
+{
     DmaCopy32(3, 0x05000000 + (arg0 << 5), 0x02036CC0 + (arg0 << 5), 32);
     DmaWait(3);
 }
 // @ 0x0804C674
-void sub_804C674(u8 arg0) {
+void sub_804C674(u8 arg0)
+{
     DmaCopy32(3, 0x02036CC0 + (arg0 << 5), 0x05000000 + (arg0 << 5), 32);
     DmaWait(3);
 }
@@ -1621,16 +1656,15 @@ void sub_804C6B0(void)
         entry = gUnk_03000BE8 + i * 16;
         switch (entry[0] & 0xF)
         {
-        case 1:
-            sub_804B3C0(entry, i, 0x05000000, 0x02036CC0);
-            break;
-        case 2:
-            sub_804B458((Unk_804B458 *)entry, i,
-                        (u16 *)0x05000000, (u16 *)0x02036CC0);
-            break;
-        case 3:
-            sub_804B4D0(entry, i, 0x05000000, 0x02036CC0);
-            break;
+            case 1:
+                sub_804B3C0(entry, i, 0x05000000, 0x02036CC0);
+                break;
+            case 2:
+                sub_804B458((Unk_804B458 *)entry, i, (u16 *)0x05000000, (u16 *)0x02036CC0);
+                break;
+            case 3:
+                sub_804B4D0(entry, i, 0x05000000, 0x02036CC0);
+                break;
         }
     }
 }
@@ -1670,37 +1704,37 @@ void sub_804C78C(void)
         {
             switch (obj[0xBE])
             {
-            case 0:
-            case 1:
-                ((void (*)(u8 *, u8))sub_804CA2C)(obj, values[i]);
-                break;
-            case 2:
-                ((void (*)(u8 *, u8))sub_804CAA0)(obj, values[i]);
-                break;
-            case 3:
-                ((void (*)(u8 *, u8))sub_804CB18)(obj, values[i]);
-                break;
-            case 4:
-                ((void (*)(u8 *, u8))sub_804CB8C)(obj, values[i]);
-                break;
-            case 5:
-                ((void (*)(u8 *, u8))sub_804CC00)(obj, values[i]);
-                break;
-            case 6:
-                ((void (*)(u8 *, u8))sub_804CC78)(obj, values[i]);
-                break;
-            case 7:
-                ((void (*)(u8 *, u8))sub_804CCEC)(obj, values[i]);
-                break;
-            case 8:
-                ((void (*)(u8 *, u8))sub_804CD60)(obj, values[i]);
-                break;
-            case 9:
-                ((void (*)(u8 *, u8))sub_804CDD4)(obj, values[i]);
-                break;
-            case 10:
-                ((void (*)(u8 *, u8))sub_804CE48)(obj, values[i]);
-                break;
+                case 0:
+                case 1:
+                    ((void (*)(u8 *, u8))sub_804CA2C)(obj, values[i]);
+                    break;
+                case 2:
+                    ((void (*)(u8 *, u8))sub_804CAA0)(obj, values[i]);
+                    break;
+                case 3:
+                    ((void (*)(u8 *, u8))sub_804CB18)(obj, values[i]);
+                    break;
+                case 4:
+                    ((void (*)(u8 *, u8))sub_804CB8C)(obj, values[i]);
+                    break;
+                case 5:
+                    ((void (*)(u8 *, u8))sub_804CC00)(obj, values[i]);
+                    break;
+                case 6:
+                    ((void (*)(u8 *, u8))sub_804CC78)(obj, values[i]);
+                    break;
+                case 7:
+                    ((void (*)(u8 *, u8))sub_804CCEC)(obj, values[i]);
+                    break;
+                case 8:
+                    ((void (*)(u8 *, u8))sub_804CD60)(obj, values[i]);
+                    break;
+                case 9:
+                    ((void (*)(u8 *, u8))sub_804CDD4)(obj, values[i]);
+                    break;
+                case 10:
+                    ((void (*)(u8 *, u8))sub_804CE48)(obj, values[i]);
+                    break;
             }
         }
     }
@@ -1796,54 +1830,49 @@ void sub_804CA2C(u8 *obj)
     }
 }
 
-#define DEFINE_RANDOM_SLOT_FUNC_16(name)                  \
-void name(u8 *obj)                                        \
-{                                                         \
-    u8 values[16];                                        \
-    u8 count;                                             \
-    u8 value;                                             \
-                                                          \
-    count = sub_80489E8((u8 *)GetObjPool(), values, 1,   \
-                         0x7F);                           \
-    obj[0xBC] = 0;                                        \
-    if ((s8)gUnk_03000D38[obj[0xBE]] < 0)                 \
-    {                                                     \
-        value = values[((s32 (*)(void))Rng_LcgNext)() %   \
-                       count];                            \
-        obj[0xBD] = value;                                \
-        gUnk_03000D38[obj[0xBE]] =                        \
-            values[((s32 (*)(void))Rng_LcgNext)() % count]; \
-    }                                                     \
-    else                                                  \
-    {                                                     \
-        obj[0xBD] = gUnk_03000D38[obj[0xBE]];             \
-    }                                                     \
-}
+#define DEFINE_RANDOM_SLOT_FUNC_16(name)                                                                                              \
+    void name(u8 *obj)                                                                                                                \
+    {                                                                                                                                 \
+        u8 values[16];                                                                                                                \
+        u8 count;                                                                                                                     \
+        u8 value;                                                                                                                     \
+                                                                                                                                      \
+        count = sub_80489E8((u8 *)GetObjPool(), values, 1, 0x7F);                                                                     \
+        obj[0xBC] = 0;                                                                                                                \
+        if ((s8)gUnk_03000D38[obj[0xBE]] < 0)                                                                                         \
+        {                                                                                                                             \
+            value = values[((s32 (*)(void))Rng_LcgNext)() % count];                                                                   \
+            obj[0xBD] = value;                                                                                                        \
+            gUnk_03000D38[obj[0xBE]] = values[((s32 (*)(void))Rng_LcgNext)() % count];                                                \
+        }                                                                                                                             \
+        else                                                                                                                          \
+        {                                                                                                                             \
+            obj[0xBD] = gUnk_03000D38[obj[0xBE]];                                                                                     \
+        }                                                                                                                             \
+    }
 
-#define DEFINE_RANDOM_SLOT_FUNC_24(name)                  \
-void name(u8 *obj)                                        \
-{                                                         \
-    u8 values[24];                                        \
-    u8 count;                                             \
-    u8 value;                                             \
-    u8 *base;                                             \
-                                                          \
-    base = (u8 *)GetObjPool();                           \
-    obj[0xBC] = 0;                                        \
-    count = sub_80489E8(base, values, 1, 0x17F);          \
-    if ((s8)gUnk_03000D38[obj[0xBE]] < 0)                 \
-    {                                                     \
-        value = values[((s32 (*)(void))Rng_LcgNext)() %   \
-                       count];                            \
-        obj[0xBD] = value;                                \
-        gUnk_03000D38[obj[0xBE]] =                        \
-            values[((s32 (*)(void))Rng_LcgNext)() % count]; \
-    }                                                     \
-    else                                                  \
-    {                                                     \
-        obj[0xBD] = gUnk_03000D38[obj[0xBE]];             \
-    }                                                     \
-}
+#define DEFINE_RANDOM_SLOT_FUNC_24(name)                                                                                              \
+    void name(u8 *obj)                                                                                                                \
+    {                                                                                                                                 \
+        u8 values[24];                                                                                                                \
+        u8 count;                                                                                                                     \
+        u8 value;                                                                                                                     \
+        u8 *base;                                                                                                                     \
+                                                                                                                                      \
+        base = (u8 *)GetObjPool();                                                                                                    \
+        obj[0xBC] = 0;                                                                                                                \
+        count = sub_80489E8(base, values, 1, 0x17F);                                                                                  \
+        if ((s8)gUnk_03000D38[obj[0xBE]] < 0)                                                                                         \
+        {                                                                                                                             \
+            value = values[((s32 (*)(void))Rng_LcgNext)() % count];                                                                   \
+            obj[0xBD] = value;                                                                                                        \
+            gUnk_03000D38[obj[0xBE]] = values[((s32 (*)(void))Rng_LcgNext)() % count];                                                \
+        }                                                                                                                             \
+        else                                                                                                                          \
+        {                                                                                                                             \
+            obj[0xBD] = gUnk_03000D38[obj[0xBE]];                                                                                     \
+        }                                                                                                                             \
+    }
 
 // @ 0x0804CAA0
 DEFINE_RANDOM_SLOT_FUNC_24(sub_804CAA0)
@@ -1932,7 +1961,8 @@ void sub_804D0F8(u8 *obj)
         obj[0xBC] = 3;
     }
 }
-typedef struct {
+typedef struct
+{
     u8 pad_0[0x10];
     u16 field_10;
     u8 pad_12[2];
@@ -1955,23 +1985,23 @@ void sub_804D1B4(u8 *obj, u8 *arg1)
         obj[0xBC] = 0;
     switch ((s8)obj[0xBC])
     {
-    case 0:
-        entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
-        break;
-    case 1:
-        obj[0xC2] = 0;
-        entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 8)];
-        break;
+        case 0:
+            entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
+            break;
+        case 1:
+            obj[0xC2] = 0;
+            entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 8)];
+            break;
     }
     switch (entry->field_10)
     {
-    case 0:
-        value = values[(u32)(u8)Rng_LcgNext() % count];
-        obj[0xBD] = value;
-        break;
-    case 1:
-        obj[0xBD] = 0;
-        break;
+        case 0:
+            value = values[(u32)(u8)Rng_LcgNext() % count];
+            obj[0xBD] = value;
+            break;
+        case 1:
+            obj[0xBD] = 0;
+            break;
     }
 }
 // @ 0x0804D260
@@ -1989,23 +2019,23 @@ void sub_804D260(u8 *obj, u8 *arg1)
         obj[0xBC] = 0;
     switch ((s8)obj[0xBC])
     {
-    case 0:
-        entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
-        break;
-    case 1:
-        obj[0xC2] = 0;
-        entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 8)];
-        break;
+        case 0:
+            entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
+            break;
+        case 1:
+            obj[0xC2] = 0;
+            entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 8)];
+            break;
     }
     switch (entry->field_10)
     {
-    case 0:
-        value = values[(u32)(u8)Rng_LcgNext() % count];
-        obj[0xBD] = value;
-        break;
-    case 1:
-        obj[0xBD] = 0;
-        break;
+        case 0:
+            value = values[(u32)(u8)Rng_LcgNext() % count];
+            obj[0xBD] = value;
+            break;
+        case 1:
+            obj[0xBD] = 0;
+            break;
     }
 }
 // @ 0x0804D310
@@ -2025,23 +2055,23 @@ void sub_804D3A0(u8 *obj, u8 *arg1)
         obj[0xBC] = 0;
     switch ((s8)obj[0xBC])
     {
-    case 0:
-        entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
-        break;
-    case 1:
-        obj[0xC2] = 0;
-        entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 8)];
-        break;
+        case 0:
+            entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
+            break;
+        case 1:
+            obj[0xC2] = 0;
+            entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 8)];
+            break;
     }
     switch (entry->field_10)
     {
-    case 0:
-        value = values[(u32)(u8)Rng_LcgNext() % count];
-        obj[0xBD] = value;
-        break;
-    case 1:
-        obj[0xBD] = 0;
-        break;
+        case 0:
+            value = values[(u32)(u8)Rng_LcgNext() % count];
+            obj[0xBD] = value;
+            break;
+        case 1:
+            obj[0xBD] = 0;
+            break;
     }
 }
 // @ 0x0804D44C
@@ -2059,23 +2089,23 @@ void sub_804D44C(u8 *obj, u8 *arg1)
         obj[0xBC] = 0;
     switch ((s8)obj[0xBC])
     {
-    case 0:
-        entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
-        break;
-    case 1:
-        obj[0xC2] = 0;
-        entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 8)];
-        break;
+        case 0:
+            entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
+            break;
+        case 1:
+            obj[0xC2] = 0;
+            entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 8)];
+            break;
     }
     switch (entry->field_10)
     {
-    case 0:
-        value = values[(u32)(u8)Rng_LcgNext() % count];
-        obj[0xBD] = value;
-        break;
-    case 1:
-        obj[0xBD] = 0;
-        break;
+        case 0:
+            value = values[(u32)(u8)Rng_LcgNext() % count];
+            obj[0xBD] = value;
+            break;
+        case 1:
+            obj[0xBD] = 0;
+            break;
     }
 }
 // @ 0x0804D4FC
@@ -2088,7 +2118,7 @@ INCLUDE_ASM("asm/nonmatchings", sub_804D5B4);
 // 直接导致全局 +4 位移 bug。待用 do-while 屏障/中间变量复现死 store 后重匹配。
 INCLUDE_ASM("asm/nonmatchings", sub_804D708);
 // @ 0x0804D798
-INCLUDE_ASM("asm/matchings", sub_804D798);  /* 台账修正: tsv=1 且 .s 已在 matchings/ (坑7); 见 INCIDENTS.md */
+INCLUDE_ASM("asm/matchings", sub_804D798); /* 台账修正: tsv=1 且 .s 已在 matchings/ (坑7); 见 INCIDENTS.md */
 // @ 0x0804D840
 INCLUDE_ASM("asm/nonmatchings", sub_804D840);
 // @ 0x0804D8F4
@@ -2107,7 +2137,8 @@ typedef void (*UnkFuncDD70)(u8 *, u32);
 extern UnkFuncDD70 gUnk_0839CE38[];
 
 // @ 0x0804DD70
-void sub_804DD70(u8 *ptr, u32 arg1) {
+void sub_804DD70(u8 *ptr, u32 arg1)
+{
     gUnk_0839CE38[*(u8 *)(ptr + 0xBE) - 0x71](ptr, arg1);
 }
 extern const u8 gUnk_087EA580[];
@@ -2123,27 +2154,27 @@ u8 sub_804DD90(u8 arg0, u8 arg1)
     data = gUnk_0839CEFC + gUnk_087EA580[arg0 * 12 + 10] * 3;
     switch (arg1)
     {
-    case 0:
-        result = data[0] & 0x3F;
-        break;
-    case 1:
-        result = data[0] >> 6;
-        break;
-    case 2:
-        result = data[1] & 0xF;
-        break;
-    case 3:
-        result = (data[1] >> 4) & 3;
-        break;
-    case 4:
-        result = data[1] >> 6;
-        break;
-    case 5:
-        result = data[2] & 3;
-        break;
-    case 6:
-        result = (data[2] >> 3) & 1;
-        break;
+        case 0:
+            result = data[0] & 0x3F;
+            break;
+        case 1:
+            result = data[0] >> 6;
+            break;
+        case 2:
+            result = data[1] & 0xF;
+            break;
+        case 3:
+            result = (data[1] >> 4) & 3;
+            break;
+        case 4:
+            result = data[1] >> 6;
+            break;
+        case 5:
+            result = data[2] & 3;
+            break;
+        case 6:
+            result = (data[2] >> 3) & 1;
+            break;
     }
     return result;
 }
@@ -2235,10 +2266,8 @@ s8 sub_804E76C(u8 *obj, u8 arg1, u8 arg2)
     if (obj[0xBE] <= 10)
     {
         values = obj + 0x8D;
-        if (values[0] != 0 || values[1] != 0 ||
-            values[2] != 0 || values[3] != 0 ||
-            values[4] != 0 || values[5] != 0 ||
-            values[6] != 0 || values[7] != 0)
+        if (values[0] != 0 || values[1] != 0 || values[2] != 0 || values[3] != 0 || values[4] != 0 || values[5] != 0 || values[6] != 0
+            || values[7] != 0)
         {
             for (i = 0; i <= 5; i++)
             {

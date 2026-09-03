@@ -10,19 +10,24 @@
 #include "sound.h"
 
 // @ 0x08020D50
-void sub_8020D50(void *arg0, u8 arg1) {
+void sub_8020D50(void *arg0, u8 arg1)
+{
     u16 newval;
-    if (*(u8 *)((u8 *)arg0 + 0xBE) > 0xA) return;
+    if (*(u8 *)((u8 *)arg0 + 0xBE) > 0xA)
+        return;
     *(u8 *)((u32)arg0 + 0xA3) = sub_804BBDC(sub_801D19C(arg0, arg1), 1, 0x1F, 0x1F, 0x1F, 0x10, 0, 3);
     newval = 0x80 | *(u16 *)((u32)arg0 + 0xB0);
     *(u16 *)((u32)arg0 + 0xB0) = newval;
 }
 // @ 0x08020DA0
-void sub_8020DA0(void *arg0, u8 arg1) {
+void sub_8020DA0(void *arg0, u8 arg1)
+{
     u16 *reg;
-    if (*(u8 *)((u8 *)arg0 + 0xBE) > 0xA) return;
+    if (*(u8 *)((u8 *)arg0 + 0xBE) > 0xA)
+        return;
     reg = (u16 *)((u32)arg0 + 0xB0);
-    if (!(*reg & 0x80)) return;
+    if (!(*reg & 0x80))
+        return;
     sub_804BD54(sub_801D19C(arg0, arg1), 1);
     *reg = 0xFF7F & *reg;
 }
@@ -34,21 +39,25 @@ void sub_8020DE4(void)
 extern u8 gUnk_03000730_arr[];
 
 // @ 0x08020DF0
-void sub_8020DF0(u8 *arg0) {
+void sub_8020DF0(u8 *arg0)
+{
     u8 i;
     u32 ret;
     u8 val;
     u8 flag;
     val = *(u8 *)(arg0 + 0xBD);
     flag = 1;
-    if (val <= 4) {
+    if (val <= 4)
+    {
         flag = 0;
     }
     ret = sub_8046480(arg0, gUnk_03000730_arr, flag);
     gUnk_0300073D = ret;
     gUnk_0300073C = 0;
-    for (i = 0; i < (u8)ret; i++) {
-        if (gUnk_03000730_arr[i] & 0xF0) {
+    for (i = 0; i < (u8)ret; i++)
+    {
+        if (gUnk_03000730_arr[i] & 0xF0)
+        {
             gUnk_0300073C++;
         }
     }
@@ -117,13 +126,16 @@ void sub_8020EEC(u8 value)
 extern u32 gUnk_087ED6A8[];
 
 // @ 0x08020F08
-void sub_8020F08(void) {
+void sub_8020F08(void)
+{
     u8 i;
-    for (i = 0; i < gUnk_03000763; i++) {
+    for (i = 0; i < gUnk_03000763; i++)
+    {
         sub_804C2FC(gUnk_087ED6A8[gUnk_03000758[i]], i + 1, 1);
     }
 }
-typedef struct Unk_8020F4C {
+typedef struct Unk_8020F4C
+{
     u8 pad24[0x24];
     u16 field_24;
     u8 pad26[0x2A - 0x26];
@@ -146,7 +158,8 @@ typedef struct Unk_8020F4C {
 } Unk_8020F4C;
 
 // @ 0x08020F4C
-void sub_8020F4C(Unk_8020F4C *arg0) {
+void sub_8020F4C(Unk_8020F4C *arg0)
+{
     arg0->field_BB = 0;
     arg0->field_BC = 0xFF;
     arg0->field_B0 = 0;
@@ -162,7 +175,8 @@ void sub_8020F4C(Unk_8020F4C *arg0) {
     sub_801FA10(arg0, 0x31);
 }
 // @ 0x08020FB8
-void sub_8020FB8(void *arg0, u16 arg1, u16 arg2, u16 arg3, u8 arg4) {
+void sub_8020FB8(void *arg0, u16 arg1, u16 arg2, u16 arg3, u8 arg4)
+{
     Unk_8020F4C *ptr = (Unk_8020F4C *)arg0;
     ptr->field_B0 = ptr->field_B0 & 0xFF0F;
     ptr->field_B0 = 0x10 | ptr->field_B0;
@@ -184,7 +198,8 @@ void sub_802103C(u8 *arg0, u8 arg1, u16 arg2)
     arg0[0xBD] = arg1;
 }
 
-typedef struct Unk_8021064 {
+typedef struct Unk_8021064
+{
     u16 field_0;
     u8 field_2;
     u8 field_3;
@@ -194,19 +209,22 @@ extern Unk_8021064 gUnk_03000670[];
 extern u8 gUnk_0861C664[];
 
 // @ 0x08021064
-void sub_8021064(u8 arg0) {
+void sub_8021064(u8 arg0)
+{
     u8 i;
     gUnk_0300068C = 0;
     gUnk_0300068E = 1;
     gUnk_0300068D = 0;
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < 7; i++)
+    {
         gUnk_03000670[i].field_0 = 0;
         gUnk_03000670[i].field_2 = 0;
         gUnk_03000670[i].field_3 = 0;
     }
     sub_804C2FC((u32)(gUnk_0861C664 + arg0 * 0x20), 0xF, 1);
 }
-typedef struct Unk_0839B2A4 {
+typedef struct Unk_0839B2A4
+{
     u32 field_0;
     u32 field_4;
     u16 field_8;
@@ -217,19 +235,12 @@ typedef struct Unk_0839B2A4 {
 extern Unk_0839B2A4 gUnk_0839B2A4[];
 
 // @ 0x080210C0
-void sub_80210C0(void *arg0, u8 arg1) {
+void sub_80210C0(void *arg0, u8 arg1)
+{
     u16 newval;
     Unk_0839B2A4 *tbl = gUnk_0839B2A4;
-    sub_801B81C((u8 *)arg0 + 0x3C,
-                *(u8 *)((u8 *)arg0 + 0xBF),
-                *(u8 *)((u8 *)arg0 + 0xC0),
-                0xDA << 1,
-                0xE,
-                tbl[0].field_0,
-                tbl[0].field_4 + (arg1 << 5),
-                (u16)(0x541 + tbl[0].field_8),
-                tbl[0].field_A,
-                2);
+    sub_801B81C((u8 *)arg0 + 0x3C, *(u8 *)((u8 *)arg0 + 0xBF), *(u8 *)((u8 *)arg0 + 0xC0), 0xDA << 1, 0xE, tbl[0].field_0,
+                tbl[0].field_4 + (arg1 << 5), (u16)(0x541 + tbl[0].field_8), tbl[0].field_A, 2);
     *(u8 *)((u8 *)arg0 + 0x66) = 3;
     newval = 0x2000 | *(u16 *)((u8 *)arg0 + 0xB0);
     *(u16 *)((u8 *)arg0 + 0xB0) = newval;
@@ -257,23 +268,29 @@ INCLUDE_ASM("asm/nonmatchings", sub_80212B4);
 // @ 0x0802151C
 INCLUDE_ASM("asm/nonmatchings", sub_802151C);
 // @ 0x08021700
-u8 sub_8021700(void) {
+u8 sub_8021700(void)
+{
     u8 ret = 0;
-    if (gUnk_03000812 < gUnk_03000811) {
+    if (gUnk_03000812 < gUnk_03000811)
+    {
         Unk_8020F4C *obj = (Unk_8020F4C *)(GetObjPool() + gUnk_0300080C[gUnk_03000812] * 0xC8);
-        switch (gUnk_03000813) {
-        case 0:
-            sub_80207DC(obj, obj->field_BF, obj->field_C0, obj->field_2A, obj->field_35);
-            gUnk_03000813 = 1;
-            break;
-        case 1:
-            if (!(obj->field_24 & 0x800)) {
-                gUnk_03000812 = gUnk_03000812 + 1;
-                gUnk_03000813 = 0;
-            }
-            break;
+        switch (gUnk_03000813)
+        {
+            case 0:
+                sub_80207DC(obj, obj->field_BF, obj->field_C0, obj->field_2A, obj->field_35);
+                gUnk_03000813 = 1;
+                break;
+            case 1:
+                if (!(obj->field_24 & 0x800))
+                {
+                    gUnk_03000812 = gUnk_03000812 + 1;
+                    gUnk_03000813 = 0;
+                }
+                break;
         }
-    } else {
+    }
+    else
+    {
         ret = 1;
     }
     return ret;
@@ -351,16 +368,13 @@ void sub_802576C(u8 *obj)
     u8 style;
     u8 selected;
 
-    for (i = gUnk_03000809;
-         i < gUnk_03000809 + 3 && i < gUnk_03000808;
-         i++)
+    for (i = gUnk_03000809; i < gUnk_03000809 + 3 && i < gUnk_03000808; i++)
     {
         selected = gUnk_0300080A;
         style = 0;
         if (i == selected)
             style = 2;
-        BgMap_PalFillRect(obj, style + 0xB, 8,
-                    (i - gUnk_03000809) * 2 + 8, 9, 2);
+        BgMap_PalFillRect(obj, style + 0xB, 8, (i - gUnk_03000809) * 2 + 8, 9, 2);
     }
 }
 // @ 0x080257D8

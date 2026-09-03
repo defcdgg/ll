@@ -11,8 +11,6 @@
 
 extern void IntrMain();
 
-
-
 // @ 0x080002A0
 void VBlank_UpdateGameScreen(void)
 {
@@ -850,9 +848,8 @@ void DummyIntr4() { }
 // @ 0x08001288
 void DummyIntr5() { }
 
-
-//AgbMain
-// @ 0x0800128C
+// AgbMain
+//  @ 0x0800128C
 void AgbMain(void)
 {
     gMainTaskSlot = 0;
@@ -891,8 +888,8 @@ void VBlank_UpdateScreenMode5(void)
         gBgTileReloadFlag = 0;
     }
 }
-//切换场景加载
-// @ 0x08001354
+// 切换场景加载
+//  @ 0x08001354
 void SceneTransition_Load(void)
 {
     u16 i;
@@ -988,8 +985,8 @@ void SceneTransition_Load(void)
     }
 }
 
-//New Game
-// @ 0x08001538
+// New Game
+//  @ 0x08001538
 void NewGame_Init(void)
 {
     u8 i;
@@ -1355,7 +1352,6 @@ void Scene_RestoreAfterBattle(void)
     Sprites_UpdateFrame();
 }
 
-
 // @ 0x08001D08
 void Task_MapExplore(void)
 {
@@ -1391,7 +1387,7 @@ void Task_MapExplore(void)
 
     if ((gHeldKeysRaw & ABXY_BUTTONS) == ABXY_BUTTONS)
     {
-        //Reset Game
+        // Reset Game
         Script_Abort(1);
         System_ResetToLogo();
         return;
@@ -1432,8 +1428,8 @@ void Task_MapExplore(void)
                     gDialogueActive = 1;
                 }
 
-                //gDialogueActive = 1     表示当前正在对话，无法移动
-                //gUnk_03004D4C = 0xD   菜单界面，无法移动
+                // gDialogueActive = 1     表示当前正在对话，无法移动
+                // gUnk_03004D4C = 0xD   菜单界面，无法移动
 
                 if (gDialogueActive || gUnk_03004D4C)
                 {
@@ -1443,7 +1439,7 @@ void Task_MapExplore(void)
                 {
                     if (CheckEncounter() != 0)
                     {
-                        //gMainGameState = 5 立即进入战斗界面
+                        // gMainGameState = 5 立即进入战斗界面
                         gMainGameState = 5;
                         return;
                     }
@@ -1489,7 +1485,7 @@ void Task_MapExplore(void)
     }
     else
     {
-        //gWarpAnimState = 1  开始播放传送动画
+        // gWarpAnimState = 1  开始播放传送动画
         switch (gWarpAnimState)
         {
             case 1:
@@ -1610,8 +1606,8 @@ void Sprites_UpdateFrame(void)
                         Chara_ProcessCmdStream(i);
                     }
                     Sprite_UpdateCharaAnim(i);
-                    Sprite_EnqueueRender(Chara_GetDrawX(ptr03002E80), ptr03002E80->y, ptr03002E80->sprNodeIdx, Chara_GetDrawZ(ptr03002E80),
-                                ptr03002E80->renderFlags);
+                    Sprite_EnqueueRender(Chara_GetDrawX(ptr03002E80), ptr03002E80->y, ptr03002E80->sprNodeIdx,
+                                         Chara_GetDrawZ(ptr03002E80), ptr03002E80->renderFlags);
                     if (ptr03002E80->subSprNodeIdx)
                     {
                         gSpriteNodePool[ptr03002E80->subSprNodeIdx].flags = 0;
@@ -1655,7 +1651,7 @@ void Sprites_UpdateFrame(void)
                         ptr03002E80->subSprNodeIdx = 0;
                     }
                     if (Sprite_EnqueueRender(ptr03002E80->x, ptr03002E80->y, ptr03002E80->sprNodeIdx, ptr03002E80->z,
-                                    ptr03002E80->renderFlags))
+                                             ptr03002E80->renderFlags))
                     {
                         ptr03002E80->stateFlags |= 8;
                     }
@@ -1733,7 +1729,7 @@ u8 Sprite_EnqueueRender(s16 x, s16 y, u8 sprNodeIdx, s16 z, u8 arg4)
 {
     SpriteNode* sprNode;
     u8 count;
-    
+
     s16 screenX, screenY;
     s16 offsetX, offsetY;
     u8 flag;
@@ -1757,8 +1753,8 @@ u8 Sprite_EnqueueRender(s16 x, s16 y, u8 sprNodeIdx, s16 z, u8 arg4)
     } else {
         screenX = x - gCameraPosX;
     }
-    
-    if (gViewportFlags[0] & 2) 
+
+    if (gViewportFlags[0] & 2)
     {
         screenY = y - ((gCameraPosY & ~0xF) + gBG3ScrollY) - 4 - z;
     } else {
@@ -2025,7 +2021,7 @@ void Sprite_UpdateCharaAnim(u8 arg0)
         paletteBits <<= 12;
 
         sprNode = &gSpriteNodePool[charaObj->sprNodeIdx];
-        
+
         if ((charaObj->field_1 & 0x7C) == 0)
         {
             sprNode->animStep = charaObj->walkAnimCounter >> 3;
@@ -2044,7 +2040,8 @@ void Sprite_UpdateCharaAnim(u8 arg0)
             {
                 sprNode->attr1 &= ~0x1000;
             }
-            sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((directionIndex*18 + currentFrameTileOffset + charaObj->vramSlotIdx * 72 + 0xA0) & 0x3FF)) | paletteBits;
+            sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((directionIndex*18 + currentFrameTileOffset + charaObj->vramSlotIdx * 72 +
+0xA0) & 0x3FF)) | paletteBits;
 
             sprNode = sprNode->next;
             if(sprNode)
@@ -2057,7 +2054,8 @@ void Sprite_UpdateCharaAnim(u8 arg0)
                 {
                     sprNode->attr1 &= ~0x1000;
                 }
-                sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((directionIndex*18 + currentFrameTileOffset + charaObj->vramSlotIdx * 72 + 0xA4) & 0x3FF)) | paletteBits;
+                sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((directionIndex*18 + currentFrameTileOffset + charaObj->vramSlotIdx * 72
++ 0xA4) & 0x3FF)) | paletteBits;
             }
 
         }
@@ -2084,7 +2082,7 @@ void Sprite_UpdateCharaAnim(u8 arg0)
             {
                 sprNode->animStep = charaObj->walkAnimCounter >> 3;
                 directionIndex = gWalkDirectionMapping[charaObj->facing];
-                
+
                 if (directionIndex == 1)
                 {
                     sprNode->attr1 |= 0x1000;
@@ -2096,16 +2094,16 @@ void Sprite_UpdateCharaAnim(u8 arg0)
             sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((charaObj->vramSlotIdx * 72 + 0xA0) & 0x3FF)) | paletteBits;
             }
         }
-        else 
+        else
         {
             if ((charaObj->field_1 & 8) == 0)
             {
-            
+
                 sprNode->animStep = 0;
                 temp_r7 =(charaObj->walkAnimCounter >> 3) & 3;
 
                 directionIndex = gWalkDirectionMapping[charaObj->facing + 8];
-                
+
                 if (directionIndex & 1)
                 {
                     currentFrameTileOffset = 0x20;
@@ -2114,7 +2112,7 @@ void Sprite_UpdateCharaAnim(u8 arg0)
                 {
                     currentFrameTileOffset = gWalkAnimFrameMapping[temp_r7 + 4] << 4;
                 }
-     
+
                 if (directionIndex & 2)
                 {
                     sprNode->attr1 |= 0x1000;
@@ -2124,7 +2122,8 @@ void Sprite_UpdateCharaAnim(u8 arg0)
                     sprNode->attr1 &= ~0x1000;
                 }
 
-            // sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((chara->field_2 * 72 +currentFrameTileOffset + 0xA0) & 0x3FF)) | paletteBits;
+            // sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((chara->field_2 * 72 +currentFrameTileOffset + 0xA0) & 0x3FF)) |
+paletteBits;
             }
             else
             {
@@ -2133,7 +2132,8 @@ void Sprite_UpdateCharaAnim(u8 arg0)
                 currentFrameTileOffset = gWalkAnimFrameMapping[temp_r7] * 16;
                 sprNode->attr1 &= ~0x1000;
             }
-            sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((charaObj->vramSlotIdx * 72 +currentFrameTileOffset + 0xA0) & 0x3FF)) | paletteBits;
+            sprNode->attr2 = ((sprNode->attr2 & 0xC00) | ((charaObj->vramSlotIdx * 72 +currentFrameTileOffset + 0xA0) & 0x3FF)) |
+paletteBits;
 
         }
         return;
@@ -2175,7 +2175,7 @@ void Anim_PlayCustom(u8 arg0) {
     chara = &gActors[arg0];
 
     if(chara->currAnimIdx == 0xFF)
-        
+
         return;
 
     animDataPtr = gCutsceneAnimScripts[chara->currAnimIdx];
@@ -2187,16 +2187,18 @@ void Anim_PlayCustom(u8 arg0) {
 
     frameDataPtr = animDataPtr +  (animDataPtr[2] + (animDataPtr[3] << 8));
 
-    
+
     if(chara->animFrameTimer == 0)
     {
         if( animDataPtr[6] + (animDataPtr[7] << 8) == 2)
         {
-            PalTransfer_Enqueue(PalTransfer_AllocSlot(), gCutsceneAnimPals[chara->currAnimIdx], gCutsceneAnimSlots[chara->currAnimIdx] + 16, 2);
+            PalTransfer_Enqueue(PalTransfer_AllocSlot(), gCutsceneAnimPals[chara->currAnimIdx], gCutsceneAnimSlots[chara->currAnimIdx]
++ 16, 2);
         }
         else
         {
-            PalTransfer_Enqueue(PalTransfer_AllocSlot(), gCutsceneAnimPals[chara->currAnimIdx], gCutsceneAnimSlots[chara->currAnimIdx] + 16, 0);
+            PalTransfer_Enqueue(PalTransfer_AllocSlot(), gCutsceneAnimPals[chara->currAnimIdx], gCutsceneAnimSlots[chara->currAnimIdx]
++ 16, 0);
 
         }
         frameDataPtr += 8;
@@ -2226,7 +2228,7 @@ void Anim_PlayCustom(u8 arg0) {
                 chara->animFrameTimer = 0;
             }
         }
-        
+
         while(count != 0)
         {
             if(chara->animFrameTimer == frameDataPtr[2] + (frameDataPtr[3] << 8) || chara->animFrameTimer == 0)
@@ -2243,7 +2245,7 @@ void Anim_PlayCustom(u8 arg0) {
                 // offset = offset << 1;
                 // unkPtr = animDataPtr + offset;
                 // unkPtr = animDataPtr + unkPtr[8] + (unkPtr[9] << 8);
-                
+
                 Anim_BuildOamChain(arg0, (animDataPtr + animDataPtr[offset+8] + (animDataPtr[offset+9]<<8)) + 4);
                 // Anim_BuildOamChain(arg0,  unkPtr + 4);
                 break;
@@ -2252,15 +2254,15 @@ void Anim_PlayCustom(u8 arg0) {
             frameDataPtr+=4;
             count--;
         }
-        
+
 
         if(chara->animFrameTimer != 0xFF)
         {
             chara->animFrameTimer++;
         }
-        
+
     }
-    
+
 }
 */
 
@@ -2529,7 +2531,6 @@ void LogoBlendEffect_Update(void)
     }
 }
 
-
 #define GET_PLTT(n)    ((n) + 0)
 #define GET_TILEMAP(n) ((n) + 32)
 // INCLUDE_ASM("asm/matchings", LogoAssets_Load);
@@ -2570,9 +2571,6 @@ void LogoAssets_Load(void)
     }
 }
 
-
-
-
 // @ 0x08003088
 void Task_DispatchGameState(void)
 {
@@ -2581,8 +2579,8 @@ void Task_DispatchGameState(void)
     gUnk_087E83F8[gMainGameState]();
 }
 
-//地图场景切换，加载数据精灵
-// @ 0x080030B0
+// 地图场景切换，加载数据精灵
+//  @ 0x080030B0
 void SceneTransition_RequestMap()
 {
     if (gSceneSubState == 0 && gScenePhase == 1)
@@ -2706,26 +2704,27 @@ void PalTransfer_Flush()
 }
 
 // @ 0x080032BC
-void OAM_FlushFromQueue(void) {
+void OAM_FlushFromQueue(void)
+{
     u16 i;
-    SpriteNode* sprNode;
+    SpriteNode *sprNode;
     u8 count;
     u16 index;
 
     index = 0;
 
-    for(i = 0; i < 128; i++)
+    for (i = 0; i < 128; i++)
     {
         sprNode = gSpriteRenderQueue[i];
-        if(sprNode == NULL)
+        if (sprNode == NULL)
             continue;
 
         count = sprNode->flags & 0x7F;
-        if(count)
+        if (count)
         {
-            while(count--)
+            while (count--)
             {
-                if(count == 0xFF)
+                if (count == 0xFF)
                     break;
                 sprNode = Sprite_WriteOam(&index, sprNode);
                 if (sprNode == NULL)
@@ -2733,17 +2732,16 @@ void OAM_FlushFromQueue(void) {
             }
         }
 
-        if(index > 0x7F)
+        if (index > 0x7F)
             return;
     }
 
-    while(index < 128)
+    while (index < 128)
     {
         gOamBuffer[index].attrs[0] = 0xA0;
         gOamBuffer[index].attrs[1] = 0;
         index++;
     }
-
 }
 
 // @ 0x08003348
@@ -2829,7 +2827,7 @@ void Sprites_LoadMapNPCs(u8 arg0) {
     u16 temp_r0;
     u32 temp_r3;
 
-    if (gObjGraphicsSetId & 0x80) 
+    if (gObjGraphicsSetId & 0x80)
         return;
 
     i = temp_r3 = gMapSceneDescriptors[arg0].npcSlotGroupId;
@@ -2840,7 +2838,7 @@ void Sprites_LoadMapNPCs(u8 arg0) {
     arg0 = gUnk_08091948[temp_r0];
 
     ptr2 = gUnk_087EA394[temp_r3 - 1];
-              
+
 
     for ( i = 2; i < arg0 + 2; i++)
     {
@@ -2935,13 +2933,13 @@ void Chara_InitFromDesc(u8 arg0, UnkStruct* arg1) {
             renderObj->field_10 = 0x1F8;
             renderObj->field_12 = 0xE8;
             subRenderObj = Sprite_InitChainNode(renderObj, 2, 0, attr1, attr2);
-            
+
             attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xA0) & 0x3FF);
             subRenderObj->field_10 = 0x1F8;
             subRenderObj->field_12 = 0xC8;
 
-            Sprite_InitChainNode(subRenderObj, 1, 0, attr1, attr2);    
-    
+            Sprite_InitChainNode(subRenderObj, 1, 0, attr1, attr2);
+
         }
         else if(chara->fields_1.stru.bit6)
         {
@@ -2950,7 +2948,7 @@ void Chara_InitFromDesc(u8 arg0, UnkStruct* arg1) {
             renderObj->field_10 = 0x1F8;
             renderObj->field_12 = 0xEE;
             subRenderObj = Sprite_InitChainNode(renderObj, 3, 0, attr1, attr2);
-            
+
             attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xB0) & 0x3FF);
             subRenderObj->field_10 = 0x18;
             subRenderObj->field_12 = 0xEE;
@@ -2967,7 +2965,7 @@ void Chara_InitFromDesc(u8 arg0, UnkStruct* arg1) {
         else
         {
             attr1 = 0x4000;
-          
+
             attr2 = ((chara->paletteId << 12) + 0x800) + (((chara->field_2 * 72) + 0xA0) & 0x3FF);
             renderObj->field_10 = 0;
             renderObj->field_12 = 0xE8;
@@ -3120,8 +3118,8 @@ void Chara_InitEffectAtPlayer(void)
  *   3) 装载体必须留在 static inline 的小函数里。把局部变量合并进本函数会让
  *      GCC2 的寄存器分配跑偏(实测: helper 版 5/140 字节差=只剩链接器 thunk,
  *      合并版 59/140)。 */
-extern u8 *gUnk_087E8430[];      /* 248 项 LZ77 压缩精灵图块指针表 */
-extern u8 gUnk_080B9DFC[][32];  /* 精灵 OBJ 调色板, 每项 16 色 BGR555 */
+extern u8 *gUnk_087E8430[]; /* 248 项 LZ77 压缩精灵图块指针表 */
+extern u8 gUnk_080B9DFC[][32]; /* 精灵 OBJ 调色板, 每项 16 色 BGR555 */
 
 static inline void Inl_LoadSpriteSheetGfx(u8 slot, u16 gfxId)
 {
@@ -3260,12 +3258,13 @@ INCLUDE_ASM("asm/nonmatchings", Party_FollowAnim);
 // INCLUDE_ASM("asm/matchings", Followers_ResetHistory);
 
 // @ 0x08004358
-void Followers_ResetHistory(void) {
+void Followers_ResetHistory(void)
+{
     u16 i;
 
-    if(!(gPartyFollowFlags & 1))
+    if (!(gPartyFollowFlags & 1))
     {
-        for(i = 0; i < 8; i++)
+        for (i = 0; i < 8; i++)
         {
             gFollowerHistX[i] = gActors[0].x;
             gFollowerHistY[i] = gActors[0].y;
@@ -3281,10 +3280,11 @@ void Followers_ResetHistory(void) {
 // INCLUDE_ASM("asm/matchings", Followers_SyncToTail);
 
 // @ 0x080043D4
-void Followers_SyncToTail(void) {
+void Followers_SyncToTail(void)
+{
     u16 i;
 
-    for(i = 0; i < 8; i++)
+    for (i = 0; i < 8; i++)
     {
         gFollowerHistX[i] = gActors[0].x;
         gFollowerHistY[i] = gActors[0].y;
@@ -3419,25 +3419,24 @@ void Party_FollowStep(void) {
 }
 */
 
-
-
 extern u8 gUnk_0838EEF4[];
 
-#define CUTSCENE_ANIM_BASE  ((u8*)0x02020000)
+#define CUTSCENE_ANIM_BASE ((u8 *)0x02020000)
 /* 把一个过场动画加载到一个缓冲槽。
  *   animId   : gCutsceneAnimConfigTable 下标 (脚本参数 data[1]|data[2]<<8)
  *   slot     : 0..N 缓冲槽, 每槽占 CUTSCENE_ANIM_BASE + slot*0x1000 的 4 KB VRAM 区
  *   slotSel  : 十进制编码 —— ≥100 表示 "减 100 存为动画槽号, 并额外置 flags 的 bit6"
  */
 // @ 0x080046DC
-void CutsceneAnim_Load(u16 animId, u8 slot, u8 slotSel) {
-        u8 extraFlags;
+void CutsceneAnim_Load(u16 animId, u8 slot, u8 slotSel)
+{
+    u8 extraFlags;
     u8 animSlot;
 
     gCutsceneAnimScripts[slot] = gUnk_087E860C[gCutsceneAnimConfigTable[animId].scriptIdx];
     gVramBufferPointers[slot] = (u32)(CUTSCENE_ANIM_BASE + slot * 0x1000);
 
-    if(slotSel > 99)
+    if (slotSel > 99)
     {
         extraFlags = 0x40;
         animSlot = slotSel - 100;
@@ -3450,7 +3449,7 @@ void CutsceneAnim_Load(u16 animId, u8 slot, u8 slotSel) {
     gCutsceneAnimFlags[slot] = extraFlags | gCutsceneAnimConfigTable[animId].loopFlag;
     gCutsceneAnimSlots[slot] = animSlot;
     gCutsceneAnimPals[slot] = &gUnk_0838EEF4[gCutsceneAnimConfigTable[animId].palIdx * 32];
-    LZ77UnCompWram((void*)gUnk_087E8D84[gCutsceneAnimConfigTable[animId].gfxIdx], (void*)(CUTSCENE_ANIM_BASE + slot * 0x1000));
+    LZ77UnCompWram((void *)gUnk_087E8D84[gCutsceneAnimConfigTable[animId].gfxIdx], (void *)(CUTSCENE_ANIM_BASE + slot * 0x1000));
 }
 
 /*
@@ -3511,23 +3510,22 @@ void CutsceneAnim_Load(u16 arg0, u8 arg1, u8 arg2) {
 // @ 0x0800478C
 INCLUDE_ASM("asm/nonmatchings", CutsceneAnim_PlayFrame);
 
-
 // @ 0x08004980
-void MapGroup_Lookup(void) {
+void MapGroup_Lookup(void)
+{
     u8 i;
 
     gPendingCharaSwitch = 0xFF;
 
-    for(i = 0; i < 22; i++)
+    for (i = 0; i < 22; i++)
     {
-        if(gUnk_087E94FC[i].field_0 == gCurrentMapId)
+        if (gUnk_087E94FC[i].field_0 == gCurrentMapId)
         {
             gUnk_03004618 = i + 1;
             return;
         }
     }
     gUnk_03004618 = 0;
-
 }
 
 // @ 0x080049C8
@@ -3766,7 +3764,7 @@ SpriteNode *Sprite_InitChainNode(SpriteNode *sprNode, u8 arg1, u16 arg2, u16 arg
  *
  * ⚠ dst 必须先算好放进变量: 直接 `LZ77UnCompVram(tbl[id], 0x06011400 + slot*0x900)` 会让
  * GCC2 先算 src 再算 dst, 尾部多一条 `adds r0, r2, #0` 把 src 拷回 r0。 */
-extern u8 *gUnk_087E8430[];   /* 248 项 LZ77 压缩图块指针表 */
+extern u8 *gUnk_087E8430[]; /* 248 项 LZ77 压缩图块指针表 */
 
 // @ 0x08004C8C
 void LoadSpriteSheetGfx(u8 slot, u16 gfxId)
@@ -3779,7 +3777,7 @@ void LoadSpriteSheetGfx(u8 slot, u16 gfxId)
 
 /* 同上: src/dst 先各自算好再交给 DmaCopy16, 否则 `vu32 *dmaRegs` 会被 CSE 提到最前面,
  * 目标里它是在 src/dst 之后才 `ldr r2, =0x040000D4` 的。 */
-extern u8 gUnk_080B9DFC[][32];   /* 每帧 16 色 BGR555 调色板 */
+extern u8 gUnk_080B9DFC[][32]; /* 每帧 16 色 BGR555 调色板 */
 
 // @ 0x08004CB8
 void LoadSpriteSheetPal(u8 slot, u16 palId)
@@ -3796,7 +3794,7 @@ void LoadSpriteSheetPal(u8 slot, u16 palId)
  * (后者由 LoadDigitFontObjTiles 连同 OBJ 调色板一起装入 0x060112C0 / 0x050003C0)。 */
 #define UI_ARROW_TILES_2  ((const u8 *)0x08393728) /* ◀ ▶      2 块 =  64 B */
 #define UI_ARROW_TILES_4  ((const u8 *)0x08393768) /* ◀ ▬ ▶ ▫  4 块 = 128 B */
-#define UI_ARROW_OBJ_VRAM ((void *)0x06011240)     /* OBJ 图块基 + 146*32 */
+#define UI_ARROW_OBJ_VRAM ((void *)0x06011240) /* OBJ 图块基 + 146*32 */
 
 /* 按 arg0 的符号位(= bit7)选一套箭头/滚动条图块, 用 DMA3 以 16 位宽装入 OBJ 图块区。
  * 调用方传的是 gObjGraphicsSetId 的最低字节(按 s8 看), 其 bit7 是图形变体标志:

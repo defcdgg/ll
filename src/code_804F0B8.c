@@ -9,7 +9,6 @@
 #include "save.h"
 #include "sound.h"
 
-
 // 检查对象 arg0 的两个候选编号(+0x91 / +0x92) 哪个通过 sub_804DD90(id, 6)。
 // 仅当 arg1 截断到 u8 后恰好为 6 时才检查; 返回 1=前一个 / 2=后一个 / 0=都不行。
 // 注: 全 ROM 无任何调用点(死代码), 两个已知引用位置都是直接 bl 不传参。
@@ -281,7 +280,7 @@ void sub_805008C(void)
         }
         if (gUnk_03000E70 & 0x10)
         {
-            block2:
+        block2:
             REG_BG0HOFS = 0;
             REG_BG0VOFS = 0;
             DmaSetUnchecked(3, 0x02005800, 0x0600F800, 0x80000400);
@@ -506,7 +505,7 @@ void BgTiles_LoadSet(u16 arg0)
 void TileDma_Reset(void)
 {
     u8 i;
-    
+
     for (i = 0; i <= 0x1D; i++)
     {
         gUnk_03000EE8[i] = 0;
@@ -627,7 +626,30 @@ u32 Op_CloseWindow(u32 *ptr)
     return 0;
 }
 // @ 0x080529B8
-INCLUDE_ASM("asm/nonmatchings", sub_80529B8);
+u8 sub_80529B8(u8 **ptr)
+{
+    u8 *data = *ptr;
+    u8 ret = 0;
+    u8 idx = data[1];
+    data = 0;
+    if ((gUnk_03000E70 & 0x20) == 0)
+    {
+        gUnk_03000E74 = 0;
+        gUnk_03000E70 |= 0x20;
+    }
+    else if (gUnk_03000E74 < idx)
+    {
+        gUnk_03000E74++;
+    }
+    else
+    {
+        gUnk_03000E74 = 0;
+        gUnk_03000E70 &= ~0x20;
+        *ptr += 2;
+        ret = 1;
+    }
+    return ret;
+}
 
 // @ 0x08052A14
 u32 Op_BgmPlay(u32 *ptr)
@@ -1024,7 +1046,6 @@ u32 Op_WaitCharaAnim(u32 *ptr)
     {
         *ptr += 2;
         return 1;
-       
     }
     return 0;
 }
@@ -1271,9 +1292,22 @@ u32 Op_IfSaveLoadedJump(u32 *ptr)
         base = (u32)gUnk_02016200;
         value += base;
     }
-    do { do { do { do { do {
-        *ptr = value;
-    } while (0); } while (0); } while (0); } while (0); } while (0);
+    do
+    {
+        do
+        {
+            do
+            {
+                do
+                {
+                    do
+                    {
+                        *ptr = value;
+                    } while (0);
+                } while (0);
+            } while (0);
+        } while (0);
+    } while (0);
     return 0;
 }
 // @ 0x080531E4

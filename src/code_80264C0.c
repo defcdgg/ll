@@ -29,42 +29,42 @@ u8 sub_802761C(u8 *obj)
     result = 0;
     switch (gUnk_03000820)
     {
-    case 0:
-        gUnk_03000828 = obj[0xBF];
-        gUnk_03000829 = obj[0xC0];
-        gUnk_03000822 = *(u16 *)(obj + 0x2A);
-        gUnk_03000824 = obj[0x35];
-        sub_80444A4(obj);
-        sub_801CE80(obj, 5, 0x1B4, 0xD, 0);
-        sub_803F5B4(obj);
-        gUnk_03000825 = 0;
-        gUnk_03000820 = 1;
-        break;
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-        break;
-    case 9:
-        if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && gUnk_03000856 == 0)
-        {
-            GetObjPool();
-            for (i = 0; i < gUnk_0300083D; i++)
+        case 0:
+            gUnk_03000828 = obj[0xBF];
+            gUnk_03000829 = obj[0xC0];
+            gUnk_03000822 = *(u16 *)(obj + 0x2A);
+            gUnk_03000824 = obj[0x35];
+            sub_80444A4(obj);
+            sub_801CE80(obj, 5, 0x1B4, 0xD, 0);
+            sub_803F5B4(obj);
+            gUnk_03000825 = 0;
+            gUnk_03000820 = 1;
+            break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            break;
+        case 9:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && gUnk_03000856 == 0)
             {
-                if ((gUnk_03000840[i] & 0xF0) == 0x10)
+                GetObjPool();
+                for (i = 0; i < gUnk_0300083D; i++)
                 {
-                    if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+                    if ((gUnk_03000840[i] & 0xF0) == 0x10)
                     {
-                        gUnk_03004F90[gUnk_03000840[i] & 0xF] = 1;
+                        if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+                        {
+                            gUnk_03004F90[gUnk_03000840[i] & 0xF] = 1;
+                        }
                     }
                 }
+                result = 1;
             }
-            result = 1;
-        }
-        break;
+            break;
     }
     sub_803F658(obj);
     if (*(u16 *)(obj + 0x24) & 0x1000)
@@ -212,28 +212,28 @@ u8 sub_8032D74(u8 *obj)
     result = 0;
     switch (gUnk_03000820)
     {
-    case 0:
-        gUnk_03000824 = obj[0x35];
-        gUnk_03000822 = *(u16 *)(obj + 0x2A);
-        sub_8048B30(0, 0x1E, obj[0xBE] == 0 ? 0x362 : 0x371);
-        gUnk_03000820 = 0x13;
-        break;
-    case 19:
-        if (sub_8047B1C(obj) == 1)
-            gUnk_03000820 = 0x14;
-        break;
-    case 20:
-        sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
-        gUnk_03000820 = 6;
-        break;
-    case 6:
-        if (!(*(u16 *)(obj + 0x24) & 0x800))
-            gUnk_03000820 = 9;
-        break;
-    case 9:
-        sub_8045B90(obj, obj[0xA1]);
-        result = 2;
-        break;
+        case 0:
+            gUnk_03000824 = obj[0x35];
+            gUnk_03000822 = *(u16 *)(obj + 0x2A);
+            sub_8048B30(0, 0x1E, obj[0xBE] == 0 ? 0x362 : 0x371);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_8047B1C(obj) == 1)
+                gUnk_03000820 = 0x14;
+            break;
+        case 20:
+            sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 6;
+            break;
+        case 6:
+            if (!(*(u16 *)(obj + 0x24) & 0x800))
+                gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(obj, obj[0xA1]);
+            result = 2;
+            break;
     }
     return result;
 }
@@ -353,47 +353,47 @@ u8 sub_803F328(u8 arg0)
     result = 0;
     switch (gUnk_0300086A)
     {
-    case 0:
-        result = 1;
-        break;
-    case 1:
-        DialogCtx_Clear3();
-        Bg0_InitClear();
-        base = 0x02035AC0;
-        v = 2;
-        sub_80196D4(0, (u8 *)base, 0xB, 2, 2, 1, 2, 0xC, 4);
-        gUnk_03000825 = 0;
-        gUnk_0300086A = v;
-        break;
-    case 2:
-        if (DialogCtx_GetField_C(0) == 4)
-        {
-            sub_803F21C((u8 *)0x02035AC0, arg0);
-            sub_80187C0(0x400);
-            gUnk_0300086A = 3;
-        }
-        break;
-    case 3:
-        if (!(sub_80187B4() & 0x400))
-            gUnk_0300086A = 4;
-        break;
-    case 4:
-        if (gUnk_03000825 <= 0x27)
-            gUnk_03000825 += 1;
-        else
-        {
-            DialogCtx_SetHead(0, 2, 2);
-            gUnk_0300086A = 5;
-        }
-        break;
-    case 5:
-        v = DialogCtx_GetField_C(0);
-        if (v == 0)
-        {
-            Disp_Bg1Off();
+        case 0:
+            result = 1;
+            break;
+        case 1:
+            DialogCtx_Clear3();
+            Bg0_InitClear();
+            base = 0x02035AC0;
+            v = 2;
+            sub_80196D4(0, (u8 *)base, 0xB, 2, 2, 1, 2, 0xC, 4);
+            gUnk_03000825 = 0;
             gUnk_0300086A = v;
-        }
-        break;
+            break;
+        case 2:
+            if (DialogCtx_GetField_C(0) == 4)
+            {
+                sub_803F21C((u8 *)0x02035AC0, arg0);
+                sub_80187C0(0x400);
+                gUnk_0300086A = 3;
+            }
+            break;
+        case 3:
+            if (!(sub_80187B4() & 0x400))
+                gUnk_0300086A = 4;
+            break;
+        case 4:
+            if (gUnk_03000825 <= 0x27)
+                gUnk_03000825 += 1;
+            else
+            {
+                DialogCtx_SetHead(0, 2, 2);
+                gUnk_0300086A = 5;
+            }
+            break;
+        case 5:
+            v = DialogCtx_GetField_C(0);
+            if (v == 0)
+            {
+                Disp_Bg1Off();
+                gUnk_0300086A = v;
+            }
+            break;
     }
     sub_801933C();
     return result;
@@ -439,40 +439,40 @@ u8 sub_80405A4(u8 *obj)
     result = 0;
     switch (gUnk_03000820)
     {
-    case 0:
-        gUnk_03000824 = obj[0x35];
-        gUnk_03000822 = *(u16 *)(obj + 0x2A);
-        gUnk_03000828 = obj[0xBF];
-        gUnk_03000829 = obj[0xC0];
-        gUnk_03000825 = 0;
-        if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x45 && (sub_80187B4() & 0x220) == 0)
-        {
-            u16 f2a = *(u16 *)(obj + 0x24) | 0x20;
-            *(u16 *)(obj + 0x24) = f2a;
-            gUnk_03000820 = 2;
-        }
-        else
-        {
-            gUnk_03000820 = 9;
-        }
-        break;
-    case 2:
-        if (gUnk_03000825 <= 0x13)
-        {
-            obj[0xBF] = sub_801768C(gUnk_03000828, -gUnk_03000828, 0x14, gUnk_03000825, gUnk_03000820);
-            gUnk_03000825 += 1;
-        }
-        else
-        {
-            sub_80207A4();
-            obj[0xBE] = 0xFF;
-            obj[0xAB] = 7;
-            gUnk_03000820 = 9;
-        }
-        break;
-    case 9:
-        result = 2;
-        break;
+        case 0:
+            gUnk_03000824 = obj[0x35];
+            gUnk_03000822 = *(u16 *)(obj + 0x2A);
+            gUnk_03000828 = obj[0xBF];
+            gUnk_03000829 = obj[0xC0];
+            gUnk_03000825 = 0;
+            if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x45 && (sub_80187B4() & 0x220) == 0)
+            {
+                u16 f2a = *(u16 *)(obj + 0x24) | 0x20;
+                *(u16 *)(obj + 0x24) = f2a;
+                gUnk_03000820 = 2;
+            }
+            else
+            {
+                gUnk_03000820 = 9;
+            }
+            break;
+        case 2:
+            if (gUnk_03000825 <= 0x13)
+            {
+                obj[0xBF] = sub_801768C(gUnk_03000828, -gUnk_03000828, 0x14, gUnk_03000825, gUnk_03000820);
+                gUnk_03000825 += 1;
+            }
+            else
+            {
+                sub_80207A4();
+                obj[0xBE] = 0xFF;
+                obj[0xAB] = 7;
+                gUnk_03000820 = 9;
+            }
+            break;
+        case 9:
+            result = 2;
+            break;
     }
     return result;
 }
@@ -496,24 +496,24 @@ u8 sub_8042200(u8 *obj)
     result = 0;
     switch (gUnk_03000820)
     {
-    case 0:
-        gUnk_03000824 = obj[0x35];
-        gUnk_03000822 = *(u16 *)(obj + 0x2A);
-        sub_801CA08(obj, 3, 0x1B4, 0xD, result);
-        gUnk_03000820 = 2;
-        break;
-    case 2:
-        if (*(u16 *)(obj + 0x24) & 0x1000)
-        {
-            sub_804C3A4(obj[0x35], sub_801B954((void **)(obj + 0xC)));
-            *(u16 *)(obj + 0x24) &= 0xEFFF;
-            sub_80207DC(obj, obj[0xBF], obj[0xC0], gUnk_03000822, gUnk_03000824);
-            gUnk_03000820 = 9;
-        }
-        break;
-    case 9:
-        result = 2;
-        break;
+        case 0:
+            gUnk_03000824 = obj[0x35];
+            gUnk_03000822 = *(u16 *)(obj + 0x2A);
+            sub_801CA08(obj, 3, 0x1B4, 0xD, result);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)(obj + 0x24) & 0x1000)
+            {
+                sub_804C3A4(obj[0x35], sub_801B954((void **)(obj + 0xC)));
+                *(u16 *)(obj + 0x24) &= 0xEFFF;
+                sub_80207DC(obj, obj[0xBF], obj[0xC0], gUnk_03000822, gUnk_03000824);
+                gUnk_03000820 = 9;
+            }
+            break;
+        case 9:
+            result = 2;
+            break;
     }
     return result;
 }
@@ -529,43 +529,43 @@ u8 sub_8042AB4(u8 *obj)
     result = 0;
     switch (gUnk_03000820)
     {
-    case 0:
-        gUnk_03000824 = obj[0x35];
-        gUnk_03000822 = *(u16 *)(obj + 0x2A);
-        gUnk_03000828 = obj[0xBF];
-        gUnk_03000829 = obj[0xC0];
-        gUnk_03000825 = 0;
-        if ((sub_80187B4() & 0x200) == 0)
-        {
-            u16 f2a = *(u16 *)(obj + 0x24) | 0x20;
-            *(u16 *)(obj + 0x24) = f2a;
-            gUnk_03000820 = 2;
-        }
-        else
-        {
-            gUnk_03000820 = 0x12;
-        }
-        break;
-    case 2:
-        if (gUnk_03000825 <= 0x13)
-        {
-            obj[0xBF] = sub_801768C(gUnk_03000828, -gUnk_03000828, 0x14, gUnk_03000825, gUnk_03000820);
-            gUnk_03000825 += 1;
-        }
-        else
-        {
-            gUnk_03000820 = 9;
-        }
-        break;
-    case 9:
-        sub_80207A4();
-        obj[0xAB] = 7;
-        obj[0xBE] = 0xFF;
-        result = 2;
-        break;
-    case 0x12:
-        result = 2;
-        break;
+        case 0:
+            gUnk_03000824 = obj[0x35];
+            gUnk_03000822 = *(u16 *)(obj + 0x2A);
+            gUnk_03000828 = obj[0xBF];
+            gUnk_03000829 = obj[0xC0];
+            gUnk_03000825 = 0;
+            if ((sub_80187B4() & 0x200) == 0)
+            {
+                u16 f2a = *(u16 *)(obj + 0x24) | 0x20;
+                *(u16 *)(obj + 0x24) = f2a;
+                gUnk_03000820 = 2;
+            }
+            else
+            {
+                gUnk_03000820 = 0x12;
+            }
+            break;
+        case 2:
+            if (gUnk_03000825 <= 0x13)
+            {
+                obj[0xBF] = sub_801768C(gUnk_03000828, -gUnk_03000828, 0x14, gUnk_03000825, gUnk_03000820);
+                gUnk_03000825 += 1;
+            }
+            else
+            {
+                gUnk_03000820 = 9;
+            }
+            break;
+        case 9:
+            sub_80207A4();
+            obj[0xAB] = 7;
+            obj[0xBE] = 0xFF;
+            result = 2;
+            break;
+        case 0x12:
+            result = 2;
+            break;
     }
     return result;
 }

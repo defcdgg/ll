@@ -104,13 +104,14 @@ void sub_801B760(u16 arg0)
     {
         return;
     }
-    gObjFlagsA[arg0/8] |= (1 << (arg0 % 8));
+    gObjFlagsA[arg0 / 8] |= (1 << (arg0 % 8));
 }
 
 // @ 0x0801B790
 u8 sub_801B790(u16 arg0)
 {
-    if ((gObjFlagsA[arg0 / 8] >> (arg0 % 8 )) & 1) return 1;
+    if ((gObjFlagsA[arg0 / 8] >> (arg0 % 8)) & 1)
+        return 1;
     return 0;
 }
 // @ 0x0801B7B8
@@ -143,8 +144,7 @@ typedef struct Unk_801B81C
 } Unk_801B81C;
 
 // @ 0x0801B81C
-void sub_801B81C(u8 *arg0, u8 arg1, u8 arg2, u16 arg3, u8 arg4,
-                 u32 arg5, u32 arg6, u16 arg7, u16 arg8, u16 arg9)
+void sub_801B81C(u8 *arg0, u8 arg1, u8 arg2, u16 arg3, u8 arg4, u32 arg5, u32 arg6, u16 arg7, u16 arg8, u16 arg9)
 {
     Unk_801B81C *obj = (Unk_801B81C *)arg0;
     u16 value;
@@ -173,13 +173,13 @@ u8 sub_801B878(u8 *arg0, u8 arg1, u8 *arg2)
     kind = *(u16 *)(arg0 + 0x18) & 0xF;
     switch (kind)
     {
-    case 6:
-    case 7:
-    case 8:
-        sub_801AD0C(arg0);
-        return arg1;
-    default:
-        return sub_801A884(arg0, arg1, arg2);
+        case 6:
+        case 7:
+        case 8:
+            sub_801AD0C(arg0);
+            return arg1;
+        default:
+            return sub_801A884(arg0, arg1, arg2);
     }
 }
 // @ 0x0801B8AC
@@ -190,14 +190,14 @@ u8 sub_801B8AC(u8 *arg0, u8 arg1)
     kind = *(u16 *)(arg0 + 0x18) & 0xF;
     switch (kind)
     {
-    case 6:
-        sub_801B570(arg0);
-        return arg1;
-    case 7:
-    case 8:
-        return arg1;
-    default:
-        return sub_801B0B8(arg0, arg1);
+        case 6:
+            sub_801B570(arg0);
+            return arg1;
+        case 7:
+        case 8:
+            return arg1;
+        default:
+            return sub_801B0B8(arg0, arg1);
     }
 }
 // @ 0x0801B8E8
@@ -297,58 +297,112 @@ void sub_801D12C(u8 *obj, u8 state)
     {
         switch (state)
         {
-        case 0:
-        case 1:
-        case 2:
-            value = obj[0xAB];
-            switch (value)
-            {
             case 0:
-                if (*(u16 *)(obj + 0x6C) == *(u16 *)(obj + 0x6E))
-                    state = 3;
-                break;
             case 1:
             case 2:
-            case 3:
+                value = obj[0xAB];
+                switch (value)
+                {
+                    case 0:
+                        if (*(u16 *)(obj + 0x6C) == *(u16 *)(obj + 0x6E))
+                            state = 3;
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                        state = 1;
+                        break;
+                    case 8:
+                        state = 2;
+                        break;
+                }
+                break;
             case 4:
+                break;
             case 5:
-            case 6:
-            case 7:
-                state = 1;
+                value = obj[0xAB];
+                switch (value)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                        state = 1;
+                        break;
+                    case 8:
+                        state = 2;
+                        break;
+                }
                 break;
-            case 8:
-                state = 2;
-                break;
-            }
-            break;
-        case 4:
-            break;
-        case 5:
-            value = obj[0xAB];
-            switch (value)
-            {
-            case 0:
-                break;
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-                state = 1;
-                break;
-            case 8:
-                state = 2;
-                break;
-            }
-            break;
         }
         obj[0xA2] = state;
     }
 }
 // @ 0x0801D19C
-INCLUDE_ASM("asm/nonmatchings", sub_801D19C);
+u16 sub_801D19C(u8 *obj, u8 kind)
+{
+    u8 v;
+    int ab;
+
+    if (obj[0xBE] <= 0xA)
+    {
+        v = kind + 3;
+        switch (v)
+        {
+            case 0:
+            case 1:
+            case 2:
+                ab = obj[0xAB];
+                switch (ab)
+                {
+                    case 0:
+                        if (*(u16 *)(obj + 0x6C) == *(u16 *)(obj + 0x6E))
+                            v = 6;
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                        v = 4;
+                        break;
+                    case 8:
+                        v = 5;
+                        break;
+                }
+                break;
+            case 4:
+                break;
+            case 5:
+                ab = obj[0xAB];
+                switch (ab)
+                {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                        v = 1;
+                        break;
+                }
+                break;
+        }
+        return v;
+    }
+}
 // @ 0x0801D214
 INCLUDE_ASM("asm/nonmatchings", sub_801D214);
 // @ 0x0801D378
@@ -371,7 +425,8 @@ INCLUDE_ASM("asm/nonmatchings", sub_801DC20);
 INCLUDE_ASM("asm/nonmatchings", sub_801DD04);
 // @ 0x0801DDB0
 INCLUDE_ASM("asm/nonmatchings", sub_801DDB0);
-typedef struct Unk_8021064 {
+typedef struct Unk_8021064
+{
     u16 field_0;
     u8 field_2;
     u8 field_3;
@@ -466,8 +521,51 @@ INCLUDE_ASM("asm/nonmatchings", sub_801F884);
 INCLUDE_ASM("asm/nonmatchings", sub_801FA10);
 // @ 0x0801FAB8
 INCLUDE_ASM("asm/nonmatchings", sub_801FAB8);
+// 场景对象 (0xC8 字节, 池 0x02037028); 与 MOD-05 共用布局 (见 src/code_8020D50.c)
+typedef struct Unk_8020F4C
+{
+    u8 pad24[0x24];
+    u16 field_24;
+    u8 pad26[0x2A - 0x26];
+    u16 field_2A;
+    u8 pad2B[0x35 - 0x2C];
+    u8 field_35;
+    u8 field_36;
+    u8 field_37;
+    u8 field_38;
+    u8 pad39[0xB0 - 0x39];
+    u16 field_B0;
+    u8 padB1[0xBB - 0xB2];
+    u8 field_BB;
+    u8 field_BC;
+    u8 padBD[0xBE - 0xBD];
+    u8 field_BE;
+    u8 field_BF;
+    u8 field_C0;
+} Unk_8020F4C;
+
 // @ 0x0801FEBC
-INCLUDE_ASM("asm/nonmatchings", sub_801FEBC);
+void sub_801FEBC(void *varg, u16 arg1, u8 arg2)
+{
+    Unk_8020F4C *arg0 = (Unk_8020F4C *)varg;
+    u16 *p = &arg0->field_B0;
+    s32 dh;
+
+    arg0->field_B0 = arg0->field_B0 & 0xFF0F;
+    arg0->field_B0 = 0x20 | arg0->field_B0;
+    gUnk_03000618 = arg1;
+    gUnk_0300061A = 0;
+    // 对象滑动参数组: field_37/38 即本地滑动区间, 0xB4/0xF 为活动上限;
+    // p 递减后即 field_37 指针, 与 0xB0 指针共用 r4 (subs 复用)
+    gUnk_0300061C = *(u8 *)(p = (u16 *)((u8 *)p - 0x79));
+    gUnk_0300061E = *(u8 *)((u8 *)arg0 + 0x38);
+    gUnk_03000620 = (dh = 0xB4 - *(u8 *)p);
+    gUnk_03000622 = 0xF - *(u8 *)((u8 *)arg0 + 0x38);
+    gUnk_03000624 = arg2;
+    if (dh > 0)
+        arg0->field_24 |= 0x20;
+    sub_801FA10(arg0, 1);
+}
 // @ 0x0801FF40
 INCLUDE_ASM("asm/nonmatchings", sub_801FF40);
 // @ 0x080200E8
@@ -560,20 +658,21 @@ void sub_802093C(u8 *arg0)
         val = *(s8 *)(arg0 + 0xBC);
         switch (val)
         {
-        case 0:
-            addr = ptr + 0x23;
-            break;
-        case 1:
-            addr = ptr + 0x24;
-            break;
-        default:
-            return;
+            case 0:
+                addr = ptr + 0x23;
+                break;
+            case 1:
+                addr = ptr + 0x24;
+                break;
+            default:
+                return;
         }
         new_var = *addr;
         arg0[0xC3] = new_var;
     }
 }
-typedef struct Unk_08393B28 {
+typedef struct Unk_08393B28
+{
     u32 field_0;
     u32 field_4;
     u16 field_8;
@@ -588,8 +687,7 @@ void sub_8020974(u8 *arg0, u16 arg1, u16 arg2, u8 arg3, u16 arg4)
 {
     Unk_08393B28 *entry = &gUnk_08393B28[arg1];
 
-    sub_801B81C(arg0, arg0[0x2B], arg0[0x2C], arg2, arg3,
-                entry->field_0, entry->field_4, entry->field_8, entry->field_A, arg4);
+    sub_801B81C(arg0, arg0[0x2B], arg0[0x2C], arg2, arg3, entry->field_0, entry->field_4, entry->field_8, entry->field_A, arg4);
 }
 
 // @ 0x080209C8
@@ -611,7 +709,8 @@ void sub_80209C8(u8 *arg0)
     }
 }
 
-typedef struct {
+typedef struct
+{
     u8 pad0[0x88];
     u16 unk_88;
     u8 pad1[0xB0 - 0x88 - 2];
@@ -621,13 +720,16 @@ typedef struct {
 } MyStruct;
 
 // @ 0x080209EC
-void sub_80209EC(MyStruct *ptr) {
-    if (ptr->unk_BE <= 6) {
+void sub_80209EC(MyStruct *ptr)
+{
+    if (ptr->unk_BE <= 6)
+    {
         ptr->unk_88 = 0;
         ptr->unk_B0 |= 2;
     }
 }
-typedef struct Unk_0839B2A4 {
+typedef struct Unk_0839B2A4
+{
     u32 field_0;
     u32 field_4;
     u16 field_8;
@@ -638,19 +740,12 @@ typedef struct Unk_0839B2A4 {
 extern Unk_0839B2A4 gUnk_0839B2A4[];
 
 // @ 0x08020A0C
-void sub_8020A0C(void *arg0, u8 arg1) {
+void sub_8020A0C(void *arg0, u8 arg1)
+{
     u16 newval;
     Unk_0839B2A4 *tbl = gUnk_0839B2A4;
-    sub_801B81C((u8 *)arg0 + 0x3C,
-                *(u8 *)((u8 *)arg0 + 0xBF),
-                *(u8 *)((u8 *)arg0 + 0xC0),
-                0xDA << 1,
-                0xE,
-                tbl[0].field_0,
-                tbl[0].field_4 + (arg1 << 5),
-                (u16)(0x541 + tbl[0].field_8),
-                tbl[0].field_A,
-                2);
+    sub_801B81C((u8 *)arg0 + 0x3C, *(u8 *)((u8 *)arg0 + 0xBF), *(u8 *)((u8 *)arg0 + 0xC0), 0xDA << 1, 0xE, tbl[0].field_0,
+                tbl[0].field_4 + (arg1 << 5), (u16)(0x541 + tbl[0].field_8), tbl[0].field_A, 2);
     *(u8 *)((u8 *)arg0 + 0x66) = 3;
     newval = 0x2000 | *(u16 *)((u8 *)arg0 + 0xB0);
     *(u16 *)((u8 *)arg0 + 0xB0) = newval;
@@ -686,34 +781,40 @@ u8 sub_8020AB0(void)
     return ret != 0;
 }
 
-typedef struct Unk_8020AE4_node {
+typedef struct Unk_8020AE4_node
+{
     u8 field_0;
     u8 pad_1[7];
     struct Unk_8020AE4_node *field_8;
     u32 field_C;
 } Unk_8020AE4_node;
 
-typedef struct Unk_03000690 {
+typedef struct Unk_03000690
+{
     u32 field_0;
     u32 field_4;
     Unk_8020AE4_node *field_8;
 } Unk_03000690;
 
 // @ 0x08020AE4
-void sub_8020AE4(void) {
+void sub_8020AE4(void)
+{
     Unk_8020AE4_node *node = ((Unk_03000690 *)0x03000690)->field_8;
-    while (node->field_0 <= 0xFE) {
+    while (node->field_0 <= 0xFE)
+    {
         (*(u16 *)(node->field_C + 0xB2))++;
         node = node->field_8;
     }
 }
 // @ 0x08020B04
-void sub_8020B04(u8 *arg0) {
+void sub_8020B04(u8 *arg0)
+{
     u8 ids[12];
     u8 i;
     u32 base = GetObjPool();
     u8 count = sub_80462E4(arg0, ids, 0x7F);
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; i++)
+    {
         sub_801D568(base + ids[i] * 0xC8);
     }
 }
@@ -751,26 +852,33 @@ void sub_8020B54(void)
     gUnk_03000714 = 0;
     gUnk_03000715 = 0;
     /* HACK (规则116): do-while 屏障打破 local_alloc 平手 tiebreak, 使 gUnk_03000716 的地址落到 r4 (目标轮换) */
-    do { gUnk_03000716 = 0; } while (0);
+    do
+    {
+        gUnk_03000716 = 0;
+    } while (0);
 }
 
 // @ 0x08020B90
-void sub_8020B90(u8 *arg0) {
+void sub_8020B90(u8 *arg0)
+{
     gUnk_030006F8[gUnk_03000714] = arg0;
     gUnk_03000714++;
-    if (arg0[0xBE] > 0xB) {
+    if (arg0[0xBE] > 0xB)
+    {
         gUnk_03000718 = (u32)arg0;
     }
 }
 
 // @ 0x08020BC0
-u8 sub_8020BC0(u8 *arg0) {
+u8 sub_8020BC0(u8 *arg0)
+{
     s32 diff;
     u16 *ptr;
 
     ptr = (u16 *)(arg0 + 0x6C);
     diff = *(s16 *)(arg0 + 0x6C) - *(s16 *)(arg0 + 0xB2);
-    if (diff <= 0) {
+    if (diff <= 0)
+    {
         *ptr = 0;
         return 1;
     }
@@ -779,14 +887,17 @@ u8 sub_8020BC0(u8 *arg0) {
 }
 
 // @ 0x08020BF0
-u8 sub_8020BF0(u8 *arg0) {
+u8 sub_8020BF0(u8 *arg0)
+{
     u8 value;
 
     value = gUnk_030006F8[0][0xBE];
-    if ((u8)(value - 0xB) <= 0x65) {
+    if ((u8)(value - 0xB) <= 0x65)
+    {
         return sub_801E848();
     }
-    if ((u8)(value - 0x71) <= 0x8D) {
+    if ((u8)(value - 0x71) <= 0x8D)
+    {
         return sub_8020C2C();
     }
 }
@@ -794,18 +905,23 @@ typedef u8 (*UnkFunc20C2C)(u8 *);
 extern UnkFunc20C2C gUnk_0839CE7C[];
 
 // @ 0x08020C2C
-u8 sub_8020C2C(void) {
+u8 sub_8020C2C(void)
+{
     return gUnk_0839CE7C[*(u8 *)(gUnk_030006F8[0] + 0xBE) - 0x71](gUnk_030006F8[0]);
 }
 
 // @ 0x08020C58
-void sub_8020C58(u8 *entries, u32 arg1) {
+void sub_8020C58(u8 *entries, u32 arg1)
+{
     u8 count = *(u8 *)gUnk_0300062C;
     u8 i;
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; i++)
+    {
         u8 *entry = (u8 *)(i * 0xC8 + (u32)entries);
-        if (*(u8 *)(entry + 0xBE) == 0xFF) continue;
-        if (*(u16 *)(entry + 0xB0) == 8 || *(u16 *)(entry + 0xB0) == 5) continue;
+        if (*(u8 *)(entry + 0xBE) == 0xFF)
+            continue;
+        if (*(u16 *)(entry + 0xB0) == 8 || *(u16 *)(entry + 0xB0) == 5)
+            continue;
         if (!(sub_80187B4() & 0x20))
             sub_804CEE0(entry, arg1);
         else
@@ -814,10 +930,10 @@ void sub_8020C58(u8 *entries, u32 arg1) {
 }
 
 // @ 0x08020CC4
-void sub_8020CC4(void *arg0, u8 arg1, u8 arg2, u16 arg3, u8 arg4, u16 arg5, u16 arg6) {
+void sub_8020CC4(void *arg0, u8 arg1, u8 arg2, u16 arg3, u8 arg4, u16 arg5, u16 arg6)
+{
     u16 newval;
-    sub_801B81C((u8 *)arg0 + 0x3C, arg1, arg2, arg3, arg4,
-                gUnk_08393B28[arg5].field_0, gUnk_08393B28[arg5].field_4,
+    sub_801B81C((u8 *)arg0 + 0x3C, arg1, arg2, arg3, arg4, gUnk_08393B28[arg5].field_0, gUnk_08393B28[arg5].field_4,
                 gUnk_08393B28[arg5].field_8, gUnk_08393B28[arg5].field_A, arg6);
     newval = 0x2000 | *(u16 *)((u8 *)arg0 + 0xB0);
     *(u16 *)((u8 *)arg0 + 0xB0) = newval;

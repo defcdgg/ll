@@ -899,6 +899,41 @@
         写成 `obj[0xBE] != 0 ? 0x371 : 0x362` 会得 `base 0x362; beq skip; adds #0xF`, 分支极性+算术全反。
         判定: 目标是 base=大值+subs → 三目真值分支写大值; 目标是 base=小值+adds → 真值分支写小值。
 
+ 126. **单侧区间守卫写成 `if (x < lo) return` 被 agbcc 常量归约成 `cmp #0; ble` (丢 #lo); 要得到 `cmp #lo; blt` 须写成"行内单侧 switch" (case 只列区间内值)**（案例 `sub_801D19C`, 2026-09-03）。
+      目标末尾: `cmp r0, #7; bgt ret; cmp r0, #1; blt ret; movs r2, #1` —— 把 1..7 视为"改 v=1", 0 与 8+ 都回 v。
+      写成 `if (ab > 7) break; if (ab < 1) break; v = 1;` 时, agbcc 把 `ab < 1` 归约成 `ab <= 0` →
+      `cmp r0, #0; ble` (差 2 字节); 改成嵌套 `switch (ab) { case 1..7: v = 1; }` 后才得 `cmp #7; bgt; cmp #1; blt`, 逐字节命中。
+      连带的两个前置: ① 外层 if 的 >0xA 路径**不写 return** (rule 54: 无 return 锁 r0=obj, 临时量上移 r1/r2) —
+         补 `return (u32)obj` 会多 r0 重载/回退; ② `ab` 声明为 `int` (有符号) 才会出 `bgt/blt`, `u8` 会出 `bhi/beq`。
+       关联: 规则 54 (无 return 锁 r0)、规则 11 (结构体成员访问)、规则 16 (switch 分发形状)、规则 22。
+
+  127. **"结构体成员两段 RMW + 读取内嵌赋值 + 链式赋值"三件套, 同时买下 zero 提前物化、subs 复用调度、diff 落 r1 三个 home**（案例 `sub_801FEBC`, 2026-09-03, 挂起→0）。
+       目标 (0xB0 位段改 + 滑动参数组 0x03000618-624 写入 + 条件位 + sub_801FA10 收尾):
+       ① `movs r3,#0` 出现在 `ands r0,r3` 之后(死槽)、`orrs r0,r6` 之前 —— 这是 `gUnk_...1A = 0`
+         的 0 提前物化进 value 死寄存器 r3 (后用 `strh r3,[0x0300061A]`)。要复现必须:
+         - **两条语句拆 RMW** (规则 13): `arg0->field_B0 = arg0->field_B0 & 0xFF0F;`
+           `arg0->field_B0 = 0x20 | arg0->field_B0;`
+         - **结构体成员访问** (规则 11, `mov ip,r0` 缓存 + 每成员 fresh 寻址);
+         单条 `x=(x&M)|C` 或裸指针 cast 均不产生空隙。
+       ② `subs r4,#0x79` (B0 指针复用出 0x37) 若写成独立语句 `p -= 0x79;` 会被调度到
+         下一存储地址 `ldr r1,=...` **之前** (差 8B); 把递减**内嵌进读取赋值表达式**
+         `g = *(u8 *)(p = (u16 *)((u8 *)p - 0x79));` 后 subs 才落到 `ldr` 之后紧贴 `ldrb` (0 差)。
+         判定: 目标 `ldr r1,=addr; subs rX,#K; ldrb; strh` 序列 + 指针递减被复用时, 用赋值表达式内嵌。
+       ③ diff 值 (0xB4 - byte) 要落 r1 且地址先置: 写成 `gUnk_03000620 = (dh = 0xB4 - *p);`
+         (链式赋值, 规则 110 同思路) 才让 qty 创建序 diff→地址, home 归位 r1; 拆两行则 diff 落 r3、
+         地址加载后置 (差 8B)。判定: 目标 `movs r1,#K; subs r1,r1,r0; strh r1,[r3]` + 尾部 `cmp r1,#0`。
+       ④ 常数 0x20 两处使用 (B0 改 + 条件位) → agbcc 保活 r6 跨全函数, 别用变量名干扰它。
+       附带: 参数用 `void *varg` + 首行 cast 局部 (规则 14), 与 code_0.h K&R/void* 声明不冲突。
+        关联: 规则 13 (两段 RMW)、规则 11 (结构体成员)、规则 110 (链式赋值=地址伪寄存器压缩)、规则 117 (global-alloc home)。
+128. **独立载入被 GCC2 提前填进 load-use 延迟槽时, 把依赖计算拆成"宽类型独立语句"把独立载入推回原位**（案例 `sub_80498E0`, 2026-09-03, 34B地板→0）。
+       目标 `ldrb r0,[r0]`(byte) → `lsls r0,r0,#3`(byte*8) → `ldrb r1,[r3]`(frame): frame 是独立载入,
+       GCC2 总把它提前填进 byte 载入的延迟槽 (得 `ldrb;ldrb;lsls`, 差 4B)。穷举 frame 局部/内联/volatile/
+       独立变量名全撞 4B 地板。解法 = 把 `byte*8` 拆成**独立语句** `u16 ofs = byte * 8;` 再 `tile=tbl[ofs+frame]`:
+       独立语句让 shift 紧贴 byte 载入, frame 读取(下一语句)落到 shift 之后 → 逐指令一致。
+       **必须 u16/int**: 若 `u8 ofs = byte*8` 会多出 u8 截断 (`lsls#27;lsrs#24` 两条, 反增 8B)。
+       判定: 目标"载入→移位→独立载入→加"序列, 而 C 得"载入→独立载入→移位→加"时, 移位拆宽类型独立语句。
+       关联: 规则 33 (死 store 改 home)、规则 25 (do-while 定槽)、规则 116 (屏障破 tiebreak)。
+
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 agbcc (egcs 1.1 系) 自带 RTL 转储开关, 对定位寄存器 home 问题极其有用:

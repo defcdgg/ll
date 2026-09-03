@@ -66,7 +66,7 @@ u32 VerifySram(const u8 *src, u8 *dest, u32 size)
         *d++ = *s++;
         --size_;
     }
-    return ((u32(*)(const u8 *, u8 *, u32))verifySramFast_Work + 1)(src, dest, size);
+    return ((u32 (*)(const u8 *, u8 *, u32))verifySramFast_Work + 1)(src, dest, size);
 }
 
 // @ 0x08055B0C

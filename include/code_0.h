@@ -87,23 +87,23 @@ void Queue34C0_Clear();
 void RenderQueue_Clear();
 u8 Sprite_AllocNode();
 SpriteNode *Sprite_InitChainNode(SpriteNode *, u8, u16, u16, u16);
-void LoadSpriteSheetGfx(u8 slot, u16 gfxId);   // LZ77 解压缩精灵图块 → OBJ 图块槽 slot
-void LoadSpriteSheetPal(u8 slot, u16 palId);   // DMA3 装 16 色调色板 → OBJ PLTT 槽 slot
-void LoadArrowObjTiles(s8);   // 按 bit7 选 2/4 块箭头图块, DMA3 装入 OBJ 图块槽 146
+void LoadSpriteSheetGfx(u8 slot, u16 gfxId); // LZ77 解压缩精灵图块 → OBJ 图块槽 slot
+void LoadSpriteSheetPal(u8 slot, u16 palId); // DMA3 装 16 色调色板 → OBJ PLTT 槽 slot
+void LoadArrowObjTiles(s8); // 按 bit7 选 2/4 块箭头图块, DMA3 装入 OBJ 图块槽 146
 void Chara_SetGfxPal(u8, u8, u8);
 void Chara_FreeSprite(u8);
 void Chara_SetCmdPtr(u8, u8 *);
 void Chara_StartMoving(u8);
 u8 Chara_AnyMoving();
 void Party_SetFollowMode();
-void SetSlotGfxId(u8 slot, u16 gfxId);   // 记 gSlotGfxId[slot]=gfxId 并置 PENDING_SPRITE_GFX
-void SetSlotPalId(u8 slot, u16 palId);   // 记 gSlotPalId[slot]=palId 并置 PENDING_SPRITE_PAL
-u8 GetPendingSpriteLoad();   // 返回 gPendingSpriteLoad 位图
+void SetSlotGfxId(u8 slot, u16 gfxId); // 记 gSlotGfxId[slot]=gfxId 并置 PENDING_SPRITE_GFX
+void SetSlotPalId(u8 slot, u16 palId); // 记 gSlotPalId[slot]=palId 并置 PENDING_SPRITE_PAL
+u8 GetPendingSpriteLoad(); // 返回 gPendingSpriteLoad 位图
 void Chara_SetPosDir(u8, s32, s32, u8);
 u16 Chara_GetDrawZ(Actor *);
 s16 Chara_GetDrawX(Actor *);
 void Sprite_FreeChain(struct SpriteNode *);
-SpriteNode* Sprite_WriteOam(u16*, SpriteNode*);
+SpriteNode *Sprite_WriteOam(u16 *, SpriteNode *);
 void Chara_StartScriptAnim(u8, u8);
 s32 Chara_AnimWaitDone(u8);
 void sub_8005020();
@@ -115,7 +115,7 @@ void ScreenFade_Apply();
 void ScreenFade_Update();
 void sub_80052F8();
 void sub_80053B4(u16, u16);
-void sub_80055E8(u16 *, u16 *, u8, u8);  // 按方向码 1..8 (gWalkDirVectors) 步进相机目标坐标, 含瓦片碰撞+滑动+实体阻挡检查
+void sub_80055E8(u16 *, u16 *, u8, u8); // 按方向码 1..8 (gWalkDirVectors) 步进相机目标坐标, 含瓦片碰撞+滑动+实体阻挡检查
 #define MovePlayer sub_80055E8
 u16 *MapTile_At(s16, s16);
 u16 MapTile_CollisionBits(u16 *, u16, u16);
@@ -128,15 +128,17 @@ void MapScene_InitSprites(u8);
 void MapScene_LoadEventAnimations(u8);
 u8 *AnimSlot_Parse(u16, u8 *);
 u8 *AnimSlot_ParseLoop(u16, u8 *);
-void sub_8007A1C(s16);   // UpdateSpriteAnim: 推进精灵动画槽帧计数, 并把当前帧图块拷进 0x02006000 图块缓存
+void sub_8007A1C(s16); // UpdateSpriteAnim: 推进精灵动画槽帧计数, 并把当前帧图块拷进 0x02006000 图块缓存
 #define UpdateSpriteAnim sub_8007A1C
-s32 sub_8007ADC(s16, s16);  // 算 (x,y) 16x16 足迹覆盖的至多 4 个瓦片坐标, 在 gMapZoneHeader 的 cells 表查区域; 命中写 gMapZoneType/gMapZoneEntryIdx 返回 1
+s32 sub_8007ADC(s16, s16); // 算 (x,y) 16x16 足迹覆盖的至多 4 个瓦片坐标, 在 gMapZoneHeader 的 cells 表查区域; 命中写
+                           // gMapZoneType/gMapZoneEntryIdx 返回 1
 #define MapZone_FindAt sub_8007ADC
-s32 sub_8007BD0(void);  // 按 gMapZoneType 0..4 分发: 0=换图(装载点+state3) 1=图内传送(state4) 2=state8 3=首次进入触发脚本 4=朝向触发脚本
+s32 sub_8007BD0(
+    void); // 按 gMapZoneType 0..4 分发: 0=换图(装载点+state3) 1=图内传送(state4) 2=state8 3=首次进入触发脚本 4=朝向触发脚本
 #define MapZone_Trigger sub_8007BD0
 void MapBg_LoadInterior(u8);
 void Logo_LoadAssets(u8);
-u32 ChoiceMenu_BuildList();  // 返回类型非 void 但体内无 return —— 原 ROM 即如此(占住 r0 使寄存器整体上移)
+u32 ChoiceMenu_BuildList(); // 返回类型非 void 但体内无 return —— 原 ROM 即如此(占住 r0 使寄存器整体上移)
 void BattleIntro_Cursor();
 void ChoiceMenu_HandleInput(u16);
 void DialogPortrait_Set(u8 portraitId, u8 position);
@@ -148,20 +150,20 @@ void Win0H_WaveDmaByVCount();
 /* 逐扫描线水波效果族 (源数据 = gWaveSineTable @0x080576D0, 见 data_805769C.h) */
 void HBlankWave_BuildTables(u16 mode);
 void HBlankWave_ApplyLineScroll(u16 scanline);
-u32 LZ_UncompressChunk(void);   // @0x08000D5C 分块 LZ 流式解压 gLzContext, 返回 0 = 全部完成
+u32 LZ_UncompressChunk(void); // @0x08000D5C 分块 LZ 流式解压 gLzContext, 返回 0 = 全部完成
 void ScreenFx_SetMode(u16);
 void AnimSlots_Release();
 void AnimSlots_StepAll();
 void BgTiles_LoadUiSet(u8);
 void BgScroll_LoadFromTable(u16);
 void PlayerSheets_Load();
-void sub_8008BA4(u8, u8);   // LoadSpriteAnimSet: 把 gUnk_087EA1A0[setId] 一组精灵动画模型装入 gUnk_030046A0[startSlot..]
+void sub_8008BA4(u8, u8); // LoadSpriteAnimSet: 把 gUnk_087EA1A0[setId] 一组精灵动画模型装入 gUnk_030046A0[startSlot..]
 #define LoadSpriteAnimSet sub_8008BA4
 void AnimSlot_Pause(u8);
 void AnimSlot_Resume(u8);
 u8 AnimSlot_Active(u8);
-void ReloadSpriteSheet(u8 slot);   // 按 slot 重载单个精灵表(图块+调色板)
-void ReloadAllSpriteSheets();   // 循环 slot 0..11 全部重载
+void ReloadSpriteSheet(u8 slot); // 按 slot 重载单个精灵表(图块+调色板)
+void ReloadAllSpriteSheets(); // 循环 slot 0..11 全部重载
 void ChoiceMenu_ResolveDest(u8);
 void DialogPortrait_FlushPending(void);
 u16 Camera_GetDrawOffset();
@@ -173,7 +175,7 @@ void MapBg_FlushPending();
 void ChestObjects_LoadForMap(u8);
 void ChestObject_BuildSprite(u8);
 void ChestObject_Open(u8);
-void LoadDigitFontObjTiles();   // 10 个数字字形 → OBJ 图块槽 150, + 2 组 OBJ 调色板
+void LoadDigitFontObjTiles(); // 10 个数字字形 → OBJ 图块槽 150, + 2 组 OBJ 调色板
 void ChestFlags_ClearAll();
 void ChestFlags_Toggle(u8);
 u8 ChestFlags_Test(u8);
@@ -194,7 +196,7 @@ u8 *MenuEnt_ParseDesc(u8, u8 *);
 void StaticObjGfx_LoadPair(u8);
 void StaticObjs_Spawn(u8);
 void StaticObjs_StepAll(void);
-void StaticObj_BuildChain(u8, u8*);
+void StaticObj_BuildChain(u8, u8 *);
 void StaticObjs_Reset();
 u16 sub_8009F70();
 void Stats_BuildSkillList(u8 *, u8, u8);
@@ -213,9 +215,9 @@ void sub_800A970(void *);
 void sub_800A978(void *);
 void FullHealParty();
 void EquipItem(u8, u8, u8);
-void sub_800AA60(u8, u8);   // AddInventoryItem: add item to inventory (cap 99)
-void sub_800AA84(u8, u8);   // RemoveInventoryItem: remove item from inventory (floor 0)
-#define AddInventoryItem sub_800AA60
+void sub_800AA60(u8, u8); // AddInventoryItem: add item to inventory (cap 99)
+void sub_800AA84(u8, u8); // RemoveInventoryItem: remove item from inventory (floor 0)
+#define AddInventoryItem    sub_800AA60
 #define RemoveInventoryItem sub_800AA84
 void Silver_Add(s32);
 void Silver_Sub(s32);
@@ -245,7 +247,7 @@ void sub_800E668(u8);
 void UiSprite_BeginSlide();
 void UiSprites_Update();
 void sub_800E8F8();
-void sub_800EAE4(u16*, u16, u8);
+void sub_800EAE4(u16 *, u16, u8);
 void MenuUi_SpawnAuxSprites(u8);
 void sub_800EC54();
 void sub_800F128();
@@ -351,7 +353,7 @@ void sub_8016C44();
 void sub_8016C88();
 void sub_8016D24();
 void Sio_BuildPacket(u8 *);
-u8 sub_8016E80(u8 *);    /** 收包; 确实返回 gSioState[3], 调用方忽略 (删 return 会少两条指令) */
+u8 sub_8016E80(u8 *); /** 收包; 确实返回 gSioState[3], 调用方忽略 (删 return 会少两条指令) */
 void sub_8016F30();
 void sub_8016FC0();
 void Sio_SetReady();
@@ -415,14 +417,14 @@ u16 BattleUiFlag_Get();
 void BattleUiFlag_Reset(u16);
 void Disp_ObjOff();
 void Disp_ObjOn();
-void sub_8019E60();   // BlankTilemap: 清空 VRAM 图块 0x2C0 并把 1024 项 tilemap 全填成该空白图块
+void sub_8019E60(); // BlankTilemap: 清空 VRAM 图块 0x2C0 并把 1024 项 tilemap 全填成该空白图块
 #define BlankTilemap sub_8019E60
 void Disp_Bg1Off();
 void DialogCtx_SetHead(u8, u8, u8);
 void sub_8019F08(u16 *, u16, u8, u8, u8, u8);
 void sub_8019F78();
 u8 DialogCtx_GetField_C(u8);
-void BgMap_PalFillRect();  // K&R: ROM 调用点无截断 (被调入口截断由定义侧提供), 全原型会给 caller 加 lsls/lsrs 破坏已匹配的 sub_802576C
+void BgMap_PalFillRect(); // K&R: ROM 调用点无截断 (被调入口截断由定义侧提供), 全原型会给 caller 加 lsls/lsrs 破坏已匹配的 sub_802576C
 void DialogCtx_Flush();
 void FlashFlag_Clear();
 u16 FlashFlag_Get();
@@ -494,7 +496,7 @@ void sub_801CBA4();
 void sub_801CE80();
 void sub_801CF90();
 void sub_801D12C(u8 *, u8);
-u16 sub_801D19C();
+u16 sub_801D19C(u8 *, u8);
 void sub_801D214();
 void sub_801D378();
 void sub_801D468();
@@ -506,7 +508,7 @@ void sub_801DB3C();
 void sub_801DC20();
 void sub_801DD04();
 void sub_801DDB0();
-void sub_801DE44();   // ResetSceneObjects: 重置 3 个标志 + 7 项表 + sub_804C2FC(表0), 再对对象列表逐项调 sub_801D710
+void sub_801DE44(); // ResetSceneObjects: 重置 3 个标志 + 7 项表 + sub_804C2FC(表0), 再对对象列表逐项调 sub_801D710
 #define ResetSceneObjects sub_801DE44
 void sub_801DEDC();
 void sub_801DF90();
@@ -526,7 +528,7 @@ void sub_801F76C();
 void sub_801F884();
 void sub_801FA10();
 void sub_801FAB8();
-void sub_801FEBC();
+void sub_801FEBC(void *, u16, u8);
 void sub_801FF40();
 void sub_80200E8();
 void sub_8020228();
@@ -540,7 +542,7 @@ void sub_8020840(u8 *obj, u8 bf, u8 c0, u16 f2a, u8 f35);
 void sub_80208A4(u8 *);
 void sub_8020914(u8 *);
 void sub_802093C(u8 *);
-void sub_8020974(u8 *, u16, u16, u8, u16);   // 入口截断定类: r1/r2/栈参 u16, r3 u8, r0 = 对象指针
+void sub_8020974(u8 *, u16, u16, u8, u16); // 入口截断定类: r1/r2/栈参 u16, r3 u8, r0 = 对象指针
 void sub_80209C8(u8 *);
 void sub_80209EC();
 void sub_8020A0C(void *, u8);
@@ -571,7 +573,7 @@ void sub_8020EEC(u8);
 void sub_8020F08();
 void sub_8020F4C();
 void sub_8020FB8(void *, u16, u16, u16, u8);
-void sub_802103C(u8 *, u8 , u16 );
+void sub_802103C(u8 *, u8, u16);
 void sub_8021064(u8);
 void sub_80210C0(void *, u8);
 void sub_8021130();
@@ -855,7 +857,7 @@ void sub_8048FB8();
 void sub_80492C0();
 void sub_80494F0();
 void sub_80497B0();
-void sub_80498E0();
+u32 sub_80498E0();
 void sub_8049958();
 void sub_8049AD8();
 void sub_8049B70();
@@ -914,18 +916,18 @@ void sub_804C184();
 void *sub_804C194(u8);
 void sub_804C1B4(u8, u8, u8);
 void sub_804C1E4(u8, u8, u8);
-u8 sub_804C214(u8,u8);
+u8 sub_804C214(u8, u8);
 void sub_804C250(u8, u8);
 void sub_804C278(u8, u8);
-void sub_804C2A0(u16* , u16* , u8 , u8 , u8 );
+void sub_804C2A0(u16 *, u16 *, u8, u8, u8);
 u16 sub_804C2F0();
-void sub_804C2FC(u32,u8,u8);
+void sub_804C2FC(u32, u8, u8);
 void sub_804C364(u8, u8);
 void sub_804C3A4(u8, u8);
 void sub_804C3E4(u8);
 void sub_804C420(u8);
 void sub_804C45C(void);
-void sub_804C4D8(u8, u8, u8);   // 三个形参入口均 lsls/lsrs #0x18 → u8
+void sub_804C4D8(u8, u8, u8); // 三个形参入口均 lsls/lsrs #0x18 → u8
 u16 sub_804C53C();
 void sub_804C548(u32, u8, u8);
 void sub_804C5B8(u8, u8);
@@ -933,10 +935,10 @@ void sub_804C5F8(u8, u8);
 void sub_804C638(u8);
 void sub_804C674(u8);
 void sub_804C6B0(void);
-void sub_804C728(u8, u8, u8);   // 三个形参入口均 lsls/lsrs #0x18 → u8
+void sub_804C728(u8, u8, u8); // 三个形参入口均 lsls/lsrs #0x18 → u8
 void sub_804C78C();
 void sub_804C890();
-u8 sub_804C8E0(u8 *, u8);   // obj池槽位移除元素+随机取回 (返回 u8)
+u8 sub_804C8E0(u8 *, u8); // obj池槽位移除元素+随机取回 (返回 u8)
 void sub_804C9B4();
 void sub_804CA2C(u8 *);
 void sub_804CAA0(u8 *);
@@ -950,12 +952,12 @@ void sub_804CDD4(u8 *);
 void sub_804CE48(u8 *);
 void sub_804CEBC();
 void sub_804CEE0();
-void sub_804D0F8(u8 *);   // obj槽位填充: 守卫+移除匹配obj[0xAC]+随机取回
-void sub_804D1B4(u8 *, u8 *);   // obj槽位概率填充: 守卫+表驱动随机
-void sub_804D260(u8 *, u8 *);   // obj槽位概率填充 (x10, sub_804D1B4 孪生)
+void sub_804D0F8(u8 *); // obj槽位填充: 守卫+移除匹配obj[0xAC]+随机取回
+void sub_804D1B4(u8 *, u8 *); // obj槽位概率填充: 守卫+表驱动随机
+void sub_804D260(u8 *, u8 *); // obj槽位概率填充 (x10, sub_804D1B4 孪生)
 void sub_804D310();
-void sub_804D3A0(u8 *, u8 *);   // obj槽位概率填充 (x13, 同族孪生)
-void sub_804D44C(u8 *, u8 *);   // obj槽位概率填充 (x10, 同族孪生)
+void sub_804D3A0(u8 *, u8 *); // obj槽位概率填充 (x13, 同族孪生)
+void sub_804D44C(u8 *, u8 *); // obj槽位概率填充 (x10, 同族孪生)
 void sub_804D4FC();
 void sub_804D5B4();
 void sub_804D708();
@@ -968,7 +970,7 @@ void sub_804DB64();
 void sub_804DC24();
 void sub_804DCD8();
 void sub_804DD70(u8 *, u32);
-u8 sub_804DD90(u8, u8);   /** 勿改宽原型/K&R: u8原型+Sub6C结构形态才是 sub_8045EB8 的解 */
+u8 sub_804DD90(u8, u8); /** 勿改宽原型/K&R: u8原型+Sub6C结构形态才是 sub_8045EB8 的解 */
 void sub_804DE20();
 void sub_804DE8C();
 u8 sub_804DF14(Unk_03000DEntry *);
@@ -990,7 +992,7 @@ void sub_804EFDC(u8 *, u8, u8, u8 *, u8);
 u8 sub_804F050(u8);
 void sub_804F07C();
 u8 sub_804F088(u8 *, u32);
-u8 sub_804F0B8(u8 *, s32);   // CheckObjectKindSlot: 比较对象 +0x91/+0x92 两个候选 id, 返 1/2/0
+u8 sub_804F0B8(u8 *, s32); // CheckObjectKindSlot: 比较对象 +0x91/+0x92 两个候选 id, 返 1/2/0
 #define CheckObjectKindSlot sub_804F0B8
 s8 sub_804F10C(u8, u8);
 u8 sub_804F17C(u8 *, u8, u8);
@@ -1027,17 +1029,17 @@ void sub_80526A0(u8, u8);
 void Script_Abort(u8);
 void BgTiles_LoadSet(u16);
 void TileDma_Reset();
-s16 sub_80527AC(void);   // FlushTileDma: 把待传图块经 DMA3 从 0x0203DE00 刷到 VRAM 0x0600B800 并等完成
+s16 sub_80527AC(void); // FlushTileDma: 把待传图块经 DMA3 从 0x0203DE00 刷到 VRAM 0x0600B800 并等完成
 #define FlushTileDma sub_80527AC
 u32 TileDma_GetCtx(u32 *);
 u32 Op_LoadTileGfx(u8);
-u32 sub_8052858(u32 *);   // ScriptGotoEntry: 脚本指针跳到 gUnk_02016200 + gUnk_02016000[data[1]]
+u32 sub_8052858(u32 *); // ScriptGotoEntry: 脚本指针跳到 gUnk_02016200 + gUnk_02016000[data[1]]
 #define ScriptGotoEntry sub_8052858
 u32 Script_Call(u32 *);
 void nullsub_7();
 u32 Op_DialogSetup(u32 *);
 u32 Op_CloseWindow(u32 *);
-void sub_80529B8();
+u8 sub_80529B8();
 u32 Op_BgmPlay(u32 *);
 u32 Op_BgmStop(u32 *);
 u32 Op_BgmVolume(u32 *);
@@ -1089,7 +1091,8 @@ u32 Op_SaveTimerB(u32 *);
 u32 Op_IfSaveFlagJump(u32 *);
 u32 Op_SaveOp(u32 *);
 u32 sub_8053270(u32 *);
-u32 sub_80532DC(u32 *);   // ScriptClearFlags: 把脚本里 data[1]>>1 个 u16 标志号逐个清位(<=0x1FF 走 0x03001C60 位图, 否则 -0x200 走 0x030018F0 位图)
+u32 sub_80532DC(
+    u32 *); // ScriptClearFlags: 把脚本里 data[1]>>1 个 u16 标志号逐个清位(<=0x1FF 走 0x03001C60 位图, 否则 -0x200 走 0x030018F0 位图)
 #define ScriptClearFlags sub_80532DC
 u32 Op_ClearSwitchTail(u32 *);
 u32 Op_IfMoneyJump(u32 *);

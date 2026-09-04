@@ -1,4 +1,4 @@
-未匹配 417 个
+未匹配 400 个
 
 [code_80002A0] 5
   0x08003958  Chara_SetWalkPath
@@ -44,13 +44,13 @@
   0x08010624  sub_8010624
   0x08010770  sub_8010770
 
-[code_8010F10] 40
+[code_8010F10] 39
   0x08010f10  sub_8010F10
   0x08011268  sub_8011268  ⏸ ⏸ 2026-09-02 opencode: 技能菜单物品页绘制=ClearBuffer(0x02005AA0,8,6)
   0x08011454  sub_8011454
   0x08012530  sub_8012530
   0x08012790  SaveUi_LoadScreen  ⏸ ⏸ 2026-09-02 gpnux: 存档/场景选择 UI 主状态机；扫描 gSaveMapUnlockFlags 并
-  0x08013870  sub_8013870  ⏸ ⏸ 2026-09-02 opencode: 文本块绘制=ClearBuffer内联填0xB001(0x14×0x1E)
+  0x08013870  sub_8013870  ⏸ ⏸ 2026-09-03 opencode: 新进展: v13(src后赋)整函数寄存器全对, 仅prologue缺sr
   0x08013934  sub_8013934
   0x08013b0c  sub_8013B0C
   0x08013c00  sub_8013C00
@@ -70,7 +70,6 @@
   0x08018070  sub_8018070
   0x080182a8  sub_80182A8
   0x080184a8  sub_80184A8
-  0x0801869c  sub_801869C
   0x08018928  sub_8018928
   0x08018a58  sub_8018A58
   0x08018bf8  sub_8018BF8
@@ -79,14 +78,14 @@
   0x08018fc0  sub_8018FC0
   0x080191cc  sub_80191CC
   0x0801933c  sub_801933C
-  0x080196d4  sub_80196D4  ⏸ ⏸ agbcc栈参数提升(r8-r11)深度决策; 9参(dialogCtx索引+8), 目标prologue: pus
   0x08019784  sub_8019784
   0x080199e0  sub_80199E0
   0x08019ad0  sub_8019AD0
   0x08019b98  sub_8019B98
   0x08019f78  sub_8019F78
+  0x0801a2ac  sub_801A2AC  ⏸ ⏸ 2026-09-03 gpnux: 25变体全差47B; GCC2寄存器分配: 目标 strh r0 保 arg0 
 
-[code_801A3C4] 48
+[code_801A3C4] 45
   0x0801a3c4  sub_801A3C4
   0x0801a6f4  sub_801A6F4
   0x0801a884  sub_801A884
@@ -100,18 +99,16 @@
   0x0801cba4  sub_801CBA4
   0x0801ce80  sub_801CE80
   0x0801cf90  sub_801CF90
-  0x0801d19c  sub_801D19C
   0x0801d214  sub_801D214
   0x0801d378  sub_801D378
   0x0801d468  sub_801D468
   0x0801d568  sub_801D568
   0x0801d710  sub_801D710
   0x0801d984  sub_801D984
-  0x0801daa0  sub_801DAA0
   0x0801db3c  sub_801DB3C
   0x0801dc20  sub_801DC20
   0x0801dd04  sub_801DD04
-  0x0801ddb0  sub_801DDB0
+  0x0801ddb0  sub_801DDB0  ⏸ ⏸ 2026-09-04 opencode: 找到byte-exact真身(fncheck OK 148B): 命名符号
   0x0801dedc  sub_801DEDC
   0x0801df90  sub_801DF90
   0x0801e040  sub_801E040
@@ -129,7 +126,6 @@
   0x0801f884  sub_801F884
   0x0801fa10  sub_801FA10
   0x0801fab8  sub_801FAB8
-  0x0801febc  sub_801FEBC  ⏸ ⏸ agbcc寄存器home深度分配; 目标value→r3/zero→r3/ptr+0x37→r4 subs复用; 尝
   0x0801ff40  sub_801FF40
   0x080200e8  sub_80200E8
   0x08020228  sub_8020228
@@ -163,7 +159,7 @@
   0x08025da8  sub_8025DA8
   0x080260bc  sub_80260BC
 
-[code_80264C0] 140
+[code_80264C0] 139
   0x080264c0  sub_80264C0
   0x0802698c  sub_802698C
   0x08026d08  sub_8026D08
@@ -269,7 +265,6 @@
   0x08038c84  sub_8038C84
   0x08038e44  sub_8038E44
   0x08039024  sub_8039024
-  0x080392c0  sub_80392C0
   0x080393e0  sub_80393E0
   0x08039724  sub_8039724
   0x08039c38  sub_8039C38  ⏸ ⏸ .s被跳转表截断, 需先补全反汇编
@@ -305,7 +300,7 @@
   0x08043b5c  sub_8043B5C
   0x08043f90  sub_8043F90
 
-[code_8044394] 102
+[code_8044394] 91
   0x0804473c  sub_804473C
   0x080448a8  sub_80448A8
   0x08044a40  sub_8044A40
@@ -313,23 +308,15 @@
   0x08045098  sub_8045098
   0x0804519c  sub_804519C
   0x08045328  sub_8045328
-  0x080455a0  sub_80455A0
-  0x08045688  sub_8045688
-  0x080457ac  sub_80457AC
-  0x08045860  sub_8045860
-  0x08045940  sub_8045940
-  0x08045a10  sub_8045A10  ⏸ ⏸ 2026-09-02 gpnux: tile动画帧; 头部/主体已逐字节对(表gUnk_08093418[b*5+4
+  0x08045940  sub_8045940  ⏸ ⏸ 2026-09-04 claude-45940: 战斗技能按类别过滤收集(8槽,switch cat 0-7范围判定
+  0x08045a10  sub_8045A10  ⏸ ⏸ 已合入真C (src/code_8044394.c 0x08045A10) 但字节 FAIL 96B 差~22B: 
   0x08045a74  sub_8045A74
   0x08045bf4  sub_8045BF4
   0x08045d00  sub_8045D00
-  0x08045f10  sub_8045F10  ⏸ ⏸ 指令流 100% 对 (132B 逐条一致), 只差 3 个 global-alloc home (obj↔dirM
-  0x08045f94  sub_8045F94
-  0x08046060  sub_8046060
   0x0804612c  sub_804612C
   0x0804621c  sub_804621C
   0x08046480  sub_8046480
   0x08046558  sub_8046558
-  0x0804666c  sub_804666C  ⏸ ⏸ 2026-09-02 opencode: 收集buf[5]+sub_80466F0处理, 结构与已匹配sub_804
   0x080466f0  sub_80466F0
   0x08046cd4  sub_8046CD4
   0x08046e18  sub_8046E18
@@ -357,9 +344,8 @@
   0x080492c0  sub_80492C0
   0x080494f0  sub_80494F0
   0x080497b0  sub_80497B0
-  0x080498e0  sub_80498E0  ⏸ ⏸规则17类寄存器轮换: 语义全解(磁盘动画帧写入器, sub_804ABF8 同族): ptr=(u8*)gUnk_0
   0x08049958  sub_8049958
-  0x08049ad8  sub_8049AD8
+  0x08049ad8  sub_8049AD8  ⏸ ⏸ 2026-09-04 opencode: 语义全解(battle stat成长: 遍历idx=(i+251+s)&0
   0x08049b70  sub_8049B70
   0x08049c1c  sub_8049C1C
   0x08049d58  sub_8049D58
@@ -386,7 +372,6 @@
   0x0804bdd8  sub_804BDD8
   0x0804be90  sub_804BE90  ⏸ ⏸ 已定性=global-alloc域(qtydump: 14 qty最长life仅8, 2块0qty, 基址vs-1谁
   0x0804bf14  sub_804BF14
-  0x0804c890  sub_804C890  ⏸ ⏸ movs r1,#0被外提到r7; long long阻外提仍差1条调度; 75分
   0x0804cee0  sub_804CEE0
   0x0804d310  sub_804D310  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(D260孪生无switch, 死存储obj[0xBC]=0
   0x0804d4fc  sub_804D4FC  ⏸ ⏸ 2026-09-02 sound-agent: 语义全解(switch((s8)obj[0xBC]) case1: 
@@ -398,8 +383,7 @@
   0x0804dabc  sub_804DABC
   0x0804db64  sub_804DB64
   0x0804dc24  sub_804DC24
-  0x0804dcd8  sub_804DCD8  ⏸ ⏸ 2026-09-02 opencode: 概率判定+掉落道具, 姊妹sub_804D1B4/D260/D708/D7
-  0x0804de8c  sub_804DE8C
+  0x0804dcd8  sub_804DCD8  ⏸ ⏸ 2026-09-04 opencode: 概率判定+掉落道具(姊妹sub_804D1B4/D260/D708/D79
   0x0804dfd8  sub_804DFD8
   0x0804e0e4  sub_804E0E4
   0x0804e2ac  sub_804E2AC
@@ -409,7 +393,7 @@
   0x0804e9dc  sub_804E9DC
   0x0804ec04  sub_804EC04
 
-[code_804F0B8] 22
+[code_804F0B8] 21
   0x0804f280  sub_804F280
   0x0804f64c  sub_804F64C
   0x0804f7f8  sub_804F7F8  ⏸ ⏸ 复杂队伍添加opcode(插入排序gPartyMemberIds+formation槽管理gUnk_03004A88
@@ -429,6 +413,5 @@
   0x08051be4  sub_8051BE4
   0x080525e8  sub_80525E8
   0x080526a0  sub_80526A0
-  0x080529b8  sub_80529B8  ⏸ ⏸ 序列全对多占1寄存器; 根因=尾部*ptr+=2被CSE复用data; 见progress
   0x08052f44  sub_8052F44  ⏸ ⏸ permuter沙箱forkserver被拒; 语义已确认(队伍ID匹配+跳转表)
   0x08053270  sub_8053270  ⏸ ⏸ 循环内高位寄存器home错位(ptr/data/limit); 见progress

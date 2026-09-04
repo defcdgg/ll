@@ -316,7 +316,32 @@ INCLUDE_ASM("asm/nonmatchings", sub_805063C);
 // @ 0x08050720
 INCLUDE_ASM("asm/nonmatchings", sub_8050720);
 // @ 0x080511A0
-INCLUDE_ASM("asm/nonmatchings", sub_80511A0);
+u8 sub_80511A0(u32 *arg0)
+{
+    u8 ret = 1;
+    u8 i;
+    if (gUnk_03000E78 != 0)
+    {
+        gUnk_03000E78--;
+        *arg0 = gUnk_03000E80[gUnk_03000E78];
+    }
+    else
+    {
+        *arg0 = *arg0 + 1;
+        Bgm_Request(gUnk_03000E68);
+        gUnk_03000E70 &= 0xFFFE;
+        i = 0;
+        while (i < gUnk_03000ECA)
+        {
+            gUnk_03000EA0[i] = 0;
+            gUnk_03000EC0[i] = 0;
+            i++;
+        }
+        gUnk_03000ECA = 0;
+        ret = 0;
+    }
+    return ret;
+}
 // @ 0x08051230
 u32 Op_ScriptStop(u32 *ptr)
 {
@@ -1367,8 +1392,38 @@ u32 Op_SaveOp(u32 *ptr)
 
     return 1;
 }
+// 脚本 opcode: 遍历脚本数据里的一段 u16 标志号列表, 逐个置位。
+//   项数 = data[1] >> 1, 每项 = data[2+2k] | data[3+2k] << 8 (小端拼 u16)
+//   号 <= 0x1FF → EventFlags_Set(号)        (置 0x03001C60 位图)
+//   号 >  0x1FF → SwitchFlags_Set(号 - 0x200)(置 0x030018F0 位图)
+// 最后把脚本指针推过整个列表。sub_80532DC 的 Set 姊妹。
+// 注: 循环条件必须写成 `n > i`(界在左), 否则 GCC2 不会把 i=0 代入入口测试。
+//     `off = t + 2;` 必须单独一句(规律30)。
 // @ 0x08053270
-INCLUDE_ASM("asm/nonmatchings", sub_8053270);
+u32 sub_8053270(u32 *ptr)
+{
+    u8 *data;
+    u8 t;
+    u8 n;
+    u32 off;
+    u16 v;
+    u16 i;
+
+    data = (u8 *)*ptr;
+    t = data[1];
+    n = t >> 1;
+    for (i = 0; n > i; i++)
+    {
+        v = data[i * 2 + 2] | (data[i * 2 + 3] << 8);
+        if (v > 0x1FF)
+            SwitchFlags_Set(v - 0x200);
+        else
+            EventFlags_Set(v);
+    }
+    off = t + 2;
+    *ptr = *ptr + off;
+    return 1;
+}
 // 脚本 opcode: 遍历脚本数据里的一段 u16 标志号列表, 逐个清除标志位。
 //   项数 = data[1] >> 1, 每项 = data[2+2k] | data[3+2k] << 8 (小端拼 u16)
 //   号 <= 0x1FF → EventFlags_Reset(号)       (清 0x03001C60 标志位图)

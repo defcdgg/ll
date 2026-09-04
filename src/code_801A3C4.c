@@ -462,8 +462,52 @@ u32 sub_801DAA0(void)
 INCLUDE_ASM("asm/nonmatchings", sub_801DB3C);
 // @ 0x0801DC20
 INCLUDE_ASM("asm/nonmatchings", sub_801DC20);
-// @ 0x0801DD04
+
+typedef struct Unk_030006A0
+{
+    u8 key;
+    u8 pad[3];
+    struct Unk_030006A0 *prev;
+    struct Unk_030006A0 *next;
+    u32 data;
+} Unk_030006A0;
 INCLUDE_ASM("asm/nonmatchings", sub_801DD04);
+
+/* 从对象排序链表 (0x030006A0) 摘除节点, 清对象字段并按 field_BE 分派:
+ * ≤0xA → sub_801CBA4, ≤0x70 → sub_801CA08, 其余 (field_BE-0x71 ≤ 0x8D) → sub_801CE80,
+ * 均传 (obj, 0, idx*22+9, (u8)(idx+1), 0); 末尾 sub_801D12C(obj,0)。 */
+// @ 0x0801DD04
+// void sub_801DD04(u8 *obj, u8 idx, u16 val)
+// {
+//     u16 f2a;
+//     u8 f35;
+//     Unk_030006A0 *node = (Unk_030006A0 *)0x030006A0 + idx;
+
+//     node->prev->next = node->next;
+//     node->next->prev = node->prev;
+//     node->prev = 0;
+//     node->next = 0;
+
+//     obj[0xAB] = 0;
+//     *(u16 *)(obj + 0xB2) = 0;
+//     *(u16 *)(obj + 0x6C) = val;
+//     obj[0xBC] = 0;
+
+//     if (*(u8 *)0x030006F0)
+//         (*(u8 *)0x030006F0)--;
+
+//     f2a = idx * 0x16 + 9;
+//     f35 = (u8)(idx + 1);
+
+//     if (obj[0xBE] <= 0xA)
+//         sub_801CBA4(obj, 0, f2a, f35, 0);
+//     else if (obj[0xBE] <= 0x70)
+//         sub_801CA08(obj, 0, f2a, f35, 0);
+//     else if ((u8)(obj[0xBE] - 0x71) <= 0x8D)
+//         sub_801CE80(obj, 0, f2a, f35, 0);
+
+//     sub_801D12C(obj, 0);
+// }
 // @ 0x0801DDB0
 INCLUDE_ASM("asm/nonmatchings", sub_801DDB0);
 extern u8 gUnk_03000730_arr[]; // gUnk_03000730 的字节视图

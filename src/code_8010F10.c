@@ -1978,7 +1978,7 @@ u32 sub_801878C(void)
     return gGstate340;
 }
 // @ 0x08018798
-void sub_8018798(u8 index, u16 value)
+void sub_8018798(u8 index, s16 value)
 {
     gGstate330[index] = value;
 }
@@ -2221,7 +2221,32 @@ void DialogCtx_Clear3(void)
 // @ 0x0801933C
 INCLUDE_ASM("asm/nonmatchings", sub_801933C);
 // @ 0x080196D4
-INCLUDE_ASM("asm/nonmatchings", sub_80196D4);
+void sub_80196D4(index, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) u8 index;
+u32 arg1;
+u16 arg2;
+u8 arg3;
+u8 arg4;
+u8 arg5;
+u8 arg6;
+u8 arg7;
+u8 arg8;
+{
+    gDialogCtx[index].padding0[0] = arg5;
+    gDialogCtx[index].padding0[1] = arg6;
+    gDialogCtx[index].padding0[2] = arg7;
+    gDialogCtx[index].padding0[3] = arg8;
+    gDialogCtx[index].padding0[4] = 0;
+    gDialogCtx[index].padding0[5] = 0;
+    gDialogCtx[index].padding0[6] = 0;
+    gDialogCtx[index].padding0[7] = 0;
+    gDialogCtx[index].field_8 = arg3;
+    gDialogCtx[index].field_9 = 0;
+    gDialogCtx[index].field_A = arg4;
+    gDialogCtx[index].field_B = 0;
+    gDialogCtx[index].field_C = 1;
+    gDialogCtx[index].field_E = arg2;
+    gDialogCtx[index].field_10 = arg1;
+}
 // @ 0x08019748
 void DialogCtx_SetPair(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
 {
@@ -2470,7 +2495,7 @@ void sub_801A270(void)
 }
 
 // @ 0x0801A2AC
-INCLUDE_ASM("asm/matchings", sub_801A2AC);
+INCLUDE_ASM("asm/nonmatchings", sub_801A2AC);
 // void sub_801A2AC(u16 arg0, u8 arg1, u8 arg2)   // ⏸ 逻辑正确(v3), 卡在寄存器分配: 见 progress.md
 // {
 //     REG_BLDCNT = arg0;

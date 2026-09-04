@@ -90,7 +90,11 @@ extern u8 gMenuCursorStack[];
 extern u8 gUnk_03000198;
 extern u8 gInvCursor2;
 extern u8 gInvViewState[];
+extern u8 gUnk_030001AE;
+extern u8 gUnk_030001AF;
+extern u8 gUnk_030001B0;
 extern u8 gItemUseCtx[];
+extern u16 gUnk_030001C8;
 
 extern u8 *gMsgTable[];
 
@@ -119,8 +123,7 @@ typedef struct
     u8 field_A;
     u8 field_B;
     u16 field_C;
-    u8 field_E;
-    u8 field_F;
+    u16 field_E;
     u32 field_10;
     // u8 padding1[4];
 } Unk_03000348;
@@ -180,6 +183,7 @@ extern u8 gUnk_03000744;
 extern u8 gUnk_03000748[];
 extern u8 gUnk_03000758[];
 extern u8 gUnk_03000763;
+extern u8 gUnk_03000768;
 extern s8 gUnk_0300076A;
 extern u16 gUnk_0300076C;
 extern u16 gUnk_0300076E;
@@ -297,6 +301,7 @@ extern u16 gUnk_03000EE8[];
 extern u16 gUnk_03000F24;
 extern u8 gUnk_03000F2A;
 extern u16 gUnk_03000F2C;
+extern u8 gUnk_03000F30;
 extern u16 gUnk_03000F2E;
 
 extern u16 gSoundTaskFlags;

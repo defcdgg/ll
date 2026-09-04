@@ -392,13 +392,150 @@ u8 sub_80454A4(u16 arg0)
     return result;
 }
 // @ 0x080455A0
-INCLUDE_ASM("asm/nonmatchings", sub_80455A0);
+u16 sub_80455A0(u8 objectIndex, u8 stat)
+{
+    u32 base;
+    u8 formation;
+
+    base = GetObjPool();
+    formation = gBattleFormationIds[*(u8 *)(base + objectIndex * 0xC8 + 0xBB)];
+    if (formation != 0)
+        formation--;
+    switch (stat)
+    {
+        case 0:
+            return gPartyStats[formation].max_hp;
+        case 1:
+            return gPartyStats[formation].max_mp;
+        case 2:
+            return gPartyStats[formation].base_atc;
+        case 3:
+            return gPartyStats[formation].base_def;
+        case 4:
+            return gPartyStats[formation].base_agl;
+        case 5:
+            return gPartyStats[formation].base_men;
+        case 6:
+            return gPartyStats[formation].base_res;
+        case 7:
+            return gPartyStats[formation].base_noa;
+    }
+}
 // @ 0x08045688
-INCLUDE_ASM("asm/nonmatchings", sub_8045688);
+void sub_8045688(u8 objectIndex, u8 stat, u8 val)
+{
+    u32 base;
+    u8 formation;
+
+    base = GetObjPool();
+    formation = gBattleFormationIds[*(u8 *)(base + objectIndex * 0xC8 + 0xBB)];
+    if (formation != 0)
+        formation--;
+    switch (stat)
+    {
+        case 0:
+            gPartyStats[formation].max_hp += val;
+            break;
+        case 1:
+            gPartyStats[formation].max_mp += val;
+            break;
+        case 2:
+            gPartyStats[formation].base_atc += val;
+            gPartyStats[formation].atc += val;
+            break;
+        case 3:
+            gPartyStats[formation].base_def += val;
+            gPartyStats[formation].def += val;
+            break;
+        case 4:
+            gPartyStats[formation].base_agl += val;
+            gPartyStats[formation].agl += val;
+            break;
+        case 5:
+            gPartyStats[formation].base_men += val;
+            gPartyStats[formation].men += val;
+            break;
+        case 6:
+            gPartyStats[formation].base_res += val;
+            gPartyStats[formation].res += val;
+            break;
+        case 7:
+            gPartyStats[formation].base_noa += val;
+            gPartyStats[formation].noa += val;
+            break;
+    }
+}
 // @ 0x080457AC
-INCLUDE_ASM("asm/nonmatchings", sub_80457AC);
+void sub_80457AC(void)
+{
+    u32 pool;
+    u8 f;
+    u8 i;
+    PlayerStats *st;
+    u8 *ob;
+
+    pool = GetObjPool();
+    for (i = 0; i <= 4; i++)
+    {
+        f = gPartyMemberIds[i];
+        if (f == 0xff)
+            continue;
+        if (f != 0)
+            f--;
+        st = &gPartyStats[f];
+        ob = (u8 *)(pool + i * 0xC8);
+        st->hp = *(u16 *)(ob + 0x6C) ? *(u16 *)(ob + 0x6C) : 1;
+        do
+        {
+        } while (
+            0); /* GCC2 arm_reorg 调度屏障: 强制 fu[1] 的 movs r6,#0 落到 mp ldrh 延迟槽(目标 0x46), 否则被 hoist 到 hp store 前 */
+        st->mp = *(u16 *)(ob + 0x70);
+        st->equip_slot5 = ob[0x91];
+        st->equip_slot6 = ob[0x92];
+        if (ob[0x91] == 0xb3 || ob[0x92] == 0xb3)
+            st->field_unk[1] = 0;
+        else
+            st->field_unk[1] = *(u16 *)(ob + 0x88);
+        Stats_BuildSkillList(&st->skills[0], st->lv, gPartyMemberIds[i]);
+    }
+}
 // @ 0x08045860
-INCLUDE_ASM("asm/nonmatchings", sub_8045860);
+s8 sub_8045860(u8 objectIndex, u8 *buf)
+{
+    u32 pool;
+    u8 *obj;
+    u8 formation;
+    s8 c;
+    u8 id;
+    u32 p1;
+
+    p1 = GetObjPool();
+    formation = gBattleFormationIds[*(u8 *)(p1 + objectIndex * 0xC8 + 0xBB)];
+    pool = GetObjPool();
+    for (c = 0; c <= 7; c++)
+        buf[c] = 0xff;
+    if (formation != 0)
+        formation--;
+    obj = (u8 *)(pool + objectIndex * 0xC8);
+    c = 0;
+    while (obj[0xAA] < gPartyStats[formation].lv)
+    {
+        obj[0xAA]++;
+        id = ItemFindSlot(obj[0xAA], gBattleFormationIds[*(u8 *)(GetObjPool() + objectIndex * 0xC8 + 0xBB)]);
+        if (id != 0xff)
+        {
+            if (sub_8048868(objectIndex, id) != 0)
+            {
+                if (c <= 7)
+                {
+                    buf[c] = id - 1;
+                    c++;
+                }
+            }
+        }
+    }
+    return c;
+}
 // @ 0x08045940
 INCLUDE_ASM("asm/nonmatchings", sub_8045940);
 // @ 0x08045A10
@@ -598,11 +735,158 @@ u8 sub_8045F10(u8 *obj, u16 dirMask)
     return result;
 }
 // @ 0x08045F94
-INCLUDE_ASM("asm/nonmatchings", sub_8045F94);
+// 姊妹 sub_8046060: 方向槽 obj[0xAB] 只增不减; CBA4 普通行走第2实参=0x4 (vs 0xA)。
+// 见 sub_8046060 注释与 RULES 规则135 (moveBits/walkOfs/stateFlags 三段链)。
+void sub_8045F94(u8 *obj, u16 arg1)
+{
+    u32 zero;
+    u16 moveBits;
+    int stateFlags;
+    int walkOfs;
+
+    if (obj[0xBE] > 0x70 && arg1 != 8)
+        return;
+    if (obj[0xAB] >= arg1)
+        return;
+    zero = 0;
+    obj[0xAB] = arg1;
+    switch (arg1)
+    {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            sub_801D12C(obj, 1);
+            if (obj[0xBE] <= 0xA)
+                sub_801CBA4(obj, 4, *(u16 *)(obj + 0x2A), obj[0x35], zero);
+            else
+                sub_801CA08(obj, 0, *(u16 *)(obj + 0x2A), obj[0x35], zero);
+            break;
+        case 8:
+            sub_801D12C(obj, 2);
+            break;
+    }
+    switch (arg1)
+    {
+        case 1:
+            stateFlags = 0x10 | *(u16 *)(obj + 0xB8);
+            *(u16 *)(obj + 0xB8) = stateFlags;
+        case 2:
+        case 3:
+        case 5:
+        case 6:
+            moveBits = 0x200 | *(u16 *)(obj + 0xB0);
+            walkOfs = 0;
+            stateFlags = moveBits;
+            *(u16 *)(obj + 0xB0) = stateFlags;
+            obj[0xA8] = walkOfs;
+            break;
+    }
+}
 // @ 0x08046060
-INCLUDE_ASM("asm/nonmatchings", sub_8046060);
+// 对象行动状态推进: 槽号 obj[0xBE]>0x70 时仅接受 arg1==8 (撤退/移除), 否则忽略;
+// 方向槽 obj[0xAB] 只增不减 (arg1<=旧值直接忽略)。arg1 1..7 = 步行/移动:
+// 先 Obj_SetMoveState(obj,1), 再按对象种类 (obj[0xBE]<=0xA 走普通行走 sub_801CBA4(…,0xA),
+// >0xA 走事件类 sub_801CA08) 传 (obj, f2A, f35, 0)。arg1==8 = 离场: Obj_SetMoveState(obj,2)。
+// 位段收尾 (arg1 1..7 落入): obj[0xB8]|=0x10 (case1 fallthrough), obj[0xB0]|=0x200, obj[0xA8]=0。
+// 第5实参 0 与 obj[0xA8]=0 的 0 是两个独立变量 (r7/r3 分配, 合并会破分配, 见 RULES 规则87家族)。
+void sub_8046060(u8 *obj, u16 arg1)
+{
+    u32 zero;
+    u16 moveBits;
+    int stateFlags;
+    int walkOfs;
+
+    if (obj[0xBE] > 0x70 && arg1 != 8)
+        return;
+    if (obj[0xAB] >= arg1)
+        return;
+    zero = 0;
+    obj[0xAB] = arg1;
+    switch (arg1)
+    {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            sub_801D12C(obj, 1);
+            if (obj[0xBE] <= 0xA)
+                sub_801CBA4(obj, 0xA, *(u16 *)(obj + 0x2A), obj[0x35], zero);
+            else
+                sub_801CA08(obj, 0, *(u16 *)(obj + 0x2A), obj[0x35], zero);
+            break;
+        case 8:
+            sub_801D12C(obj, 2);
+            break;
+    }
+    switch (arg1)
+    {
+        case 1:
+            stateFlags = 0x10 | *(u16 *)(obj + 0xB8);
+            *(u16 *)(obj + 0xB8) = stateFlags;
+        case 2:
+        case 3:
+        case 5:
+        case 6:
+            moveBits = 0x200 | *(u16 *)(obj + 0xB0);
+            walkOfs = 0;
+            stateFlags = moveBits;
+            *(u16 *)(obj + 0xB0) = stateFlags;
+            obj[0xA8] = walkOfs;
+            break;
+    }
+}
 // @ 0x0804612C
-INCLUDE_ASM("asm/nonmatchings", sub_804612C);
+// 对象状态推进 (sub_8046060 家族变体): 方向槽 obj[0xAB] 为 arg1-2 或 arg1==0xB 时进入;
+// arg1==0xB 且方向==8 直接返回。方向==8 = 入池: 在 GetObjPool 槽里找 field_BE 与
+// obj[0xBE] 匹配的槽下标 i, 调 sub_801DD04(obj, i, *(u16*)(obj+0x6C) + arg2) 挂到节点链表;
+// 否则清方向后按 obj[0xBE]<=0xA 走 sub_801CBA4/CA08。尾部清 obj[0xB8] bit4。
+// 注意: prev 用 (u16)(arg1+0xFFFE) 写法 (u16 回绕减 2, 见 RULES 135 家族);
+// pool 指针池扫后复用为 &obj[0xB8] (规则87: 一个局部兼职两个值买寄存器 home)。
+void sub_804612C(u8 *obj, u16 arg1, u16 arg2)
+{
+    u8 *pool;
+    u8 i;
+    u8 zero;
+    u16 prev;
+    u16 v;
+
+    prev = (u16)(arg1 + 0xFFFE);
+    if (obj[0xab] != prev && arg1 != 0xb)
+        return;
+    if (arg1 == 0xb && obj[0xab] == 8)
+        return;
+    if (obj[0xab] == 8)
+    {
+        pool = (u8 *)GetObjPool();
+        for (i = 0; i <= 4; i++)
+            if (pool[i * 0xC8 + 0xBE] == obj[0xBE])
+                break;
+        v = *(u16 *)(obj + 0x6c);
+        sub_801DD04(obj, i, (u16)(v + arg2));
+    }
+    else
+    {
+        zero = 0;
+        obj[0xab] = 0;
+        if (obj[0xbe] <= 0xa)
+            sub_801CBA4(obj, 0, *(u16 *)(obj + 0x2a), obj[0x35], zero);
+        else
+            sub_801CA08(obj, 0, *(u16 *)(obj + 0x2a), obj[0x35], 0);
+    }
+    if (*(u16 *)(obj + 0xb8) & 0x10)
+    {
+        pool = obj + 0xb8;
+        *(u16 *)pool = *(u16 *)(obj + 0xb8) & 0xFFEF;
+    }
+    sub_801D12C(obj, 0);
+}
 // @ 0x0804621C
 INCLUDE_ASM("asm/nonmatchings", sub_804621C);
 // @ 0x080462E4
@@ -612,7 +896,44 @@ INCLUDE_ASM("asm/nonmatchings", sub_8046480);
 // @ 0x08046558
 INCLUDE_ASM("asm/nonmatchings", sub_8046558);
 // @ 0x0804666C
-INCLUDE_ASM("asm/nonmatchings", sub_804666C);
+// 行动点收集+处理: 清空 buf[0..4] 后调 sub_804DE8C (重置道具/状态区), 收集 obj[0xBE]<=0xA 且
+// sub_8045F10(obj,0x43)==2 的对象槽号到 buf, 再对每个收集到的槽号调 sub_80466F0(obj, 槽号)。
+// 与已匹配 sub_8046C50 同构 (0x6C50 是写 0xBC=4, 本函数是调 sub_80466F0 处理)。
+void sub_804666C(void)
+{
+    u8 indices[8];
+    u8 *buffer;
+    u8 *base;
+    u8 count;
+    u8 i;
+    u8 j;
+    u8 max;
+    u8 limit;
+
+    base = (u8 *)GetObjPool();
+    sub_804DE8C();
+    buffer = indices;
+    count = 0;
+    for (i = 0; i <= 4; i++)
+        buffer[i] = 0;
+    i = 0;
+    max = 5;
+    while (i < max)
+    {
+        if (sub_8045F10(base + i * 0xC8, 0x43) == 2)
+        {
+            buffer[count] = i;
+            count++;
+        }
+        i++;
+    }
+    limit = count;
+    for (j = 0; j < limit; j++)
+    {
+        u8 idx = indices[j];
+        sub_80466F0(base + idx * 0xC8, idx);
+    }
+}
 // @ 0x080466F0
 INCLUDE_ASM("asm/nonmatchings", sub_80466F0);
 // @ 0x08046C50
@@ -670,7 +991,97 @@ INCLUDE_ASM("asm/nonmatchings", sub_8047D28);
 // @ 0x08047DC8
 INCLUDE_ASM("asm/nonmatchings", sub_8047DC8);
 // @ 0x08047FCC
-INCLUDE_ASM("asm/nonmatchings", sub_8047FCC);
+s32 sub_8047FCC(u16 arg0)
+{
+    s8 ret = 0;
+    if (arg0 <= 0x39)
+    {
+
+        switch (arg0)
+        {
+            case 0:
+                return ret;
+            case 1:
+                ret = 0;
+                break;
+            case 2:
+                ret = 0xff;
+                break;
+            case 3:
+                ret = 0xfd;
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                ret = 0xff;
+                break;
+            case 10:
+                ret = 0;
+                break;
+            case 11:
+                ret = 0xfe;
+                break;
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 21:
+            case 22:
+            case 23:
+            case 24:
+            case 25:
+                ret = 0xff;
+                break;
+            case 26:
+                ret = 7;
+                break;
+            case 27:
+                ret = 0x1e;
+                break;
+            case 28:
+            case 29:
+            case 30:
+            case 31:
+            case 32:
+            case 33:
+            case 34:
+            case 35:
+            case 36:
+            case 37:
+            case 38:
+            case 39:
+            case 40:
+            case 41:
+            case 42:
+            case 43:
+            case 44:
+            case 45:
+            case 46:
+            case 47:
+            case 48:
+            case 49:
+            case 50:
+            case 51:
+            case 52:
+            case 53:
+            case 54:
+            case 55:
+            case 56:
+            case 57:
+                ret = 0xff;
+                break;
+        }
+    }
+    return ret;
+}
 // @ 0x080480EC
 INCLUDE_ASM("asm/nonmatchings", sub_80480EC);
 // @ 0x080481B8
@@ -2191,13 +2602,13 @@ void sub_804D310(u8 *obj, u8 *arg1)
     zero = 0;
     switch (entry->field_10)
     {
-    case 0:
-        value = values[(u32)(u8)Rng_LcgNext() % count];
-        obj[0xBD] = value;
-        break;
-    case 1:
-        obj[0xBD] = zero;
-        break;
+        case 0:
+            value = values[(u32)(u8)Rng_LcgNext() % count];
+            obj[0xBD] = value;
+            break;
+        case 1:
+            obj[0xBD] = zero;
+            break;
     }
 }
 // @ 0x0804D3A0
@@ -2362,7 +2773,31 @@ void sub_804DE20(void)
     }
 }
 // @ 0x0804DE8C
-INCLUDE_ASM("asm/nonmatchings", sub_804DE8C);
+void sub_804DE8C(void)
+{
+    u8 i;
+
+    for (i = 0; i <= 4; i++)
+    {
+        gUnk_03000DC8[i].field_0 = 0;
+        gUnk_03000DC8[i].field_1 = 0;
+    }
+    for (i = 0; i <= 15; i++)
+    {
+        gUnk_03000D88[i].field_0 = 0;
+        gUnk_03000D88[i].field_1 = 0;
+    }
+    gUnk_03000DDC = 0;
+    for (i = 0; i <= 15; i++)
+    {
+        if (gUnk_03004980[gInvPageItemIds[i]] != 0)
+        {
+            gUnk_03000D88[gUnk_03000DDC].field_0 = gInvPageItemIds[i];
+            gUnk_03000D88[gUnk_03000DDC].field_1 = gUnk_03004980[gInvPageItemIds[i]];
+            gUnk_03000DDC++;
+        }
+    }
+}
 // @ 0x0804DF14
 u8 sub_804DF14(Unk_03000DEntry *dest)
 {
@@ -2414,7 +2849,31 @@ INCLUDE_ASM("asm/nonmatchings", sub_804E0E4);
 // @ 0x0804E2AC
 INCLUDE_ASM("asm/nonmatchings", sub_804E2AC);
 // @ 0x0804E6DC
-INCLUDE_ASM("asm/nonmatchings", sub_804E6DC);
+s8 sub_804E6DC(u8 *obj, u8 value)
+{
+    u8 result;
+    u8 *data;
+    u8 i;
+
+    result = -1;
+    if (obj[0xBE] <= 10)
+    {
+        data = obj + 0x8D;
+        if (data[0] != 0 || data[1] != 0 || data[2] != 0 || data[3] != 0 || data[4] != 0 || data[5] != 0 || data[6] != 0
+            || data[7] != 0)
+        {
+            for (i = 0; i <= 5; i++)
+            {
+                if (gUnk_087EA580[data[i] * 12 + 5] == value)
+                {
+                    result = i;
+                    break;
+                }
+            }
+        }
+    }
+    return result;
+}
 // @ 0x0804E76C
 s8 sub_804E76C(u8 *obj, u8 arg1, u8 arg2)
 {

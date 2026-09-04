@@ -2786,7 +2786,8 @@ void Sprites_ReleaseAll(void)
     }
 }
 // @ 0x080033E8
-typedef struct {
+typedef struct
+{
     u16 field_0;
     u8 pad[16 - 2];
 } Unk_087EA394;

@@ -246,7 +246,110 @@ INCLUDE_ASM("asm/nonmatchings", sub_8033988);
 // @ 0x08033E2C
 INCLUDE_ASM("asm/nonmatchings", sub_8033E2C);
 // @ 0x08034440
-INCLUDE_ASM("asm/nonmatchings", sub_8034440);
+u32 sub_8034440(u8 *arg)
+{
+    u32 ret;
+    u32 zero;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            sub_8020DE4();
+            gUnk_03000820 = 1;
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x386, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0x3E, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            zero = 0;
+            *(u16 *)&arg[0x24] = keys;
+            sub_801CBA4(arg, zero, gUnk_03000822, gUnk_03000824, zero);
+            gUnk_03000820 = 6;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 8;
+            break;
+        case 8:
+            if (sub_801EEE4(arg, GetObjPool(), 0, 0, 0x32) == 1)
+                gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    return ret;
+}
+/*
+u32 sub_8034440(u8 *arg)
+{
+    u32 ret;
+    u32 zero;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        sub_8020DE4();
+        gUnk_03000820 = 1;
+        gUnk_03000824 = arg[0x35];
+        gUnk_03000822 = *(u16 *)&arg[0x2A];
+        break;
+    case 1:
+        sub_8020974(arg + 0xC, 0x386, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 2;
+        break;
+    case 2:
+        if (*(u16 *)&arg[0x24] & 0x800)
+            break;
+        Sfx_Play(0x3E, 1, 0);
+        gUnk_03000820 = 5;
+        break;
+    case 5:
+        if (!(*(u16 *)&arg[0x24] & 0x1000))
+            break;
+        sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+        keys = *(u16 *)&arg[0x24] & 0xEFFF;
+        zero = 0;
+        *(u16 *)&arg[0x24] = keys;
+        sub_801CBA4(arg, zero, gUnk_03000822, gUnk_03000824, zero);
+        gUnk_03000820 = 6;
+        break;
+    case 6:
+        if (*(u16 *)&arg[0x24] & 0x800)
+            break;
+        gUnk_03000820 = 8;
+        break;
+    case 8:
+        if (sub_801EEE4(arg, GetObjPool(), 0, 0, 0x32) == 1)
+            gUnk_03000820 = 9;
+        break;
+    case 9:
+        sub_8045B90(arg, arg[0xA1]);
+        ret = 2;
+        break;
+    }
+    return ret;
+}
+*/
 // @ 0x080345AC
 INCLUDE_ASM("asm/nonmatchings", sub_80345AC);
 // @ 0x08034718
@@ -456,6 +559,28 @@ void sub_803F5B4(u8 *obj)
         }
     }
 }
+/*
+void sub_803F5B4(u8 *arg0)
+{
+    u32 pool;
+    u8 i;
+    s32 ret;
+
+    pool = GetObjPool();
+    sub_8020DF0(arg0);
+    gUnk_0300083D = sub_8020E5C();
+    gUnk_03000840 = sub_8020E54();
+    gUnk_03000858 = 0;
+    for (i = 0; i < gUnk_0300083D; i++) {
+        if ((((u8 *)gUnk_03000840)[i] & 0xF0) == 0x10) {
+            ret = sub_804473C(arg0, pool + (((u8 *)gUnk_03000840)[i] & 0xF) * 0xC8);
+            ret += *(u16 *)(pool + (((u8 *)gUnk_03000840)[i] & 0xF) * 0xC8 + 0xB2);
+            *(u16 *)(pool + (((u8 *)gUnk_03000840)[i] & 0xF) * 0xC8 + 0xB2) = ret;
+            gUnk_03000858++;
+        }
+    }
+}
+*/
 // @ 0x0803F658
 INCLUDE_ASM("asm/nonmatchings", sub_803F658);
 // @ 0x0803FF54

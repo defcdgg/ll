@@ -53,6 +53,7 @@ gUnk_0839D5BC = 0x0839D5BC;
 gUnk_0839DBF6 = 0x0839DBF6;
 gUnk_03000730_arr = 0x03000730;
 gUnk_087ED6A8 = 0x087ED6A8;
+gUnk_087ED6D4 = 0x087ED6D4;
 gUnk_0861AAA4 = 0x0861AAA4;
 gUnk_0861C664 = 0x0861C664;
 gUnk_0861C764 = 0x0861C764;
@@ -129,7 +130,13 @@ SECTIONS {
         . = 0x000001AA; gInvPageUpItems = .;
         . = 0x000001AC; gInvPageDownItems = .;
 
+        . = 0x000001AE; gUnk_030001AE = .;
+        . = 0x000001AF; gUnk_030001AF = .;
+        . = 0x000001B0; gUnk_030001B0 = .;
+
         . = 0x000001B4; gItemUseCtx = .;
+
+        . = 0x000001C8; gUnk_030001C8 = .;
 
         . = 0x000001D0; gMsgTable = .;
 
@@ -194,6 +201,7 @@ SECTIONS {
         . = 0x00000748; gUnk_03000748 = .;
         . = 0x00000758; gUnk_03000758 = .;
         . = 0x00000763; gUnk_03000763 = .;
+        . = 0x00000768; gUnk_03000768 = .;
         . = 0x0000076A; gUnk_0300076A = .;
         . = 0x0000076C; gUnk_0300076C = .;
         . = 0x0000076E; gUnk_0300076E = .;

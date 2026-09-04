@@ -722,9 +722,15 @@
      **诊断法**: `gccdump.greg` 看 `X preferences: 0` —— 该伪寄存器被硬分 r0 (案例是 c);
      冲突表里 `X conflicts: ... 0 ...` 即与硬 r0 冲突 (case 是分支内读挤掉它)。
      **判据**: 目标里"同一地址连续 3 条 ldrb"而朴素 C 只有 1 条 = 原代码存在分块读。
-     注意: 这是规则 23 (勿缓存重读全局) 的反向实例 —— 不是缓存进跨块局部, 而是**分块短命局部**
-     恰好阻止 CSE。两者都只为复现 GCC2 的分配行为。
-     关联: 规则 88 (跨块 home 归 global-alloc, 按伪寄存器生死边界改)、规则 87、规则 97。
+      注意: 这是规则 23 (勿缓存重读全局) 的反向实例 —— 不是缓存进跨块局部, 而是**分块短命局部**
+      恰好阻止 CSE。两者都只为复现 GCC2 的分配行为。
+      **第二次案例 (sub_8025650, 2026-09-04)**: 同一手法还破 **store→load 转发** —— 全局刚被
+      `strh` 写、分支内再读时, GCC2 会把读转发成移位寄存器值 (省掉 ldrh); 分支内 `u16 c = g;`
+      局部化后强制真重读。且转发被破后 subs 结果落回 r0、被紧随的位测试 `movs r0` 破坏,
+      连带 global-alloc 的两个地址 home (arg0↔r7 / &g↔r6) 一次归位 —— 10 字节平台期一步清零。
+      判据补充: 目标 `strh rX,[rY]; ...; ldrh rZ,[rY]` (存后跨分支重读) 而候选是
+      `lsls/lsrs` 双移位 = 候选发生了转发, 用分块局部重读。
+      关联: 规则 88 (跨块 home 归 global-alloc, 按伪寄存器生死边界改)、规则 87、规则 97、规则 114 (u8 形参配空原型须 K&R 定义)。
 
 112. **switch 守卫的分式拆分让独立 load 落进 `ands` 与 `subs` 的调度空隙**（案例 `sub_800A534`, 2026-09-02）。
      目标形状: `ldrb [tbl,#8]; ands r0,r1; ldrb r2,[tbl,#6]; subs r0,#1; cmp r0,#6; bhi` ——
@@ -800,6 +806,10 @@
      判定: 目标三条 strb 顺序 714,715,716 而 C 得 714,716,715 (链式) / r4,r5,r6 (散写) 时,
      先试"最后一个存储加 do-while 屏障", 比链式赋值更精准 —— 链式还会搅乱池序 (规则 110)。
      关联: 规则 17 (同题已解)、规则 25 (do-while 屏障定槽)、规则 110 (链式=地址伪寄存器压缩)。
+     **⚠ 脆弱性 (sub_801DDB0 2026-09-04)**: 此 do-while 屏障 tiebreak 对**同 TU 内新增的全局符号引用**敏感 ——
+     给姊妹函数引入 `extern T gUnk_0839B2D4[]` 后, sub_8020B54 的 714/715 载入 r5/r6 互换 (agbcc local_alloc
+     平手受符号表/伪寄存器计数影响)。swap 源序修 load 却破 store 序 (二者与源序耦合), 屏障只会把目标推到 r4, 无解。
+     即: 改本 TU 任何函数前, 若涉及新增符号引用, 先 fncheck sub_8020B54 确认没被扰动。
  117. **跨块 home 争议 = global-alloc 的 `allocno_compare` 排序, 用 `-da` 的 `.flow` 转储量化**（案例 `sub_8045F10`, 2026-09-02, 未破）。
       规则 88 说"跨块的 home 归 global-alloc, 别查 qty 表", 但没说怎么算 —— 补上:
       源码 `tools/agbcc/gcc/global.c:605 allocno_compare()`, 与 QTY_CMP_PRI **同形**:
@@ -951,6 +961,44 @@
        → 用命名符号, 别用裸地址; 草稿里 `arr[idx-1]` 保持不拆分(命名符号下本就不折叠, 拆成 `idx=idx-1` 反致 home 互换)。
        关联: 规则 32 (字面量 vs extern 改寄存器分配)、规则 7 (原型截断)。
 
+131. **多栈参"提升进高位寄存器 + 一个溢出 [sp]"的触发器 = 用 `arr[idx].field=` 成员直写(非指针局部), 让每次访存重算地址 → CSE 出 off/base 占满 r4-r6 → 最后使用的栈参无低寄存器可用而 spill, 其余四个依次提升 r8/sb/sl/ip**（案例 `sub_80196D4`, 2026-09-04, 破解 2026-09-02 挂起）。
+       症状: 9 参函数目标 prologue = `push{r4-r7,lr}; 存r8/sb/sl; sub sp,#4; ldr r4,[sp,#0x24]; str r4,[sp]; ldr r7,[sp,#0x28]; mov r8,r7; ...mov ip,r4`
+       (第5参→[sp]局部槽, 第6-9参→r8/sb/sl/ip)。
+       破法: **不要**写 `p = base + off; p[0]=arg5; ...` (指针局部) —— 那样 off 在 arg5 之后才出生, local-alloc 按优先级让 arg5 抢到低寄存器 r4, 提升错位。
+       改写 `gDialogCtx[index].padding0[0]=arg5; gDialogCtx[index].field_8=arg3; ... gDialogCtx[index].field_10=arg1;` (每行重算 `index*20`),
+       GCC2 CSE 把 `index*20`(off) 与基址符号(base) 提成两个**贯穿全函数**的 qty, 加上零常量(6 个 strb 复用)共占满 r4/r5/r6;
+       于是 5 个栈参里"使用最晚"的那个(arg4, 寿命最长→优先级最低→最后分配)拿不到任何低寄存器 → spill 到 `sub sp,#4` 的局部槽,
+       其余 arg5-8 依次提升进 r8/sb/sl/ip。判定: 目标"栈参提升+一个 spill"→ 把指针局部拆回成员直写, 让地址重算撑高 off/base 的 n_refs 与寿命。
+       ⚠ 参数类型必须保留窄类型(u8/u16): 全 u32 会让栈参直接 `ldrb [sp,#off]` 就地读(无提升)。窄类型 ANSI 定义与 K&R 空原型 `f();` 冲突报
+       "default promotion can't match empty parameter list" → 用 **K&R 旧式定义** `f(a,b) u8 a; u32 b; {...}` 保留 code_0.h 的 `void f();`(调用者无截断, 不能改原型)。
+       关联: 规则 88 (global-alloc life 定优先级)、规则 106 (提升决策可被 C 结构改变)、规则 130 (命名符号防折叠)。
+
+132. **switch 型属性 getter: 不写显式 default `return` → 默认路径 fall-through 返回 stale r0(=函数内某早先值), 这迫使该值的 home 留在 r0, 连带把后续地址计算的 temp/base/fid 挤到 r1/r2/r3 命中目标**（案例 `sub_80455A0`, 2026-09-04）。
+       目标形如 `bl GetX; adds r2,r0,#0; ldr r3,=sym; ...; cmp r5,#7; bhi <epilogue>` 且 epilogue 直接 `pop;bx`(默认返回 r0=GetX 结果, 无 mov/无截断)。
+       写法: `base=GetX(); ...switch(stat){case 0..7: return arr[f].fieldN;} ` **结尾不写 return**。
+       - 写了 `return base;` → GCC2 在默认路加截断/`mov r0,r2`(多指令)。
+       - 不写 → GCC2 把 base 的 home 定在 r0(调用返回寄存器, 因它"活到"默认出口), 地址计算另起 r1/r2/r3, index 段逐指令对齐。
+       ⚠ 配套: 数组 stride 必须用**真结构尺寸**(PlayerStats=0x40→`lsls #6`); 内联草稿若按实际字段大小(0x1C)会算成 ×28 的 `lsl#3;sub;lsl#2`。
+       返回类型 u16 与 u32 在"无 return 语句"时字节一致(无值可截断), 取语义类型。
+       关联: 规则 97 (u32 formation 使 load 落 r2)、规则 44 (base 先物化再 movs)。
+
+
+133. **"某 call 结果只用一次却需留在 r0(无拷贝) + 让紧随的全局基址 ldr 落 caller-saved 寄存器在 call 之后载入" → 把该 call 结果存进一个用后即死的独立局部变量**（案例 `sub_8045860`, 2026-09-04）。
+       症状: 目标 `bl GetX; ldr r2,=globalBase; ...add rX,rX,r0...`(call 结果 r0 直接用, 全局基址在 call 后载入 caller-saved r2)。
+       - 内联 `f = base[*(GetObjPool()+...)]` → GCC2 把 `ldr r4,=base` **提到 call 前**(选 callee-saved 以存活), bl 偏移差 2 字节。
+       - 复用同名变量 `pool=GetX(); ...; pool=GetX()` → 首次结果被 `add r2,r0,#0` 拷贝(因 pool home 需跨后续)= 多一条指令。
+       - **独立变量** `u32 p1=GetX(); f=base[*(p1+...)];`(p1 之后不再用)→ p1 留 r0 无拷贝, base 落 r2 在 call 后载入, 全段对齐。
+       配套: 多个"生命周期不重叠"的同型循环计数器若目标共用一个寄存器, 就**合并成单变量**多次复位(别拆成 i/j 抢不同 home)。
+       关联: 规则 132 (stale-r0 默认返回)、规则 97 (临时量类型决定 load home)。
+
+134. **目标把某常量(如 `movs rN,#0`)塞进某 `ldr` 的延迟槽, 而标准 C 把它 hoist 到更早处 → 在该常量"应在位置"之前插一条空循环 `do{}while(0)` 作 arm_reorg 调度屏障**（案例 `sub_80457AC`, 2026-09-04, 新工具)。
+       症状: 目标 `ldrh r0,[..]; movs r6,#0; strh r0,[..]` —— 零填在 ldrh 与 strh 之间(load-delay 槽); 你的等价 C 里这条零被 arm_reorg 提到更早 (如上一条 store 前), 差一截字节。
+       穷举语义等价写法(三元/if/变量/块作用域/`if(0);`/标签/空语句)全不改此 hoist。
+       解: 在目标零"应出现位置"对应的 C 语句**之前**插 `do {} while (0);` (或 `while(0);`/`for(;;)break;`)。空循环产生 NOTE_INSN_LOOP_BEG/END,
+       改变 arm_reorg 填延迟槽的候选集, 把零压回 ldrh 槽。纯 no-op, 不动数据流/语义 (≠ 规则18/113 的偷改数据流 hack); 先例 sub_8045EB8 的"死语句留 movs rN,#0"。
+       ⚠ 仅当 fncheck 证实差异常量位置且无干净解时用; 加注释说明是调度屏障。
+       关联: 规则 89 (字段类型决定 ldrh/ldrsh)、坑11 (死语句痕迹)。
+
 
 ## 寄存器分配定量诊断 (agbcc -dl 转储) —— 破解"怎么写都不换寄存器"类卡壳
 agbcc (egcs 1.1 系) 自带 RTL 转储开关, 对定位寄存器 home 问题极其有用:
@@ -1057,6 +1105,31 @@ callval/raw=reassign} × do-while 屏障; permuter 5 次 (base/t6/t1/output-10/e
 permuter 最优 output-10 差 2 真实字节但靠 `diff=a; b-diff` 偷改数据流 (不可读, 清洗即退回 subs r2)。
 候选存 `permuter/sub_8049AD8/candidates/`。下一步同 sub_80531A8: 补 global-alloc 转储看 diff 的候选/优先级,
 或找能触发"短命值进 r0 + 长命拷贝进 r2 且不被 CSE 合并"的引用形式。
+
+### sub_804DCD8 / sub_804D798 —— obj[0xC2]/obj[0xBD] 存的 addr/val 寄存器 split, 同 global-alloc 族 (2026-09-04)
+
+姊妹族 sub_804D1B4/D260/D708/D798/DCD8 (概率判定+掉落道具)。目标把 `obj[0xC2]=0`/`obj[0xBD]=0` 这类
+"存常量到 obj+off" 排成 **复用 r1 存值 + 把地址拷到 r2** (`adds r2,r1,#0; movs r1,#0; ...; strb r1,[r0]`),
+matched 的 sub_804D260 也是 addr=r1/val=r0。但 straight-line 写法 (sub_804DCD8 的 `obj[0xBC]=1; obj[0xC2]=0;`)
+让 agbcc 给 addr=r0/val=r2, 少那条拷贝 → 函数短 4B。命名符号/switch 折叠/零变量/交换顺序/~15 变体 + permuter
+全产不出那条跨块 r1 复用拷贝 (global-alloc live-range-split, 同 sub_80531A8/sub_8049AD8 决策层)。
+**⚠ 致命副作用**: status=0 函数若落地这个 4B 短版, 会把后续函数 (sub_804DD70) 整体位移 -4, 连锁改前面函数
+(VBlank_UpdateGameScreen@0x080003d4) 的 bl 目标 → 全 ROM 红; 而 **fncheck 会假报 OK** (比对前缀, 漏报尺寸短)。
+定论必须看 `ll.map` 函数实际尺寸/下一函数地址 或 make+SHA1, 别信 fncheck 的 "OK N bytes"。
+
+### sub_80525E8 —— 脚本装载器的"早载存址 &E6C 落 r1"二难, 同 global-alloc 族 (2026-09-04)
+
+`sub_80525E8(songId,entry,mode)` (LZ_BGM 装载, 姊妹 sub_80513A0): LZ 解压 + switch 设 `gUnk_03000E6C`。
+目标 case2 (mode==2) 骨架: `ldr r1,&E6C; lsls; ldr r2,tbl; adds; ldrh; ldr r3,base; adds; str r0,[r1]` ——
+**存址 &E6C 早载(0x8e)且落 r1**, 且 default/case1 与 case2 的 `str r0,[r1]` 由 cross-jump 合并成共享尾。
+穷举 ~28 变体 (switch 序/scriptPtr 尾存/v 命名临时/tblv/base/np/b2/dst 指针/ydst 统一跨块指针/volatile/
+冗余二次 store/do-while 屏障/-g flag) + permuter 4 轮(含 37825 迭代, 停 280)。**产物已 184B 尺寸一致**,
+只剩 case2 三处 load 顺序/寄存器 (早载&r1 ↔ 晚载&r2 不可兼得)。
+定量: 早载 &E6C 伪寄存器 2refs/14–16insns → pri≈5700–8500 抢不过表基址临时 (2refs/4insns → 20000),
+目标需 &E6C n_refs≥5 才拿得到 r1, C 层产生不了; late 载则 &E6C 拿 r1 但 load 位置差 4 条。
+→ **cross-jump 合并公共 str 的前提=两支路 store 寄存器号一致; 而"早载即低 pri"使存址抢不到首选寄存器,
+存在"早载+rN 正确"不可兼得的二难**。与 sub_80531A8/sub_804DCD8 同决策层。最佳候选见
+`permuter/sub_80525E8/base.c` (O1/np+b2+v) + functions.tsv note。
 
 ### 其他已确认的死路
 
@@ -1234,6 +1307,13 @@ arm-none-eabi-ld -r -T /tmp/wrap.ld /tmp/b1.o -o baserom.o
 差异行集中在池常量地址(被 objdump 解码成 `movs r0, r0` 之类的假指令)。
 用部分链接 + cmp 一次就能定性, 别去调写法。
 
+→ **permuter 想让老实的 score=0 也走同一条路**: 直接在 `permuter/<fn>/compile.sh`
+  末尾 (`.align 2, 0` 之后) 给函数用到的每个绝对符号追加
+  `printf ".equ gUnk_0300XXX, 0x0300XXXX\n" >> "$T/f.s"`, 汇编器会把它化成绝对地址,
+  字面池就从 `R_ARM_ABS32 + 符号名` 变成 `.word 0x...`, 与 target.o 的池按键一致,
+  permuter 即可真实到 0 (实测 sub_804DE8C, 2026-09-04)。注意此招只为给 permuter
+  打分清零, **合入 src 仍用真 extern**, 最终定性仍以 fncheck/bytecmp 为准。
+
 ### 10. 分节注释 `/* ==== 标题 ====` 漏写 `*/` → 吞掉紧跟的那一行 extern
 
 `iwram.h` 里追加的 `/* ==== 视口/摄像机滚动 ... ====` 没有闭合, C 注释在**下一个** `*/`
@@ -1346,3 +1426,53 @@ tools/preproc/preproc .scratch/x.i | tools/agbcc/bin/agbcc -mthumb-interwork -Wi
     -Wparentheses -O2 -fhex-asm -fprologue-bugfix -dl -o .scratch/x.s
 grep '^Register ' gccdump.lreg; grep '^;; Register .* in' gccdump.lreg; rm -f gccdump.lreg
 ```
+
+135. **尾部多 store 的"常量+拷贝中转"链: orr 结果先落 int 临时再 store, 且最后一个 0 与 orr 常量共用 r3** —— `moveBits(u16)=0x200|y; walkOfs=0; stateFlags(int)=moveBits; *(u16*)(obj+0xB0)=stateFlags; obj[0xA8]=walkOfs;` 让 GCC2 把 0x200-常量伪 (r3, 死于 adds r0,r3 拷贝) 的颜色让给 0-pseudo (def 落 b8, 被 r3-read@b6 反依赖挡住), orr 累加器=常量拷贝侧 r0 (const-as-accumulator)。
+   若 moveBits 直 store (无 int 中转), 0-pseudo 恒落 r1@ba (差 4B); 若 0x200 临时复用 u32 zero, orr 翻成 `orrs r1,r0` (dest=y 侧)。
+   第 5 实参 0 与末尾 `obj[0xA8]=0` 的 0 必须是**两个独立变量** (同一变量则 strb 源复用 arg5 的 r7)。
+   （案例 `sub_8046060`, 2026-09-04, permuter 破局: 在手工 u1.c 上加 `stateFlags=moveBits` 中转一句 → 70→0; 姊妹 sub_8045F94 同族仅差 CBA4 第2实参 0xA/4, 2026-09-04 gpnux 用同一模板直接得分 0, 无需再做 permuter 探索 — 同族先例成立时直接套用）
+
+136. **fndiff 中 `ldrb r1,[r0]` (载入值进 r1 而非常规 r0) + 后续 `adds r0,r1,#0` 拷回 → 载入值还要作第 2/后续实参用, 不是纯 home 偏好**: 先查调用点语义 (该值是否兼作下一 bl 的实参), 别急着当寄存器分配死磕。（案例 `sub_804666C` 第三循环 `sub_80466F0(obj, indices[j])`, 2026-09-04; 曾被误判为 2B home 差挂起 2 天）
+
+137. **u16 回绕减法: 目标把 `arg1-2` 编成 `ldr rX,=0xFFFE; adds rY,rA,rX; lsls#16; lsrs#16` (加补码+掩码) 而非 `subs #2` → 源必须写 `(u16)(arg1 + 0xFFFE)`**, 写 `(u16)(arg1 - 2)` 恒出 subs+掩码 (差 4B)。probe 验证: `(u16)(arg1-2)` → `subs r0,r1,#2;lsls;lsrs`; `(u16)(arg1+0xFFFE)` → 目标形状。同类 `(arg1 + 0xFFFE) != x` 直接比较 (无掩码) 又是另一形状, 必须带 (u16) 强转。改错 30 分钟级别卡点, 先试 +0xFFFE。
+   （案例 `sub_804612C`, 2026-09-04, gpnux; 连带发现 sub_801DD04 是 3 参 (obj, idx, val), 池扫下标 i 就是 idx 实参）
+
+138. **K&R 空原型 `void f();` 会让 3 参调用编错实参 (第 3 参 r2 丢失) — 匹配前先查被调子函数 (如 sub_801DD04) 的真实签名, 按反汇编证据写全原型**; 合入时 src 里的空原型若与真 C 定义冲突 (make 报 conflicting types), 升级为全原型 `(u8*, u16, u16)` (无调用点则安全)。案例 `sub_804612C`, 2026-09-04。
+
+139. **位域结构体局部被 GCC2 寄存器提升 (整值留寄存器、末尾一次 str) 而目标要求"每写一个字段就 str 回栈、但不重载"时, 用 `union { struct S s; u32 w[N]; } u;` 包裹可强制内存驻留 + 逐字段写回**（案例 `sub_8025518`, 2026-09-04, 未破但结构归位 4510→945）。
+     判定: 目标对同一 `[sp]` 连续 `ands/orrs; str [sp]` 多条且**首条之后不再 ldr [sp]** (值在寄存器链 r4→r2→r4… 上前进, 但每步都镜像写回内存)。
+     朴素 `struct S s; s.f0=..; s.f1=..; out[0]=*(u32*)&s;` 会被提升: GCC2 把整值留一个寄存器, 中间 str 判死删掉, 只末尾写一次。
+     **正解**: 声明 `union { struct S s; u32 w[2]; } u;`, 字段一律 `u.s.fX = ..` 写, 末尾用 `out[0]=u.w[0]; out[1]=u.w[1];` 读回。
+     u32 数组视图让 GCC2 认定内存可能被观察 → 放弃提升, 对**首个被访问的字 (word0)** 逐字段 str 回 [sp], 且 CSE 把上一步结果转发给下一步 (不重载), 与目标一致。
+     ⚠ 不对称: 同一 union 里**后写的 word1 仍可能被留在寄存器只 str 一次** (GCC2 在 word0 temp 释放后压力下降), 目标若对 word1 也逐字段 str 则纯 C 难强制 —— 这是 sub_8025518 的残留卡点之一。
+     配套: 单字段算术 (如 `g2 = a6 + 0xd`) 拆成 `new_var = a6 + 0xd; u.s.g2 = new_var;` 可让 a6 保持入口的 `<<24` 未归一形态, 复现目标的 `+0xd0000; lsrs #0x10` 移位域算术。
+      ⚠⚠ permuter 对此族压到 <945 全靠 `new_var=u.w[0]; out[0]=new_var;` (new_var 取 u16) **截断 word0 高 16 位**省指令 —— 规则18/113 偷改数据流, 非法, 必须人工回退到全字 `out[0]=u.w[0]`。
+     关联: 规则 87 (双职变量买 home)、规则 88/117 (跨块 home 归 global-alloc)、规则 99 (数据默认 1-D)。
+
+140. **⭐⭐ 传 `-1` 给 u16 形参会被 GCC2 折成池常量 `ldr rN,=0xFFFF`; ROM 若是 `movs rN,#1; rsbs rN,rN,#0` (s32 -1 进 callee-saved 跨多次调用) → 形参必须是有符号 `s16`**（案例 `sub_8024820`, 2026-09-04）。
+     目标形状: `push {r4,lr}; movs r4,#1; rsbs r4,r4,#0; movs r0,#0; adds r1,r4; bl sub_8018798; movs r0,#1; adds r1,r4; bl` —— s32 -1 物化一次进 r4, 跨 `bl` 复用, 每次调用在 u16 边界截断 (被调方 `strh r1,[r0]`)。
+     我写 `sub_8018798(0,-1)` (原形参 `u16 value`) 时 GCC2 在调用点把 -1 类型转换成 `(u16)-1 = 0xFFFF` 再传给 u16 形参 → 每个用 -1 的块产生 `ldr r4,=0xffff` + 4 字节池条目, 且 `int`/`s16` 局部变量缓存还会多出 `lsls r4,#16; lsrs r4,#16` 显式截断 (都差 1 x 真实指令数)。
+     正解: 把被调方形参声明成**有符号** `s16 value` 后, -1 保持 s32 直入寄存器 → `movs r4,#1; rsbs r4,r4,#0`, 逐字节命中 (bytecmp 0 real diff, fncheck OK)。
+     **安全判据**: 改形参 u16→s16 安全 iff 被调函数体对该参数只做"写 `strh`/读"这类不依赖无符号语义的窄存取 (i.e. 编译后字节不变; 本例 `gGstate330[index]=value` 两型一样)。改之前务必单独编译被调函数两型比对字节, 并 grep 确认没有其它已匹配调用者会被影响。
+     关联: 规则 117 (常量物化/负常量 arm_split_constant)、规则 87 (寄存器 home: 跨 bl 存活的常值取 callee-saved)、规则 96 (permuter 打分同一程序)。
+
+141. **⭐⭐ 汇编跳转表有 N 个 case → C 代码必须显式写 N 个 case，且按 0..N-1 顺序排列** —— GCC2 对 `switch` 的优化取决于 case 的完整性和顺序。缺 case 会让 GCC2 生成不同的比较树/跳转表结构，导致字节不匹配。（案例 `sub_8047FCC` 58 项跳转表，2026-09-04, gpnux；permuter 探索卡在 S-bit 差异，实际正确写法全 case 显式列出即得分 0）
+
+142. **case 0 用 `return ret` 而非 `break` 可改变控制流结构** —— 当目标汇编的 case 0 处理路径与其余 case 不同（如直接跳到尾部），用 `return` 而非 `break` 可让 GCC2 生成匹配的目标代码。（案例 `sub_8047FCC` case 0 用 `return ret` 匹配目标早期返回路径，2026-09-04）
+
+143. **⭐⭐ home 互换卡点: permuter 的"多余赋值"是有效杠杆, 但产物必须人工去类型作弊**
+    （案例 `sub_800FA24`, 2026-09-04, opencode）。
+    目标 `chara=&gPartyStats[i]` 指针 home 是 r1, 候选恒 r2 → 整个 HP/MP 体字节全互换
+    (bytecmp 114B)。20+ 纯 C 变体 (u8/u16/u32 索引、ptr 算术拼法、声明序、const_int vs
+    symbol_ref) 全无效。permuter 中奖输出 output-400: 在 MP 分支插入
+    `new_var = (gUnk_030001AF) ? (gUnk_030001AF) : (999);` 的**多余赋值** —— 新增局部量
+    改变伪寄存器生死边界, chara 一次归位 r1 (bytecmp 114→33)。
+    但 permuter 把 `new_var` 声明为 `u8` → 999 被截断成 231 (`movs r0,#0xe7`), 是规则 18 的
+    语义作弊; 目标从字面池 `ldr r0,=999`。人工修正为 `u16 amt; amt=gUnk_030001AF;
+    if (amt==0) amt=0x3E7; chara->mp+=amt;` → 保留 999 + 保留 home 翻转, bytecmp 只剩 4 个
+    bl 槽假差, fncheck OK 264B。
+    **流程**: ① permuter 中奖产物若改变数据流 (截断/改常量), 先记录"它加了哪个多余赋值"的
+    机制, 而非直接采信源码; ② 人工把类型改宽 (u8→u16/u32) 并重新跑 bytecmp —— 类型宽度决定
+    字面量是否物化成池常量, 是 home 翻转与语义正确之间的唯一变量; ③ 改类型后 home 仍保留才
+    算真解。这是规则 87 (变量兼职) 的"外部新增局部量"变体: 不需复用现有变量, 凭空加一个
+    语义无痛的赋值语句即可改变伪寄存器生死边界。

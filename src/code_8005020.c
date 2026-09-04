@@ -3550,7 +3550,56 @@ void sub_800F670(void)
 // @ 0x0800F70C
 INCLUDE_ASM("asm/nonmatchings", sub_800F70C);
 // @ 0x0800FA24
-INCLUDE_ASM("asm/nonmatchings", sub_800FA24);
+u8 sub_800FA24(void)
+{
+    PlayerStats *chara;
+    u8 partyIdx;
+    u16 amt;
+
+    gUnk_030001C8 = 0;
+    gUnk_030001B0 = 0x10;
+
+    partyIdx = gMenuCursorStack[0] - 1;
+    if (partyIdx == 0xFF)
+        return 0x27;
+
+    partyIdx = gPartyMemberIds[partyIdx];
+    if (partyIdx != 0)
+        partyIdx--;
+
+    chara = &gPartyStats[partyIdx];
+
+    if (gUnk_030001AE == 1)
+    {
+        if (chara->hp == chara->max_hp)
+            return 0x24;
+        chara->hp += gUnk_030001AF;
+        if (chara->hp > chara->max_hp)
+            chara->hp = chara->max_hp;
+    }
+    else
+    {
+        if (chara->mp == chara->max_mp)
+            return 0x24;
+        amt = gUnk_030001AF;
+        if (amt == 0)
+            amt = 0x3E7;
+        chara->mp += amt;
+        if (chara->mp > chara->max_mp)
+            chara->mp = chara->max_mp;
+    }
+
+    sub_800AA84(gUnk_030001A0[gMenuCursorStack[gMenuCursorGrp]], 1);
+    if (gInventory[gUnk_030001A0[gMenuCursorStack[gMenuCursorGrp]]] == 0)
+    {
+        gMenuCursorSel = gMenuCursorStack[gMenuCursorGrp];
+        sub_800E668(0xFF);
+    }
+
+    sub_8010624(0xFF, 1);
+    Sfx_Play(0x17, 1, 0);
+    return 0x23;
+}
 // @ 0x0800FB2C
 INCLUDE_ASM("asm/nonmatchings", sub_800FB2C);
 // @ 0x0800FDEC

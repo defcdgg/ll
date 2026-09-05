@@ -1,6 +1,6 @@
 # 数据区域全量导出计划 (de-blob + 符号化 + 类型化)
 
-> 依据: `docs/INCIDENTS.md`(协作铁律/方案 B) + `docs/RULES.md`(验证分层) +
+> 依据: `docs/INCIDENTS.md`(协作铁律/方案 B) + `docs/EXPERIENCE.md`(验证分层) +
 > `docs/modules/README.md`+`FUNCTIONAL_MAP.md`。本文只管 **ROM 数据区**, 代码匹配见 AGENTS.md。
 > 生成日期: 2026-09-01。所有数字均为本机实测 (`ll.map` / `scripts/data.json` / `baserom.gba` 扫描)。
 
@@ -111,7 +111,7 @@ gUnk_0839CE7C:            @ 0x0839CE7C, size 0x1C4
 
 好处: **零新增二进制文件**、按构造字节正确、符号真实存在 (链接器可解析) →
 `linker.ld` 里那 28 个手贴绝对符号**全部可以删掉**, 代码侧改用 `extern const u8 gUnk_0839CE7C[]`
-拿真重定位 (顺带满足规则 6/32 的"防常量折叠"诉求, 不再靠硬写地址)。
+拿真重定位 (顺带满足经验 6/32 的"防常量折叠"诉求, 不再靠硬写地址)。
 
 Tier 2 里**已识别的图形/脚本资产**再升级成命名 `.bin` 资产文件 (pokeemerald 风格:
 `data/graphics/<name>.4bpp.lz` / `.gbapal` / `.bin.lz`), 由 manifest 驱动, 与
@@ -141,7 +141,7 @@ data/
 
 - [ ] `scripts/data_gen.py`: 读 `scripts/data.json` + `data/manifest/*.yaml` →
       输出 `data/rodata/*.s` + `include/rodata.h` + `build/data_gen_report.json`。
-      切块规则: 只在 **4 对齐的 item 边界**断开; 每块头部写 `. = ` 锚点由 linker.ld 负责。
+      切块方式: 只在 **4 对齐的 item 边界**断开; 每块头部写 `. = ` 锚点由 linker.ld 负责。
 - [ ] `scripts/datacov.py`: 覆盖率/一致性审计 (见 §5), 输出 `docs/reports/data_coverage.csv` (目录重建)。
 - [ ] `scripts/lz.py`: LZ77/RLE/delta 解码 + **round-trip 重压校验** (只用于识别, 不改字节)。
 - [ ] `scripts/data_graph.py`: 指针表可达性 → `docs/reports/data_refs.csv`
@@ -184,7 +184,7 @@ git add -A && git commit -m "data: de-blob 0x087E9554-0x08800000 (193 syms)"
 
 blob 拆完后, `gUnk_0839CE7C` 等已经是真符号 → 删 `SECTIONS {}` 外的绝对赋值,
 改成引用生成符号。**这一步会改变重定位形态**, 因此必须逐符号 `make` 验证
-(规则 32: 符号化/字面量化本身会改变代码生成 —— 这里改的是数据侧引用, 但池值必须不变)。
+(经验 32: 符号化/字面量化本身会改变代码生成 —— 这里改的是数据侧引用, 但池值必须不变)。
 
 **D2 验收**: `grep -cE "^[A-Za-z_][A-Za-z_0-9]* = 0x08" linker.ld` → 0; SHA1 绿。
 
@@ -255,7 +255,7 @@ gSpriteGfxPtrTable:
 
 ---
 
-## 5. 验证分层 (对齐 RULES.md 的 fndiff/fncheck 思路)
+## 5. 验证分层 (对齐 EXPERIENCE.md 的 fndiff/fncheck 思路)
 
 | 层 | 命令 | 抓什么 |
 |---|---|---|
@@ -342,7 +342,7 @@ shape3 非法 : (1,1)  (1,1)   (1,1)   (1,1)
 | 0x0805887C | 保留名, **类型改 `const u8[4][4]`** | 名字准确 (每 shape×size 需多少块 OBJ), 只是没体现二维 |
 
 **改名安全性**: 5 张表在 `asm/` 里全部**不按名字引用** (gbadisasm 写硬码 `.4byte 0x08058834`),
-所以改名只影响 C 侧 → 零链接风险 (见 RULES.md「符号改名管线」)。
+所以改名只影响 C 侧 → 零链接风险 (见 EXPERIENCE.md「符号改名管线」)。
 
 ## 9. 一句话给决策
 

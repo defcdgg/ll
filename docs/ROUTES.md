@@ -154,7 +154,7 @@ extern const EnemyCharaStat gCharaBaseData[];
  * const 性不同会报 conflicting types (agbcc 严格) */
 ```
 ⚠ 两个视图不能混用: 字节视图函数 (sub_800AAF8/AB18) 改成 struct 字段访问会改变 GCC2
-代码生成 (ldrb→ldrh 等), 导致已匹配 ROM 变红 (实测踩到, 规则 67 变体)。
+代码生成 (ldrb→ldrh 等), 导致已匹配 ROM 变红 (实测踩到, 经验 67 变体)。
 
 ## 新增代码片段 (PartyForm_ApplyBonus, 已入 src/)
 

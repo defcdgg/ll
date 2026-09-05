@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # bytecmp.sh <func> <candidate.c> <abs-symbol-assignments...>
-# 单函数**字节级**判定 (RULES 规则 29): 编候选 -> 部分链接(施加字面池重定位)
+# 单函数**字节级**判定 (EXPERIENCE 经验 29): 编候选 -> 部分链接(施加字面池重定位)
 # -> objcopy 出 .text -> 与 permuter/<func>/target.o 的 .text 逐字节 cmp。
 # 输出 "OK" = 字节完全一致 (bl 槽位除外)。比 fndiff 的 score 更可信。
 set -euo pipefail

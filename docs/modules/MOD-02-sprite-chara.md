@@ -228,7 +228,7 @@
 未解锁单图块+单精灵 (tileOffsetY=0x20)。代码生成要点: **gfx 指针 ±偏移形态** (r4 缓存) 命中字面池内联布局,
 独立符号会多 4 个池使 ROM 布局漂移。
 
-**代码生成要点 (新增沉淀, 详见 RULES 规则 89-95)**:
+**代码生成要点 (新增沉淀, 详见 EXPERIENCE 经验 89-95)**:
 - 静态物件动画的 EnqueueRender 返回值不能以 u8 原型读 (目标直接 cmp) — 用 s32 别名 `Sprite_EnqueueRender_S32` (linker.ld 同址别名)。
 - `StaticMapObject.x/y/z` 与 `ChestObject.x/y` 实为 **u16** (目标 ldrh 零扩展), 改 s16 会引入 ldrsh 使 ROM 红掉 8 字节。
 - `gUnk_08095028` 若在 C 文件 内定义为空数组会占 .data 8 字节导致 rom 溢出 — 必须 extern 引用。

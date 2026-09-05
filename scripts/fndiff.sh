@@ -13,7 +13,7 @@
 # 不需要整个 ROM 变绿, 也不碰别人的半成品 —— 多智能体并行时的首选验证手段。
 # 依赖: permuter/<func>/compile.sh (没有则自动生成), asm/nonmatchings/<func>.s
 #
-# 注意: score 可能因"字面池未重定位"虚高 (RULES 规则 29)。
+# 注意: score 可能因"字面池未重定位"虚高 (EXPERIENCE 经验 29)。
 #       要字节级定论请再用 scripts/fncheck.py <func>。
 
 set -euo pipefail

@@ -23,6 +23,8 @@ handler 读 `data[1..]` 参数、执行动作、推进 `*ptr`、返回 1=继续�
 | 0x0805008C | ✅C | `sub_805008C` | 逐帧后台服务 (VBlank_UpdateGameScreen 末尾调用, ScriptPump_Run 姊妹): 按 E70 状态位依次消费 bit4 窗口拷贝 (opcode∈{0,0x17} 时即便无请求位也主动做一次) / bit6 FlushTileDma / bit8 BgTiles_LoadSet(0) / bit9 LZ_UncompressChunk, 解压完且 bit10 时 PC=gUnk_02016200+gUnk_02016000[gUnk_03000E69] (gUnk_03000E69=脚本槽索引, 新符号) |
 | 0x08052580 | ✅C | `Script_ResetVM` | VM 复位: 指针=02016200, 状态=0, gUnk_03000ECB=1/03000ECC=0xC, gUnk_03000E78(调用栈深)=0, gUnk_03000E80[8](返回地址栈)=0, gUnk_03000ECA=0 |
 | 0x08052574 | ✅C | `Script_GetFlags` | 返回 gUnk_03000E70 (调用方用 bit0 判断脚本忙) |
+| 0x080526A0 | ✅C | `sub_80526A0` | 脚本 VM 启动/跳转: arg1==2 → 指针=gUnk_02016200+gUnk_02016000[arg0], arg1==3 不动, 其它复位到 gUnk_02016200; 然后清 8 个 u16 局部槽 gScriptLocalSlots[0..7]=0xFFFF + 置 E70 bit0 + 清 gUnk_03000E72 (gScriptLocalSlots = gUnk_03000ED8 的 u16[] 视图别名, 新符号) |
+| 0x0804FA94 | ✅C | `sub_804FA94` | 脚本条件跳转 (任一 flag 置位版, 镜像 804F974): 遍历 data[1]/2 个 u16 flag id (≤0x1FF 查 EventFlags_Test 否则 SwitchFlags_Test(id-0x200)), 任一真 → 指针=gUnk_02016200+gUnk_02016000[data[2]], 全假 → 指针推进 data+count+3; 经 gUnk_0862D434 函数指针表调用 |
 | 0x08052728 | ✅C | `Script_Abort` | arg0=1: 指针复位+停; 3: 仅停 |
 | 0x08051230 | ✅C | `Op_ScriptStop` | opcode: 停 VM, 清 gUnk_03000EA0[]/03000EC0[](数量=03000ECA), 非 0x200 模式指针复位 |
 | 0x0804F210 | ✅C | `SioBattle_ResetState` | 清 gUnk_03000DF0[0..4] + 03000E04/03000E05 (通信对战状态) |
@@ -36,7 +38,7 @@ handler 读 `data[1..]` 参数、执行动作、推进 `*ptr`、返回 1=继续�
 | 0x0805291C | ✅C | `Op_CloseWindow` | 关窗口: 清 BG0 显示, 状态\|=0x100 |
 | 0x08051A1C | ✅C | `Op_OpenWindow` | 开窗口: WindowBgBuf 填 0xB000, BG0CNT=charbase2/screenbase31, 状态\|=0x10 |
 | 0x0804F0B8 | ✅C | `CheckObjectKindSlot` (已有名) | 死代码 (无调用点) |
-| 0x0804F10C/17C/280/64C/7F8/F8D8/974/FA04/FA94/FB24/80501B8/8050434/805063C/8050720/80511A0/80512C4/80513A0/805144C/8051AEC/8051BE4/80525E8/80526A0/80529B8/8052AE8/8052F44/8053270 | ❌ | (待匹配) | 804F280=大型角色控制 opcode (调 Chara_SetGfxPal/FreeSprite/StartScriptAnim/AnimWaitDone/Chara_SetWalkPath); 80525E8/80526A0=BGM/脚本装载入口(场景加载/NewGame 调用); 8052F44=队伍成员条件跳转; 8053270=循环指令 |
+| 0x0804F10C/17C/280/64C/7F8/F8D8/974/FA04/FB24/80501B8/8050434/805063C/8050720/80511A0/80512C4/80513A0/805144C/8051AEC/8051BE4/80525E8/80529B8/8052AE8/8052F44/8053270 | ❌ | (待匹配) | 804F280=大型角色控制 opcode (调 Chara_SetGfxPal/FreeSprite/StartScriptAnim/AnimWaitDone/Chara_SetWalkPath); 80525E8=BGM/脚本装载入口(场景加载/NewGame 调用; 80526A0 已单独 ✅ 见上); 8052F44=队伍成员条件跳转; 8053270=循环指令 |
 
 ## opcode 处理器 (真 C, 按功能分组)
 
@@ -104,12 +106,18 @@ handler 读 `data[1..]` 参数、执行动作、推进 `*ptr`、返回 1=继续�
 0x0805305C→sub_8009B1C, 0x08053078→wait !sub_8009B34, 0x0805309C→FullHealParty, 0x080530B4→sub_800A9C0(EquipItem),
 0x08052B34(✅asm)/0x08052AE8(❌)/0x08052858(`ScriptGotoEntry` 已名)/0x08052878(`Script_Call`)/0x080528C8(`Op_DialogSetup`)/0x0805291C 见上。
 
-## 未匹配 24 个清单
+## 未匹配 22 个清单
 
-804F280(大型角色控制), 804F64C, 804F7F8, 804F974, 804FA04, 804FA94, 804FB24,
+804F280(大型角色控制), 804F64C, 804F7F8, 804F974, 804FA04, 804FB24,
 805008C, 80501B8, 8050434, 805063C, 8050720, 80511A0, 80512C4, 80513A0, 805144C, 8051AEC, 8051BE4,
-80525E8(BGM/脚本装载), 80526A0(事件启动), 80529B8, 8052AE8, 8052F44(队伍条件跳转), 8053270(循环)
+80525E8(BGM/脚本装载), 80529B8, 8052AE8, 8052F44(队伍条件跳转), 8053270(循环)
 + 已匹配 asm: 8052B34, 8053360(Op_IfMoneyJump)。
++ 已匹配真C: 80526A0 —— 脚本 VM 启动/跳转: 前任 score 25 是 extern 池重定位假分 (经验 164),
+  去 m2c no-op 后人工形态直接过; `= -1` 须 extern u16[] 视图才出 orr 展开 (经验 165),
+  新别名 gScriptLocalSlots; fncheck OK 136B。
++ 已匹配真C: 804FA94 —— 任一 flag 置位条件跳转: 前任 score 10 = extern 池假分 + bl 伪影,
+  指令流本已全对; t 存 r8/0x1FF 存 sb; `long long dest` 截断暂存承重 (经验 166);
+  原型 void() → u32(u32*) (无调用方零风险); fncheck OK 144B (2 池重定位, 2 bl 忽略)。
 + 已匹配真C: 804F10C —— 搜索函数: GetObjPool 空闲槽里找首个 sub_804E76C 命中者, 返内部下标或 -1
   (sub_80489E8 先筛 sub_8045F10==2 的槽); 需 int idx + s8 tmp 中间变量复现截断调度, fncheck OK 110B。
 + 已匹配真C: 804F17C —— 收集版姊妹: 全命中 sub_804E76C 的槽下标写入 out[] 并返数量, 死代码无调用点, fncheck OK 148B。

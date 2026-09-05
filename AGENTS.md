@@ -1,7 +1,7 @@
 # AGENTS.md — 开工手册 (每个 agent 必读, 唯一操作权威)
 
 > 项目: 《Lunar Legend (Japan)》GBA ROM 全量反编译。终验 = `make` 后 `sha1sum -c ll.sha1` 通过 (ROM 逐字节一致)。
-> 本文件 = 怎么干活; 深度经验 (102 条规律/坑/失败存档) 在 `docs/RULES.md`, 索引见文末 §9。
+> 本文件 = 怎么干活; 深度经验 (102 条规律/坑/失败存档) 在 `docs/EXPERIENCE.md`, 索引见文末 §9。
 > ⚠ **匹配流程是铁律 6 (permuter 先到分数 0 才许动 src), 违反视为事故**。
 
 ## 0. 铁律 (多 agent 并行, 违反 = 事故)
@@ -20,7 +20,7 @@
     2. **先建 permuter 草稿**: `scripts/mkpermuter.py <fn>` 生成 base.c (不合入 src);
     3. 自己读反汇编+草稿,**人工分析/优化 C** (类型、访问、调度、语义), 改 base.c;
     4. `permuter.py` 跑分 → **分数=0 才算候选成立** (分数≠0 继续改/重跑);
-    5. permuter 抛出的代码**可能不可读/有界外索引/偷改数据流** (规则18/113), 必须**人工修正为人类代码**;
+    5. permuter 抛出的代码**可能不可读/有界外索引/偷改数据流** (经验 18/113), 必须**人工修正为人类代码**;
     6. 修正后**再次跑分, 分数仍=0** 才算真正匹配 (改人类代码可能改变字节, 必须复验);
     7. 全部 OK 才允许合入 `src/<module>.c` 替换 INCLUDE_ASM, 再走 §2 的 fncheck/make/sha1。
     违反: 直接改 src 靠 make 试错, 分数从未到 0 → 视为事故, 回退且不留痕。
@@ -31,7 +31,7 @@
    |---|---|---|
    | 该函数一行结论 (✅要点 / ⏸卡点+候选) | `functions.tsv` note 列 + status 翻转 | 每次合入/挂起时, **必写** |
    | 逐函数详细故事、原型修正记录、死路清单 | `docs/progress.md` 追加 | 匹配过程有非平凡发现时 |
-   | **新发现的代码生成规律** (可复现模式, 附案例函数地址) | `docs/RULES.md` 追加编号规则 | 同一个坑/技巧第二次用到时 |
+   | **新发现的代码生成规律** (可复现模式, 附案例函数地址) | `docs/EXPERIENCE.md` 追加编号经验 | 同一个坑/技巧第二次用到时 |
    | 并发冲突、构建/工具事故 | `docs/INCIDENTS.md` 追加一行 (时间\|事件\|根因\|对策) | 事故发生当场 |
    | 模块语义/数据结构/命名发现 | 对应 `docs/modules/MOD-*.md` | 分析或改名后 |
 
@@ -58,7 +58,7 @@ status isa   module        addr        asm_lines name                 note
   用于按 §2「优先 ≤60 行小函数」筛目标; 切片缺失为 0, `code.s` 变更后需重跑 `tsv_init.py`。
   注: 主体行数 ≠ 指令数, 每条字面池 `.4byte` 占 1 行但占 4 ROM 字节。
 - **`note` (末列) = 完成/挂起明细**, 一行无制表符:
-  完成 `✅ 日期 agent: 关键技术点(规则号); fncheck 结果` | 挂起 `⏸ 卡在哪; 最佳候选路径; 详情见 progress.md §xxx`。
+  完成 `✅ 日期 agent: 关键技术点(经验号); fncheck 结果` | 挂起 `⏸ 卡在哪; 最佳候选路径; 详情见 progress.md §xxx`。
   详细故事写 `docs/progress.md`, TSV note 只放一行。
   ⚠ note 可能含字面 `"` (引号) 与尾随 tab — **禁止用 csv.writer 重写 TSV** (会加 CSV 引号/丢尾 tab),
   按行 `split("\t", 5)` + `"\t".join` 处理。
@@ -85,9 +85,9 @@ scripts/bytecmp.sh sub_XXXXXX <候选.c> "sym = 0x...;"...   # 4. 候选级字�
 python3 scripts/gen_asm.py                      # 6. 增量重建 asm/ (内容不变不 touch)
 python3 scripts/fncheck.py sub_XXXXXX           # 7. 字节定论
 timeout 900 make 2>&1 | tail -3 && sha1sum -c ll.sha1   # 8. 全量终验
-#    用了 r8/sb/sl 且 make 红在别的函数 = GCC2 泄漏 → 拆 C 文件 (RULES 坑1)
+#    用了 r8/sb/sl 且 make 红在别的函数 = GCC2 泄漏 → 拆 C 文件 (EXPERIENCE 坑1)
 # 9. 铁律 8: 禁止 git commit/push — 只改文件&写共享文档, 提交由外部流水线统一收尾
-scripts/claim.sh --release sub_XXXXXX           # 10. 释放; 按铁律 6 留痕: TSV status+note / progress / RULES / INCIDENTS / modules
+scripts/claim.sh --release sub_XXXXXX           # 10. 释放; 按铁律 6 留痕: TSV status+note / progress / EXPERIENCE / INCIDENTS / modules
 ```
 
 ## 2b. permuter 用法 (匹配必经压分工具, 铁律 6 的主战场)
@@ -109,10 +109,10 @@ scripts/claim.sh --release sub_XXXXXX           # 10. 释放; 按铁律 6 留痕
 cd permuter/<fn> && timeout 280 ../../.venv/bin/python ../../tools/decomp-permuter/permuter.py . -j 1
 ```
 - 自己分析/优化 base.c (类型、访问、调度、语义), 再跑分。permuter 只探索**语句顺序/括号放置**,
-  适合"调度槽位"与"home 互换"类卡点 (实测 sub_8014084 → 规则87; sub_8007ADC 2685→27B 平台期)。
+  适合"调度槽位"与"home 互换"类卡点 (实测 sub_8014084 → 经验 87; sub_8007ADC 2685→27B 平台期)。
   **结构/表达式问题它救不了**, 卡 30 分钟就 `scripts/claim.sh --note "具体卡点"` 转挂起换目标。
 - 中奖输出 `output-<score>-<n>/source.c`; **分数低 ≠ 对 / 分数=0 也不可直接合入**:
-  ① 规则18/113 可能偷改数据流/有界外索引, 人工核对每条访存并**修正为人类可读代码**;
+  ① 经验 18/113 可能偷改数据流/有界外索引, 人工核对每条访存并**修正为人类可读代码**;
   ② 修正后**再跑分, 仍=0** 才算真正匹配 (改人类代码可能改变字节, 必须复验);
   ③ 复验通过才 `scripts/fndiff.sh --promote <fn> <winner>.c` 固化, 然后才许按 §2 合入 src。
   全程字节定性以 `bytecmp.sh` / `fncheck.py` 为准 (score 会假高)。
@@ -121,12 +121,12 @@ cd permuter/<fn> && timeout 280 ../../.venv/bin/python ../../tools/decomp-permut
 ## 3. 硬约束 (ROM 布局相关, 不可违反)
 
 - 函数/数据**顺序即布局**: 不重排函数, INCLUDE_ASM 顺序 = ROM 顺序; linker.ld 符号按地址序插。
-- 数据表声明**默认保持 1-D** (规则99): 改多维会改变消费者索引算术; 逻辑维度写注释。
+- 数据表声明**默认保持 1-D** (经验 99): 改多维会改变消费者索引算术; 逻辑维度写注释。
 - 硬件寄存器一律 `include/gba/io.h` 的 `REG_*` 宏 (它们是 `(*(vu16 *)...)` volatile), 禁止裸地址或普通 u16 强转
   (`*(u16 *)0x04000054` ✗ → `REG_BLDY` ✓); **permuter base.c 同理**: 不能 include 头文件时, 把
   `typedef volatile unsigned short vu16;` + `#define REG_x (*(vu16 *)0x...)` 从 io.h 原样内联,
-  否则是在给另一个程序打分 (规则96)。DMA/串行口先查 `include/gba/macro.h`
-  的 `DmaSet/DmaCopy*/CpuSet` 宏 (规则55 — 目标里"连续同基址 str + 一次空读"就是宏展开形状)。
+  否则是在给另一个程序打分 (经验 96)。DMA/串行口先查 `include/gba/macro.h`
+  的 `DmaSet/DmaCopy*/CpuSet` 宏 (经验 55 — 目标里"连续同基址 str + 一次空读"就是宏展开形状)。
 - ⚠ 寄存器号/通道别凭记忆: `0x040000B0`=DMA0SAD 不是 DMA3; `0x04000130`=REG_KEYINPUT 不是定时器。先 grep io.h。
 - volatile 只给真实 IO; u16 寄存器字节读用 `*(vu8 *)&REG_x`。
 
@@ -150,7 +150,7 @@ cd permuter/<fn> && timeout 280 ../../.venv/bin/python ../../tools/decomp-permut
 | `python3 scripts/gen_reports.py` | 重生成 docs/reports/remaining.md (Markdown; 名称列 Ctrl+Click 跳 asm 切片, permuter 列跳套件目录, 行数<200 前缀 ▶; 全量清单看 functions.tsv) |
 | `make ctx` | 重生成 m2c 上下文 (头文件改后) |
 | `tools/gbadisasm/gbadisasm baserom.gba -c ll.cfg > code.s` | 重出反汇编 (改名管线第 2 步) |
-| `arm-none-eabi-cpp ... && agbcc -dl` | RTL/寄存器分配转储 → gccdump.lreg (查 home, RULES §诊断) |
+| `arm-none-eabi-cpp ... && agbcc -dl` | RTL/寄存器分配转储 → gccdump.lreg (查 home, EXPERIENCE §诊断) |
 
 ## 5. m2c 初转 (大函数起手)
 
@@ -181,7 +181,7 @@ make ctx
 - ROM 绝对符号: `linker.ld` 的 `SECTIONS {}` **外面** `gUnk_08XXXXXX = 0x08XXXXXX;` (放里面会叠加段基址污染池值)。
 - 同地址多类型视图 → 起别名符号 (也在 SECTIONS 外)。
 
-**函数改名全链** (细节与坑见 RULES.md「符号改名管线」):
+**函数改名全链** (细节与坑见 EXPERIENCE.md「符号改名管线」):
 ```bash
 sed -i 's/\bOldName\b/NewName/g' ll.cfg include/code_0.h src/*.c   # TSV 不用改 (addr 主键)
 tools/gbadisasm/gbadisasm baserom.gba -c ll.cfg > code.s
@@ -201,7 +201,7 @@ make ctx && timeout 900 make 2>&1 | tail -3 && sha1sum -c ll.sha1
 
 | 文件 | 内容 | 什么时候读 |
 |---|---|---|
-| `docs/RULES.md` | **102 条代码生成规律** + 寄存器诊断 + 失败案例存档 + 坑 + 改名管线全文 + 硬件寄存器全规范 | 写 C 前查同族规律; 卡寄存器必看规则 29/51/54/76/87/88/102 + 失败存档 |
+| `docs/EXPERIENCE.md` | **102 条代码生成规律** + 寄存器诊断 + 失败案例存档 + 坑 + 改名管线全文 + 硬件寄存器全规范 | 写 C 前查同族规律; 卡寄存器必看经验 29/51/54/76/87/88/102 + 失败存档 |
 | `docs/INCIDENTS.md` | 并发/构建事故记录 (追加式) | 发生并发冲突/想改共享文件前 |
 | `docs/progress.md` | 逐函数匹配故事/原型修正表 (追加式) | 接手挂起函数前 |
 | `docs/modules/README.md` | MOD-01..09 物理分段索引 + 分析状态 | 选目标前 |

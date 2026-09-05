@@ -3,7 +3,7 @@
 # 全链函数改名 (R4): ll.cfg -> code.s -> include/*.h 原型 + src/*.c 引用点 -> gen_asm -> 定向重编 -> fncheck。
 # 失败任意一步自动回滚。详见 REFACTOR_PLAN.md R4。
 #
-# 事故根因防御 (RULES): 默认 **不改原型签名**, 只换名字。需要升级签名时人工加 --prototype。
+# 事故根因防御 (EXPERIENCE): 默认 **不改原型签名**, 只换名字。需要升级签名时人工加 --prototype。
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

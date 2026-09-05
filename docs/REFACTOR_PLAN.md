@@ -105,10 +105,10 @@ timeout 900 make && sha1sum -c ll.sha1  # 绿
 > 2026-09-05: 按上文 R5 结论 (静态快照过期) 删掉 functions.csv, gen_reports.py 只产 remaining.txt; 全量清单以 functions.tsv 为唯一来源 (已含 asm_lines 列)。残留 functions.csv 会在下次运行时自动清掉。
 > 2026-09-05: remaining.txt 改为 remaining.md (Markdown 表格, 名称列链接 `../../asm/nonmatchings/<name>.s`, VS Code/VSCodium 里 Ctrl+Click 直接打开切片)。纯 .txt 编辑器无内置点路径跳转, 只有终端 fileLinks 与 Markdown 支持。残留 remaining.txt 下次运行自动清掉。
 
-## R6 — 文档与并发规则
+## R6 — 文档与并发约定
 
 - `.gitattributes`: `functions.tsv merge=union` + 现有四行保留。
-- `RULES.md`: 「符号改名管线」整节改写为 rename_fn.sh 流程; split_asm 相关表述全部替换; 新增规则: **改名不得顺手改原型签名** (本次事故, 附 5 字节教训)。
+- `EXPERIENCE.md`: 「符号改名管线」整节改写为 rename_fn.sh 流程; split_asm 相关表述全部替换; 新增经验: **改名不得顺手改原型签名** (本次事故, 附 5 字节教训)。
 - `INCIDENTS.md`: 工作循环更新 (TSV 行 = 认领粒度不变, 冲突面从"改 yaml 任意行"缩到"改自己那行"); 事故记录追加本次改名事故。
 - (PLAN.md 已删, 速查并入 AGENTS.md §4)
 - (已删) `(已删)ASSIGNMENTS` 顶部加"本表状态列由 audit 生成, 勿手改"声明。

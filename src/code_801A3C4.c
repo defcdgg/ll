@@ -508,10 +508,35 @@ INCLUDE_ASM("asm/nonmatchings", sub_801DD04);
 
 //     sub_801D12C(obj, 0);
 // }
-// @ 0x0801DDB0
 INCLUDE_ASM("asm/nonmatchings", sub_801DDB0);
-extern u8 gUnk_03000730_arr[]; // gUnk_03000730 的字节视图
 
+
+// @ 0x0801DDB0
+// typedef struct UnkT_0839B2D4
+// {
+//     u32 field_0;
+//     u32 field_4;
+//     u16 field_8;
+//     u16 field_A;
+// } UnkT_0839B2D4;
+// extern UnkT_0839B2D4 gUnk_0839B2D4;
+// void sub_801DDB0(u8 *arg0, u8 arg1)
+// {
+//     // UnkT_0839B2D4 *tbl = (UnkT_0839B2D4 *)0x0839B2D4;
+//     UnkT_0839B2D4 *tbl = &gUnk_0839B2D4;
+//     u16 nv;
+//     sub_801B81C(arg0 + 0x3C, 0x78, 0x50, 0xDA << 1, 0xE, tbl->field_0,
+//                 tbl->field_4 + (arg1 << 5), (u16)(0x549 + tbl->field_8), tbl->field_A, 0x402);
+//     arg0[0x66] = 3;
+//     nv = 0x80 | *(u16 *)(arg0 + 0x54);
+//     *(u16 *)(arg0 + 0x54) = nv;
+//     nv = 0x2000 | *(u16 *)(arg0 + 0xB0);
+//     *(u16 *)(arg0 + 0xB0) = nv;
+//     REG_DISPCNT |= 0x8000;
+//     REG_WINOUT |= 0x1400;
+// }
+
+extern u8 gUnk_03000730_arr[]; // gUnk_03000730 的字节视图
 // @ 0x0801DE44
 void sub_801DE44(void)
 {
@@ -919,6 +944,8 @@ u32 sub_8020B48(void)
 {
     return gUnk_03000718;
 }
+// INCLUDE_ASM("asm/matchings", sub_8020B54);
+
 // @ 0x08020B54
 void sub_8020B54(void)
 {
@@ -927,13 +954,8 @@ void sub_8020B54(void)
         gUnk_030006F8[i] = 0;
     gUnk_03000714 = 0;
     gUnk_03000715 = 0;
-    /* HACK (规则116): do-while 屏障打破 local_alloc 平手 tiebreak, 使 gUnk_03000716 的地址落到 r4 (目标轮换) */
-    do
-    {
-        gUnk_03000716 = 0;
-    } while (0);
+    do { gUnk_03000716 = 0; } while (0);
 }
-
 // @ 0x08020B90
 void sub_8020B90(u8 *arg0)
 {

@@ -128,8 +128,8 @@ def main():
         out = [lines[0]]
         for line in lines[1:]:
             p = line.split("\t")
-            if len(p) >= 5 and int(p[3], 16) in fix:
-                p[4] = fix[int(p[3], 16)]
+            if len(p) >= 6 and int(p[3], 16) in fix:
+                p[5] = fix[int(p[3], 16)]
                 line = "\t".join(p)
             out.append(line)
         open(TSV, "w", encoding="utf-8").writelines(out)

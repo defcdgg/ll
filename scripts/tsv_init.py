@@ -8,8 +8,10 @@
   - 名字经 include/*.h 的 `#define 语义名 sub_XXX` 别名解析回 ll.cfg 名
 
 列序 (制表符, 首行表头, 按 addr 升序):
-  status	isa	module	addr	name	note
-  module = 翻译单元 (src/<module>.c); note = 完成/挂起明细 (一行, 无制表符; 重新生成时按 addr 保留)
+  status	isa	module	addr	asm_lines	name	note
+  module = 翻译单元 (src/<module>.c)
+  asm_lines = asm/{matchings,nonmatchings}/<name>.s 的行数 (切片缺失时 0; code.s 变更后需重跑)
+  note = 完成/挂起明细 (一行, 无制表符; 重新生成时按 addr 保留)
 """
 import csv
 import os
@@ -19,6 +21,7 @@ import sys
 LLCFG = "ll.cfg"
 SRC_DIR = "src"
 INCLUDE_DIR = "include"
+ASM_DIR = "asm"
 OUT = "functions.tsv"
 
 FUNC_START = re.compile(r'^(?:thumb|arm)_func ')
@@ -94,6 +97,24 @@ def scan_definitions(text):
     return found
 
 
+def asm_slice_lines(name, status):
+    """asm 切片**主体**行数: 去掉 3 行头 (\t.syntax unified / thumb_func_start / 标签@地址)
+    与尾部空行 + \t\t.syntax divided, 以及紧贴主体的尾部 "\t.align 2, 0"。
+    主体内部的 .align 与字面池 .4byte 行仍计入 (多段池的函数 .align 会出现在池前)。
+    目录与 status 不符时 (坑7: status 与切片落点漂移) 回退另一目录; 两处都没有返回 0。"""
+    folders = ("matchings", "nonmatchings") if status == 1 else ("nonmatchings", "matchings")
+    for folder in folders:
+        p = os.path.join(ASM_DIR, folder, name + ".s")
+        if not os.path.exists(p):
+            continue
+        L = open(p, encoding="utf-8", errors="replace").read().splitlines()
+        end = len(L) - 2
+        if end > 3 and L[end - 1].startswith("\t.align"):
+            end -= 1
+        return max(end - 3, 0)
+    return 0
+
+
 def main():
     llc = load_llcfg(LLCFG)
     src_files = sorted(
@@ -150,9 +171,9 @@ def main():
         seen[r[2]] = r[3]
 
     with open(OUT, "w", encoding="utf-8") as f:
-        f.write("status\tisa\tmodule\taddr\tname\tnote\n")
+        f.write("status\tisa\tmodule\taddr\tasm_lines\tname\tnote\n")
         for status, isa, addr, name, tu, note in out_rows:
-            f.write(f"{status}\t{isa}\t{tu}\t0x{addr:08x}\t{name}\t{note}\n")
+            f.write(f"{status}\t{isa}\t{tu}\t0x{addr:08x}\t{asm_slice_lines(name, status)}\t{name}\t{note}\n")
 
     n1 = sum(1 for r in out_rows if r[0] == 1)
     print(f"{OUT}: {len(out_rows)} 行 (status1={n1} status0={len(out_rows)-n1})")

@@ -60,8 +60,8 @@ def yaml_statuses() -> tuple[str, dict[str, int]]:
     statuses = {}
     for line in text.splitlines()[1:]:
         p = line.split("\t")
-        if len(p) >= 5 and p[2] in ("code_8010F10", "code_801A3C4", "code_8020D50", "code_80264C0", "code_8044394"):
-            statuses[p[4]] = int(p[0])
+        if len(p) >= 6 and p[2] in ("code_8010F10", "code_801A3C4", "code_8020D50", "code_80264C0", "code_8044394"):
+            statuses[p[5]] = int(p[0])
     return text, statuses
 
 
@@ -69,7 +69,7 @@ def set_status(text: str, func: str) -> str:
     lines = text.splitlines(True)
     for i, line in enumerate(lines):
         p = line.split("\t")
-        if len(p) >= 5 and p[4] == func and p[0] == "0":
+        if len(p) >= 6 and p[5] == func and p[0] == "0":
             p[0] = "1"
             lines[i] = "\t".join(p)
             break

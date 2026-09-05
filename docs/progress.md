@@ -607,57 +607,37 @@ void sub_8009370(void)
 }
 ```
 
-### sub_8018E34 (0x08018E34) — 挂起 (尾段 base→r0 vs base→r1)
-- **前两个分支已逐条全等**, 只剩最后一段 (38/116 字节差, 全部集中在尾段 8 条指令)
-- 语义 (四路查表, 返回 u8):
-  ```c
-  u8 sub_8018E34(void) {
-      if (sub_80187B4() & 0x20)  return gUnk_083989CB[(u8)sub_80187A8() - 0x3a];
-      if (sub_80187B4() & 0x200) return gUnk_083989DC[(u8)sub_80187A8() - 0x1c];
-      if (gUnk_03004820 == 0)    return gUnk_083989B0[gUnk_03004820];
-      return gUnk_083989B0[gUnk_03004820 - 1];
-  }
-  ```
-- 已一次命中的细节: `movs r1,#0x20; ands r1,r0` (目的=常量寄存器) ✓;
-  `movs r1,#0x80; lsls r1,#2` 物化 0x200 ✓; `(u8)sub_80187A8()` 的 `lsls/lsrs #0x18` ✓;
-  `subs r0,#0x3a` / `subs r0,#0x1c` 无后置截断 ✓; `== 0` 先写才得到目标的 `beq` 极性
-  (写成 `!= 0` 会得到 `bne`, 45 分 vs 38 分)
-- **剩余唯一差异**: 尾段目标 `ldr r1,=base; subs r0,#1; adds r0,r0,r1` —— 表基址进 **r1**,
-  x 的值留在 **r0** 不重读; 我的 `ldr r0,=base; ldrb r1,[r1]; subs r1,#1; adds r1,r1,r0` ——
-  基址抢了 r0, 于是 x 被重读一次。连带目标能把 4 条路径的 `ldrb r0,[r0]` 合并成一个尾块,
-  我这边前两支各自带一份 `ldrb` + `b 尾`。
-  即: **纯 local-alloc 对 base qty 的寄存器选择 (r0 vs r1)**, 与 CSE 是否判定 x 在 cmp 后死亡互为因果。
-- **已试无效** (~20 种): `!=0`/`==0` 两种极性、if-else 显式 else、三元表达式、
-  具名 `u8 x` 局部(单独用/与全局混用/只在 then 用/只在 else 用)、`(u32)base + x - 1`、
-  `base[-1 + x]`、`(u8)(x-1)` 截断、`u8 *addr` 统一出口(106, 大幅变差)、permuter 150s(最优 100)
-- **规则 77 再次验证**: 指针加法的操作数顺序 (`base+x` vs `x+base`) 得分完全相同, 改不动
-- 套件保留 `permuter/sub_8018E34/` (base.c = v7 = 当前最优 38/116)
+### sub_8018E34 (0x08018E34) — ✅ 已匹配 (2026-09-05)
+- **破局关键**: 旧候选全是**早返** (`if(...) return ...;`), 各分支自带 `ldrb + b 尾`。
+  改成**具名 `u8 ret` + if/else-if 链 + 末尾单 `return ret`** 后, 4 条路径汇成**单个出口块**
+  (目标唯一的 `_08018E9A` `ldrb r0,[r0]`), 尾段表基址进 r1、x 不重读, 整函数逐字节命中
+  (**fncheck OK 116B**)。打破了 "global-alloc 域三连" 里对本函数的"改不动"判定 → RULES §失败案例存档已加反例。
+- 命名与符号: 0x03004820 即已注册 `gEncounterEnabled` (u8), src 沿用该名; 三张 ROM 表
+  `gUnk_083989B0/CB/DC` (0x083989xx) 新注册 linker.ld 外层绝对符号区。`code_0.h` 原型
+  `void sub_8018E34()` → `u8 sub_8018E34()` (唯一调用者 sub_8018A58 未匹配 INCLUDE_ASM, 改返型零风险)。
+- 语义: 依 `gGstate324`(u16 输入) 位 0x20/0x200 与 `gEncounterEnabled` 查三张菜单/对话图标表,
+  返回 u8 图标 ID; sub_8018A58 把它乘 12 作 0x087ED394 压缩图表索引 (LZ77 加载)。
 
-> ⚠ `permuter/` 在 `.gitignore` 里，最优候选**不随仓库分发**，故把源码内联在此备查。
-```c
-/* permuter/sub_8018E34/base.c —— bytecmp 结果见上，勿直接合入 */
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-
-extern u8 gUnk_083989B0[];
-extern u8 gUnk_083989CB[];
-extern u8 gUnk_083989DC[];
-extern u8 gUnk_03004820;
-extern u32 sub_80187A8();
-extern u16 sub_80187B4();
-
-u8 sub_8018E34(void)
-{
-    if (sub_80187B4() & 0x20)
-        return gUnk_083989CB[(u8)sub_80187A8() - 0x3a];
-    if (sub_80187B4() & 0x200)
-        return gUnk_083989DC[(u8)sub_80187A8() - 0x1c];
-    if (gUnk_03004820 == 0)
-        return gUnk_083989B0[gUnk_03004820];
-    return gUnk_083989B0[gUnk_03004820 - 1];
-}
-```
+> 挂起期旧分析存档 (早返版 37/152, 尾段 base→r0 vs base→r1 之争, 勿再试):
+> - 语义 (四路查表, 返回 u8):
+>   ```c
+>   u8 sub_8018E34(void) {
+>       if (sub_80187B4() & 0x20)  return gUnk_083989CB[(u8)sub_80187A8() - 0x3a];
+>       if (sub_80187B4() & 0x200) return gUnk_083989DC[(u8)sub_80187A8() - 0x1c];
+>       if (gUnk_03004820 == 0)    return gUnk_083989B0[gUnk_03004820];
+>       return gUnk_083989B0[gUnk_03004820 - 1];
+>   }
+>   ```
+> - 已一次命中的细节: `movs r1,#0x20; ands r1,r0` (目的=常量寄存器) ✓;
+>   `movs r1,#0x80; lsls r1,#2` 物化 0x200 ✓; `(u8)sub_80187A8()` 的 `lsls/lsrs #0x18` ✓;
+>   `subs r0,#0x3a` / `subs r0,#0x1c` 无后置截断 ✓; `== 0` 先写才得到目标的 `beq` 极性
+>   (写成 `!= 0` 会得到 `bne`, 45 分 vs 38 分)
+> - 旧差异: 尾段目标 `ldr r1,=base; subs r0,#1; adds r0,r0,r1` —— 表基址进 **r1**, x 留 **r0** 不重读;
+>   早返版 `ldr r0,=base; ldrb r1,[r1]; subs r1,#1; adds r1,r1,r0` —— 基址抢 r0, x 被重读;
+>   即纯 local-alloc 对 base qty 的寄存器选择与 CSE 是否判定 x 在 cmp 后死亡互为因果。
+> - 旧已试无效 (~20 种): `!=0`/`==0` 极性、if-else 显式 else、三元、具名 `u8 x` 局部、
+>   `(u32)base + x - 1`、`base[-1 + x]`、`(u8)(x-1)` 截断、`u8 *addr` 统一出口(106, 大幅变差)、
+>   permuter 150s(最优 100)。规则 77 (指针加法操作数顺序) 再次验证改不动。
 
 ### sub_804BE90 (0x0804BE90) — 挂起 (表基址与 -1 谁进 sl)
 - 语义已完全破解, **指令序列 90% 一致** (最佳 65/132 字节差, 差值集中在 4 处):
@@ -3429,3 +3409,104 @@ bytecmp 144B 亦定论字节一致。
 **建议下一步**: ① 找能让 &E6C n_refs≥5 的引用形式 (如让地址在 LZ 区或 default 块被"值"用一次 → REG_EQUIV 计数);
 ② 或按 RULES sub_80531A8 思路给 agbcc 打补丁打印完整 qty 优先级表; ③ 交叉比对同族 sub_80513A0 (同样 LZ+E6C 结构, 挂起)。
 README 补充: 本函数与 sub_80513A0 是姊妹装载器, 解一个的另一半概率大。
+
+## 2026-09-04 `sub_8015E1C` 二次尝试 (agent1, 挂起, 70B→65B)
+
+前手 2026-09-02 已全解语义, 卡规则17类寄存器置换 (r2↔r3, tile/dest/hoist 三处), 8 版候选恒差 70/104B。
+
+**本轮改进** (1105→960 fndiff, 70→65B bytecmp):
+1. **去 p 变量, 直接用 arg3**: `while ((b = *arg3) != 0xFF)` + `arg3++` —— 省掉 `u8 *p` 的声明与赋值,
+   让源指针直接落 r4 (与目标一致, prologue offset 2 对齐)。
+2. **链式赋值 `dest[0] = (dest[0x20] = attr + 1);`** (空白分支): 让两格存储共用同一值寄存器,
+   匹配目标的 blank case 结构 (r3/r2 两 home 各存一次同值)。
+
+**残留差异** (规则17 类, 非本次可解):
+- prologue: arg2→r3 (我) vs r2 (目标), base→r2 (我) vs r3 (目标) —— r2↔r3 置换
+- 循环体: dest+64 hoist 到 r3 (我) vs 内联 recompute 到 r2 (目标)
+- tile→r2 (我) vs r3 (目标), dest→r6 (我) vs r2 (目标)
+- advance: r6=2 (我) vs r0=2 (目标)
+
+**结论**: permuter 620 分版 (链式赋值) 是当前最优候选 (fndiff 960, bytecmp 65/104B)。
+后续需 fndiff 逐指令长磨 (参考 Text_PutGlyph 作者 2435→2610→0 的过程) 或改编译器 qty 分配。
+最佳候选: `permuter/sub_8015E1C/base.c`。
+
+## 2026-09-05 sub_801A6F4 挂起 (gpnux, 结构100%解, 卡 GCC2 CSE 常量替换)
+
+**语义**: 精灵对象调色板装载 + BG 配置。`switch/if (type)` (type = `f_18 & 0xF`):
+type 6/7 → 构建 BG1CNT (优先级来自 `f_2A&3`, charbase 3, screenbase 0xF00, 清 0x4000/0xC000)
+→ `REG_BG1CNT = 值` → `DmaFill16(3,0,0x06007800,0x800)` + 内联 wait (`if(status<0) do{}while(status&0x80000000)`)
+→ `REG_DISPCNT |= 0x200`; type 8 → 逐字节 RMW 构建 BG3CNT (b0: `(b0&~3)|(f_2A&3)` / `(b0&~0xC)|8` / `&~0x30` / `&~0x40` / `&0x7F`; b1: `(b1&~0x1F)|0xD`→`|0x20`→`&0x3F`)
+→ `REG_BG3CNT = 值` → `DmaFill16(3,0,0x06006800,0x800)` + wait; 公共尾: `sub_804C548(f_14, f_29, (u8)sub_801B954(arg0))` (调色板 DMA 到 `0x05000000+slot*0x20`)。
+
+**已定死的形状** (逐条验证过):
+- 入口 `mov ip, r0` (arg0 全程 ip), `ldrh r0,[r0,#0x18]; movs rX,#0xf; ands rX,r0`。
+- **type 必须是 `s16`** 才有目标的分发 `cmp #6;bge / cmp #7;ble / cmp #8;beq` (有符号); `u16`→`bhi`、`int`→`bgt#5`。
+- 目标分发 = `switch` 或 `if(type>=6){ if(type<=7){} else if(type==8){} }` (两者同形)。
+- BGCNT 构建全部是**逐条独立语句** (合并单表达式会折叠常量, 如 `0xF00|0x2000`→`0x2F00`)。
+- type-8 每条 b0 写入是完整 32 位合并 `bgcnt = (…) | (bgcnt & 0xFFFFFF00)`; `~0xC`/`~0x30`/`~0x40` 由
+  `movs #0xd/#0x31/#0x41; negs` 物化 (= 源码常量是 `~0xC` 不是 `~0xD`!); `~0x1F` 才是 `movs #0x20; negs`。
+- type-8 b1 必须拆成多条语句 (单表达式会被 GCC 折叠 `0xD|0x20`→`0x2D`), 用临时或直接成员访问。
+- DMA wait 用 `if((s32)status<0){ do{status=dmaRegs[2];}while(status&mask); }` (同 Op_OpenWindow)。
+- 尾调用 `sub_804C548(u32 src, u8 slot, u8 count)` (code_8044394.c:2119), `sub_801B954((void**)arg0)`。
+
+**卡点 = GCC2 CSE 把 type 寄存器替换进 stmt2 的常量 8** (RTL `(ior:SI X (reg 185))`, REG_DEAD 185):
+- `case 8:`/`type==8` 分发记录 `beq body8` → CSE 建立 `reg_type == 8` 等价 (qty_comparison_const)。
+- 随后 stmt2 的 `| 8` 被 CSE 换成 type 寄存器 (`orrs r2, r5`), type 活范围延到 case-8 体内 (66 insns)
+  → 优先级骤降 → type 落 r5 (目标 r1) → 级联全函数寄存器错位 (~2535 分)。
+- 已试无效: 死 store `type=0` (被 tree DCE 提前删)、barrier 各种位置 (仅 stmt2 barrier→2155)、
+  显式 `(u8)type` (2720)、类型 s8/u8/u16/u32/int、struct/裸指针、`-g` 变体 (同 2535)。
+
+**半个突破口** (结构 `permuter/sub_801A6F4/base.c` 保持 switch 版):
+```c
+if (type < 6) {} else if (type > 7) { if (type != 8) {} else { /*body8*/ } } else { /*body67*/ }
+```
+这个 m2c 结构让最后的 `cmp #8` 记录 **NE** 而非 EQ → 无替换, type 落 r1, stmt2 正确物化 `movs rX,#8`,
+case-8 体寄存器分配几乎全对 (2250 分)。代价: ① 外层 `if(type<6){}` 被规范成 `cmp #5;bgt` (目标 `bge #6`);
+② body8/body67 布局互换 (body8 内联、body67 置后)。`else if(type<=7)` 变体会重新引入替换 (3410)。
+下一步方向: 找到同时满足 `bge #6` 分发 + body67 内联 + body8 走 NE 分支的结构; 或按规则 117
+定量法抬 type 的 qty 优先级让它长活也落 r1 (它被 r1 上是 m2c 证明可行的)。
+
+## sub_8052F44 (0x08052F44) — ✅ 2026-09-05 opencode (接手 sen1 挂起项, 104B 逐字节)
+
+**状态**: 已匹配。bytecmp OK 104B → 合入 src → fncheck OK (102B + 3 池重定位) → TSV status 0→1。
+sha1 当时红在 `code_801A3C4.o` (另一 agent sensenova 正在改的 sub_8020B54, 4B), 与本函数无关。
+
+**最终 C**:
+```c
+u32 sub_8052F44(u32 *ptr)
+{
+    u8 *data = (u8 *)*ptr;
+    u8 count = 0;
+    u16 i;
+
+    for (i = 0; i <= 4; i++)
+        if (gPartyMemberIds[i] == data[1]) { count++; break; }
+    if (count == data[2])
+        *ptr = *(u16 *)((u32)gUnk_02016000 + data[3] * 2) + (u32)gUnk_02016200;
+    else
+        *ptr += 4;
+    return 1;
+}
+```
+语义 = 脚本 opcode: 统计队伍中 ID==data[1] 的成员数, 等于 data[2] 则跳脚本表项 data[3]。
+
+**接手时的错误诊断** (前两轮 sen1 结论"纯 C 不可控, 需原版编译器"是错的):
+1. **`i` 必须是 `u16`, 不是 `u8`** —— 目标循环体 `adds r0,r2,#1; lsls r0,r0,#0x10; lsrs r2,r0,#0x10`
+   是 **u16** 截断; 累加器 `count` 才是 u8 (`lsls/lsrs #0x18`)。两变量宽度不同,
+   前两轮全部假设成 u8 → 卡在 score 1000 / 535 误判"不可达 0"。同 TU 已匹配的
+   `Op_RemovePartyMember` 就是 `u16 i` → `#0x10`, 直接可作对照模板。
+   → 已写成规则 146。
+2. **`i` 不得在声明处初始化** —— 写 `u16 i = 0;` + `for (i = 0; ...)` 会让 `data`/`count` 的
+   寄存器 home 在 r3↔r4 互换, 全函数 `ldrb r0,[r3,#1]` / `cmp r4,r0` 级联错位, 差 12B。
+   删掉声明处的 `= 0` 即逐字节命中。→ 已写成规则 145。
+3. **跳转表写法直接抄已匹配同族** —— 尾部 12 条指令与 `Op_IfEventFlagJump` / `Op_IfSwitchJump`
+   完全同形 (`*(u16 *)((u32)gUnk_02016000 + data[3] * 2) + (u32)gUnk_02016200`),
+   不必从零推导。这是本函数的最高杠杆一步。
+
+**permuter 用法说明**: 本套件 permuter 最优稳定在 **score 15 = 3 个符号字面池**(permuter 不能施加
+重定位, 池里的 `gPartyMemberIds`/`gUnk_02016000`/`gUnk_02016200` 在目标里是硬编码常量)。
+**score 15 对本函数即"等价于 0"**, 以 `bytecmp.sh`(施加 abs.ld 重定位后)为准 → OK 104 bytes。
+与规则 68 同类: score 不能按池数量机械估算。
+
+**教训**: 挂起项的 note 写"需原版编译器"之前, 应先把**类型宽度**穷举一遍 (`lsls` 移位量是免费判据)。
+本次两个卡点都是"一个词"级别的差异, 却在 TSV 里被记录成"不可达 0"。

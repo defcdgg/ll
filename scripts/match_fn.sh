@@ -13,9 +13,9 @@ fi
 
 # ---- 1. 定位函数与 TU ----
 row=$(grep -P "\t$fn\t" functions.tsv) || { echo "TSV 里没有 $fn"; exit 1; }
-status=$(awk -F'\t' -v n="$fn" '$5==n {print $1}' functions.tsv)
+status=$(awk -F'\t' -v n="$fn" '$6==n {print $1}' functions.tsv)
 [ "$status" = "1" ] || { echo "$fn 在 TSV 里 status=0, 但查找失败?"; exit 1; }
-tu=$(awk -F'\t' -v n="$fn" '$5==n {print $3}' functions.tsv)
+tu=$(awk -F'\t' -v n="$fn" '$6==n {print $3}' functions.tsv)
 srcf="src/$tu.c"
 
 # ---- 2. 校验 src 是真 C (非 INCLUDE_ASM) ----
@@ -41,7 +41,7 @@ sha1sum -c ll.sha1
 python3 scripts/audit.py 2>&1 | sed -n '2,5p'
 echo ""
 echo "收尾清单:"
-echo "  1. TSV note: awk -i inplace -F'\\t' -v n='$fn' '\$5==n {\$6=\"✅ $(date +%F) ${DECOMP_AGENT:-?}: fncheck OK\"; print}' OFS='\\t' functions.tsv"
+echo "  1. TSV note: awk -i inplace -F'\\t' -v n='$fn' '\$6==n {\$7=\"✅ $(date +%F) ${DECOMP_AGENT:-?}: fncheck OK\"; print}' OFS='\\t' functions.tsv"
 echo "  2. git add -A && git commit -m 'match $fn'"
 echo "  3. scripts/claim.sh --release $fn"
 echo "  4. 故事写 docs/progress.md"

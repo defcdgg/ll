@@ -102,6 +102,8 @@ timeout 900 make && sha1sum -c ll.sha1  # 绿
 
 **验收门**: 四个 make 目标可用; reports 重生成后与旧 CSV 语义 diff 报告 (新增/消失条目) 人工过目。
 > 实测: code.s/asm 幂等 0 写入; verify 全绿 591/591; remaining 四 TU 分组报表正常; gen_reports 产出 functions.csv+remaining.txt。
+> 2026-09-05: 按上文 R5 结论 (静态快照过期) 删掉 functions.csv, gen_reports.py 只产 remaining.txt; 全量清单以 functions.tsv 为唯一来源 (已含 asm_lines 列)。残留 functions.csv 会在下次运行时自动清掉。
+> 2026-09-05: remaining.txt 改为 remaining.md (Markdown 表格, 名称列链接 `../../asm/nonmatchings/<name>.s`, VS Code/VSCodium 里 Ctrl+Click 直接打开切片)。纯 .txt 编辑器无内置点路径跳转, 只有终端 fileLinks 与 Markdown 支持。残留 remaining.txt 下次运行自动清掉。
 
 ## R6 — 文档与并发规则
 

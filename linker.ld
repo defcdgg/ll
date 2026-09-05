@@ -39,6 +39,7 @@ gUnk_087EB22C = 0x087EB22C;
 
 D_87EB2A8 = 0x087EB2A8;
 gUnk_0839CE7C = 0x0839CE7C;
+gUnk_0839B2D4 = 0x0839B2D4;
 gUnk_0839B2E0 = 0x0839B2E0;
 gUnk_0839B462 = 0x0839B462;
 gUnk_0839BB4C = 0x0839BB4C;    /* tile 动画帧表 (sub_804EFDC 用) */
@@ -47,6 +48,9 @@ gUnk_0839CC4C = 0x0839CC4C;
 gUnk_0839CC4C_entries = 0x0839CC4C;
 gUnk_0839CE38 = 0x0839CE38;
 gUnk_0839CEFC = 0x0839CEFC;
+gUnk_083989B0 = 0x083989B0;    /* 菜单/对话图标表 A (sub_8018E34 用) */
+gUnk_083989CB = 0x083989CB;    /* 菜单/对话图标表 B (sub_8018E34 用) */
+gUnk_083989DC = 0x083989DC;    /* 菜单/对话图标表 C (sub_8018E34 用) */
 gUnk_08393B28 = 0x08393B28;
 gUnk_08393B28_entries = 0x08393B28;   /* 同址别名: u16 视图 (offset 0x10 字段, sub_804D1B4) */
 gUnk_0839D5BC = 0x0839D5BC;

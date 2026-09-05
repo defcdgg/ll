@@ -398,7 +398,7 @@ void sub_8018928();
 void sub_8018A58();
 void sub_8018BF8();
 void sub_8018D9C();
-void sub_8018E34();
+u8 sub_8018E34();
 void sub_8018EA8();
 void sub_8018FC0();
 void Bg0_InitClear();
@@ -507,7 +507,7 @@ u32 sub_801DAA0(); // PollSceneTimer: 场景计时状态机 (0x0300068E 0..0x22+
 void sub_801DB3C();
 void sub_801DC20();
 void sub_801DD04(u8 *, u8, u16);
-void sub_801DDB0();
+void sub_801DDB0(u8 *, u8);
 void sub_801DE44(); // ResetSceneObjects: 重置 3 个标志 + 7 项表 + sub_804C2FC(表0), 再对对象列表逐项调 sub_801D710
 #define ResetSceneObjects sub_801DE44
 void sub_801DEDC();

@@ -20,7 +20,7 @@ esac; done
 # ---- 1. 前置检查 ----
 grep -qE "^(thumb|arm)_func 0x[0-9a-f]+ $old\$" ll.cfg || { echo "ll.cfg 里没有 $old"; exit 1; }
 grep -qE "^(thumb|arm)_func 0x[0-9a-f]+ $new\$" ll.cfg && { echo "ll.cfg 已有 $new, 撞车"; exit 1; }
-grep -qP "^[01]\t[a-z]+\t\w+\t0x[0-9a-f]+\t$old\t" functions.tsv || { echo "functions.tsv 里没有 $old"; exit 1; }
+grep -qP "^[01]\t[a-z]+\t\w+\t0x[0-9a-f]+\t[0-9]+\t$old\t" functions.tsv || { echo "functions.tsv 里没有 $old"; exit 1; }
 
 addr=$(grep -E "^(thumb|arm)_func 0x[0-9a-f]+ $old\$" ll.cfg | awk '{print $2}')
 if [ "$FORCE" != 1 ]; then
@@ -65,7 +65,7 @@ done
 echo "改名引用点: $(echo "$touching" | wc -l) 个文件"
 
 # ---- 5. functions.tsv 缓存名同步 ----
-sed -i "s/^\(0x[0-9a-f]*	[01]	[a-z]*	[0-9]*	\)$old\t/\1$new\t/" functions.tsv
+sed -i "s/^\([01]	[a-z]*	\w*	0x[0-9a-f]*	[0-9]*	\)$old\t/\1$new\t/" functions.tsv
 python3 scripts/gen_asm.py --sync
 
 # ---- 6. 定向重编受影响 TU + fncheck ----
@@ -77,7 +77,7 @@ python3 scripts/fncheck.py "$new" || fails=1
 # 调用点在同一 TU 的已匹配函数一并核验
 for f in $(grep -lE "\b$new\b" src/*.c); do
   tu=$(basename "$f" .c)
-  for fn in $(awk -F'\t' -v t="$tu" '$3==t && $2==1 {print $5}' functions.tsv); do
+  for fn in $(awk -F'\t' -v t="$tu" '$3==t && $2==1 {print $6}' functions.tsv); do
     python3 scripts/fncheck.py "$fn" > /dev/null 2>&1 || { echo "FAIL: $fn ($tu)"; fails=1; }
   done
 done

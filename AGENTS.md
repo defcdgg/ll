@@ -44,20 +44,28 @@
 ## 1. 函数清单: functions.tsv (唯一权威)
 
 ```
-status isa   module        addr        name                 note
-1      thumb  code_80002A0  0x080002a0  VBlank_UpdateGameScreen
-0      thumb  code_8005020  0x080055e8  sub_80055E8          ⏸ 612指令+r8/sb; 语义已全解; 待攻
+status isa   module        addr        asm_lines name                 note
+1      thumb  code_80002A0  0x080002a0  261       VBlank_UpdateGameScreen
+0      thumb  code_8005020  0x080055e8  685       sub_80055E8          ⏸ 612指令+r8/sb; 语义已全解; 待攻
 ```
 
 - **主键 = addr** (永不漂移); `name` 是缓存, 权威在 `ll.cfg` (改名后 `gen_asm.py --sync` 自动回写)。
 - `status`: 1=已匹配 0=未匹配。`module`: 翻译单元 (`src/<module>.c`)。
+- `asm_lines`: `asm/{matchings,nonmatchings}/<name>.s` 的**主体**行数, 已扣除 3 行头
+  (`.syntax unified` / `thumb_func_start` / `标签 @地址`)、尾部空行 + `.syntax divided`、以及紧贴主体的
+  尾部 `.align 2, 0`。主体内部的 `.align` 与字面池 `.4byte` 行仍计入 (多段池的函数 `.align` 会落在池前)。
+  用于按 §2「优先 ≤60 行小函数」筛目标; 切片缺失为 0, `code.s` 变更后需重跑 `tsv_init.py`。
+  注: 主体行数 ≠ 指令数, 每条字面池 `.4byte` 占 1 行但占 4 ROM 字节。
 - **`note` (末列) = 完成/挂起明细**, 一行无制表符:
   完成 `✅ 日期 agent: 关键技术点(规则号); fncheck 结果` | 挂起 `⏸ 卡在哪; 最佳候选路径; 详情见 progress.md §xxx`。
   详细故事写 `docs/progress.md`, TSV note 只放一行。
+  ⚠ note 可能含字面 `"` (引号) 与尾随 tab — **禁止用 csv.writer 重写 TSV** (会加 CSV 引号/丢尾 tab),
+  按行 `split("\t", 5)` + `"\t".join` 处理。
 - 常用查询:
   ```bash
   awk -F'\t' '$1==0' functions.tsv | wc -l              # 剩余总数
   awk -F'\t' '$1==0 && $3=="code_80264C0"' functions.tsv   # 某 TU 的未匹配
+  awk -F'\t' '$1==0 && $5<=60 {print $4,$6}' functions.tsv  # ≤60 行小函数 (挑目标)
   grep -P '\t⏸' functions.tsv                           # 所有挂起项(带卡点)
   python3 scripts/tsv_init.py                            # 从 src 重新推导 (note 按 addr 保留)
   ```
@@ -138,7 +146,7 @@ cd permuter/<fn> && timeout 280 ../../.venv/bin/python ../../tools/decomp-permut
 | `make code.s` / `make asm` | 重出反汇编 / 增量重建 asm/ |
 | `make verify` | 全量终验: make+SHA1+audit+status=1 全量字节核验 |
 | `make remaining [TU=xxx]` | 未匹配报表 (scripts/remaining.py) |
-| `python3 scripts/gen_reports.py` | 重生成 docs/reports/ (functions.csv + remaining.txt) |
+| `python3 scripts/gen_reports.py` | 重生成 docs/reports/remaining.md (Markdown; 名称列 Ctrl+Click 跳 asm 切片, permuter 列跳套件目录, 行数<200 前缀 ▶; 全量清单看 functions.tsv) |
 | `make ctx` | 重生成 m2c 上下文 (头文件改后) |
 | `tools/gbadisasm/gbadisasm baserom.gba -c ll.cfg > code.s` | 重出反汇编 (改名管线第 2 步) |
 | `arm-none-eabi-cpp ... && agbcc -dl` | RTL/寄存器分配转储 → gccdump.lreg (查 home, RULES §诊断) |

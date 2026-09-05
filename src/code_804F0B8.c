@@ -1074,8 +1074,41 @@ u32 Op_WaitCharaAnim(u32 *ptr)
     }
     return 0;
 }
+// 脚本 opcode: 队伍成员计数条件跳转。
+//   统计 gPartyMemberIds[0..4] 中等于 data[1] 的成员个数 count。
+//   count == data[2] → 脚本指针跳到 gUnk_02016200 + gUnk_02016000[data[3]]
+//   否则             → 跳过本指令(4 字节)
+// 注: 同族条件跳转见 Op_IfEventFlagJump / Op_IfSwitchJump / Op_IfMoneyJump;
+//     跳转表写法必须写成 *(u16 *)((u32)gUnk_02016000 + data[3] * 2) + gUnk_02016200,
+//     与 Op_IfEventFlagJump 逐字节同形。
+// 注: 循环计数 i 必须是 u16 (目标 lsls/lsrs #0x10), count 必须是 u8 (#0x18);
+//     且 i 不能在声明处初始化 —— `for (i = 0; ...)` 自带初始化, 预先写
+//     `u16 i = 0;` 会让 GCC2 把 data/count 的寄存器 home 在 r3/r4 互换(差 12B)。
 // @ 0x08052F44
-INCLUDE_ASM("asm/nonmatchings", sub_8052F44);
+u32 sub_8052F44(u32 *ptr)
+{
+    u8 *data = (u8 *)*ptr;
+    u8 count = 0;
+    u16 i;
+
+    for (i = 0; i <= 4; i++)
+    {
+        if (gPartyMemberIds[i] == data[1])
+        {
+            count++;
+            break;
+        }
+    }
+    if (count == data[2])
+    {
+        *ptr = *(u16 *)((u32)gUnk_02016000 + data[3] * 2) + (u32)gUnk_02016200;
+    }
+    else
+    {
+        *ptr += 4;
+    }
+    return 1;
+}
 // @ 0x08052FAC
 u32 Op_LoadAnimSet(u32 *ptr)
 {

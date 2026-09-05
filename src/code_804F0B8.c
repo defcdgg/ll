@@ -222,11 +222,145 @@ setup:
     return 0;
 }
 // @ 0x0804F974
-INCLUDE_ASM("asm/nonmatchings", sub_804F974);
+// 脚本条件跳转: data[1] 为 flag 表字节数, 循环 count/2 个 u16 flag id
+// (id<=0x1FF 查 EventFlags_Test, 否则查 SwitchFlags_Test(id-0x200)), 任一为真 →
+// 指针跳到 0x02016200 + tbl[data[2]], 全假 → 指针推进 *ptr + t + 3; 恒返 1。
+// 注: ① 跳转路径必须写 `u16 *tbl = (u16*)0x02016000;` 提升变量 + 字面量基址,
+//     `*ptr = tbl[data[2]] + 0x02016200;` — 符号形式或加和顺序会让 GCC 把基址加法
+//     跨跳合并进公共尾部 (基址落 r1, 目标要 r2, 差 5B)。
+// ② 推进路径必须用嵌套块内新变量 `u32 step = t + 3; *ptr = *ptr + step;` —
+//     让 t+3 独立于 *ptr 装载 (目标 mov r1,r8; adds r1,#3; ldr r0,[r6]; adds r0,r0,r1)。
+u32 sub_804F974(u32 *ptr)
+{
+    u8 *data;
+    u8 t;
+    u8 n;
+    u16 *tbl;
+    u16 i;
+    u16 v;
+    u8 res;
+
+    data = (u8 *)*ptr;
+    t = data[1];
+    n = t >> 1;
+    tbl = (u16 *)0x02016000;
+    for (i = 0; n > i; i++)
+    {
+        v = data[i * 2 + 3] | (data[i * 2 + 4] << 8);
+        if (v > 0x1FF)
+            res = SwitchFlags_Test(v - 0x200);
+        else
+            res = EventFlags_Test(v);
+        if (res == 0)
+            break;
+    }
+    if (res != 0)
+        *ptr = tbl[data[2]] + 0x02016200;
+    else
+    {
+        u32 step = t + 3;
+        *ptr = *ptr + step;
+    }
+    return 1;
+}
 // @ 0x0804FA04
-INCLUDE_ASM("asm/nonmatchings", sub_804FA04);
+// INCLUDE_ASM("asm/nonmatchings", sub_804FA04);
+u32 sub_804FA04(u32 *ptr)
+{
+    u8 *data;
+    u8 t;
+    u8 n;
+    u32 off;
+    u16 i;
+    u16 v;
+    u16 *tbl;
+    u8 res;
+
+    data = (u8 *) (*ptr);
+    t = data[1];
+    n = t >> 1;
+    for (i = 0; n > i; i++)
+    {
+        v = data[(i * 2) + 3] | (data[(i * 2) + 4] << 8);
+        if (v > 0x1FF)
+        {
+            res = SwitchFlags_Test(v - 0x200);
+        }
+        else
+        {
+            res = EventFlags_Test(v);
+        }
+        if (res != 0)
+        {
+            break;
+        }
+    }
+
+    tbl = (u16 *) 0x02016000;
+    if (res == 0)
+    {
+        *ptr = 0x02016200 + tbl[data[2]];
+    }
+    else
+    {
+        off = t + 3;
+        *ptr = (*ptr) + off;
+    }
+    return 1;
+}
+
 // @ 0x0804FA94
-INCLUDE_ASM("asm/nonmatchings", sub_804FA94);
+// 脚本条件跳转 (任一 flag 置位版, 镜像 sub_804F974): data[1] 为 flag 表字节数, 循环 count/2 个
+// u16 flag id (id<=0x1FF 查 EventFlags_Test, 否则查 SwitchFlags_Test(id-0x200)), 任一为真 →
+// 指针跳到 gUnk_02016200 + gUnk_02016000[data[2]], 全假 → 指针推进 data + count + 3; 恒返 1。
+// 注: t 全程存 r8 (推进路径 mov r1,r8)、0x1FF 存 sb; 跳转路径必须写 tbl 提升变量 + 字面量基址
+// 在前的和 (`tbl = (u16*)0x02016000;` 提到 if 前, `*ptr = 0x02016200 + tbl[data[2]]`) ——
+// 直写/符号形式会让 GCC 把基址加法跨跳合并进公共尾部 (基址落 r1, 目标要 r2, 差 5B)。
+// `n > i` / `v > 0x1FF` 的操作数序对应 cmp r7,r4 / cmp r1,sb, 勿翻转。
+// res 无初值 = 原始代码如此 (零循环时读 r1 残值, 目标同样无初始化指令)。
+u32 sub_804FA94(u32 *ptr)
+{
+    u8 *data;
+    u8 t;
+    u8 n;
+    u32 off;
+    u16 i;
+    u16 v;
+    u16 *tbl;
+    u8 res;
+
+    data = (u8 *) (*ptr);
+    t = data[1];
+    n = t >> 1;
+    for (i = 0; n > i; i++)
+    {
+        v = data[(i * 2) + 3] | (data[(i * 2) + 4] << 8);
+        if (v > 0x1FF)
+        {
+            res = SwitchFlags_Test(v - 0x200);
+        }
+        else
+        {
+            res = EventFlags_Test(v);
+        }
+        if (res != 0)
+        {
+            break;
+        }
+    }
+
+    tbl = (u16 *) 0x02016000;
+    if (res != 0)
+    {
+        *ptr = 0x02016200 + tbl[data[2]];
+    }
+    else
+    {
+        off = t + 3;
+        *ptr = (*ptr) + off;
+    }
+    return 1;
+}
 // @ 0x0804FB24
 INCLUDE_ASM("asm/nonmatchings", sub_804FB24);
 extern u16 (*gUnk_0862D434[])(u32 *);
@@ -452,46 +586,39 @@ void Script_ResetVM(void)
 // @ 0x080525E8
 INCLUDE_ASM("asm/nonmatchings", sub_80525E8);
 // @ 0x080526A0
-INCLUDE_ASM("asm/nonmatchings", sub_80526A0);
-
 // 脚本 VM 启动/跳转: 按 arg1 模式设置脚本指针 gUnk_03000E6C, 然后清局部槽并置运行标志。
 //   arg1==2 -> 跳到脚本区第 arg0 项入口 (gUnk_02016200 + gUnk_02016000[arg0])
 //   arg1==3 -> 保持脚本指针不变
 //   其它    -> 复位到脚本区基址 gUnk_02016200
-// 之后把 8 个 u16 局部槽 (gUnk_03000ED8) 全置 0xFFFF, 置运行标志 bit0, 清 gUnk_03000E72。
-// void sub_80526A0(u8 arg0, u8 arg1)
-// {
-//     u8 i;
-//     u16 mask = 0xFFFF;
+// 之后把 8 个 u16 局部槽 (gScriptLocalSlots) 全置 0xFFFF, 置运行标志 bit0, 清 gUnk_03000E72。
+// 注: base 0x02016200 / 表基址 0x02016000 必须写字面量, 换 gUnk_02016200/gUnk_02016000 符号
+//     会改变 case2 块寄存器分配 (差 9B); `= -1` 是窄化 store 的 ldrh/orr/strh 展开形状,
+//     写 `|= 0xFFFF` 或经局部指针/强转视图访问都会被折叠成直接 store (字节错)。
+void sub_80526A0(u8 arg0, u8 arg1)
+{
+    u8 i;
+    u16 *tbl;
 
-//     if (arg1 != 2)
-//     {
-//         if (arg1 <= 2)
-//         {
-//             gUnk_03000E6C = (u32)gUnk_02016200;
-//         }
-//         else if (arg1 == 3)
-//         {
-//         }
-//         else
-//         {
-//             gUnk_03000E6C = (u32)gUnk_02016200;
-//         }
-//     }
-//     else
-//     {
-//         gUnk_03000E6C = (u32)(gUnk_02016200 + gUnk_02016000[arg0]);
-//     }
-
-//     for (i = 0; i <= 7; i++)
-//     {
-//         u16 v = ((u16 *)&gUnk_03000ED8)[i];
-//         v |= mask;
-//         ((u16 *)&gUnk_03000ED8)[i] = v;
-//     }
-//     gUnk_03000E70 |= 1;
-//     gUnk_03000E72 = 0;
-// }
+    tbl = (u16 *)0x02016000;
+    switch (arg1)
+    {
+    default:
+    case 1:
+        gUnk_03000E6C = 0x02016200;
+        break;
+    case 2:
+        gUnk_03000E6C = 0x02016200 + tbl[arg0];
+        break;
+    case 3:
+        break;
+    }
+    for (i = 0; i <= 7; i++)
+    {
+        gScriptLocalSlots[i] = -1;
+    }
+    gUnk_03000E70 = gUnk_03000E70 | 1;
+    gUnk_03000E72 = 0;
+}
 
 // @ 0x08052728
 void Script_Abort(u8 arg0)

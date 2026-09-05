@@ -15,7 +15,7 @@
   5) 配 compile.sh + settings.toml。
 
 base.c 仅为种子: permuter 用系统 cpp -nostdinc, 不能 include 项目头文件; 函数体里用到的
-u8/u16/... 与本 C 文件 extern/结构体都要在 base.c 顶部自行内联 (见 AGENTS.md §2b / RULES 规则96)。
+u8/u16/... 与本 C 文件 extern/结构体都要在 base.c 顶部自行内联 (见 AGENTS.md §2b / EXPERIENCE 经验 96)。
 """
 import re
 import sys

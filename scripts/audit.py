@@ -114,8 +114,8 @@ def main():
         print(f"!! addr 不在 ll.cfg: {missing}")
 
     pend = [r for r in rows if r["status"] == "0"]
-    pend_noted = [r for r in pend if r["note"].strip().startswith("⏸")]
-    done_noted = [r for r in rows if r["status"] == "1" and r["note"].strip().startswith("✅")]
+    pend_noted = [r for r in pend if (r["note"] or "").strip().startswith("⏸")]
+    done_noted = [r for r in rows if r["status"] == "1" and (r["note"] or "").strip().startswith("✅")]
     print(f"note 覆盖: 挂起 {len(pend_noted)}/{len(pend)} | 完成 {len(done_noted)}/{n1}")
 
     bad = []

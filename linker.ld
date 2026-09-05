@@ -57,6 +57,7 @@ gUnk_08393B28_entries = 0x08393B28;   /* 同址别名: u16 视图 (offset 0x10 �
 gUnk_0839D5BC = 0x0839D5BC;
 gUnk_0839DBF6 = 0x0839DBF6;
 gUnk_03000730_arr = 0x03000730;
+gScriptLocalSlots = 0x03000ED8;   /* gUnk_03000ED8 的 u16[] 视图别名: 脚本 VM 8 个 u16 局部槽 (sub_80526A0) */
 gUnk_0861A5E4 = 0x0861A5E4;
 gUnk_0861C664 = 0x0861C664;
 gUnk_08619FA4 = 0x08619FA4;

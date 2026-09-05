@@ -116,8 +116,8 @@ handler 读 `data[1..]` 参数、执行动作、推进 `*ptr`、返回 1=继续�
   去 m2c no-op 后人工形态直接过; `= -1` 须 extern u16[] 视图才出 orr 展开 (经验 165),
   新别名 gScriptLocalSlots; fncheck OK 136B。
 + 已匹配真C: 804FA94 —— 任一 flag 置位条件跳转: 前任 score 10 = extern 池假分 + bl 伪影,
-  指令流本已全对; t 存 r8/0x1FF 存 sb; `long long dest` 截断暂存承重 (经验 166);
-  原型 void() → u32(u32*) (无调用方零风险); fncheck OK 144B (2 池重定位, 2 bl 忽略)。
+  指令流本已全对; 跳转路径须 tbl 提升变量+字面量基址在前防跨跳合并 (经验 166);
+  原型 void() → u32(u32*) (无调用方零风险); fncheck OK 144B (2 bl 忽略)。
 + 已匹配真C: 804F10C —— 搜索函数: GetObjPool 空闲槽里找首个 sub_804E76C 命中者, 返内部下标或 -1
   (sub_80489E8 先筛 sub_8045F10==2 的槽); 需 int idx + s8 tmp 中间变量复现截断调度, fncheck OK 110B。
 + 已匹配真C: 804F17C —— 收集版姊妹: 全命中 sub_804E76C 的槽下标写入 out[] 并返数量, 死代码无调用点, fncheck OK 148B。

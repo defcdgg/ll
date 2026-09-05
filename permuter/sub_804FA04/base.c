@@ -1,44 +1,51 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
-typedef unsigned int u32;
 typedef signed int s32;
-
-extern u8 EventFlags_Test(u16);
-extern u8 SwitchFlags_Test(u16);
+typedef unsigned int u32;
 extern u16 gUnk_02016000[];
 extern u8 gUnk_02016200[];
-
+u8 EventFlags_Test(u16);
+u8 SwitchFlags_Test(u16);
 u32 sub_804FA04(u32 *ptr)
 {
     u8 *data;
-    u8 b;
+    u8 t;
+    u8 n;
+    u32 off;
     u16 i;
-    u16 id;
-    u8 result;
-    u32 newval;
+    u16 v;
+    u16 *tbl;
+    u8 res;
 
-    data = (u8 *)*ptr;
-    b = data[1];
-    for (i = 0; b >> 1 > i; i++)
+    data = (u8 *) (*ptr);
+    t = data[1];
+    n = t >> 1;
+    for (i = 0; n > i; i++)
     {
-        id = data[3 + i * 2] | (data[4 + i * 2] << 8);
-        if (id > 0x1FF)
-            result = SwitchFlags_Test(id - 0x200);
+        v = data[(i * 2) + 3] | (data[(i * 2) + 4] << 8);
+        if (v > 0x1FF)
+        {
+            res = SwitchFlags_Test(v - 0x200);
+        }
         else
-            result = EventFlags_Test(id);
-        if (result != 0)
+        {
+            res = EventFlags_Test(v);
+        }
+        if (res != 0)
+        {
             break;
+        }
     }
-    if (result == 0)
+
+    tbl = (u16 *) 0x02016000;
+    if (res == 0)
     {
-        u32 value = *(u16 *)((u32)gUnk_02016000 + data[2] * 2);
-        newval = value + (u32)gUnk_02016200;
+        *ptr = 0x02016200 + tbl[data[2]];
     }
     else
     {
-        u32 t = b + 3;
-        newval = *ptr + t;
+        off = t + 3;
+        *ptr = (*ptr) + off;
     }
-    *ptr = newval;
     return 1;
 }

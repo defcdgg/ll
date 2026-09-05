@@ -319,6 +319,7 @@ extern u8 gUnk_03000ECA;
 extern u8 gUnk_03000ECB;
 extern u8 gUnk_03000ECC;
 extern u8 gUnk_03000ED8;
+extern u16 gScriptLocalSlots[];
 extern u16 gUnk_03000EE8[];
 extern u16 gUnk_03000F24;
 extern u8 gUnk_03000F2A;

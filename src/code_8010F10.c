@@ -115,7 +115,82 @@ INCLUDE_ASM("asm/nonmatchings", sub_8013870);
 // @ 0x08013934
 INCLUDE_ASM("asm/nonmatchings", sub_8013934);
 // @ 0x08013B0C
-INCLUDE_ASM("asm/nonmatchings", sub_8013B0C);
+void sub_8013B0C(u16 arg0)
+{
+    u16 *tile;
+    u16 v;
+    u16 base;
+    u16 shadow;
+    u16 flag;
+    int new_var;
+    gUnk_03004DBC++;
+    new_var = 0x204;
+    flag = 0;
+    tile = Text_TileAt(10, 2);
+    if (arg0 == 0xB0)
+    {
+        v = (gUnk_03004DBC >> 4) & 3;
+        shadow = v;
+        *tile = ((shadow + 0xC) << 12) + new_var;
+        tile--;
+        *tile = ((((v + 1) & 3) + 0xC) << 12) + 0x204;
+        tile--;
+        *tile = ((((v + 2) & 3) + 0xC) << 12) + new_var;
+        tile--;
+        *tile = ((((shadow + 3) & 3) + 0xC) << 12) + 0x204;
+        tile--;
+        *tile = ((((v + 4) & 3) + 0xC) << 12) + new_var;
+    }
+    else
+    {
+        v = (gUnk_03004DBC >> 2) & 3;
+        if (v == 3)
+        {
+            v = 1;
+            flag = 0x400;
+        }
+        base = (u16) (0x204 + v);
+        shadow = 0xD000;
+        *tile = 0xB001;
+        tile--;
+        if (arg0 > 0x8C)
+        {
+            *tile = (base + shadow) + flag;
+        }
+        else
+        {
+            *tile = 0xB001;
+        }
+        tile--;
+        if (arg0 > 0x69)
+        {
+            *tile = (base + shadow) + flag;
+        }
+        else
+        {
+            *tile = 0xB001;
+        }
+        tile--;
+        if (arg0 > 0x46)
+        {
+            *tile = (base + shadow) + flag;
+        }
+        else
+        {
+            *tile = 0xB001;
+        }
+        tile--;
+        v = arg0;
+        if (v > 0x23)
+        {
+            *tile = (base + shadow) + flag;
+        }
+        else
+        {
+            *tile = 0xB001;
+        }
+    }
+}
 // @ 0x08013C00
 INCLUDE_ASM("asm/nonmatchings", sub_8013C00);
 extern u16 gUnk_03004D48;
@@ -1924,11 +1999,11 @@ void sub_8017640(void *dst, void *src, s32 count)
     }
 }
 // @ 0x0801768C
-s16 sub_801768C(s16 arg0, s16 arg1, s16 arg2, s16 arg3, s8 mode)
+s16 sub_801768C(s16 arg0, s16 arg1, s16 arg2, s16 arg3, u8 mode)
 {
   float new_var;
   s16 result;
-  switch (mode)
+  switch ((s8)mode)
   {
     case 0:
       result = arg1;
@@ -2409,7 +2484,57 @@ void DialogCtx_SetPair(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
 // @ 0x08019784
 INCLUDE_ASM("asm/nonmatchings", sub_8019784);
 // @ 0x080199E0
-INCLUDE_ASM("asm/nonmatchings", sub_80199E0);
+// 淡出步进: flags=gFlashFlags; 若 flags&0x1000 按低 nibble 分派。
+// case1: 4 通道循环, bits=(u8*)0x030004D7, 第 i 位为 1 时把
+//   gUnk_03000390[*(vu16*)0x04000006 & 0xFF] 写入 gUnk_030004D8[i], 其 >>1 写入 gUnk_030004E8[i]。
+// case2: REG_BLDY = gUnk_03000390[*(u8*)0x04000006]; 再按 flags&0xF00 设 REG_BLDCNT
+//   (0x100→0xBF, 0x200→0xFF)。case2 的 bldy/tbl/port 三指针预载 + i=0xFF 之间形成
+//   arm_reorg 调度窗口, 使 movs r4,#0xff 落入 ldr→ldrb 延迟槽 (规则128/134 族)。
+void sub_80199E0(void)
+{
+    u16 flags;
+    u8 i;
+    u8 *bits;
+    vu16 *bldy;
+    u16 *tbl;
+    u8 *port;
+
+    flags = gFlashFlags;
+    if (flags & 0x1000)
+    {
+        switch (flags & 0xF)
+        {
+        case 0:
+            break;
+        case 1:
+            for (i = 0, bits = (u8 *)0x030004D7; i < 4; i++)
+            {
+                if ((bits[0] >> i) & 1)
+                {
+                    *(u16 *)gUnk_030004D8[i] = gUnk_03000390[*(vu16 *)0x04000006 & 0xFF];
+                    *(u16 *)gUnk_030004E8[i] = gUnk_03000390[*(vu16 *)0x04000006 & 0xFF] >> 1;
+                }
+            }
+            break;
+        case 2:
+            bldy = (vu16 *)0x04000054;
+            tbl = gUnk_03000390;
+            port = (u8 *)0x04000006;
+            i = 0xFF;
+            *bldy = tbl[*port];
+            switch (flags & 0xF00)
+            {
+            case 0x100:
+                REG_BLDCNT = 0xBF;
+                break;
+            case 0x200:
+                REG_BLDCNT = i;
+                break;
+            }
+            break;
+        }
+    }
+}
 // @ 0x08019AD0
 void sub_8019AD0(u8 arg0, u16 arg1)
 {

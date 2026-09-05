@@ -1669,3 +1669,60 @@ grep '^Register ' gccdump.lreg; grep '^;; Register .* in' gccdump.lreg; rm -f gc
      差异; 组数 > bl 数 → 每多一组一个真实差异。另: abs.ld 给 bl 目标赋真地址 (0x08xxxxxx) 会因
      基址 0 超 ±4MB 触发 veneer 追加, 不影响 .text 前 0x??? 字节的比较。
      关联: 规则 29 (fndiff 池假高), bytecmp.sh 头注。
+
+157. **局部数组按 4 字节向上取整分配栈槽, 所以"最小语义尺寸"与"凑数尺寸"常生成完全相同的字节** (2026-09-05, 案例 sub_801D468)。
+     `u8 a[5]; u8 b[7]; u8 c[12];` 与 `u8 a[8]; u8 b[8]; u8 c[12];` 都产出 `sub sp, #0x1c`
+     (5→8, 7→8, 12→12, 共 28)。实测边界: 5/6/12=23→#0x1c, 5/8/12=25→#0x1c, 5/5/12=22→#0x1c,
+     但 4/7/12=23→**#0x18** (首个槽 4 不需要取整, 省了 4 字节)。
+     用途: ① 反推原 C 数组尺寸时**不要**用 `sub sp` 除槽数硬算, 只能得到"取整后的尺寸";
+     ② 候选写不出来精确尺寸时用最小语义值 (例: mode0 写 5 项就写 [5], 别凑 8) —— 字节通常已相同,
+     别为对齐尺寸浪费时间。判定法: 两种写法各跑一次 fndiff, 只要逐指令全对且 `sub sp` 一致即为等价。
+     关联: 规则 27 (初始化顺序即指令顺序), 规则 47 (r8 序言/栈槽交互), 规则 124。
+158. **分支内"表地址计算先于实参装载"时, 把表址提成显式指针局部放 call 前** (案例 sub_801DB3C, 2026-09-05)。
+    目标 `lsls r5,r4,#1; adds r5,r5,r4; lsls r5,r5,#2; ldr r0,=tbl; adds r5,r5,r0` 在 arg0-arg3 装载**之前**。
+    内联写法 `sub_801B81C(..., tbl[idx].field_0, ...)` 让 GCC2 把地址计算推迟到 `str sp` 装载之间,
+    挤爆低号寄存器 → 强制 r8/r9/sl 溢出 (入口 `mov r7,sl; push {r5,r6,r7}` 多 6 条 + 中间 3 处往返)。
+    解 = 独立语句 `t = &tbl[idx];` 放 call 前 → GCC2 把地址计算排到分支最前, 表指针稳定占 r5,
+    参数全落低号寄存器, 逐指令命中。关联: 规则 47 (r8 序言), 规则 128 (宽类型独立语句)。
+159. **if/else 的直落块 = 原 C 的 if 体** (案例 sub_801DB3C, 2026-09-05): 目标 `cmp; bhi→B块; A块直落; b join`
+    表明 A 是 if 体、B 是 else 体。写 `if (be <= 0xA) {A} else {B}` (A 的条件为真走直落) 才命中;
+    反写 `if (be > 0xA) {B} else {A}` 会得到镜像布局 `bls→A块; B块直落`。判定: 目标分支指令 (bhi/bls)
+    指向哪块, 哪块就是 else; 直落块写进 if 体。关联: 规则 3 (分支极性), 规则 9 (flag 分支形状)。
+
+160. **⭐⭐ 改共享原型的 signedness 会静默改坏"远端"已匹配调用点 — 定义侧与调用点侧的类型需求可以不同, 解法 = 定义侧宽类型 + 显式窄转换** (2026-09-05, 案例 sub_801768C; 已修复整 ROM 位移 8B)。
+    事故: 提交 d4fcb74 把 `sub_801768C` 从 INCLUDE_ASM 换真 C 时, 顺手把共享原型
+    `u16 sub_801768C(s16, s16, u8, u8, u8)` 改成 `s16 (s16, s16, s16, s16, s8)`。第 5 参改 s8 后,
+    另一个 TU (`src/code_80264C0.c`) 里两个**早已匹配**的调用点 `sub_80405A4` / `sub_8042AB4`
+    传 `gUnk_03000820` (u8) 给 s8 形参, GCC2 被迫补一条 `ldrsb r2,[r6,r2]` 符号扩展 (原来直接复用
+    顶部 `ldrb` 的零扩展值), 各 +4B → 0x08040690 起全部符号位移 +8B → sha1 大面积红。
+    正确形态: 原型 `s16 sub_801768C(s16, s16, s16, s16, u8)` (前 4 参仍必须 s16: 定义体走有符号
+    float 转换, 改 u8 会转成 `__fixunsdfsi`, 288B 直接膨胀到 404B), 定义侧形参声明 `u8 mode` 但
+    开关写 `switch ((s8)mode)` —— 显式转换重新触发 `lsls r4,r4,#24; asrs r4,r4,#24` 截断
+    (u8 会发 `lsrs` 逻辑扩展, 与 ROM 差 1 字节)。三个 TU 全部字节命中 (sub_801768C 288B /
+    sub_80405A4 236B / sub_8042AB4 220B / SoundMain_Frame 196B)。
+    排查法 (整 ROM 位移定位): `fncheck --blame` 先报 "整体位移 -8"; 再用
+    `arm-none-eabi-nm -n ll.elf` 逐个符号对比 `functions.tsv` 的 addr, 找第一个
+    `actual > expected` 的符号 = 尺寸漂移起点 (本次 sub_80405A4 之后), 漂移量阶梯 (+4 → +8)
+    直接指出是几个函数各多/少几个字节。别只靠 fncheck 的 FAIL 名单: 位移受害的 11 个函数
+    (HBlankWave_BuildTables/Rand_TableNext/... ) 全表 FAIL 但字节本身没错, 是 bl 目标/池值连带偏移。
+    教训: ① 动共享原型 (尤其第 N 参 signedness / 宽度) 后必须全量回归同调函数, 而不是只 fncheck 自己那个;
+    ② 原型必须兼容**定义体**和**所有调用点**, 二者冲突时用"宽形参 + 函数体内显式窄转换"而不是 K&R 裸声明
+    (K&R 会让 sound.c 的调用点丢掉 `lsls/asrs` 符号扩展, 同样改坏字节)。
+     关联: 规则 140 (u16 形参装 -1 的池常量陷阱), 规则 148 (INCLUDE_ASM→真 C 扰动姊妹函数),
+     规则 156 (bytecmp 差字节基线 4×bl), INCIDENTS 2026-09-05 23:5x。
+161. **⭐⭐ 位域链赋值 (union.fields) 触发 GCC2 的逐位字节级 RMW, 输出 `movs rX,#N; negs rX,rX; ands` 的 ~mask 链 + sl/ip/r9 常量提升** (2026-09-06, 案例 sub_801D984)。
+     写 `o->fields.AffineParamNo_L = 0; fields.HFlip = 0; fields.VFlip = 0; fields.Size = 1;` 时
+     GCC2 对同字节内相邻位域生成**一条** 加载→连续 ands→orr→存储 的 RMW, 掩码按
+     `~字段位` 的补码物化 (`movs #0xf; negs` = ~0x0E, `movs #0x11; negs` = ~0x10,
+     复用 `subs r1,#0x10` = ~0x20), 0x3F/0x40 这类小常量被提到循环前放 sl/ip。
+     对比: 裸字节 `t &= ~0x0E; t &= ~0x10; ...` (u8 局部) 会被 GCC2 折叠成 8 位掩码
+     `movs rX,#0xf1` (规则 76 同类), 得不到目标形态。**当目标出现 ~mask 的 neg 连发 + 高位
+     常量提升时, 先试 union fields 位域写法而不是裸掩码**。GBA OAM 位域 (GameOamData) 的
+     完整半字 RMW (HPos/CharNo 跨字节字段) 也是位域赋值自动出的 (掩码 0xFFFFFE00 走池, 不折叠)。
+162. **8 位存储目标会让 GCC2 在 expand 时把加法操作数换成 subreg 再被 expand_binop 交换, 产生 3-op `adds rd,rm,rd`; 用 u32 临时量接住和可保住 2-op `adds rd,rm`** (2026-09-06, 案例 sub_801D984)。
+     `o->fields.VPos = field_3 + r7;` (VPos 是 :8 位域) → GCC2 先把 field_3 的零扩展字节抽成
+     `(subreg:SI (reg:QI))` 再进 plus, expand_binop 见 op1 是 REG 而 op0 是 subreg 就交换
+     → RTL `(plus r7_var field3)` → 分配后 `adds r0,r7,r0` (3-op, 0x1BC0), 与 ROM 的
+     `adds r0,r7` (2-op, 0x19C0) 差 1 字节。解法: `u32 t = field_3 + r7; o->fields.VPos = t;`
+     —— 先算完整 SImode 和, 截断留到位域存储, expand 时 op0/op1 都是 REG 不交换。
+     教训: "存到小字段"的加法若 2-op/3-op 对不上, 优先把和提成 u32 临时。

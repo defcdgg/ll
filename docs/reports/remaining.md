@@ -1,4 +1,4 @@
-# 未匹配 389 个
+# 未匹配 372 个
 
 (▶ = 行数 < 200, 优先目标)
 
@@ -26,7 +26,7 @@
 | 0x08007350 |   746 | [MapScene_LoadEventAnimations](../../asm/nonmatchings/MapScene_LoadEventAnimations.s) |  |
 | 0x08007adc |   127 | ▶ **[sub_8007ADC](../../asm/nonmatchings/sub_8007ADC.s)** |  |
 | 0x08008254 |   472 | [ChoiceMenu_HandleInput](../../asm/nonmatchings/ChoiceMenu_HandleInput.s) |  |
-| 0x080091c4 |   209 | [PaletteEffects_Update](../../asm/nonmatchings/PaletteEffects_Update.s) | [permuter/sub_80091C4/](../../permuter/sub_80091C4/) |
+| 0x080091c4 |   209 | [PaletteEffects_Update](../../asm/nonmatchings/PaletteEffects_Update.s) | [permuter/PaletteEffects_Update/](../../permuter/PaletteEffects_Update/) |
 | 0x08009600 |   590 | [PaletteFx_Transform](../../asm/nonmatchings/PaletteFx_Transform.s) |  |
 | 0x0800a1b4 |   258 | [sub_800A1B4](../../asm/nonmatchings/sub_800A1B4.s) |  |
 | 0x0800a3c8 |   178 | ▶ **[sub_800A3C8](../../asm/nonmatchings/sub_800A3C8.s)** |  |
@@ -45,13 +45,13 @@
 | 0x0800fb2c |   361 | [sub_800FB2C](../../asm/nonmatchings/sub_800FB2C.s) |  |
 | 0x0800fdec |   146 | ▶ **[sub_800FDEC](../../asm/nonmatchings/sub_800FDEC.s)** |  |
 | 0x0800ff10 |   306 | [sub_800FF10](../../asm/nonmatchings/sub_800FF10.s) |  |
-| 0x08010170 |   121 | ▶ **[sub_8010170](../../asm/nonmatchings/sub_8010170.s)** |  |
-| 0x08010300 |   157 | ▶ **[sub_8010300](../../asm/nonmatchings/sub_8010300.s)** |  |
-| 0x080104f8 |   142 | ▶ **[sub_80104F8](../../asm/nonmatchings/sub_80104F8.s)** |  |
+| 0x08010170 |   121 | ▶ **[sub_8010170](../../asm/nonmatchings/sub_8010170.s)** | [permuter/sub_8010170/](../../permuter/sub_8010170/) |
+| 0x08010300 |   157 | ▶ **[sub_8010300](../../asm/nonmatchings/sub_8010300.s)** | [permuter/sub_8010300/](../../permuter/sub_8010300/) |
+| 0x080104f8 |   142 | ▶ **[sub_80104F8](../../asm/nonmatchings/sub_80104F8.s)** | [permuter/sub_80104F8/](../../permuter/sub_80104F8/) |
 | 0x08010624 |   162 | ▶ **[sub_8010624](../../asm/nonmatchings/sub_8010624.s)** |  |
 | 0x08010770 |   251 | [sub_8010770](../../asm/nonmatchings/sub_8010770.s) |  |
 
-## code_8010F10 (38)
+## code_8010F10 (31)
 
 | addr | 行数 | 名称 | permuter |
 |---|---:|---|---|
@@ -62,7 +62,6 @@
 | 0x08012790 |  2078 | [SaveUi_LoadScreen](../../asm/nonmatchings/SaveUi_LoadScreen.s) |  |
 | 0x08013870 |   100 | ▶ **[sub_8013870](../../asm/nonmatchings/sub_8013870.s)** | [permuter/sub_8013870/](../../permuter/sub_8013870/) |
 | 0x08013934 |   236 | [sub_8013934](../../asm/nonmatchings/sub_8013934.s) |  |
-| 0x08013b0c |   127 | ▶ **[sub_8013B0C](../../asm/nonmatchings/sub_8013B0C.s)** |  |
 | 0x08013c00 |   409 | [sub_8013C00](../../asm/nonmatchings/sub_8013C00.s) |  |
 | 0x0801417c |   388 | [sub_801417C](../../asm/nonmatchings/sub_801417C.s) |  |
 | 0x080146a8 |   481 | [sub_80146A8](../../asm/nonmatchings/sub_80146A8.s) |  |
@@ -72,52 +71,41 @@
 | 0x08015c18 |   245 | [InvUi_Main](../../asm/nonmatchings/InvUi_Main.s) |  |
 | 0x08015e1c |    59 | ▶ **[sub_8015E1C](../../asm/nonmatchings/sub_8015E1C.s)** | [permuter/sub_8015E1C/](../../permuter/sub_8015E1C/) |
 | 0x08016d24 |   138 | ▶ **[sub_8016D24](../../asm/nonmatchings/sub_8016D24.s)** | [permuter/sub_8016D24/](../../permuter/sub_8016D24/) |
-| 0x08017120 |    99 | ▶ **[sub_8017120](../../asm/nonmatchings/sub_8017120.s)** |  |
 | 0x080171e4 |   467 | [sub_80171E4](../../asm/nonmatchings/sub_80171E4.s) |  |
-| 0x0801768c |   130 | ▶ **[sub_801768C](../../asm/nonmatchings/sub_801768C.s)** |  |
 | 0x080177ac |   933 | [BattleTask_Run](../../asm/nonmatchings/BattleTask_Run.s) |  |
-| 0x08017fa4 |    91 | ▶ **[sub_8017FA4](../../asm/nonmatchings/sub_8017FA4.s)** |  |
+| 0x08017fa4 |    91 | ▶ **[sub_8017FA4](../../asm/nonmatchings/sub_8017FA4.s)** | [permuter/sub_8017FA4/](../../permuter/sub_8017FA4/) |
 | 0x08018070 |   266 | [sub_8018070](../../asm/nonmatchings/sub_8018070.s) |  |
 | 0x080182a8 |   258 | [sub_80182A8](../../asm/nonmatchings/sub_80182A8.s) |  |
 | 0x080184a8 |   254 | [sub_80184A8](../../asm/nonmatchings/sub_80184A8.s) |  |
-| 0x08018928 |   147 | ▶ **[sub_8018928](../../asm/nonmatchings/sub_8018928.s)** |  |
-| 0x08018a58 |   184 | ▶ **[sub_8018A58](../../asm/nonmatchings/sub_8018A58.s)** |  |
-| 0x08018bf8 |   196 | ▶ **[sub_8018BF8](../../asm/nonmatchings/sub_8018BF8.s)** |  |
+| 0x08018a58 |   184 | ▶ **[sub_8018A58](../../asm/nonmatchings/sub_8018A58.s)** | [permuter/sub_8018A58/](../../permuter/sub_8018A58/) |
+| 0x08018bf8 |   196 | ▶ **[sub_8018BF8](../../asm/nonmatchings/sub_8018BF8.s)** | [permuter/sub_8018BF8/](../../permuter/sub_8018BF8/) |
 | 0x08018ea8 |   139 | ▶ **[sub_8018EA8](../../asm/nonmatchings/sub_8018EA8.s)** | [permuter/sub_8018EA8/](../../permuter/sub_8018EA8/) |
 | 0x08018fc0 |   192 | ▶ **[sub_8018FC0](../../asm/nonmatchings/sub_8018FC0.s)** |  |
-| 0x080191cc |   168 | ▶ **[sub_80191CC](../../asm/nonmatchings/sub_80191CC.s)** |  |
+| 0x080191cc |   168 | ▶ **[sub_80191CC](../../asm/nonmatchings/sub_80191CC.s)** | [permuter/sub_80191CC/](../../permuter/sub_80191CC/) |
 | 0x0801933c |   479 | [sub_801933C](../../asm/nonmatchings/sub_801933C.s) |  |
 | 0x08019784 |   296 | [sub_8019784](../../asm/nonmatchings/sub_8019784.s) |  |
-| 0x080199e0 |   117 | ▶ **[sub_80199E0](../../asm/nonmatchings/sub_80199E0.s)** |  |
-| 0x08019ad0 |    95 | ▶ **[sub_8019AD0](../../asm/nonmatchings/sub_8019AD0.s)** |  |
 | 0x08019b98 |   294 | [sub_8019B98](../../asm/nonmatchings/sub_8019B98.s) |  |
-| 0x08019f78 |   122 | ▶ **[sub_8019F78](../../asm/nonmatchings/sub_8019F78.s)** |  |
 | 0x0801a2ac |    30 | ▶ **[sub_801A2AC](../../asm/nonmatchings/sub_801A2AC.s)** | [permuter/sub_801A2AC/](../../permuter/sub_801A2AC/) |
 
-## code_801A3C4 (45)
+## code_801A3C4 (41)
 
 | addr | 行数 | 名称 | permuter |
 |---|---:|---|---|
-| 0x0801a3c4 |   260 | [sub_801A3C4](../../asm/nonmatchings/sub_801A3C4.s) | [permuter/sub_801A3C4/](../../permuter/sub_801A3C4/) |
 | 0x0801a6f4 |   195 | ▶ **[sub_801A6F4](../../asm/nonmatchings/sub_801A6F4.s)** | [permuter/sub_801A6F4/](../../permuter/sub_801A6F4/) |
 | 0x0801a884 |   586 | [sub_801A884](../../asm/nonmatchings/sub_801A884.s) |  |
 | 0x0801ad0c |   492 | [sub_801AD0C](../../asm/nonmatchings/sub_801AD0C.s) |  |
 | 0x0801b0b8 |   600 | [sub_801B0B8](../../asm/nonmatchings/sub_801B0B8.s) |  |
-| 0x0801b570 |   143 | ▶ **[sub_801B570](../../asm/nonmatchings/sub_801B570.s)** |  |
+| 0x0801b570 |   143 | ▶ **[sub_801B570](../../asm/nonmatchings/sub_801B570.s)** | [permuter/sub_801B570/](../../permuter/sub_801B570/) |
 | 0x0801b964 |   593 | [sub_801B964](../../asm/nonmatchings/sub_801B964.s) |  |
 | 0x0801be34 |   759 | [sub_801BE34](../../asm/nonmatchings/sub_801BE34.s) |  |
 | 0x0801c484 |   672 | [sub_801C484](../../asm/nonmatchings/sub_801C484.s) |  |
 | 0x0801ca08 |   202 | [sub_801CA08](../../asm/nonmatchings/sub_801CA08.s) |  |
 | 0x0801cba4 |   368 | [sub_801CBA4](../../asm/nonmatchings/sub_801CBA4.s) |  |
-| 0x0801ce80 |   139 | ▶ **[sub_801CE80](../../asm/nonmatchings/sub_801CE80.s)** |  |
 | 0x0801cf90 |   213 | [sub_801CF90](../../asm/nonmatchings/sub_801CF90.s) |  |
-| 0x0801d214 |   161 | ▶ **[sub_801D214](../../asm/nonmatchings/sub_801D214.s)** |  |
-| 0x0801d378 |   120 | ▶ **[sub_801D378](../../asm/nonmatchings/sub_801D378.s)** |  |
-| 0x0801d468 |   125 | ▶ **[sub_801D468](../../asm/nonmatchings/sub_801D468.s)** |  |
+| 0x0801d214 |   161 | ▶ **[sub_801D214](../../asm/nonmatchings/sub_801D214.s)** | [permuter/sub_801D214/](../../permuter/sub_801D214/) |
+| 0x0801d378 |   120 | ▶ **[sub_801D378](../../asm/nonmatchings/sub_801D378.s)** | [permuter/sub_801D378/](../../permuter/sub_801D378/) |
 | 0x0801d568 |   208 | [sub_801D568](../../asm/nonmatchings/sub_801D568.s) |  |
 | 0x0801d710 |   315 | [sub_801D710](../../asm/nonmatchings/sub_801D710.s) |  |
-| 0x0801d984 |   137 | ▶ **[sub_801D984](../../asm/nonmatchings/sub_801D984.s)** |  |
-| 0x0801db3c |   112 | ▶ **[sub_801DB3C](../../asm/nonmatchings/sub_801DB3C.s)** |  |
 | 0x0801dc20 |   107 | ▶ **[sub_801DC20](../../asm/nonmatchings/sub_801DC20.s)** |  |
 | 0x0801dd04 |    85 | ▶ **[sub_801DD04](../../asm/nonmatchings/sub_801DD04.s)** | [permuter/sub_801DD04/](../../permuter/sub_801DD04/) |
 | 0x0801ddb0 |    70 | ▶ **[sub_801DDB0](../../asm/nonmatchings/sub_801DDB0.s)** | [permuter/sub_801DDB0/](../../permuter/sub_801DDB0/) |
@@ -143,6 +131,7 @@
 | 0x08020228 |   120 | ▶ **[sub_8020228](../../asm/nonmatchings/sub_8020228.s)** |  |
 | 0x0802031c |   391 | [sub_802031C](../../asm/nonmatchings/sub_802031C.s) |  |
 | 0x08020648 |   176 | ▶ **[sub_8020648](../../asm/nonmatchings/sub_8020648.s)** |  |
+| 0x08020b54 |    28 | ▶ **[sub_8020B54](../../asm/nonmatchings/sub_8020B54.s)** |  |
 
 ## code_8020D50 (22)
 
@@ -153,12 +142,12 @@
 | 0x0802151c |   227 | [sub_802151C](../../asm/nonmatchings/sub_802151C.s) |  |
 | 0x0802181c |   141 | ▶ **[sub_802181C](../../asm/nonmatchings/sub_802181C.s)** |  |
 | 0x0802192c |  1370 | [sub_802192C](../../asm/nonmatchings/sub_802192C.s) |  |
-| 0x08022458 |   122 | ▶ **[sub_8022458](../../asm/nonmatchings/sub_8022458.s)** |  |
+| 0x08022458 |   122 | ▶ **[sub_8022458](../../asm/nonmatchings/sub_8022458.s)** | [permuter/sub_8022458/](../../permuter/sub_8022458/) |
 | 0x08022550 |   193 | ▶ **[sub_8022550](../../asm/nonmatchings/sub_8022550.s)** |  |
 | 0x08022710 |  1102 | [sub_8022710](../../asm/nonmatchings/sub_8022710.s) |  |
 | 0x08022f2c |   208 | [sub_8022F2C](../../asm/nonmatchings/sub_8022F2C.s) |  |
 | 0x080230bc |   293 | [sub_80230BC](../../asm/nonmatchings/sub_80230BC.s) |  |
-| 0x08023320 |   123 | ▶ **[sub_8023320](../../asm/nonmatchings/sub_8023320.s)** |  |
+| 0x08023320 |   123 | ▶ **[sub_8023320](../../asm/nonmatchings/sub_8023320.s)** | [permuter/sub_8023320/](../../permuter/sub_8023320/) |
 | 0x08023414 |   504 | [sub_8023414](../../asm/nonmatchings/sub_8023414.s) |  |
 | 0x08023820 |  1485 | [sub_8023820](../../asm/nonmatchings/sub_8023820.s) |  |
 | 0x080244bc |   180 | ▶ **[sub_80244BC](../../asm/nonmatchings/sub_80244BC.s)** |  |
@@ -314,7 +303,7 @@
 | 0x08043b5c |   478 | [sub_8043B5C](../../asm/nonmatchings/sub_8043B5C.s) |  |
 | 0x08043f90 |   460 | [sub_8043F90](../../asm/nonmatchings/sub_8043F90.s) |  |
 
-## code_8044394 (88)
+## code_8044394 (83)
 
 | addr | 行数 | 名称 | permuter |
 |---|---:|---|---|
@@ -322,12 +311,11 @@
 | 0x080448a8 |   153 | ▶ **[sub_80448A8](../../asm/nonmatchings/sub_80448A8.s)** |  |
 | 0x08044a40 |   575 | [sub_8044A40](../../asm/nonmatchings/sub_8044A40.s) |  |
 | 0x08044f4c |   162 | ▶ **[sub_8044F4C](../../asm/nonmatchings/sub_8044F4C.s)** |  |
-| 0x08045098 |   110 | ▶ **[sub_8045098](../../asm/nonmatchings/sub_8045098.s)** |  |
+| 0x08045098 |   110 | ▶ **[sub_8045098](../../asm/nonmatchings/sub_8045098.s)** | [permuter/sub_8045098/](../../permuter/sub_8045098/) |
 | 0x0804519c |   199 | ▶ **[sub_804519C](../../asm/nonmatchings/sub_804519C.s)** |  |
 | 0x08045328 |    91 | ▶ **[sub_8045328](../../asm/nonmatchings/sub_8045328.s)** |  |
 | 0x08045940 |   104 | ▶ **[sub_8045940](../../asm/nonmatchings/sub_8045940.s)** | [permuter/sub_8045940/](../../permuter/sub_8045940/) |
 | 0x08045a10 |    52 | ▶ **[sub_8045A10](../../asm/nonmatchings/sub_8045A10.s)** | [permuter/sub_8045A10/](../../permuter/sub_8045A10/) |
-| 0x08045a74 |   150 | ▶ **[sub_8045A74](../../asm/nonmatchings/sub_8045A74.s)** |  |
 | 0x08045bf4 |   142 | ▶ **[sub_8045BF4](../../asm/nonmatchings/sub_8045BF4.s)** |  |
 | 0x08045d00 |   234 | [sub_8045D00](../../asm/nonmatchings/sub_8045D00.s) |  |
 | 0x0804621c |   105 | ▶ **[sub_804621C](../../asm/nonmatchings/sub_804621C.s)** |  |
@@ -343,7 +331,6 @@
 | 0x0804753c |   194 | ▶ **[sub_804753C](../../asm/nonmatchings/sub_804753C.s)** |  |
 | 0x080476dc |   526 | [sub_80476DC](../../asm/nonmatchings/sub_80476DC.s) |  |
 | 0x08047b1c |   243 | [sub_8047B1C](../../asm/nonmatchings/sub_8047B1C.s) |  |
-| 0x08047d28 |    84 | ▶ **[sub_8047D28](../../asm/nonmatchings/sub_8047D28.s)** |  |
 | 0x08047dc8 |   210 | [sub_8047DC8](../../asm/nonmatchings/sub_8047DC8.s) |  |
 | 0x080480ec |   104 | ▶ **[sub_80480EC](../../asm/nonmatchings/sub_80480EC.s)** |  |
 | 0x080481b8 |   177 | ▶ **[sub_80481B8](../../asm/nonmatchings/sub_80481B8.s)** |  |
@@ -354,14 +341,13 @@
 | 0x08048c30 |    43 | ▶ **[sub_8048C30](../../asm/nonmatchings/sub_8048C30.s)** |  |
 | 0x08048c80 |    58 | ▶ **[sub_8048C80](../../asm/nonmatchings/sub_8048C80.s)** | [permuter/sub_8048C80/](../../permuter/sub_8048C80/) |
 | 0x08048da4 |   154 | ▶ **[sub_8048DA4](../../asm/nonmatchings/sub_8048DA4.s)** |  |
-| 0x08048f0c |    85 | ▶ **[sub_8048F0C](../../asm/nonmatchings/sub_8048F0C.s)** |  |
 | 0x08048fb8 |   329 | [sub_8048FB8](../../asm/nonmatchings/sub_8048FB8.s) |  |
 | 0x080492c0 |   267 | [sub_80492C0](../../asm/nonmatchings/sub_80492C0.s) |  |
 | 0x080494f0 |   318 | [sub_80494F0](../../asm/nonmatchings/sub_80494F0.s) |  |
 | 0x080497b0 |   151 | ▶ **[sub_80497B0](../../asm/nonmatchings/sub_80497B0.s)** |  |
 | 0x08049958 |   181 | ▶ **[sub_8049958](../../asm/nonmatchings/sub_8049958.s)** |  |
 | 0x08049ad8 |    73 | ▶ **[sub_8049AD8](../../asm/nonmatchings/sub_8049AD8.s)** | [permuter/sub_8049AD8/](../../permuter/sub_8049AD8/) |
-| 0x08049b70 |    86 | ▶ **[sub_8049B70](../../asm/nonmatchings/sub_8049B70.s)** |  |
+| 0x08049b70 |    86 | ▶ **[sub_8049B70](../../asm/nonmatchings/sub_8049B70.s)** | [permuter/sub_8049B70/](../../permuter/sub_8049B70/) |
 | 0x08049c1c |   152 | ▶ **[sub_8049C1C](../../asm/nonmatchings/sub_8049C1C.s)** |  |
 | 0x08049d58 |    77 | ▶ **[sub_8049D58](../../asm/nonmatchings/sub_8049D58.s)** | [permuter/sub_8049D58/](../../permuter/sub_8049D58/) |
 | 0x08049df8 |   402 | [sub_8049DF8](../../asm/nonmatchings/sub_8049DF8.s) |  |
@@ -370,12 +356,11 @@
 | 0x0804aa2c |   115 | ▶ **[sub_804AA2C](../../asm/nonmatchings/sub_804AA2C.s)** |  |
 | 0x0804ab40 |    68 | ▶ **[sub_804AB40](../../asm/nonmatchings/sub_804AB40.s)** | [permuter/sub_804AB40/](../../permuter/sub_804AB40/) |
 | 0x0804acc0 |    50 | ▶ **[sub_804ACC0](../../asm/nonmatchings/sub_804ACC0.s)** |  |
-| 0x0804ae2c |   146 | ▶ **[sub_804AE2C](../../asm/nonmatchings/sub_804AE2C.s)** |  |
 | 0x0804af60 |   136 | ▶ **[sub_804AF60](../../asm/nonmatchings/sub_804AF60.s)** |  |
 | 0x0804b080 |   186 | ▶ **[sub_804B080](../../asm/nonmatchings/sub_804B080.s)** |  |
 | 0x0804b288 |   153 | ▶ **[sub_804B288](../../asm/nonmatchings/sub_804B288.s)** |  |
-| 0x0804b3c0 |    79 | ▶ **[sub_804B3C0](../../asm/nonmatchings/sub_804B3C0.s)** |  |
-| 0x0804b4d0 |    81 | ▶ **[sub_804B4D0](../../asm/nonmatchings/sub_804B4D0.s)** |  |
+| 0x0804b3c0 |    79 | ▶ **[sub_804B3C0](../../asm/nonmatchings/sub_804B3C0.s)** | [permuter/sub_804B3C0/](../../permuter/sub_804B3C0/) |
+| 0x0804b4d0 |    81 | ▶ **[sub_804B4D0](../../asm/nonmatchings/sub_804B4D0.s)** | [permuter/sub_804B4D0/](../../permuter/sub_804B4D0/) |
 | 0x0804b56c |   123 | ▶ **[sub_804B56C](../../asm/nonmatchings/sub_804B56C.s)** |  |
 | 0x0804b654 |   180 | ▶ **[sub_804B654](../../asm/nonmatchings/sub_804B654.s)** |  |
 | 0x0804b7b0 |    67 | ▶ **[sub_804B7B0](../../asm/nonmatchings/sub_804B7B0.s)** | [permuter/sub_804B7B0/](../../permuter/sub_804B7B0/) |
@@ -388,14 +373,13 @@
 | 0x0804be90 |    67 | ▶ **[sub_804BE90](../../asm/nonmatchings/sub_804BE90.s)** |  |
 | 0x0804bf14 |   265 | [sub_804BF14](../../asm/nonmatchings/sub_804BF14.s) |  |
 | 0x0804cee0 |   283 | [sub_804CEE0](../../asm/nonmatchings/sub_804CEE0.s) |  |
-| 0x0804d310 |    71 | ▶ **[sub_804D310](../../asm/nonmatchings/sub_804D310.s)** | [permuter/sub_804D310/](../../permuter/sub_804D310/) |
 | 0x0804d4fc |    94 | ▶ **[sub_804D4FC](../../asm/nonmatchings/sub_804D4FC.s)** | [permuter/sub_804D4FC/](../../permuter/sub_804D4FC/) |
 | 0x0804d5b4 |   175 | ▶ **[sub_804D5B4](../../asm/nonmatchings/sub_804D5B4.s)** |  |
 | 0x0804d708 |    71 | ▶ **[sub_804D708](../../asm/nonmatchings/sub_804D708.s)** | [permuter/sub_804D708/](../../permuter/sub_804D708/) |
 | 0x0804d840 |    91 | ▶ **[sub_804D840](../../asm/nonmatchings/sub_804D840.s)** |  |
 | 0x0804d8f4 |   143 | ▶ **[sub_804D8F4](../../asm/nonmatchings/sub_804D8F4.s)** |  |
 | 0x0804da04 |    93 | ▶ **[sub_804DA04](../../asm/nonmatchings/sub_804DA04.s)** |  |
-| 0x0804dabc |    83 | ▶ **[sub_804DABC](../../asm/nonmatchings/sub_804DABC.s)** |  |
+| 0x0804dabc |    83 | ▶ **[sub_804DABC](../../asm/nonmatchings/sub_804DABC.s)** | [permuter/sub_804DABC/](../../permuter/sub_804DABC/) |
 | 0x0804db64 |    98 | ▶ **[sub_804DB64](../../asm/nonmatchings/sub_804DB64.s)** |  |
 | 0x0804dc24 |    91 | ▶ **[sub_804DC24](../../asm/nonmatchings/sub_804DC24.s)** | [permuter/sub_804DC24/](../../permuter/sub_804DC24/) |
 | 0x0804dcd8 |    75 | ▶ **[sub_804DCD8](../../asm/nonmatchings/sub_804DCD8.s)** | [permuter/sub_804DCD8/](../../permuter/sub_804DCD8/) |
@@ -407,7 +391,7 @@
 | 0x0804e9dc |   271 | [sub_804E9DC](../../asm/nonmatchings/sub_804E9DC.s) |  |
 | 0x0804ec04 |   351 | [sub_804EC04](../../asm/nonmatchings/sub_804EC04.s) |  |
 
-## code_804F0B8 (19)
+## code_804F0B8 (18)
 
 | addr | 行数 | 名称 | permuter |
 |---|---:|---|---|
@@ -429,4 +413,3 @@
 | 0x08051be4 |  1151 | [sub_8051BE4](../../asm/nonmatchings/sub_8051BE4.s) |  |
 | 0x080525e8 |    85 | ▶ **[sub_80525E8](../../asm/nonmatchings/sub_80525E8.s)** | [permuter/sub_80525E8/](../../permuter/sub_80525E8/) |
 | 0x080526a0 |    63 | ▶ **[sub_80526A0](../../asm/nonmatchings/sub_80526A0.s)** | [permuter/sub_80526A0/](../../permuter/sub_80526A0/) |
-| 0x08052f44 |    53 | ▶ **[sub_8052F44](../../asm/nonmatchings/sub_8052F44.s)** | [permuter/sub_8052F44/](../../permuter/sub_8052F44/) |

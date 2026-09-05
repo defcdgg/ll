@@ -10,6 +10,7 @@ MEMORY {
 }
 
 gUnk_08091948 = 0x08091948;
+gUnk_08393A24 = 0x08393A24;
 gUnk_08093418 = 0x08093418;
 gClassStatCurveTable = 0x080921F0;
 gStatGrowthCurveTables = 0x080923D8;
@@ -56,6 +57,14 @@ gUnk_08393B28_entries = 0x08393B28;   /* 同址别名: u16 视图 (offset 0x10 �
 gUnk_0839D5BC = 0x0839D5BC;
 gUnk_0839DBF6 = 0x0839DBF6;
 gUnk_03000730_arr = 0x03000730;
+gUnk_0861A5E4 = 0x0861A5E4;
+gUnk_0861C664 = 0x0861C664;
+gUnk_08619FA4 = 0x08619FA4;
+gUnk_08619AA4 = 0x08619AA4;
+gUnk_08393A74 = 0x08393A74;
+gUnk_08393A54 = 0x08393A54;
+gUnk_08393A30 = 0x08393A30;   /* u8 表 6行×4列, sub_801B570 用 (progress.md 待登记项) */
+gUnk_083939F8 = 0x083939F8;
 gUnk_087ED394 = 0x087ED394;
 gUnk_0861A4A4 = 0x0861A4A4;
 gUnk_0809C834 = 0x0809C834;
@@ -67,6 +76,7 @@ gUnk_0861C764 = 0x0861C764;
 gUnk_087EA580 = 0x087EA580;
 gCharaBaseData = 0x087EA580;
 gUnk_0839B2A4 = 0x0839B2A4;
+gUnk_0839B2B0 = 0x0839B2B0;   /* 12 字节步长表 (sub_801DB3C 分支 arg2<=2) */
 gUnk_087E8430 = 0x087E8430;   /* 精灵图块 LZ77 指针表 (LoadSpriteSheetGfx) */
 gUnk_080B9DFC = 0x080B9DFC;   /* 精灵 OBJ 调色板数组 [][32] (LoadSpriteSheetPal) */
 gUnk_087EA1A0 = 0x087EA1A0;
@@ -79,6 +89,7 @@ gUnk_08619A60 = 0x08619A60;
 gUnk_08619430 = 0x08619430;
 gSaveSignature = 0x08098199;   /* 12B "LUNAR1_12_09" 存档签名 */
 gUnk_080981E6 = 0x080981E6;    /* u16[] 存档块长度表 {2, 0x5A, 8, 0} */
+gUnk_080981EE = 0x080981EE;    /* u8[] 6B/项 出生/传送参数表 {npcSetId, tileX, tileY, facing, moveCmd u16} */
 gUnk_087EB1E8 = 0x087EB1E8;    /* 存档块指针表 {&gUnk_03004D48, gSaveTimers, gSaveFlags, ...} */
 gDialogPortraitTilemapPtrs = 0x087E9818; /* four dialog portrait tilemap positions */
 gUnk_087EB2E0 = 0x087EB2E0;    /* 角色头像 LZ77 指针表 (存档/队伍菜单用) */
@@ -100,6 +111,7 @@ SECTIONS {
         . = 0x00005C44; gMsgLineBuf = .;   /* u16[29] Msg_RenderLine 输出行缓冲 */
         . = 0x00016000; gUnk_02016000 = .;
         . = 0x00016200; gUnk_02016200 = .;
+        . = 0x000352C0; gUnk_020352C0 = .;
         . = 0x00035B04; gUnk_02035B04 = .;
         . = 0x00036EC0; gUnk_02036EC0 = .;
         . = 0x0003EE00; gCharaWalkCmdBuf = .;
@@ -144,6 +156,10 @@ SECTIONS {
         . = 0x000001B0; gUnk_030001B0 = .;
 
         . = 0x000001B4; gItemUseCtx = .;
+
+        . = 0x000001C4; gUnk_030001C4 = .;
+        . = 0x000001C5; gUnk_030001C5 = .;
+        . = 0x000001C6; gUnk_030001C6 = .;
 
         . = 0x000001C8; gUnk_030001C8 = .;
 
@@ -199,6 +215,9 @@ SECTIONS {
         . = 0x00000624; gUnk_03000624 = .;
         . = 0x0000062C; gUnk_0300062C = .;
         . = 0x00000630; gUnk_03000630 = .;
+        . = 0x00000638; gUnk_03000638 = .;
+        . = 0x00000668; gUnk_03000668 = .;
+        . = 0x00000669; gUnk_03000669 = .;
         . = 0x00000670; gUnk_03000670 = .;
         . = 0x0000068C; gUnk_0300068C = .;
         . = 0x0000068D; gUnk_0300068D = .;
@@ -217,7 +236,9 @@ SECTIONS {
         . = 0x00000758; gUnk_03000758 = .;
         . = 0x00000763; gUnk_03000763 = .;
         . = 0x00000768; gUnk_03000768 = .;
+        . = 0x00000769; gUnk_03000769 = .;
         . = 0x0000076A; gUnk_0300076A = .;
+        . = 0x0000076B; gUnk_0300076B = .;
         . = 0x0000076C; gUnk_0300076C = .;
         . = 0x0000076E; gUnk_0300076E = .;
         . = 0x00000770; gUnk_03000770 = .;
@@ -275,8 +296,10 @@ SECTIONS {
         . = 0x0000094B; gUnk_0300094B = .;
         . = 0x0000094C; gUnk_0300094C = .;
         . = 0x0000094D; gUnk_0300094D = .;
+        . = 0x0000096C; gUnk_0300096C = .;
         . = 0x00000970; gUnk_03000970 = .;
         . = 0x0000097B; gUnk_0300097B = .;
+        . = 0x0000097C; gUnk_0300097C = .;
         . = 0x0000097D; gUnk_0300097D = .;
         . = 0x0000097E; gUnk_0300097E = .;
         . = 0x000009BF; gUnk_030009BF = .;
@@ -284,7 +307,12 @@ SECTIONS {
         . = 0x000009C5; gUnk_030009C5 = .;
         . = 0x000009C8; gUnk_030009C8 = .;
         . = 0x000009D0; gUnk_030009D0 = .;
+        . = 0x000009D8; gUnk_030009D8 = .;
         . = 0x00000AD8; gUnk_03000AD8 = .;
+        . = 0x00000AD9; gUnk_03000AD9 = .;
+        . = 0x00000ADA; gUnk_03000ADA = .;
+        . = 0x00000ADB; gUnk_03000ADB = .;
+        . = 0x00000ADC; gUnk_03000ADC = .;
         . = 0x00000ADD; gUnk_03000ADD = .;
         . = 0x00000ADE; gUnk_03000ADE = .;
         . = 0x00000AE0; gUnk_03000AE0 = .;
@@ -393,6 +421,7 @@ SECTIONS {
         . = 0x00002C38; gSilverAmount = .;
         . = 0x00002C3C; gCameraTargetY = .;
         . = 0x00002C40; gUnk_03002C40 = .;
+        . = 0x00002C44; gUnk_03002C44 = .;  /* 同址别名: gPartyFollowFlags 视图 */
         . = 0x00002C44; gPartyFollowFlags = .;
         . = 0x00002C48; gAfterBattleCounter = .;
         . = 0x00002C4C; gSceneLoadToggle = .;

@@ -575,7 +575,65 @@ INCLUDE_ASM("asm/nonmatchings", sub_8045A10);
 //     return 1;
 // }
 // @ 0x08045A74
-INCLUDE_ASM("asm/nonmatchings", sub_8045A74);
+// 从 list[0..count-1] 中按 obj 槽(0xC8)的字段阈值筛选:
+// t1=(u16)(field_6e/10 * arg3), t2=(u16)(field_72/10 * arg3);
+// mode 0: field_6c < t1; mode 1: field_70 < t2; mode 2: 两者都满足。
+// 命中的索引写回 list[0..n-1], 返回命中数 n。
+u8 sub_8045A74(u8 *obj, u8 *list, u8 count, u8 arg3, u8 mode)
+{
+    u8 buf[5];
+    u8 i;
+    u8 j;
+    u8 *o;
+    u16 s1;
+    u16 s2;
+    u16 t1;
+    u16 t2;
+
+    for (j = 0; j <= 4; j++)
+        buf[j] = 0;
+    arg3 /= 10;
+    i = 0;
+    for (j = 0; j < count; j++)
+    {
+        o = obj + (u32)list[j] * 0xC8;
+        s1 = *(u16 *)(o + 0x6c);
+        s2 = *(u16 *)(o + 0x70);
+        t1 = (u16)(*(u16 *)(o + 0x6e) / 10);
+        t2 = (u16)(*(u16 *)(o + 0x72) / 10);
+        t1 = (u16)(t1 * arg3);
+        t2 = (u16)(t2 * arg3);
+        switch (mode)
+        {
+        case 0:
+            if (s1 < t1)
+            {
+                buf[i] = list[j];
+                i++;
+            }
+            break;
+        case 1:
+            if (s2 < t2)
+            {
+                buf[i] = list[j];
+                i++;
+            }
+            break;
+        case 2:
+            if (s1 < t1 && s2 < t2)
+            {
+                buf[i] = list[j];
+                i++;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    for (j = 0; j < i; j++)
+        list[j] = buf[j];
+    return i;
+}
 // @ 0x08045B90
 void sub_8045B90(u8 *obj, u8 index)
 {
@@ -987,7 +1045,47 @@ INCLUDE_ASM("asm/nonmatchings", sub_80476DC);
 // @ 0x08047B1C
 INCLUDE_ASM("asm/nonmatchings", sub_8047B1C);
 // @ 0x08047D28
-INCLUDE_ASM("asm/nonmatchings", sub_8047D28);
+u8 sub_8047D28(u8 *obj, u8 mask)
+{
+    u8 result;
+    u16 flags1;
+    u16 flags2;
+    u8 i;
+    int v;
+    u8 bit;
+
+    result = 0;
+    flags2 = 0;
+    flags1 = 0;
+    if (obj[0xBE] <= 0xA)
+    {
+        if (sub_804E76C(obj, 2, 6) >= 0)
+            flags2 = 3;
+        if (sub_804E76C(obj, 2, 7) >= 0)
+            flags2 = 0xC;
+    }
+    else if ((u8)(obj[0xBE] - 0xC) <= 0x64)
+    {
+        flags1 = *(u16 *)(*(u32 *)(obj + 0x88) + 0x16);
+        flags2 = *(u16 *)(*(u32 *)(obj + 0x88) + 0x18);
+    }
+    else if (obj[0xBE] > 0x70)
+    {
+        flags1 = *(u16 *)(*(u32 *)(obj + 0x88) + 0x2A);
+        flags2 = *(u16 *)(*(u32 *)(obj + 0x88) + 0x2C);
+    }
+    i = 0;
+    bit = 1;
+    for (; i <= 3; i++)
+    {
+        v = (bit << i) & mask;
+        if ((flags1 & v) != 0)
+            result = 1;
+        else if ((flags2 & v) != 0)
+            result = 2;
+    }
+    return result;
+}
 // @ 0x08047DC8
 INCLUDE_ASM("asm/nonmatchings", sub_8047DC8);
 // @ 0x08047FCC
@@ -1533,7 +1631,46 @@ u8 sub_8048D84(u8 *arg0, u8 *arg1)
 // @ 0x08048DA4
 INCLUDE_ASM("asm/nonmatchings", sub_8048DA4);
 // @ 0x08048F0C
-INCLUDE_ASM("asm/nonmatchings", sub_8048F0C);
+void sub_8048F0C(void)
+{
+    u8 *state;
+
+    state = &gUnk_0300097B;
+    switch (*state)
+    {
+        case 0:
+            break;
+        case 1:
+            sub_804B96C(gUnk_0300097D, 1, 0x10, 0x1C, 0x1F, 4, 4, -1, 2);
+            gUnk_0300097C = 0;
+            Sfx_Play(0x18, 0, 0);
+            *state = 2;
+            break;
+        case 2:
+            if (gUnk_0300097C <= 3)
+            {
+                gUnk_0300097C++;
+            }
+            else
+            {
+                sub_804C4D8(gUnk_0300097D, 1, 0x10);
+                gUnk_0300097C = 0;
+                *state = 3;
+            }
+            break;
+        case 3:
+            if (gUnk_0300097C <= 0xF)
+            {
+                gUnk_0300097C++;
+            }
+            else
+            {
+                gUnk_0300097C = 0;
+                *state = 0;
+            }
+            break;
+    }
+}
 // @ 0x08048FB8
 INCLUDE_ASM("asm/nonmatchings", sub_8048FB8);
 // @ 0x080492C0
@@ -1730,7 +1867,46 @@ void sub_804ADF8(void)
     gUnk_0300097E = 0;
 }
 // @ 0x0804AE2C
-INCLUDE_ASM("asm/nonmatchings", sub_804AE2C);
+// 注: OAM 缓冲用强转常量 (非 gOamBuffer 符号) 才能让 agbcc 逐迭代重物化基址 (RULES 规则102)
+#define OAM_BUF ((GameOamData *)0x030035C0)
+extern u8 gUnk_08393A24[];
+void sub_804AE2C(void)
+{
+    u16 i;
+
+    if ((gUnk_03000ADE & 1) != 0 && (gUnk_03000ADE & 0xF0) == 0x10)
+    {
+        gUnk_03000AD9 = *(u8 *)(gUnk_030009D0 + 0x2D);
+        gUnk_03000ADA = *(u8 *)(gUnk_030009D0 + 0x2D) - *(u8 *)(gUnk_030009D0 + 0x2E);
+        gUnk_03000ADB = 0xA0;
+        gUnk_03000ADC = 0;
+        i = gUnk_03000AD9;
+        if (i > gUnk_03000ADA)
+        {
+            do
+            {
+                if (gUnk_03000ADB > OAM_BUF[i].fields.VPos)
+                    gUnk_03000ADB = OAM_BUF[i].fields.VPos;
+                if (gUnk_03000ADC < gUnk_08393A24[OAM_BUF[i].fields.Size + (OAM_BUF[i].fields.Shape << 2)] * 8
+                        + OAM_BUF[i].fields.VPos)
+                    gUnk_03000ADC = (u8)(gUnk_08393A24[OAM_BUF[i].fields.Size + (OAM_BUF[i].fields.Shape << 2)] * 8
+                        + OAM_BUF[i].fields.VPos);
+                gUnk_030009D8[i] = OAM_BUF[i].fields.HPos;
+                i--;
+            } while (i > gUnk_03000ADA);
+        }
+        gUnk_03000ADE |= 2;
+        gUnk_03000AD8 = (u8)((gUnk_03000AD8 + 1) % 5);
+        if (gUnk_03000AD8 == 0)
+            gUnk_03000ADD++;
+        if ((gUnk_03000ADC - gUnk_03000ADD) < (gUnk_03000ADB - 0x1E))
+        {
+            gUnk_03000ADE &= ~1;
+            gUnk_03000ADE &= ~2;
+        }
+    }
+}
+#undef OAM_BUF
 // @ 0x0804AF60
 INCLUDE_ASM("asm/nonmatchings", sub_804AF60);
 // @ 0x0804B080

@@ -351,21 +351,21 @@ void Text_FillHidden(u16 *, u8 *);
 u16 *Text_TileAt(u8, u8);
 void sub_8016C44();
 void sub_8016C88();
-void sub_8016D24();
+u32 sub_8016D24();
 void Sio_BuildPacket(u8 *);
 u8 sub_8016E80(u8 *); /** 收包; 确实返回 gSioState[3], 调用方忽略 (删 return 会少两条指令) */
 void sub_8016F30();
 void sub_8016FC0();
 void Sio_SetReady();
 void Sio_Shutdown();
-void sub_8017120();
+u32 sub_8017120();
 s32 sub_80171E4();
 u32 Sio_IsHost();
 void sub_80175C0();
 void Sio_SetXferCtx(u32 *, u32 *, u32, u32);
 void Sio_ClearSlot();
 void sub_8017640();
-u16 sub_801768C(s16, s16, u8, u8, u8);
+s16 sub_801768C(s16, s16, s16, s16, s8);
 
 void BattleTask_Run();
 void sub_8017FA4(s8);
@@ -409,7 +409,7 @@ void sub_80196D4();
 void DialogCtx_SetPair(u32, u32, u32, u32, u32);
 void sub_8019784();
 void sub_80199E0();
-void sub_8019AD0();
+void sub_8019AD0(u8, u16);
 void sub_8019B98();
 void BattleUiFlag_Clear();
 void BattleUiFlag_Set(u16);
@@ -422,7 +422,7 @@ void sub_8019E60(); // BlankTilemap: 清空 VRAM 图块 0x2C0 并把 1024 项 ti
 void Disp_Bg1Off();
 void DialogCtx_SetHead(u8, u8, u8);
 void sub_8019F08(u16 *, u16, u8, u8, u8, u8);
-void sub_8019F78();
+void sub_8019F78(u16 *, int, s8, int, u8, u8, u8, u8);
 u8 DialogCtx_GetField_C(u8);
 void BgMap_PalFillRect(); // K&R: ROM 调用点无截断 (被调入口截断由定义侧提供), 全原型会给 caller 加 lsls/lsrs 破坏已匹配的 sub_802576C
 void DialogCtx_Flush();

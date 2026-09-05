@@ -270,7 +270,7 @@ status	isa	module	addr	asm_lines	name	note
 0	thumb	code_8010F10	0x08012790	2078	SaveUi_LoadScreen	⏸ 2026-09-02 gpnux: 存档/场景选择 UI 主状态机；扫描 gSaveMapUnlockFlags 并以 SaveFlag_Get 判断可用场景，确认后调用 MapScene_Load；已完成语义改名，保留原始 asm；fncheck OK (4320B)
 0	thumb	code_8010F10	0x08013870	100	sub_8013870	⏸ 2026-09-03 opencode: 新进展: v13(src后赋)整函数寄存器全对, 仅prologue缺src→r8(w落r8非r9)→53B(多为偏移级联); permuter最佳490=cand_490_best.c: `int new_var=0xFE`顶赋(低pri长活值→r8, 规则117: 4次/158insn pri~506)使填零块逐字节命中, 剩~21真实字节=①prologue r8装new_var非src ②串src=ldr r4,=const非mov r4,r8 ③转义比较cmp r1,r8非立即#0xfe; 根因=目标把src基址留r8(仅mov r4,r8一次用, 需低pri allocno), 但src作迭代器(14次/34insn pri~12353)必落r4(v16轮换), 单独成变量又折叠(p=src被常量传播); 穷举~35变体(声明序/int别名/命名符/全局符/双向迭代/-g)未破; 下一步按规则117抬fill值pri或拆src基址+迭代器且防折叠
 0	thumb	code_8010F10	0x08013934	236	sub_8013934	
-0	thumb	code_8010F10	0x08013b0c	127	sub_8013B0C	
+0	thumb	code_8010F10	0x08013b0c	127	sub_8013B0C	⏸ 2026-09-05 zcode-ll: 语义全解(0x03004DBC帧计数++后, Text_TileAt(10,2)起向左5块图块: arg0==0xB0动画帧路径((v+i)&3+0xC)<<12+0x204, 否则仪表路径v=(c>>2)&3(==3则v=1+flag=0x400), 每块arg0>0x8C/0x69/0x46/0x23时base+0xD000+flag否则0xB001); permuter 485分(output-485-1, int v+u16 shadow阻止重结合), bytecmp 115B差; 新符号gUnk_03004DBC(u16)已登记; 剩余=GCC2池条目重复(4×0xB001)+CSE跨块+寄存器home级联; 攻坚: 特殊路径0x204临时寄存器复用链+0xB001池条目数
 0	thumb	code_8010F10	0x08013c00	409	sub_8013C00	
 1	thumb	code_8010F10	0x08013f3c	85	Save_LoadSlot0	
 1	thumb	code_8010F10	0x08013fe8	80	Save_LoadContinue	
@@ -299,7 +299,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8010F10	0x08015fb4	63	SaveUi_Open	
 1	thumb	code_8010F10	0x08016038	21	sub_8016038	✅ 2026-09-02 qwen: gPartyMemberIds[arg0]!=0xFF → LZ77UnCompWram(gUnk_087EB2E0[id],0x02020000); fncheck OK 48B; 全ROM绿
 1	thumb	code_8010F10	0x08016068	44	sub_8016068	✅ 2026-09-02 qwen: gPartyMemberIds[arg0]!=0xFF → DmaCopy32+DmaCopy16(规则55宏); K&R定义保 void() 原型(SceneBg_Reload 无参调用靠 r0 残留); 新登记 gUnk_0809E4E4@0x0809E4E4; fncheck OK 100B; 全ROM绿
-1	thumb	code_8010F10	0x080160cc	15	sub_80160CC	✅ 2026-09-02 qwen: 2×LZ77UnCompWram(gUnk_087EB2E0[11],0x02020000)+(0x080A0B58,0x02020800); 修复他人嵌套注释(/* extern */ 提前闭合致 TU 编译崩); fncheck OK 40B; 全ROM绿
+1	thumb	code_8010F10	0x080160cc	15	sub_80160CC	✅ 2026-09-02 qwen: 2×LZ77UnCompWram(gUnk_087EB2E0[11],0x02020000)+(0x080A0B58,0x02020800); 修复他人嵌套注释(/* extern */ 提前闭合致 C 文件 编译崩); fncheck OK 40B; 全ROM绿
 1	thumb	code_8010F10	0x080160f4	52	sub_80160F4	
 1	thumb	code_8010F10	0x08016178	67	sub_8016178	✅ 2026-09-02 qwen: 按 arg0 算 rows/cols 夹取(10/15) 后向 VRAM 0x02005800 填 0xB001 边框(嵌套循环); 原型 void()→void(u16) 无调用方; fncheck OK 124B
 1	thumb	code_8010F10	0x080161f4	43	sub_80161F4	✅ 2026-09-02 qwen: arg0-- 后 <<2, 向 VRAM 填 4 个 (0xB240+gUnk_08098308[arg0+i]); K&R定义保 void() 原型(MenuHp_Update 传3参); 新登记 gUnk_08098308; fncheck OK 88B
@@ -351,16 +351,16 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8010F10	0x08016fc0	129	sub_8016FC0	✅ 2026-09-02 gpnux: Multi-SIO 串行IRQ; 收FEFE同步头+unk_18>0xD即复位并交换收发双缓冲, 按unk_14/unk_18推进SIODATA8发送与unk_24[2][16]接收矩阵, 主机拉SIO Start位+启TM3; 新注册gSioState结构化别名gUnk_03004DF0(Unk_03004DF0类型, iwram.h); 寄存器必须按SioMultiCnt双u16视图(非volatile)访问出[base,#2]形状, vSioMultiCnt/io.h分开宏均改码型; fncheck 252B OK
 1	thumb	code_8010F10	0x080170bc	10	Sio_SetReady	
 1	thumb	code_8010F10	0x080170d0	34	Sio_Shutdown	
-0	thumb	code_8010F10	0x08017120	99	sub_8017120	
+1	thumb	code_8010F10	0x08017120	99	sub_8017120	✅ 2026-09-05 zcode-ll: SIO会话轮询(field_48&0x180==0x100→IntrWait, sub_8016D24驱动, 按field_4C分支: 0x100→unk0=0x4E4C+field_4C=1, 0x1000/0x2000→unk18[field_4D]写0/0x1000, 0x8000→nibble(<<28>>28 vs <<20>>28)不等返3, 尾Sio_BuildPacket返0); 关键: ①gSioSession.field_48合并为u32(原4×u8无引用)使基址+位移寻址 ②nibble比较必须写显式移位(status<<28>>28)否则GCC产movs+ands ③原型void→u32(sub_8016D24/sub_8017120, 调用者忽略返回值无影响) ④第二个store写status&0x1000靠CSE复用r3; fncheck OK 196B, 调用者sub_80175C0无回归
 0	thumb	code_8010F10	0x080171e4	467	sub_80171E4	
 1	thumb	code_8010F10	0x08017588	26	Sio_IsHost	
 1	thumb	code_8010F10	0x080175c0	29	sub_80175C0	✅ 2026-09-02 opencode: SIO槽清零; CpuFill32(0,&gSioSession,0x60)+循环清unk18[2]前4字节; 零常量需先入独立变量令movs r1,#0最先(规则103); fncheck OK
 1	thumb	code_8010F10	0x08017600	14	Sio_SetXferCtx	
 1	thumb	code_8010F10	0x0801761c	17	Sio_ClearSlot	
 1	thumb	code_8010F10	0x08017640	42	sub_8017640	✅ 2026-09-02 opencode: memcpy变体(字计数, 总长度count*4); (dst|src)&3对齐走逐字ldm/stm否则逐字节; void*参数+函数顶声明u8*d/s令dst→r3/src→r4 home正确; count=count*4;count--两句分开得lsls r2,r2,#2;subs r2,#1(规则104); fncheck OK	
-0	thumb	code_8010F10	0x0801768c	130	sub_801768C	
+1	thumb	code_8010F10	0x0801768c	130	sub_801768C	✅ 2026-09-05 zcode-ll: 浮点插值switch(mode): case0=arg1直通, case1=arg1*(arg3/arg2), case2=arg1*(2.0-arg3/arg2), case3=arg1*((-10*arg3/arg2+20)/10), 尾=arg0+result*arg3/arg2; 关键: ①原型实际为全s16+s16返回(已改code_0.h, 调用方字节不变因本库调用方不扩展小类型) ②case赋值无强转(fixsfsi非fixunssfsi) ③case1需保留死赋值scale=2.0f-...否则float临时home变 ④尾部乘法必须result*arg3顺序; permuter 80分, fncheck OK 288B, 3个已匹配调用者无回归
 0	thumb	code_8010F10	0x080177ac	933	BattleTask_Run	
-0	thumb	code_8010F10	0x08017fa4	91	sub_8017FA4	
+0	thumb	code_8010F10	0x08017fa4	91	sub_8017FA4	⏸ 2026-09-05 zcode-ll: 语义全解(清0x03000324位+按s8参数置位+ListNode_Init(gUnk_03000318)+重置gUnk_03000240/gGstate314+三初始化调用+(g&0x261)|8+清0x40); 结构100%对, 仅0x261块两条load寄存器home互换(ldrh r0/ldr r1 vs ldrh r1/ldr r0, ands r1,r0及后4条全对); permuter 35分(output-35-1, v2=v副本+((int)0x20)括号技巧), bytecmp基线28(bl占位)+2; 新符号gUnk_03000240(u8)/gUnk_03000318(UnkNode)已登记iwram.h+linker.ld; 攻坚方向: 0x261块value/const分配顺序
 0	thumb	code_8010F10	0x08018070	266	sub_8018070	
 0	thumb	code_8010F10	0x080182a8	258	sub_80182A8	
 0	thumb	code_8010F10	0x080184a8	254	sub_80184A8	
@@ -386,22 +386,22 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8010F10	0x0801887c	14	sub_801887C	
 1	thumb	code_8010F10	0x0801889c	14	sub_801889C	
 1	thumb	code_8010F10	0x080188bc	50	sub_80188BC	✅ 2026-09-02 opencode: 按键轮询+前沿检测; s8倒计时(减后经临时变量重读内存才生成ldrsb); readkeys/clear/tail三标签goto控布局; 新符号gUnk_03000310=当前按键缓冲; fncheck OK
-0	thumb	code_8010F10	0x08018928	147	sub_8018928	
-0	thumb	code_8010F10	0x08018a58	184	sub_8018A58	
+1	thumb	code_8010F10	0x08018928	147	sub_8018928	✅ 2026-09-05 zcode-ll: gBattleUiFlags→REG_DISPCNT的BG位转移(位0x01-0x08置DISPCNT 0x100<<n; 位0x10-0x80清对应DISPCNT位; 各自清源标志); 自然直写一次通过; fncheck OK 304B
+0	thumb	code_8010F10	0x08018a58	184	sub_8018A58	⏸ 2026-09-05 zcode-ll: 语义全解: 背景加载(idx=sub_8018E34()*12查表0x087ED394三项: LZ77UnCompVram→0x06000000/sub_804C548(+4,0,3)/LZ77→0x06006000; DmaCopy32(3,0x0861A4A4,0x06005000,0x140)+DmaWait; bl sub_8018BF8后 dispcnt/bldcnt 为未初始化局部(→r6/r7, 掩码链覆盖全部16位故垃圾无影响): dispcnt&=~7,~0x10,|=0x20,0x40,&=~0x80,~0x100,~0x200,|=0x400,0x800,0x1000,0x2000,&=~0x4000,~0x8000→REG_DISPCNT; bldcnt|=3,&=~0xC,~0x30,~0x40,~0x80,~0x1F00,|=0xC00,0x2000,&=~0xC000→REG_BLDCNT; DmaFill16(3,0,gUnk_02036EC0,0x168); gUnk_030004D0=0x02036EC0; sub_804C548(0x0809C834,0xB,3); gUnk_030004D7=0; val=0x04000010 walked +4×3→gUnk_030004D8[4], val-=0xA→gUnk_030004E8[4]×4; gUnk_03000500.field_2,0,6,4,A,8,E,C=0; BgLoad_Finish); 新符号gUnk_030004D0/D8[4]/E8[4]/02036EC0/087ED394/0861A4A4/0809C834已登记; 候选permuter/sub_8018A58/base.c (53diff, 池位漂移+掩码链寄存器分配); 攻坚: 对齐池条目序+确认未初始化局部落r6/r7
 0	thumb	code_8010F10	0x08018bf8	196	sub_8018BF8	
 1	thumb	code_8010F10	0x08018d9c	66	sub_8018D9C	✅ 2026-09-02 op1: tilemap 0x221/0x241 项按 gGstate324 bit14 选边框/空图块; p/q 双基址(020352C0/2)+首项缓存 idx=0x221; 首候选 fncheck 152B 全等 (bytecmp 4B 差=bl槽)
 1	thumb	code_8010F10	0x08018e34	54	sub_8018E34	✅ 2026-09-05 opencode: 具名 u8 ret + if/else-if 链(非早返) 令尾段 base→r1/单出口合并(破 global-alloc 域判定); 查表语义+寄存器使用; fncheck OK 116B
 0	thumb	code_8010F10	0x08018ea8	139	sub_8018EA8	
 0	thumb	code_8010F10	0x08018fc0	192	sub_8018FC0	
 1	thumb	code_8010F10	0x08019148	60	Bg0_InitClear	
-0	thumb	code_8010F10	0x080191cc	168	sub_80191CC	
+0	thumb	code_8010F10	0x080191cc	168	sub_80191CC	⏸ 2026-09-05 zcode-ll: 语义全解: 32宽u16图块矩形边框绘制(u16* dest, u16 pal基址, u8 x0,y0,w,h): x1=x0+w,y1=y0+h双循环, 图块值=(pal<<12)+偏移: 角(y==y0&&(x==x0||x==x1-1))||(y==y1-1&&(x==x1-1||x==x0))→+0x1FF, 上边→+0x1FE, 下边→|(0x800)+0x1FE(VFLIP), 左边→+0x1FD, 右边→|(0x800)+0x1FD, 内部→+1; 值计算在y循环内(x-guard后); 目标sp槽序[param,y0,corner,top,bottom,left,inner](8槽0x20)+x1→sb,y1→sl,x0→r8; 我的候选(36diff,permuter 5100)卡在: x0→ip非r8/y1被spill(目标在sl)/param未spill; 候选permuter/sub_80191CC/base.c; 攻坚: 变量声明序+spill模式对齐
 1	thumb	code_8010F10	0x08019304	29	DialogCtx_Clear3	
 0	thumb	code_8010F10	0x0801933c	479	sub_801933C	
 1	thumb	code_8010F10	0x080196d4	58	sub_80196D4	✅ 2026-09-04 claude-196d4: 关键=用 gDialogCtx[index].field 直写(非p指针), 每次重算地址→CSE出off(r4)/base(r6), 寄存器压力逼arg4溢出[sp]+arg5-8提升r8/sb/sl/ip; struct field_E改u16(strh@0xE); fndiff逐指令全等	
 1	thumb	code_8010F10	0x08019748	30	DialogCtx_SetPair	
 0	thumb	code_8010F10	0x08019784	296	sub_8019784	
 0	thumb	code_8010F10	0x080199e0	117	sub_80199E0	
-0	thumb	code_8010F10	0x08019ad0	95	sub_8019AD0	
+1	thumb	code_8010F10	0x08019ad0	95	sub_8019AD0	✅ 2026-09-05 zcode-ll 接管(gpnux→zcode-ll): 闪光效果设置: v=flags&0xFFF0/0xFF0F/0xF0FF(三条独立语句,合一会被常数折叠), |=2, flags=arg1|v|0x1000; gUnk_03000386=0; raw写0x04000048=0x3F/0x40=0xF0/0x44=0x2A0(地址距关系合成-8/+4); DISPCNT|=0x2000; gUnk_030004D4=arg0/D5=0; switch(flags&0xF0){0x10:break, 0x20:BLDY=0x18}(空case与default合流); switch(flags&0xF00){0x100:BLDCNT=0xBF, 0x200:=0xFF}; 原型改为void(u8,u16); fncheck OK 200B
 0	thumb	code_8010F10	0x08019b98	294	sub_8019B98	
 1	thumb	code_8010F10	0x08019df8	6	BattleUiFlag_Clear	
 1	thumb	code_8010F10	0x08019e04	9	BattleUiFlag_Set	
@@ -413,7 +413,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8010F10	0x08019ecc	9	Disp_Bg1Off	
 1	thumb	code_8010F10	0x08019ee0	19	DialogCtx_SetHead	
 1	thumb	code_8010F10	0x08019f08	60	sub_8019F08	✅ 2026-09-02 opencode: tilemap区域改写(u16 tile&0xFC00+addVal); 起始&tilemap[startRow*32+startCol]+双重循环+w/height; key=指针u16*p;u8 col;u8 row声明序定r5/r6 home(p先声才OK); 原型K&R→全原型(u16*,u16,u8,u8,u8,u8); 调用点传6参无截断; fncheck OK	
-0	thumb	code_8010F10	0x08019f78	122	sub_8019F78	
+1	thumb	code_8010F10	0x08019f78	122	sub_8019F78	✅ 2026-09-05 zcode-ll: 32宽u16缓冲区水平滚动(8参, r1/r3未用): shift s8>0从右列left+width左移拷贝/else从left右移, 列数width行数height; 关键: ①y循环上界必须写height+top(否则adds操作数序反) ②下标必须括号分组(y<<5)+(col+shift)阻止LICM上提sp重读 ③col/u8 x/u8 y; fncheck OK 228B
 1	thumb	code_8010F10	0x0801a05c	11	DialogCtx_GetField_C	
 1	thumb	code_8010F10	0x0801a074	66	BgMap_PalFillRect	✅ K&R声明+定义; 声明顺序col,dst,row定r6/r7 home
 1	thumb	code_8010F10	0x0801a0f0	37	DialogCtx_Flush	
@@ -424,7 +424,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8010F10	0x0801a1dc	26	BattleFx_Stop	
 1	thumb	code_8010F10	0x0801a218	38	BattleFx_DispOff	
 1	thumb	code_8010F10	0x0801a270	29	sub_801A270	
-0	thumb	code_8010F10	0x0801a2ac	30	sub_801A2AC	⏸ 2026-09-03 gpnux: 25变体全差47B; GCC2寄存器分配: 目标 strh r0 保 arg0 于 r0 且 arg0<<16 入 r3, 我方任意写法 lsls r0,#16 就地clobber r0 再 lsrs 恢复; v9/u32最接近; 详情 progress.md
+0	thumb	code_8010F10	0x0801a2ac	30	sub_801A2AC	⏸ 2026-09-05 zcode-ll 接管(sen1→zcode-ll): 原型实为(int,u8,u8)非(u16,u8,u8); 语义全解: REG_BLDCNT=arg0, REG_BLDALPHA=arg1|arg2<<8, switch((u16)(((u32)(arg0<<16)>>22)&2)){case2,3: REG_BLDY=arg1}; 关键: ①arg0须int(u16会引入入口截断) ②v须u32(lsrs非asrs) ③switch值(u16)提升为int才出bgt有符号比较 ④目标lsls r3,r0,#16为独立副本(具名变量赋值)使调度器可提升至首条; 候选permuter/sub_801A2AC/base.c: fndiff 0 diff, bytecmp剩13B=v-shift调度位置(arg1-ext之前)与链home(r3整体vs r0分裂); 旧候选47B; 攻坚: 调度优先级/链home合并
 1	thumb	code_8010F10	0x0801a2ec	25	sub_801A2EC	✅ 2026-09-02 qwen: BG tileset 流式解压 gUnk_030004F8<=3 → LZ77UnCompVram(gUnk_087EBDF0[pos], 0x06008000+pos*0x1000); pos++ (全局不缓存→调用后重读); 新登记 ROM 符号 gUnk_087EBDF0@0x087EBDF0 (linker.ld SECTIONS 外); fncheck OK 56B; 全ROM SHA1 绿
 1	thumb	code_8010F10	0x0801a324	6	BgLoad_Reset	
 1	thumb	code_8010F10	0x0801a330	6	BgLoad_Finish	
@@ -433,10 +433,10 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8010F10	0x0801a35c	6	sub_801A35C	
 1	thumb	code_8010F10	0x0801a36c	29	BgScrolls_WriteAll	
 1	thumb	code_8010F10	0x0801a3a8	14	sub_801A3A8	✅ 2026-09-02 qwen: gUnk_03000500 视作 u16[4][2], arr[arg0][0/1]=arg1/arg2; iwram.h 的 Unk_03000500 是 struct 无 array→用本地 union 转型(否则被 CSE 成单基址+displacement, 目标要两地址+r4); 原型→void(u8,u16,u16); fncheck OK 28B
-0	thumb	code_801A3C4	0x0801a3c4	260	sub_801A3C4	
+1	thumb	code_801A3C4	0x0801a3c4	260	sub_801A3C4	✅ 2026-09-05 sensenova: case1 dest=(f_24<<5)+0x06010000+(f_22<<12)防GCC2常量重结合; DMA ch3(0x040000D4)非ch0; case6无break落case4; fncheck OK 552B
 1	thumb	code_801A3C4	0x0801a5ec	75	sub_801A5EC	✅ 2026-09-02 opencode: 0x30字节结构体逐字段拷贝; fncheck OK
 1	thumb	code_801A3C4	0x0801a684	54	sub_801A684	
-0	thumb	code_801A3C4	0x0801a6f4	195	⏸ CSE把type寄存器替换进case8的常量8, type活到case8体内→落r5(目标r1)级联全函数寄存器错位; 结构100%解, m2c结构(if(type<6){}else if(type>7){if(type!=8){}else{}}else{})已证NE分支可杀替换但布局互换; 详见progress.md §2026-09-05
+0	thumb	code_801A3C4	0x0801a6f4	195	sub_801A6F4	⏸ CSE把type寄存器替换进case8的常量8, type活到case8体内→落r5(目标r1)级联全函数寄存器错位; 结构100%解, m2c结构(if(type<6){}else if(type>7){if(type!=8){}else{}}else{})已证NE分支可杀替换但布局互换; 详见progress.md §2026-09-05
 0	thumb	code_801A3C4	0x0801a884	586	sub_801A884	
 0	thumb	code_801A3C4	0x0801ad0c	492	sub_801AD0C	
 0	thumb	code_801A3C4	0x0801b0b8	600	sub_801B0B8	
@@ -515,7 +515,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_801A3C4	0x08020ae4	17	sub_8020AE4	
 1	thumb	code_801A3C4	0x08020b04	32	sub_8020B04	
 1	thumb	code_801A3C4	0x08020b48	5	sub_8020B48	
-1	thumb	code_801A3C4	0x08020b54	28	sub_8020B54	✅ 2026-09-02 opencode: do-while(0)屏障打破local_alloc tiebreak(RULES 25+110); fncheck OK
+0	thumb	code_801A3C4	0x08020b54	28	sub_8020B54	⏸ 真身已匹配(do-while(0)屏障,RULES 25+110)但sub_801A3C4转真C后其local_alloc r5/r6 tiebreak被扰动; 拆 C 文件可解(RULES坑1); 已回退INCLUDE_ASM
 1	thumb	code_801A3C4	0x08020b90	23	sub_8020B90	
 1	thumb	code_801A3C4	0x08020bc0	26	sub_8020BC0	
 1	thumb	code_801A3C4	0x08020bf0	30	sub_8020BF0	
@@ -764,7 +764,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8044394	0x08046060	100	sub_8046060	✅ 2026-09-04 opencode-46060: 对象行动状态推进(方向槽obj[0xAB]只增不减, arg1==8=离场SetMoveState(2), 1..7=步行SetMoveState(1)+按obj[0xBE]<=0xA分派CBA4(0xA)/CA08); 尾部位段 case1 fallthrough B8|=0x10/B0|=0x200/A8=0; 与姊妹sub_8045F94仅差CBA4第2实参(0xA vs 4); 关键=第5实参0与obj[0xA8]=0须两个独立变量+0x200块须moveBits(u16)算→walkOfs=0→stateFlags=int拷→store(moveBits直store则零落r1@ba, 差4B); fncheck OK 204B; make+SHA1绿
 1	thumb	code_8044394	0x0804612c	124	sub_804612C	✅ 2026-09-04 gpnux: 对象入池/行走分派 (sub_8046060 家族); 方向槽=arg1-2 或 arg1==0xB 进入, ==8 时在 GetObjPool 槽里找 field_BE 匹配下标 i 调 sub_801DD04(obj,i,0x6C+arg2), 否则清方向按 0xBE<=0xA 分派 CBA4/CA08; 尾部清 B8 bit4; 关键=(u16)(arg1+0xFFFE) 回绕减2 (规则135) + pool 指针复用为 &obj[0xB8] (规则87) + prev/zero 独立变量; permuter base=0 + fndiff 0, fncheck OK 240B; make红为并发 (见 INCIDENTS), 非本函数	
 0	thumb	code_8044394	0x0804621c	105	sub_804621C	
-1	thumb	code_8044394	0x080462e4	226	sub_80462E4	⏸真C待攻(现 INCLUDE_ASM matchings 保 status=1 字节绿): 231指令+r8/sb/sl三连(坑1:合并真C恐泄漏破同TU)+栈buf[12]+3调用(GetObjPool/sub_8045F10/sub_801F884); 语义=obj池按 sub_8045F10==2 收集索引到buf, 再按 sub_801F884(arg0) 的 nibble 过滤写回 arg1; 候选 permuter/sub_80462E4/v1.c 差320/456B(寄存器分配/循环peel全不同); 需专项逐块攻
+1	thumb	code_8044394	0x080462e4	226	sub_80462E4	⏸真C待攻(现 INCLUDE_ASM matchings 保 status=1 字节绿): 231指令+r8/sb/sl三连(坑1:合并真C恐泄漏破同一 C 文件)+栈buf[12]+3调用(GetObjPool/sub_8045F10/sub_801F884); 语义=obj池按 sub_8045F10==2 收集索引到buf, 再按 sub_801F884(arg0) 的 nibble 过滤写回 arg1; 候选 permuter/sub_80462E4/v1.c 差320/456B(寄存器分配/循环peel全不同); 需专项逐块攻
 0	thumb	code_8044394	0x08046480	110	sub_8046480	
 0	thumb	code_8044394	0x08046558	150	sub_8046558	
 1	thumb	code_8044394	0x0804666c	67	sub_804666C	✅ 2026-09-04 opencode-46060: 行动点收集处理(sub_804DE8C重置+收集0x5F10(obj,0x43)==2槽号到buf+逐个sub_80466F0(obj,槽号)); 同构sub_8046C50; 2026-09-02卡点真因=第2实参是indices[j]本身非0(挂起note的寄存器home分析走偏); fncheck OK 132B; make+SHA1绿
@@ -813,7 +813,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8044394	0x08048cec	46	sub_8048CEC	
 1	thumb	code_8044394	0x08048d40	19	sub_8048D40	✅ 2026-09-02 opencode: obj[0xBE]<=10 时清零 0x7E..0x86 五个u16; 关键=写5条 *(u16*)(arg0+const)=0 (用*ptr++/数组索引会致 r0/r1 互换 FAIL); fncheck OK 36B
 1	thumb	code_8044394	0x08048d64	17	sub_8048D64	✅ 2026-09-02 opencode: min((u16)(obj[0x6E]-obj[0x6C]), arg1) 语义: diff<arg1返(u16)diff否则arg1; u16形参/返回触发 lsl/lsr#16; fncheck OK 30B
-1	thumb	code_8044394	0x08048d84	17	sub_8048D84	✅ 2026-09-02 opencode: 两 obj 的 [0xAC]&0xF 之和 <=5 返1; 裸 u8* 偏移即可(勿引 MyStruct, 那是别 TU 局部); fncheck OK 30B
+1	thumb	code_8044394	0x08048d84	17	sub_8048D84	✅ 2026-09-02 opencode: 两 obj 的 [0xAC]&0xF 之和 <=5 返1; 裸 u8* 偏移即可(勿引 MyStruct, 那是别 C 文件 局部); fncheck OK 30B
 0	thumb	code_8044394	0x08048da4	154	sub_8048DA4	
 0	thumb	code_8044394	0x08048f0c	85	sub_8048F0C	
 0	thumb	code_8044394	0x08048fb8	329	sub_8048FB8	
@@ -853,9 +853,9 @@ status	isa	module	addr	asm_lines	name	note
 0	thumb	code_8044394	0x0804b4d0	81	sub_804B4D0	
 0	thumb	code_8044394	0x0804b56c	123	sub_804B56C	
 0	thumb	code_8044394	0x0804b654	180	sub_804B654	
-0	thumb	code_8044394	0x0804b7b0	67	sub_804B7B0	⏸ 结构 100% 对齐 (64 条指令一一对应, 只差 66B 的寄存器 home 级联)。**sub_804B8E8 与本函数逐字节完全相同** (只差标签), 解一个即解两个。语义: 对 `gUnk_03000AE8` 16B 表里 `[arg0 .. arg0+arg1)` 这段槽位逐个处理 —— `if ((s8)entry->field_0 == -1) continue;` → `if ((entry->field_0 & 0x20) == 0) sub_804C3A4(entry->field_1, 1);` → `sub_804C420(arg0 + i);` → `entry->field_0 |= 0xFF; entry->field_1 |= 0xFF; entry->field_2 = entry->field_3 = 0;`。已验证写法: ① 必须 `Unk_03000AE8 *base = (Unk_03000AE8 *)gUnk_03000AE8;` + `entry = &base[arg0 + i];` (复用同 TU 的 sub_804C4D8 家族形状); ② 掩码必须是**变量** (`mask = 0xFF;` 放循环体内由 LICM 提到 preheader) —— 直接写 `|= 0xFF` 会被整条 RMW 折叠 (规则 76, 实测 100B); ③ `(s8)entry->field_0 != -1` 与 `(entry->field_0 & 0x20)` 要写成**两次独立访存** (ldrb + ldrsb 各一次, 目标就是两条 load), 合并成一个 u8 临时量会少一条 ldrsb。卡点=纯 global-alloc 抢槽: 目标把 r8/r9/r10 给 {mask, arg0, base} 而在循环内重物化 -1 (`movs r2,#1; negs r2,r2`) 与 0 (`movs r0,#0`); 我的候选把 r8 给了 0 的 hoist (`mov r8, r6`) 于是 base 被重物化, 级联出 66B。permuter 能到 40B, 但靠的是 `(*(new_var = &entry))->field_2 = 0;` 伪语句 + `|= 0xFF` 字面量 (语义扭曲, 铁律 4 禁, 未采纳)。下一步建议: 找能阻止 CSE 把 0 提进 callee-saved 的写法 (例如让 field_2/field_3 的 0 与 ldrsb 的索引 0 共用同一物化点), 或按规则 87 让某个常量兼职。定量法见 RULES 规则 117 |
+0	thumb	code_8044394	0x0804b7b0	67	sub_804B7B0	⏸ 结构 100% 对齐 (64 条指令一一对应, 只差 66B 的寄存器 home 级联)。**sub_804B8E8 与本函数逐字节完全相同** (只差标签), 解一个即解两个。语义: 对 `gUnk_03000AE8` 16B 表里 `[arg0 .. arg0+arg1)` 这段槽位逐个处理 —— `if ((s8)entry->field_0 == -1) continue;` → `if ((entry->field_0 & 0x20) == 0) sub_804C3A4(entry->field_1, 1);` → `sub_804C420(arg0 + i);` → `entry->field_0 |= 0xFF; entry->field_1 |= 0xFF; entry->field_2 = entry->field_3 = 0;`。已验证写法: ① 必须 `Unk_03000AE8 *base = (Unk_03000AE8 *)gUnk_03000AE8;` + `entry = &base[arg0 + i];` (复用同一 C 文件 的 sub_804C4D8 家族形状); ② 掩码必须是**变量** (`mask = 0xFF;` 放循环体内由 LICM 提到 preheader) —— 直接写 `|= 0xFF` 会被整条 RMW 折叠 (规则 76, 实测 100B); ③ `(s8)entry->field_0 != -1` 与 `(entry->field_0 & 0x20)` 要写成**两次独立访存** (ldrb + ldrsb 各一次, 目标就是两条 load), 合并成一个 u8 临时量会少一条 ldrsb。卡点=纯 global-alloc 抢槽: 目标把 r8/r9/r10 给 {mask, arg0, base} 而在循环内重物化 -1 (`movs r2,#1; negs r2,r2`) 与 0 (`movs r0,#0`); 我的候选把 r8 给了 0 的 hoist (`mov r8, r6`) 于是 base 被重物化, 级联出 66B。permuter 能到 40B, 但靠的是 `(*(new_var = &entry))->field_2 = 0;` 伪语句 + `|= 0xFF` 字面量 (语义扭曲, 铁律 4 禁, 未采纳)。下一步建议: 找能阻止 CSE 把 0 提进 callee-saved 的写法 (例如让 field_2/field_3 的 0 与 ldrsb 的索引 0 共用同一物化点), 或按规则 87 让某个常量兼职。定量法见 RULES 规则 117 |
 0	thumb	code_8044394	0x0804b834	94	sub_804B834	
-0	thumb	code_8044394	0x0804b8e8	67	sub_804B8E8	⏸ 与 sub_804B7B0 逐字节相同, 同一候选直接可用。结构 100% 对齐 (64 条指令一一对应, 只差 66B 的寄存器 home 级联)。**sub_804B8E8 与本函数逐字节完全相同** (只差标签), 解一个即解两个。语义: 对 `gUnk_03000AE8` 16B 表里 `[arg0 .. arg0+arg1)` 这段槽位逐个处理 —— `if ((s8)entry->field_0 == -1) continue;` → `if ((entry->field_0 & 0x20) == 0) sub_804C3A4(entry->field_1, 1);` → `sub_804C420(arg0 + i);` → `entry->field_0 |= 0xFF; entry->field_1 |= 0xFF; entry->field_2 = entry->field_3 = 0;`。已验证写法: ① 必须 `Unk_03000AE8 *base = (Unk_03000AE8 *)gUnk_03000AE8;` + `entry = &base[arg0 + i];` (复用同 TU 的 sub_804C4D8 家族形状); ② 掩码必须是**变量** (`mask = 0xFF;` 放循环体内由 LICM 提到 preheader) —— 直接写 `|= 0xFF` 会被整条 RMW 折叠 (规则 76, 实测 100B); ③ `(s8)entry->field_0 != -1` 与 `(entry->field_0 & 0x20)` 要写成**两次独立访存** (ldrb + ldrsb 各一次, 目标就是两条 load), 合并成一个 u8 临时量会少一条 ldrsb。卡点=纯 global-alloc 抢槽: 目标把 r8/r9/r10 给 {mask, arg0, base} 而在循环内重物化 -1 (`movs r2,#1; negs r2,r2`) 与 0 (`movs r0,#0`); 我的候选把 r8 给了 0 的 hoist (`mov r8, r6`) 于是 base 被重物化, 级联出 66B。permuter 能到 40B, 但靠的是 `(*(new_var = &entry))->field_2 = 0;` 伪语句 + `|= 0xFF` 字面量 (语义扭曲, 铁律 4 禁, 未采纳)。下一步建议: 找能阻止 CSE 把 0 提进 callee-saved 的写法 (例如让 field_2/field_3 的 0 与 ldrsb 的索引 0 共用同一物化点), 或按规则 87 让某个常量兼职。定量法见 RULES 规则 117 |
+0	thumb	code_8044394	0x0804b8e8	67	sub_804B8E8	⏸ 与 sub_804B7B0 逐字节相同, 同一候选直接可用。结构 100% 对齐 (64 条指令一一对应, 只差 66B 的寄存器 home 级联)。**sub_804B8E8 与本函数逐字节完全相同** (只差标签), 解一个即解两个。语义: 对 `gUnk_03000AE8` 16B 表里 `[arg0 .. arg0+arg1)` 这段槽位逐个处理 —— `if ((s8)entry->field_0 == -1) continue;` → `if ((entry->field_0 & 0x20) == 0) sub_804C3A4(entry->field_1, 1);` → `sub_804C420(arg0 + i);` → `entry->field_0 |= 0xFF; entry->field_1 |= 0xFF; entry->field_2 = entry->field_3 = 0;`。已验证写法: ① 必须 `Unk_03000AE8 *base = (Unk_03000AE8 *)gUnk_03000AE8;` + `entry = &base[arg0 + i];` (复用同一 C 文件 的 sub_804C4D8 家族形状); ② 掩码必须是**变量** (`mask = 0xFF;` 放循环体内由 LICM 提到 preheader) —— 直接写 `|= 0xFF` 会被整条 RMW 折叠 (规则 76, 实测 100B); ③ `(s8)entry->field_0 != -1` 与 `(entry->field_0 & 0x20)` 要写成**两次独立访存** (ldrb + ldrsb 各一次, 目标就是两条 load), 合并成一个 u8 临时量会少一条 ldrsb。卡点=纯 global-alloc 抢槽: 目标把 r8/r9/r10 给 {mask, arg0, base} 而在循环内重物化 -1 (`movs r2,#1; negs r2,r2`) 与 0 (`movs r0,#0`); 我的候选把 r8 给了 0 的 hoist (`mov r8, r6`) 于是 base 被重物化, 级联出 66B。permuter 能到 40B, 但靠的是 `(*(new_var = &entry))->field_2 = 0;` 伪语句 + `|= 0xFF` 字面量 (语义扭曲, 铁律 4 禁, 未采纳)。下一步建议: 找能阻止 CSE 把 0 提进 callee-saved 的写法 (例如让 field_2/field_3 的 0 与 ldrsb 的索引 0 共用同一物化点), 或按规则 87 让某个常量兼职。定量法见 RULES 规则 117 |
 0	thumb	code_8044394	0x0804b96c	265	sub_804B96C	
 1	thumb	code_8044394	0x0804bb64	61	sub_804BB64	
 0	thumb	code_8044394	0x0804bbdc	196	sub_804BBDC	
@@ -913,7 +913,7 @@ status	isa	module	addr	asm_lines	name	note
 0	thumb	code_8044394	0x0804d4fc	94	sub_804D4FC	⏸ 2026-09-02 sound-agent: 语义全解(switch((s8)obj[0xBC]) case1: obj[0xC2]=flag&Rng, entry=...[8+obj[0xC2]*2]); 卡点=switch值home: 目标movs r4,#0;ldrsb r4,[r1,r4]单次装载r4(callee-saved跨Rng存活)供case1复用ands r4,r0; 我恒r0+地址外提, case1重读obj[0xBC]; flag/s8指针/if-elseif变体全双装载1585-2530; permuter best 835; 候选permuter/sub_804D4FC/base.c(835)
 0	thumb	code_8044394	0x0804d5b4	175	sub_804D5B4	
 0	thumb	code_8044394	0x0804d708	71	sub_804D708	⏸ 2026-09-03 ll-agent: 死代码还原INCLUDE_ASM(原C少4字节→+4全局位移); ROM尾部死store `movs r0,#0;strb r0,[obj+0xBC]`被C编译器优化掉; 待重匹配
-1	thumb	code_8044394	0x0804d798	81	sub_804D798	⏸ 2026-09-02 opencode: 概率判定+随机槽道具, 姊妹sub_804D708同族但obj[0xBC]恒1+obj[0xC2]=(Rng&3)选offset; standalone fncheck过但全TU编译ands r0,r1 vs r1,r0+&obj[0xC2]调度差; 候选permuter/sub_804D798/
+1	thumb	code_8044394	0x0804d798	81	sub_804D798	⏸ 2026-09-02 opencode: 概率判定+随机槽道具, 姊妹sub_804D708同族但obj[0xBC]恒1+obj[0xC2]=(Rng&3)选offset; standalone fncheck过但全文件编译ands r0,r1 vs r1,r0+&obj[0xC2]调度差; 候选permuter/sub_804D798/
 0	thumb	code_8044394	0x0804d840	91	sub_804D840	
 0	thumb	code_8044394	0x0804d8f4	143	sub_804D8F4	
 0	thumb	code_8044394	0x0804da04	93	sub_804DA04	
@@ -975,7 +975,7 @@ status	isa	module	addr	asm_lines	name	note
 0	thumb	code_804F0B8	0x08051be4	1151	sub_8051BE4	
 1	thumb	code_804F0B8	0x08052574	5	Script_GetFlags	
 1	thumb	code_804F0B8	0x08052580	45	Script_ResetVM	
-0	thumb	code_804F0B8	0x080525e8	85	sub_80525E8	⏸ LZ_BGM装载入口: switch(cmp#1;beq/cmp#2;beq) 已复现; 卡 case2 早载 &E6C 落 r1(global-alloc墙, 同 sub_80531A8); 最佳 permuter output-280-1/O1
+0	thumb	code_804F0B8	0x080525e8	85	sub_80525E8	⏸ LZ_BGM装载入口: 指令序已100%复现(base.c, 仅差case2尾12B寄存器号 E6C r2→r1/tbl r1→r2/base r1→r3); 2026-09-05 claude 证明墙: 目标需E6C先于tbl/base拿r1 → pri(E6C)≥10000 即 refs≥7 或 sugg{r1}; case2块内RTL无硬寄存器(combine追踪实证)→sugg不可达; 拷贝链堆refs被CSE提前折叠(v19实测); base→r3还要求r2@(28,30)被占(结构性无解); 18变体+-g+-O1+permuter290全败; 详见 progress.md 2026-09-05 段 + RULES 150; 候选 permuter/sub_80525E8/base.c
 0	thumb	code_804F0B8	0x080526a0	63	sub_80526A0	
 1	thumb	code_804F0B8	0x08052728	22	Script_Abort	
 1	thumb	code_804F0B8	0x08052758	18	BgTiles_LoadSet	

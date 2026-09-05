@@ -231,8 +231,8 @@
 **代码生成要点 (新增沉淀, 详见 RULES 规则 89-95)**:
 - 静态物件动画的 EnqueueRender 返回值不能以 u8 原型读 (目标直接 cmp) — 用 s32 别名 `Sprite_EnqueueRender_S32` (linker.ld 同址别名)。
 - `StaticMapObject.x/y/z` 与 `ChestObject.x/y` 实为 **u16** (目标 ldrh 零扩展), 改 s16 会引入 ldrsh 使 ROM 红掉 8 字节。
-- `gUnk_08095028` 若在 TU 内定义为空数组会占 .data 8 字节导致 rom 溢出 — 必须 extern 引用。
-- 跨 TU 原型统一: 本批为 `sub_8009AC4(u8,u8)` / `sub_8009E80(u8,u8*)` / `EquipItem(u8,u8,u8)` 等补全了 code_0.h 原型。
+- `gUnk_08095028` 若在 C 文件 内定义为空数组会占 .data 8 字节导致 rom 溢出 — 必须 extern 引用。
+- 跨 C 文件 原型统一: 本批为 `sub_8009AC4(u8,u8)` / `sub_8009E80(u8,u8*)` / `EquipItem(u8,u8,u8)` 等补全了 code_0.h 原型。
 
 ## 选项目的地数据分割 (2026-09-02)
 

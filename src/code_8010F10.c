@@ -1799,7 +1799,45 @@ void Sio_Shutdown(void)
     gSioState[6] = 0;
 }
 // @ 0x08017120
-INCLUDE_ASM("asm/nonmatchings", sub_8017120);
+u32 sub_8017120(int arg0)
+{
+    u32 status;
+
+    if ((gSioSession.field_48 & 0x180) == 0x100)
+        IntrWait(1, 0x80);
+    gSioSession.field_48 = sub_8016D24((u8 *)&gSioSession + 0x18);
+    if (arg0 != 0)
+        Sio_SetReady();
+    if (gSioSession.field_4C == 0)
+    {
+        if (gSioSession.field_48 & 0x100)
+        {
+            gSioSession.unk0 = 0x4E4C;
+            gSioSession.field_4C = 1;
+        }
+    }
+    else
+    {
+        status = gSioSession.field_48;
+        if (status & 0x1000)
+        {
+            *(u16 *)((u8 *)&gSioSession + 0x18 + gSioSession.field_4D * 24) = 0;
+            return 1;
+        }
+        if (status & 0x2000)
+        {
+            *(u16 *)((u8 *)&gSioSession + 0x18 + gSioSession.field_4D * 24) = status & 0x1000;
+            return 2;
+        }
+        if (status & 0x8000)
+        {
+            if (((status << 28) >> 28) != ((status << 20) >> 28))
+                return 3;
+        }
+    }
+    Sio_BuildPacket((u8 *)&gSioSession);
+    return 0;
+}
 // @ 0x080171E4
 INCLUDE_ASM("asm/nonmatchings", sub_80171E4);
 // @ 0x08017588
@@ -1886,7 +1924,35 @@ void sub_8017640(void *dst, void *src, s32 count)
     }
 }
 // @ 0x0801768C
-INCLUDE_ASM("asm/nonmatchings", sub_801768C);
+s16 sub_801768C(s16 arg0, s16 arg1, s16 arg2, s16 arg3, s8 mode)
+{
+  float new_var;
+  s16 result;
+  switch (mode)
+  {
+    case 0:
+      result = arg1;
+      break;
+
+    case 1:
+      new_var = 2.0f - (((float) arg3) / ((float) arg2));
+      result = ((float) arg1) * (((float) arg3) / ((float) arg2));
+      break;
+
+    case 2:
+      new_var = 2.0f - (((float) arg3) / ((float) arg2));
+      result = ((float) arg1) * new_var;
+      break;
+
+    case 3:
+      result = (double) (((float) arg1) * (((((-10.0f) * ((float) arg3)) / ((float) arg2)) + 20.0f) / 10.0f));
+      break;
+
+  }
+
+  return arg0 + ((result * arg3) / arg2);
+}
+
 // @ 0x080177AC
 INCLUDE_ASM("asm/nonmatchings", BattleTask_Run);
 // @ 0x08017FA4
@@ -2116,7 +2182,49 @@ tail:
     sub_80182A8(gUnk_03000310, gGstate330);
 }
 // @ 0x08018928
-INCLUDE_ASM("asm/nonmatchings", sub_8018928);
+void sub_8018928(void)
+{
+    if (gBattleUiFlags & 1)
+    {
+        REG_DISPCNT |= 0x100;
+        gBattleUiFlags &= 0xFFFE;
+    }
+    if (gBattleUiFlags & 2)
+    {
+        REG_DISPCNT |= 0x200;
+        gBattleUiFlags &= 0xFFFD;
+    }
+    if (gBattleUiFlags & 4)
+    {
+        REG_DISPCNT |= 0x400;
+        gBattleUiFlags &= 0xFFFB;
+    }
+    if (gBattleUiFlags & 8)
+    {
+        REG_DISPCNT |= 0x800;
+        gBattleUiFlags &= 0xFFF7;
+    }
+    if (gBattleUiFlags & 0x10)
+    {
+        REG_DISPCNT &= 0xFEFF;
+        gBattleUiFlags &= 0xFFEF;
+    }
+    if (gBattleUiFlags & 0x20)
+    {
+        REG_DISPCNT &= 0xFDFF;
+        gBattleUiFlags &= 0xFFDF;
+    }
+    if (gBattleUiFlags & 0x40)
+    {
+        REG_DISPCNT &= 0xFBFF;
+        gBattleUiFlags &= 0xFFBF;
+    }
+    if (gBattleUiFlags & 0x80)
+    {
+        REG_DISPCNT &= 0xF7FF;
+        gBattleUiFlags &= 0xFF7F;
+    }
+}
 // @ 0x08018A58
 INCLUDE_ASM("asm/nonmatchings", sub_8018A58);
 // @ 0x08018BF8
@@ -2303,7 +2411,41 @@ INCLUDE_ASM("asm/nonmatchings", sub_8019784);
 // @ 0x080199E0
 INCLUDE_ASM("asm/nonmatchings", sub_80199E0);
 // @ 0x08019AD0
-INCLUDE_ASM("asm/nonmatchings", sub_8019AD0);
+void sub_8019AD0(u8 arg0, u16 arg1)
+{
+    u16 v;
+
+    v = gFlashFlags & 0xFFF0;
+    v &= 0xFF0F;
+    v &= 0xF0FF;
+    v |= 2;
+    gFlashFlags = arg1 | v | 0x1000;
+    gUnk_03000386 = 0;
+    *(vu16 *)0x04000048 = 0x3F;
+    *(vu16 *)0x04000040 = 0xF0;
+    *(vu16 *)0x04000044 = 0x2A0;
+    REG_DISPCNT |= 0x2000;
+    gUnk_030004D4 = arg0;
+    gUnk_030004D5 = 0;
+    switch (gFlashFlags & 0xF0)
+    {
+    case 0x10:
+        break;
+    case 0x20:
+        REG_BLDY = 0x18;
+        break;
+    }
+    switch (gFlashFlags & 0xF00)
+    {
+    case 0x100:
+        REG_BLDCNT = 0xBF;
+        break;
+    case 0x200:
+        REG_BLDCNT = 0xFF;
+        break;
+    }
+}
+
 // @ 0x08019B98
 INCLUDE_ASM("asm/nonmatchings", sub_8019B98);
 // @ 0x08019DF8
@@ -2408,7 +2550,35 @@ void sub_8019F08(u16 *tilemap, u16 addVal, u8 startCol, u8 startRow, u8 width, u
     }
 }
 // @ 0x08019F78
-INCLUDE_ASM("asm/nonmatchings", sub_8019F78);
+void sub_8019F78(u16 *dest, int a1, s8 shift, int a3, u8 left, u8 top, u8 width, u8 height)
+{
+    u8 col;
+    u8 x;
+    u8 y;
+
+    if (shift == 0)
+        return;
+    if (shift > 0)
+    {
+        col = left + width;
+        for (x = 0; x < width; x++)
+        {
+            for (y = top; y < height + top; y++)
+                dest[(y << 5) + (col + shift)] = dest[(y << 5) + col];
+            col--;
+        }
+    }
+    else
+    {
+        col = left;
+        for (x = 0; x < width; x++)
+        {
+            for (y = top; y < height + top; y++)
+                dest[(y << 5) + (col + shift)] = dest[(y << 5) + col];
+            col++;
+        }
+    }
+}
 // @ 0x0801A05C
 u8 DialogCtx_GetField_C(u8 index)
 {

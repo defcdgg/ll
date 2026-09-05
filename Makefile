@@ -125,7 +125,7 @@ $(C_BUILDDIR)/agb_sram.o: CC1FLAGS := -mthumb-interwork -Wimplicit -Wparentheses
 
 # INCLUDE_ASM 展开成汇编期的 `.include "asm/<dir>/<func>.s"`, make 看不到这层依赖。
 # 不补就会踩到: 改 ll.cfg 函数名 + 重生成 code.s + split_asm 后, 引用该函数的
-# 其它 TU 的 .o **不会重编**, 链接期报 undefined reference 旧名 (已实际踩到)。
+# 其它 C 文件 的 .o **不会重编**, 链接期报 undefined reference 旧名 (已实际踩到)。
 # 在解析期用 grep 把依赖补上; 用 $(wildcard) 过滤, 避开注释里那些已不存在的 .s。
 define ADD_ASM_DEPS
 $(C_BUILDDIR)/$(1).o: $$(filter $$(wildcard $(ASM_SUBDIR)/*/*.s),\
@@ -178,7 +178,7 @@ verify:
 	python3 scripts/audit.py
 	python3 scripts/verify_all.py
 
-# 剩余报表: 还剩哪些未匹配 (TU=xxx 过滤)
+# 剩余报表: 还剩哪些未匹配 (MODULE=xxx 过滤)
 remaining:
 	python3 scripts/remaining.py
 

@@ -148,7 +148,7 @@ gCharaBaseData = 0x087EA580;   /* 结构视图: PartyForm_ApplyBonus */
 iwram.h:
 ```c
 extern const EnemyCharaStat gCharaBaseData[];
-/* gUnk_087EA580 不在 iwram.h — 各 TU 用局部 extern 保持原状:
+/* gUnk_087EA580 不在 iwram.h — 各 C 文件 用局部 extern 保持原状:
  *   code_8005020.c: extern u8 gUnk_087EA580[]      (非 const, 3 处)
  *   code_8044394.c: extern const u8 gUnk_087EA580[] (const, 1 处)
  * const 性不同会报 conflicting types (agbcc 严格) */

@@ -15,7 +15,7 @@
   5) 配 compile.sh + settings.toml。
 
 base.c 仅为种子: permuter 用系统 cpp -nostdinc, 不能 include 项目头文件; 函数体里用到的
-u8/u16/... 与本 TU extern/结构体都要在 base.c 顶部自行内联 (见 AGENTS.md §2b / RULES 规则96)。
+u8/u16/... 与本 C 文件 extern/结构体都要在 base.c 顶部自行内联 (见 AGENTS.md §2b / RULES 规则96)。
 """
 import re
 import sys
@@ -67,7 +67,7 @@ KAND_R = re.compile(r'^[A-Za-z_][A-Za-z0-9_ ]+\s+[*]?[A-Za-z_]\w*\s*;\s*$')
 
 
 def find_def(text_lines, want_addr, name2addr):
-    """在 TU 文本里找 addr 对应的真 C 定义起始行(0 基)。返回 (def_start, canonical_name) 或 None。
+    """在 C 文件 文本里找 addr 对应的真 C 定义起始行(0 基)。返回 (def_start, canonical_name) 或 None。
     INCLUDE_ASM 占位或别名不存在时返回 None。"""
     n = len(text_lines)
     for i in range(n):

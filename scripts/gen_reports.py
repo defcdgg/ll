@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """从 functions.tsv 重生成 docs/reports/ (R5)。
 
-remaining.md    未匹配清单 (按 TU 分组, Markdown 表格; 名称列链接到 asm 切片,
+remaining.md    未匹配清单 (按 C 文件 分组, Markdown 表格; 名称列链接到 asm 切片,
                 VS Code / VSCodium 里 Ctrl+Click 直接打开; 无 note;
                 行数 < SMALL(200) 的名称加 ▶ 前缀高亮;
                 permuter 列链接到 permuter/&lt;fn&gt;/ 套件目录, 不存在则留空)

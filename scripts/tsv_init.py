@@ -9,7 +9,7 @@
 
 列序 (制表符, 首行表头, 按 addr 升序):
   status	isa	module	addr	asm_lines	name	note
-  module = 翻译单元 (src/<module>.c)
+  module = C 文件 (src/<module>.c)
   asm_lines = asm/{matchings,nonmatchings}/<name>.s 的行数 (切片缺失时 0; code.s 变更后需重跑)
   note = 完成/挂起明细 (一行, 无制表符; 重新生成时按 addr 保留)
 """

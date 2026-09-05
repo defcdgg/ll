@@ -50,7 +50,8 @@ status isa   module        addr        asm_lines name                 note
 ```
 
 - **主键 = addr** (永不漂移); `name` 是缓存, 权威在 `ll.cfg` (改名后 `gen_asm.py --sync` 自动回写)。
-- `status`: 1=已匹配 0=未匹配。`module`: 翻译单元 (`src/<module>.c`)。
+ - `status`: 1=已匹配 0=未匹配。`module`: **C 文件** (`src/<module>.c` → 一个 `.o`),
+   即翻译单元 (Translation Unit); 文档统一称"C 文件", 命令过滤用 `MODULE=xxx`。
 - `asm_lines`: `asm/{matchings,nonmatchings}/<name>.s` 的**主体**行数, 已扣除 3 行头
   (`.syntax unified` / `thumb_func_start` / `标签 @地址`)、尾部空行 + `.syntax divided`、以及紧贴主体的
   尾部 `.align 2, 0`。主体内部的 `.align` 与字面池 `.4byte` 行仍计入 (多段池的函数 `.align` 会落在池前)。
@@ -64,7 +65,7 @@ status isa   module        addr        asm_lines name                 note
 - 常用查询:
   ```bash
   awk -F'\t' '$1==0' functions.tsv | wc -l              # 剩余总数
-  awk -F'\t' '$1==0 && $3=="code_80264C0"' functions.tsv   # 某 TU 的未匹配
+  awk -F'\t' '$1==0 && $3=="code_80264C0"' functions.tsv   # 某 C 文件 的未匹配
   awk -F'\t' '$1==0 && $5<=60 {print $4,$6}' functions.tsv  # ≤60 行小函数 (挑目标)
   grep -P '\t⏸' functions.tsv                           # 所有挂起项(带卡点)
   python3 scripts/tsv_init.py                            # 从 src 重新推导 (note 按 addr 保留)
@@ -84,7 +85,7 @@ scripts/bytecmp.sh sub_XXXXXX <候选.c> "sym = 0x...;"...   # 4. 候选级字�
 python3 scripts/gen_asm.py                      # 6. 增量重建 asm/ (内容不变不 touch)
 python3 scripts/fncheck.py sub_XXXXXX           # 7. 字节定论
 timeout 900 make 2>&1 | tail -3 && sha1sum -c ll.sha1   # 8. 全量终验
-#    用了 r8/sb/sl 且 make 红在别的函数 = GCC2 泄漏 → 拆 TU (RULES 坑1)
+#    用了 r8/sb/sl 且 make 红在别的函数 = GCC2 泄漏 → 拆 C 文件 (RULES 坑1)
 # 9. 铁律 8: 禁止 git commit/push — 只改文件&写共享文档, 提交由外部流水线统一收尾
 scripts/claim.sh --release sub_XXXXXX           # 10. 释放; 按铁律 6 留痕: TSV status+note / progress / RULES / INCIDENTS / modules
 ```
@@ -137,7 +138,7 @@ cd permuter/<fn> && timeout 280 ../../.venv/bin/python ../../tools/decomp-permut
 | `scripts/fndiff.sh <fn> [cand.c]` | 单函数逐指令形状 diff (+`--promote` 固化) |
 | `scripts/fncheck.py <fn...>` | 已合入真身的字节定论; `--blame` 差异归属到 .o |
 | `scripts/bytecmp.sh <fn> <cand.c> "sym = 0x...;"...` | 候选级字节判定 (部分链接施加池重定位) |
-| `python3 scripts/audit.py` | 函数清单体检: TSV×ll.cfg 漂移 + status=1 全量字节核验 + note 覆盖 + TU 新鲜度 |
+| `python3 scripts/audit.py` | 函数清单体检: TSV×ll.cfg 漂移 + status=1 全量字节核验 + note 覆盖 + C 文件 新鲜度 |
 | `python3 scripts/gen_asm.py [--sync] [--dry-run]` | TSV+ll.cfg+code.s → asm/ (增量幂等) |
 | `python3 scripts/tsv_init.py` | 从 src/*.c 重新推导 functions.tsv (note 保留) |
 | `scripts/rename_fn.sh <old> <new>` | **全链改名一条命令** (ll.cfg→code.s→引用点→gen_asm→fncheck, 失败自动回滚) |
@@ -145,7 +146,7 @@ cd permuter/<fn> && timeout 280 ../../.venv/bin/python ../../tools/decomp-permut
 | `scripts/mkpermuter.py <函数名或0x地址>` | 一键建 permuter 套件: 从 asm/{non,}matchings 拷 .s 出 target.o, 把 src 里的真 C 函数体原样拷成 base.c 种子; INCLUDE_ASM 占位自动跳过 |
 | `make code.s` / `make asm` | 重出反汇编 / 增量重建 asm/ |
 | `make verify` | 全量终验: make+SHA1+audit+status=1 全量字节核验 |
-| `make remaining [TU=xxx]` | 未匹配报表 (scripts/remaining.py) |
+| `make remaining [MODULE=xxx]` | 未匹配报表 (scripts/remaining.py) |
 | `python3 scripts/gen_reports.py` | 重生成 docs/reports/remaining.md (Markdown; 名称列 Ctrl+Click 跳 asm 切片, permuter 列跳套件目录, 行数<200 前缀 ▶; 全量清单看 functions.tsv) |
 | `make ctx` | 重生成 m2c 上下文 (头文件改后) |
 | `tools/gbadisasm/gbadisasm baserom.gba -c ll.cfg > code.s` | 重出反汇编 (改名管线第 2 步) |

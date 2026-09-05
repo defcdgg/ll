@@ -1,6 +1,6 @@
 # 模块索引 (MOD 物理分段视图)
 
-> 模块 = 按 ROM 地址连续切分的翻译单元 (与 `src/<module>.c` 一一对应)。
+> 模块 = 按 ROM 地址连续切分的 C 文件 (与 `src/<module>.c` 一一对应)。
 > 功能/语义视图 (F1-F9) 见 `../FUNCTIONAL_MAP.md`; 同构家族见 `../ATLAS.md` §3。
 > **实时进度/剩余一律查 `functions.tsv`** (本表不维护计数):
 > `awk -F'\t' '$1==0 && $3=="code_80264C0"' ../functions.tsv | wc -l`

@@ -56,6 +56,9 @@ gUnk_08393B28_entries = 0x08393B28;   /* 同址别名: u16 视图 (offset 0x10 �
 gUnk_0839D5BC = 0x0839D5BC;
 gUnk_0839DBF6 = 0x0839DBF6;
 gUnk_03000730_arr = 0x03000730;
+gUnk_087ED394 = 0x087ED394;
+gUnk_0861A4A4 = 0x0861A4A4;
+gUnk_0809C834 = 0x0809C834;
 gUnk_087ED6A8 = 0x087ED6A8;
 gUnk_087ED6D4 = 0x087ED6D4;
 gUnk_0861AAA4 = 0x0861AAA4;
@@ -80,6 +83,7 @@ gUnk_087EB1E8 = 0x087EB1E8;    /* 存档块指针表 {&gUnk_03004D48, gSaveTimer
 gDialogPortraitTilemapPtrs = 0x087E9818; /* four dialog portrait tilemap positions */
 gUnk_087EB2E0 = 0x087EB2E0;    /* 角色头像 LZ77 指针表 (存档/队伍菜单用) */
 gUnk_087EBDF0 = 0x087EBDF0;    /* BG tileset LZ77 指针表[4] → VRAM 0x06008000 + idx*0x1000 */
+gUnk_087EBE00 = 0x087EBE00;    /* 精灵/瓦片 LZ77 指针表[9] (sub_801A3C4 按 f_18&0xF 分派) */
 gMPlayInfos2 = 0x087EDC80;    /* 音轨 MusicPlayerInfo 指针表[4] (Sfx_* 用) */
 gSongHeaderTable = 0x087ED910;    /* 歌曲头指针表 (BGM/SFX 共用, MPlayStart 第二参) */
 gUnk_0809E4E4 = 0x0809E4E4;    /* 角色调色板/图形表 [N][32] (sub_8016068 DMA 源) */
@@ -97,6 +101,7 @@ SECTIONS {
         . = 0x00016000; gUnk_02016000 = .;
         . = 0x00016200; gUnk_02016200 = .;
         . = 0x00035B04; gUnk_02035B04 = .;
+        . = 0x00036EC0; gUnk_02036EC0 = .;
         . = 0x0003EE00; gCharaWalkCmdBuf = .;
         . = 0x00040000;
     } >ewram
@@ -154,12 +159,14 @@ SECTIONS {
         . = 0x00000226; gPartyMenuIdx = .;
         . = 0x00000227; gSkillMenuPage = .;
         . = 0x0000022B; gUnk_0300022B = .;
+        . = 0x00000240; gUnk_03000240 = .;
         . = 0x00000248; gUnk_03000248 = .;
         . = 0x00000310; gUnk_03000310 = .;
         . = 0x00000312; gGstate312 = .;
 
         . = 0x00000314; gGstate314 = .;
         . = 0x00000316; gUnk_03000316 = .;
+        . = 0x00000318; gUnk_03000318 = .;
         . = 0x00000324; gGstate324 = .;
         . = 0x00000328; gBattleRngSeed = .;     
         . = 0x0000032E; gGstate32E = .;
@@ -168,10 +175,14 @@ SECTIONS {
         . = 0x00000348; gDialogCtx = .;
         . = 0x00000384; gFlashFlags = .;   
         . = 0x00000386; gUnk_03000386 = .;
+        . = 0x00000390; gUnk_03000390 = .;
+        . = 0x000004D0; gUnk_030004D0 = .;
         . = 0x000004D4; gUnk_030004D4 = .;
         . = 0x000004D5; gUnk_030004D5 = .;
         . = 0x000004D6; gUnk_030004D6 = .;
         . = 0x000004D7; gUnk_030004D7 = .; 
+        . = 0x000004D8; gUnk_030004D8 = .;
+        . = 0x000004E8; gUnk_030004E8 = .;
         . = 0x000004F8; gUnk_030004F8 = .;  
         . = 0x00000500; gUnk_03000500 = .;
         . = 0x00000510; gBattleUiFlags = .;
@@ -516,6 +527,7 @@ SECTIONS {
         . = 0x00004D4C; gUnk_03004D4C = .;
         . = 0x00004D60; gSaveTimers = .;
 
+        . = 0x00004DBC; gUnk_03004DBC = .;
         . = 0x00004DC0; gBgTileReloadFlag = .;
         . = 0x00004DC4; gSaveBusyA = .;
         . = 0x00004DC8; gSaveFlags = .;

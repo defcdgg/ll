@@ -87,7 +87,7 @@ timeout 900 make && sha1sum -c ll.sha1  # 绿
 2. 备份将触碰的文件 → `.scratch/refactor/pre-rename/`。
 3. 改 ll.cfg → 重出 code.s (gbadisasm, 与 git 版 cmp 幂等)。
 4. 改 include/*.h 原型 + src/*.c 全部引用点 (INCLUDE_ASM stub 行 / 真 C 调用点) — **原型默认保持 K&R 或原样换名, 不自动升级签名** (本次事故根因; 需升级时人工确认后加 `--prototype`)。
-5. gen_asm.py (增量) → 定向重编受影响 TU → fncheck: 被改名函数 + 全部调用者。
+5. gen_asm.py (增量) → 定向重编受影响 C 文件 → fncheck: 被改名函数 + 全部调用者。
 6. 任一 FAIL → 自动回滚 + 非零退出。
 
 `scripts/match_fn.sh <fn>` — 合入尾巴自动化: 校验 src 已是真 C → TSV 翻 `1 c` → tsv2yaml → gen_asm → make → SHA1 → audit → 提示 commit (重构期间跳过 commit)。
@@ -96,12 +96,12 @@ timeout 900 make && sha1sum -c ll.sha1  # 绿
 
 ## R5 — make 目标 + 周边生成
 
-- `make code.s` (gbadisasm 重出), `make asm` (gen_asm), `make verify` (make+SHA1+audit+全量 fncheck 扫描 kind=c), `make remaining [TU=code_80264C0]` (TSV 剩余报表, 直接回答"还剩哪些")。
+- `make code.s` (gbadisasm 重出), `make asm` (gen_asm), `make verify` (make+SHA1+audit+全量 fncheck 扫描 kind=c), `make remaining [MODULE=code_80264C0]` (TSV 剩余报表, 直接回答"还剩哪些")。
 - `scripts/ida_rename.py`: ll.cfg vs i64 名字 diff → 批量重命名脚本 (清 progress.md 的 IDA 同步欠账)。
 - `docs/reports/` 已删 (静态快照过期); 需要时由 TSV+callgraph 重生成。
 
 **验收门**: 四个 make 目标可用; reports 重生成后与旧 CSV 语义 diff 报告 (新增/消失条目) 人工过目。
-> 实测: code.s/asm 幂等 0 写入; verify 全绿 591/591; remaining 四 TU 分组报表正常; gen_reports 产出 functions.csv+remaining.txt。
+> 实测: code.s/asm 幂等 0 写入; verify 全绿 591/591; remaining 四 C 文件 分组报表正常; gen_reports 产出 functions.csv+remaining.txt。
 > 2026-09-05: 按上文 R5 结论 (静态快照过期) 删掉 functions.csv, gen_reports.py 只产 remaining.txt; 全量清单以 functions.tsv 为唯一来源 (已含 asm_lines 列)。残留 functions.csv 会在下次运行时自动清掉。
 > 2026-09-05: remaining.txt 改为 remaining.md (Markdown 表格, 名称列链接 `../../asm/nonmatchings/<name>.s`, VS Code/VSCodium 里 Ctrl+Click 直接打开切片)。纯 .txt 编辑器无内置点路径跳转, 只有终端 fileLinks 与 Markdown 支持。残留 remaining.txt 下次运行自动清掉。
 
@@ -124,7 +124,7 @@ timeout 900 make && sha1sum -c ll.sha1  # 绿
 5. 提交 (重构后首次): 按逻辑拆 3-4 个 commit —
    ① 工具链+脚本 (scripts/, .gitattributes, Makefile)
    ② 函数清单 (functions.tsv + 生成物 yaml + ll.cfg/code.s 相关)
-   ③ 源码 (src/ include/ linker.ld, 含 TU 拆分与改名)
+   ③ 源码 (src/ include/ linker.ld, 含 C 文件 拆分与改名)
    ④ 文档 (docs/, modules.draft.yaml) + tag `post-tsv-refactor`。
 
 ## 待拍板方案 (原 COLLABORATION §2 遗留, 重构后复工前决定)

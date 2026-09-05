@@ -68,13 +68,13 @@ echo "改名引用点: $(echo "$touching" | wc -l) 个文件"
 sed -i "s/^\([01]	[a-z]*	\w*	0x[0-9a-f]*	[0-9]*	\)$old\t/\1$new\t/" functions.tsv
 python3 scripts/gen_asm.py --sync
 
-# ---- 6. 定向重编受影响 TU + fncheck ----
+# ---- 6. 定向重编受影响 C 文件 + fncheck ----
 tus=$(grep -lE "\b$new\b" src/*.c | sed 's|src/||; s|\.c$||' | sort -u)
 make ${tus:+$tus/%.o} > /dev/null 2>&1 || make > /dev/null   # 缺依赖时退全量
 fails=0
 for tu in $tus; do true; done
 python3 scripts/fncheck.py "$new" || fails=1
-# 调用点在同一 TU 的已匹配函数一并核验
+# 调用点在同一 C 文件 的已匹配函数一并核验
 for f in $(grep -lE "\b$new\b" src/*.c); do
   tu=$(basename "$f" .c)
   for fn in $(awk -F'\t' -v t="$tu" '$3==t && $2==1 {print $6}' functions.tsv); do

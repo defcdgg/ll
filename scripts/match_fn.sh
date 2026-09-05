@@ -11,7 +11,7 @@ if [ -n "$ag" ] && [ "$ag" != "${DECOMP_AGENT:-}" ]; then
   echo "锁持有者 $ag != DECOMP_AGENT=${DECOMP_AGENT:-未设}"; exit 1
 fi
 
-# ---- 1. 定位函数与 TU ----
+# ---- 1. 定位函数与 C 文件 ----
 row=$(grep -P "\t$fn\t" functions.tsv) || { echo "TSV 里没有 $fn"; exit 1; }
 status=$(awk -F'\t' -v n="$fn" '$6==n {print $1}' functions.tsv)
 [ "$status" = "1" ] || { echo "$fn 在 TSV 里 status=0, 但查找失败?"; exit 1; }

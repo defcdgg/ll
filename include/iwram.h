@@ -105,11 +105,13 @@ extern u8 gSkillMenuTmpB;
 extern u8 gPartyMenuIdx;
 extern u8 gSkillMenuPage;
 extern u8 gUnk_0300022B;
+extern u8 gUnk_03000240;
 extern u32 gUnk_03000248;
 extern u16 gUnk_03000310;
 extern u16 gGstate312;
 extern u16 gGstate314;
 extern u8 gUnk_03000316;
+extern UnkNode gUnk_03000318; // 战斗待机行动链表头 (ListNode_Init)
 extern u16 gGstate324;
 extern u32 gBattleRngSeed;
 extern u8 gGstate32E;
@@ -131,11 +133,15 @@ extern Unk_03000348 gDialogCtx[];
 
 extern u16 gFlashFlags;
 extern u16 gUnk_03000386;
+extern u16 gUnk_03000390[];
 
 extern u8 gUnk_030004D4;
 extern u8 gUnk_030004D5;
 extern u8 gUnk_030004D6;
 extern u8 gUnk_030004D7;
+extern u32 gUnk_030004D0;
+extern u32 gUnk_030004D8[4];
+extern u32 gUnk_030004E8[4];
 
 extern u8 gUnk_030004F8;
 
@@ -868,6 +874,7 @@ extern u8 gUnk_03004D4C;
 extern u8 gUnk_03004D50;
 extern u8 gSaveTimers[];
 
+extern u16 gUnk_03004DBC;
 extern u8 gBgTileReloadFlag;
 extern u8 gSaveBusyA;
 extern u8 gSaveFlags[];
@@ -922,10 +929,7 @@ typedef struct
     u16 unk2;
     u8 pad0[0x18 - 4];
     Unk_03004F20_entry unk18[2];
-    u8 field_48;
-    u8 field_49;
-    u8 field_4A;
-    u8 field_4B;
+    u32 field_48; /* 0x48 状态位域 (原 field_48..4B 四个 u8, 无单独引用) */
     u8 field_4C;
     u8 field_4D;
     u8 pad1[0x5E - 0x4E];

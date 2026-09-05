@@ -10,7 +10,70 @@
 #include "sound.h"
 
 // @ 0x0801A3C4
-INCLUDE_ASM("asm/nonmatchings", sub_801A3C4);
+extern u8 *gUnk_087EBE00[];
+
+void sub_801A3C4(Unk_801A5EC *obj)
+{
+    switch (obj->f_18 & 0xF)
+    {
+        case 1:
+            LZ77UnCompVram(gUnk_087EBE00[obj->f_26 + obj->f_22],
+                           (void *)((obj->f_24 << 5) + 0x06010000 + (obj->f_22 << 12)));
+            break;
+        case 2:
+            LZ77UnCompWram(gUnk_087EBE00[obj->f_26 + obj->f_22],
+                           (void *)((obj->f_22 << 12) + 0x020212C0));
+            break;
+        case 3:
+            LZ77UnCompWram(gUnk_087EBE00[obj->f_26 + obj->f_22],
+                           (void *)((obj->f_22 << 12) + 0x02020E00));
+            break;
+        case 6:
+            if (obj->f_22 == 0)
+            {
+                DmaFill16(3, 0, (void *)0x0600C000, 0x4000);
+                DmaWait(3);
+            }
+        case 4:
+            LZ77UnCompWram(gUnk_087EBE00[obj->f_26 + obj->f_22],
+                           (void *)((obj->f_22 << 12) + 0x0202B2C0));
+            break;
+        case 5:
+            LZ77UnCompWram(gUnk_087EBE00[obj->f_26 + obj->f_22],
+                           (void *)((obj->f_22 << 12) + 0x020302C0));
+            break;
+        case 7:
+            if (obj->f_22 == 0)
+            {
+                DmaFill16(3, 0, (void *)0x0600C000, 0x20);
+                DmaWait(3);
+            }
+            LZ77UnCompVram(gUnk_087EBE00[obj->f_26 + obj->f_22],
+                           (void *)((obj->f_22 << 12) + 0x0600C020));
+            break;
+        case 8:
+            if (obj->f_22 == 0)
+            {
+                DmaFill16(3, 0, (void *)0x06008000, 0x20);
+                DmaWait(3);
+            }
+            LZ77UnCompVram(gUnk_087EBE00[obj->f_26 + obj->f_22],
+                           (void *)((obj->f_22 << 12) + 0x06008020));
+            break;
+        case 9:
+            LZ77UnCompWram(gUnk_087EBE00[obj->f_26 + obj->f_22],
+                           (void *)((obj->f_22 << 12) + 0x02037C28));
+            break;
+    }
+
+    obj->f_22++;
+    if (obj->f_22 >= obj->f_20)
+    {
+        sub_801A684((u8 *)obj);
+        if ((obj->f_18 & 0xF) != 9)
+            obj->f_18 = 0xF7FF & obj->f_18;
+    }
+}
 // @ 0x0801A5EC
 void sub_801A5EC(Unk_801A5EC *dst, Unk_801A5EC *src)
 {
@@ -944,18 +1007,18 @@ u32 sub_8020B48(void)
 {
     return gUnk_03000718;
 }
-// INCLUDE_ASM("asm/matchings", sub_8020B54);
+INCLUDE_ASM("asm/nonmatchings", sub_8020B54);
 
 // @ 0x08020B54
-void sub_8020B54(void)
-{
-    u8 i;
-    for (i = 0; i < 7; i++)
-        gUnk_030006F8[i] = 0;
-    gUnk_03000714 = 0;
-    gUnk_03000715 = 0;
-    do { gUnk_03000716 = 0; } while (0);
-}
+// void sub_8020B54(void)
+// {
+//     u8 i;
+//     for (i = 0; i < 7; i++)
+//         gUnk_030006F8[i] = 0;
+//     gUnk_03000714 = 0;
+//     gUnk_03000715 = 0;
+//     do { gUnk_03000716 = 0; } while (0);
+// }
 // @ 0x08020B90
 void sub_8020B90(u8 *arg0)
 {

@@ -21,3 +21,4 @@ extern u16 gMsgLineBuf[]; /* 0x02005C44: 单条消息行的 u16 瓦片缓冲 (29
 extern u8 gCutsceneGfxBuf[];
 extern u8 gSpritePoolBackup[0xA00];
 extern u8 gQueue34C0Backup[0x100];
+extern u8 gUnk_02036EC0[];

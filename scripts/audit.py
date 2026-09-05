@@ -133,7 +133,7 @@ def main():
     for nm, v in bad[:20]:
         print(f"  !! {nm}: {v}")
 
-    print("\n=== 各翻译单元最后修改时间 ===")
+    print("\n=== 各 C 文件最后修改时间 ===")
     now = {}
     for f in sorted(os.listdir("src")):
         if f.endswith(".c"):

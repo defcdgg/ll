@@ -151,7 +151,7 @@ else
     ./install.sh ../..
     cd ../..
 
-    # Makefile 两个变体都用: agbcc (普通 TU) + old_agbcc (m4a/m4a_tables/agb_sram)
+    # Makefile 两个变体都用: agbcc (普通 C 文件) + old_agbcc (m4a/m4a_tables/agb_sram)
     for b in agbcc old_agbcc; do
         if [ ! -f "tools/agbcc/bin/$b" ]; then
             echo "Error: tools/agbcc/bin/$b missing after build."

@@ -1857,7 +1857,7 @@ void StaticObjs_Spawn(u8 arg0)
 }
 
 /* ⚠ code_0.h 里的 u8 返回类型会生成 lsls/cmp 截断; 目标是直接 cmp。
- * 本 TU 内用宏把调用改指到 s32 原型的本地别名 (同一 ROM 符号, 链接期同一地址)。 */
+ * 本 C 文件 内用宏把调用改指到 s32 原型的本地别名 (同一 ROM 符号, 链接期同一地址)。 */
 s32 Sprite_EnqueueRender_S32(u16, u16, u8, u16, u8);
 
 /* 静态地图物件逐帧动画: 遍历 gStaticMapObjects[3] (field_0=激活):

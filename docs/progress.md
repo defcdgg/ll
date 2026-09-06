@@ -4130,6 +4130,49 @@ ld 插的 veneer —— 装置伪影, mine.o 的 .text 实际 144B 与目标同�
 make + sha1 通过, audit 690/1059 (65%)。镜像姊妹 sub_804F974 (全置位版?) 仍挂起 ——
 预期同根因, 套件 target.s 池符号化 + 找承重分配语句应可复制本路径。
 
+## sub_801CBA4 (⏸ 2026-09-05 sense)
+
+**状态**: 挂起。permuter base score=2225 (从 7635 经多轮优化压下), 但未达 0, 不能合入 src。
+
+**签名** (从参数截断宽度推导): `void sub_801CBA4(u8 *obj, u8 kind, u16 f2a, u8 f35, u8 arg5)`。
+prologue 首页寄存器: r6=obj, r8=kind(u8), sl=f2a(u16), sb(=r9)=f35(u8), r2=arg5(u8 临时),
+r4=entry, r5=anim, r7=flag。
+
+**优化历程**:
+1. **case 重排** (0,10,1,2,3,4,6,7,8,9): 7635→2990 (−4645)。GCC 按 C 源码顺序发射 case 块,
+   目标物理块序为 CC20(0) CC74(10) CCC0(1) CD14(2) CD18(3) CD30(4) CD5A(6) CD7C(7) CDC4(8) CDDC(9) CDEA(tail)。
+2. **case 1 的 v1/v2 临时**: 2990→2450。function-scope `u16 v1; u16 v2;` 强制目标的重算地址 store 序
+   (load→addr→store, load→addr→store), 与已匹配姊妹 sub_801CE80 同风格。
+3. **tail 操作数序** (`val*4 + obj[0xBE]*16`): 2450→2450 (同分, 但 asm 更近)。
+4. **case 0 eac 临时** (`v1 = sub_8020EAC(obj); if (v1 == 1)`): 2450→2450 (防 case0/case7 eac 合并)。
+5. **ab=4 尾技巧**: 2450→2225。在 tail 中 `ab = 4;` 然后 `val * ab` 代替 `val * 4`。
+   permuter 发现: 用局部变量代替常量改变寄存器分配, 使 tail 指令序更近目标。语义等价 (ab 在此处仅存 4)。
+
+**卡点** (2225 分构成):
+- **r5/r6 互换** (89 register diffs × 5 = 445 pts): 目标 obj=r6/anim=r5, mine obj=r5/anim=r6。
+  纯分配器选择。9+ 次尝试失败 (声明序 anim↔entry、flag 置首、register 修饰、anim=0、额外长活局部、
+  entry 改 u8*、register u8 *obj、ab 改 u16)。姊妹 sub_801CA08 用 ip(r12) 放 obj, sub_801CE80 用 ip,
+  说明分配器选择随函数结构变化, 难以外部控制。
+- **24 处结构差异** (~24×100 = 2400 pts):
+  - case 0 `ab` 二次截断: 目标 `lsls r0,r1,#0x18; lsrs r0,r0,#0x18; cmp r0,#0` (ab 已 ldrb 过仍截断)。
+    试 `(u8)ab==0`、`ab` 改 u16、`int ab` 等均不产生该截断。原因不明 (可能原码显式 `(u8)` cast)。
+  - case 0 `idx = field_12` 共享: 目标 CD9E 为 case0(CC50→CD9E)/case7(CD96→CD9E) 共享块,
+    mine 两处内联。GCC -O2 tail-merge 未合并 (可能因 case0 eac 检查嵌套在 bc 检查内)。
+  - case 4 死截断: 目标 `bl sub_8020EAC; lsls r0,r0,#0x18; lsrs r0,r0,#0x18; b CD9A` (结果截断后丢弃)。
+    10+ 种 C 变体 (u8/int 返回、显式 cast、赋值给临时、嵌套 if、`(void)` 强转) 均不产生。
+    已确认本编译器始终消除死截断 (/tmp/t1-t6.c 验证), 疑编译器版本差异。
+  - tail 指令序: 目标先 `ldr r2,=base` 再 `lsrs r0,#0x16`, mine 相反。试多种表达式序均未改善。
+  - `.short 0x0000` 对齐填充与 literal pool 布局差异。
+
+**下一步** (若再攻):
+1. 尝试 `-g` 编译变体 (`-mthumb-interwork -Wparentheses -Werror -O2 -g -fprologue-bugfix`) 改变分配/保活。
+2. 尝试将 case 0 的 eac 检查改为与 case 7 结构完全一致 (均顶层 `if (cond) if (eac==1) ... else ...`) 以触发共享。
+3. 接受 r5/r6 差 (445 pts) 后, 专注消除 24 处结构差异中的可解部分 (tail 序、.short 填充)。
+
+**permuter 套件**: permuter/sub_801CBA4/ (base.c score=2225, compile.sh/target.o/settings.toml 完整)。
+最佳输出目录 output-2225-1 (与 base.c 同分, permuter 未能超越人工优化)。
+注: 拆分后本函数归属 C 文件由 code_801A3C4 迁至 code_801A5EC (2026-09-06 zcode-ll2)。
+
 ## 2026-09-06 zcode-ll2: code_801A3C4.c 拆分 + 4 函数匹配 (≤200行批次)
 
 **核心突破: 拆分 C 文件解除 TU 状态泄漏扰动 (经验 148 的解法落地)**
@@ -4304,7 +4347,6 @@ flags &= 0xFFEF; gUnk_03000889 = 0x15;` 直落终态; case0x15 只剩 `obj[0xBE]
 
 **字节定论**: 15×fncheck OK (各 404B, 23 池重定位施加, 7 bl 槽忽略); 全量 make exit=0 +
 SHA1 绿; 进度 716/1059 (67.6%)。code_80264C0 剩 45 个未匹配。
-
 ## 2026-09-06 claude-8030D9C: sub_80345AC (717/1059)
 
 **✅ sub_80345AC (161行, code_80264C0)** — sub_8034440 (0x08034440, 2026-09-04 匹配) 的同族克隆:
@@ -4467,3 +4509,65 @@ D4FC/DB64 (17/26行差) 未动。**⏸ 444行对 803D20C/803CE0C (14行差) / 61
 **⚠ 事故**: 收尾发现 src/code_80264C0.c 被截空 (与 glm5 并行写竞态), 从 HEAD 基线重放
 全部 21 个合并恢复 (含 glm5 的 8037E14/7FE8/81BC/8390/8568/874C), 见 INCIDENTS.md。
 **字节定论**: 22×fncheck OK (本批); make exit=0 + SHA1 绿; audit 738 全过。
+**✅ sub_8051AEC (107 行, MOD-08 脚本 VM, 浮点插值家族)** — 2026-09-06 opencode:
+- 家族同源: sub_801768C (src/code_8010F10.c) 完全同构 (同 5 参签名/同 float 表达式/同尾除), 先读其匹配 C 定框架。
+- 本体: `s16 f(s16 base, s16 amp, s16 total, s16 step, u8 mode)`; mode1 = `amp * (step*10/total)/10`,
+  mode2 = `amp * (((-10*step)/total + 20)/10)`, 返回 `base + step*result/total`。**结果直接写回参数 arg1** (累加器),
+  无独立 result 局部 → default/case0 路径 arg1 原值直达尾部 r0。
+- 卡点链: ① 先写 `s16 result = arg1;` 具名局部 → score 500, 入口参数转换序错乱 (arg2 在 arg1 前);
+  ② permuter 跑到 280 平台期, 给 `arg1 = arg1;`/`new_var = arg3` 假招 (score 40 仍差入口序);
+  ③ RTL 转储定位: s16 参数截断链 (ashift+lshiftrt) 被 **combine 吸收进首用点** (body 内 `result=arg1`),
+  而 arg2 链多消费者留入口 → 序变 arg0,arg2,arg1,arg3; ④ 正解 = 复用参数 + `case 0: break;`
+  (case 值域含 0 → 分派树 `cmp#1;beq;cmp#1;ble;cmp#2;beq;b` 与目标一致, 否则退化 `cmp#2` 直链)。
+- 原型修正: code_0.h `void sub_8051AEC();` → `s16 sub_8051AEC(s16, s16, s16, s16, u8);` (无调用点, 零风险)。
+- fncheck OK (248B @0x08051aec, 0 池重定位); 全量 make+SHA1 绿。进度 700/1059 (66.1%)。
+
+## sub_805063C (0x0805063C) — tile 对写入器, 未收敛 (⏸)
+
+**语义** (全解): 脚本 opcode 级 tilemap 写入器。参数 (u16 *dest, u8 charIdx, u8 x, u8 y)。
+p = dest + (x + y*32) (u16); v = *(u16*)(0x0862D574 + x_fr*2 + charIdx*18), x_fr=gUnk_03000F2A。
+- v ≤ 0xDF: 直接瓦片 id。p[0]=0xB000+((v&0xFF)<<1); p[0x20]=0xB001+((表重读&0xFF)<<1)
+  (表重读必须写在 p[0] 之后, 否则 GCC2 CSE 掉第二次读)。
+- 0xDF < v ≤ 0xEFF: 在 gUnk_03000EE8[0..gUnk_03000F24-1] 搜 v (找到即 break), 得 i。
+  T=(i+0xE0)<<1; p[0]=0xB000+T; p[0x20]=0xB000+(T+1)  [目标: (T+1)+0xB000, 0xB000 在 r8]。
+- v > 0xEFF: ret=1。末尾 gUnk_03000F2A++。
+
+**已攻克的结构点** (均有实测支撑):
+1. 外层 if 必须倒写 `if (v <= 0xEFF) {...} else {ret=1;}` 才得目标块序 [Z][Y][W][ret1]。
+2. 内层也倒写 `if (v <= 0xDF) {Z} else {Y}`。
+3. 首读用 `off` 变量 `off = gUnk_03000F2A * 2 + charIdx * 18;` 才避免 GCC2 因式化为 (9ci+x)*2。
+   目标序: base→r7, x→r3, 2x, 18ci→r6, 求和。
+4. Z 常量 SImode: `(v & 0xFF) << 1` 必须先落进 u32 变量 (z1/z2) 再 +0xB000/0xB001,
+   否则 GCC2 收窄成 HImode → 池 0xFFFFB000/0xFFFFB001。
+5. Y 的 0xB000 用变量 base2 (=0xB000, 在循环前赋) → GCC2 载入寄存器 (ip 或 r8)。
+6. store2 用 VAF 招式 `(u = t + 1) + base2` → 得目标 `adds r0,#1; add r0,ip/r8` (免 fold/免 orr)。
+7. 循环必须显式 do-while 包 `if (i < n)` 才得目标"不剥 q[0]"形态 (for/while 都会被 GCC2 剥首元素)。
+
+**卡点 (未收敛, 目标 vs 我, fndiff 最好 3170/5445, bytecmp 差 114/228B)**:
+A. `T=(i+0xE0)<<1` 的移位编码: 目标 `lsls #0x10; lsrs #0xf` (HImode 移位), 我怎么写都
+   `lsls #0x11; lsrs #0x10` (SImode 移位+截断)。g1 最小复刻 sub_8049B70 同结构也一样
+   #17/#16 —— 目标/sub_8049B70 的 #0x10/#0xf 编码在当前 tools/agbcc 无法复现 (试过
+   (u16)cast、*2、u16 中间变量、-g flag、old_agbcc, 全部 #17/#16)。疑 GCC2 构建版本差异。
+B. 寄存器 home: 目标 v 住 r4 且 Z 分支不破坏 (用 r0 做 ands), 我 v 被 `ands r4,r2` 覆盖;
+   目标入口 `adds r2,r4,#0` (v 复制去 cmp) 与循环前 `adds r4,r2,#0` (复制回) 两条 home 复制,
+   我没有。目标 ret→sb(r9), 0xB000→r8, x-addr→ip, base→r7; 我 ret→r8/r9 依结构漂移。
+   唯一把 prologue (mov r7,r9; mov r6,r8; push {r6,r7}) + base r7 + x-addr ip + 0xB000 r8
+   全对齐的是 permuter 把 y 改成 unsigned int 的 3170 版 —— 但那毁掉 y 的 u8 截断
+   (目标 `lsls #0x18; lsrs #0x13`)。鱼与熊掌未兼得。
+
+**最佳候选**: permuter/sub_805063C/base.c (v_IA, 4990) 与 permuter/sub_805063C/output-3170-4/
+source.c (3170, y 改 int 不可读)。permuter 产物 <2905 的都是 score 假高 (经验 29, 池未重定位)。
+
+**✅ BattleFx_UpdateTable (sub_8019784, 296 行, MOD-03 淡出波表生成器)** — 2026-09-06 opencode:
+- 语义: 逐帧调用 (sub_801889C); 按 gFlashFlags 分派生成 gUnk_03000390[256] 淡出波表。
+  `if (flags&0x1000) { case1: 角度步进 g386%360, 逐项填 (s8)g4D0[g386%360]; case2: 斜坡 + 0x50..0x9F 逐项 ±, 0x10/0x20 方向, 镜像抄 160-i }
+   else if (flags&0x2000) { case1: 相位写回数据表 amp(cos-sin)+amp; case2: 转 0x1000+清 g386 }`。
+- 匹配全程卡点链 (全部有 RTL 转储佐证):
+  ① 结构骨架先按 sub_80199E0 族 + gFlashFlags 语义重建 (score 14065 → 8650, 无结构差);
+  ② **switch 分派树**: 第一 switch 用 `case 0: break;` 显式 (才能得 `cmp#1;beq;cmp#1;bgt` 树), 第二 switch 同形但目标出 `ble` 版 → 全是 later block-relayout, 结构 C 相同即可 (别在两个 switch 里写不同形式);
+  ③ **16 位局部共享**: angle(case1)/v(case2)/amp_float(0x2000 case1) 全用同一个 `s16 tmp` → 同寄存器 r6, 一改全消 (8650→7755);
+  ④ **int diff 中间量锁定符号扩展**: `tmp = (s16)((u16)g386 - i) >> 2` 会被 gcc 折叠掉 (s16)i 的符号扩展; 拆 `int diff = g386 - i; tmp = (s16)diff >> 2;` 后出目标 `lsls r1,r3,#16; asrs; subs; lsls #16; asrs #18`;
+  ⑤ **case2 条件翻转**: `if (g386 <= 0x10F) { 循环 } else { 置 0x4000 }` (循环在真支, 目标直落) vs 反写 `>0x10F` 出 `ble` 到循环 — 目标要 `bgt` 到 setflag;
+  ⑥ **核心: 去 local 快照, 直接读全局 + 常量在前**: `u16 flags = gFlashFlags; if (flags & 0x1000)` 让 and 的操作数全是 REG → gcc 把**变量**当累加器 (`adds r0,r3;ands r0,r2` ✗); 改 `if (0x1000 & gFlashFlags)` (常量在源文本前 + 内存操作数) → 常量进累加器 (`adds r0,r2;ands r0,r3` ✓, 目标全 3 处 and/or 同此)。expab_binop 的 commutative swap 只在 op0 是 CONST_INT 或 REG 顺序下触发, 经 preserve_subexpressions_p(-O2) force_reg 后行为不同;
+  ⑦ 原型/命名: code_0.h `void sub_8019784();` 保持; 全链改名 → `BattleFx_UpdateTable`。
+- fncheck OK (604B @0x08019784, 0 池重定位); 全量 make+SHA1 绿。进度 718/1059 (67.8%)。

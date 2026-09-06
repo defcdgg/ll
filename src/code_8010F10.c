@@ -2227,7 +2227,7 @@ void sub_801887C(void)
 // @ 0x0801889C
 void sub_801889C(void)
 {
-    sub_8019784();
+    BattleFx_UpdateTable();
     if (!(gGstate324 & 8))
     {
         sub_804AE2C();
@@ -2482,7 +2482,97 @@ void DialogCtx_SetPair(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
     ptr[7] = e;
 }
 // @ 0x08019784
-INCLUDE_ASM("asm/nonmatchings", sub_8019784);
+void BattleFx_UpdateTable(void)
+{
+    s16 i;
+    s16 tmp;
+    if (0x1000 & gFlashFlags)
+    {
+        switch (gFlashFlags & 0xF)
+        {
+        case 0:
+            break;
+        case 1:
+            gUnk_03000386 = ((s16)gUnk_03000386 + gUnk_030004D4) % 360;
+            for (i = 0, tmp = gUnk_03000386; i <= 0x9F;)
+            {
+                gUnk_03000390[i] = (s8)((s8 *)gUnk_030004D0)[(s16)tmp % 360];
+                i++;
+                tmp = (u16)(tmp + gUnk_030004D6);
+            }
+            break;
+        case 2:
+        {
+            int diff;
+            if ((s16)gUnk_03000386 <= 0x10F)
+            {
+                gUnk_03000386 = (u16)(gUnk_03000386 + gUnk_030004D4);
+                for (i = 0x50; i <= 0x9F; i++)
+                {
+                    diff = gUnk_03000386 - i;
+                    tmp = (s16)diff >> 2;
+                    if (tmp > 24)
+                    {
+                        tmp = 24;
+                    }
+                    if (tmp < 0)
+                    {
+                        tmp = 0;
+                    }
+                    switch (gFlashFlags & 0xF0)
+                    {
+                    case 0x10:
+                        gUnk_03000390[i] = tmp;
+                        break;
+                    case 0x20:
+                        gUnk_03000390[i] = 24 - tmp;
+                        break;
+                    }
+                }
+                for (i = 0; i <= 0x4F; i++)
+                {
+                    gUnk_03000390[i] = gUnk_03000390[0xA0 - i];
+                }
+            }
+            else
+            {
+                gFlashFlags |= 0x4000;
+            }
+        }
+        break;
+        }
+    }
+    else if (0x2000 & gFlashFlags)
+    {
+        switch (gFlashFlags & 0xF)
+        {
+        case 0:
+            break;
+        case 1:
+        {
+            s16 j;
+            for (j = gUnk_03000386; j < ((s16)gUnk_03000386 + 18); j++)
+            {
+                ((s8 *)gUnk_030004D0)[j] = (int)((float)(int)gUnk_030004D5 * gCosTable[j] - (float)(int)gUnk_030004D5 * gSinTable[j] + (float)(int)gUnk_030004D5);
+            }
+            if (j <= 359)
+            {
+                gUnk_03000386 = j;
+            }
+            else
+            {
+                gFlashFlags = (gFlashFlags & ~0x2000) | 0x1000;
+                gUnk_03000386 = 0;
+            }
+        }
+        break;
+        case 2:
+            gFlashFlags = (gFlashFlags & ~0x2000) | 0x1000;
+            gUnk_03000386 = 0;
+            break;
+        }
+    }
+}
 // @ 0x080199E0
 // 淡出步进: flags=gFlashFlags; 若 flags&0x1000 按低 nibble 分派。
 // case1: 4 通道循环, bits=(u8*)0x030004D7, 第 i 位为 1 时把

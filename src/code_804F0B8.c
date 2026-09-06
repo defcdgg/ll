@@ -556,7 +556,22 @@ u32 Op_OpenWindow(u32 *ptr)
     return 1;
 }
 // @ 0x08051AEC
-INCLUDE_ASM("asm/nonmatchings", sub_8051AEC);
+s16 sub_8051AEC(s16 arg0, s16 arg1, s16 arg2, s16 arg3, u8 mode)
+{
+    switch ((s8)mode)
+    {
+        case 0:
+            break;
+        case 1:
+            arg1 = ((float)arg1) * ((((float)arg3) * 10.0f) / ((float)arg2) / 10.0f);
+            break;
+        case 2:
+            arg1 = ((float)arg1) * (((((-10.0f) * ((float)arg3)) / ((float)arg2)) + 20.0f) / 10.0f);
+            break;
+    }
+
+    return arg0 + ((arg1 * arg3) / arg2);
+}
 // @ 0x08051BE4
 INCLUDE_ASM("asm/nonmatchings", sub_8051BE4);
 

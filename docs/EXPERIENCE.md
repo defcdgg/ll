@@ -1833,3 +1833,44 @@ grep '^Register ' gccdump.lreg; grep '^;; Register .* in' gccdump.lreg; rm -f gc
      `adds rd, r_mult, r_base`; 直接 `arg1 + i * 0xC8` 会被 fold 成 ptr+int (op0=ptr) 翻转
      `adds rd, r_base, r_mult` (2026-09-06, 案例 sub_801DEDC/DF90)。
 168. **半字 `|= K` 的 orrs 寄存器互换用命名临时修 (同族两处同时命中)**: 目标 `ldrh r1; movs r0,#K; orrs r0,r1; strh r0`(载荷在 r1、常量在 r0), 直接 `x |= K`/显式 `x = x|K`/`x = K|x` 全给镜像形状 (load r0/const r1); 函数顶声明 `u16 t;` + `t = x|K; x = t;` 一次修正 case0 与 case2-else 两处 (2026-09-06, 案例 sub_8030D9C; 同族 sub_8030F30/80310C4/8030C08 同构可复用)。另: 跳表函数 permuter 真 0 的完整路径 = 按 164 把套件 target.s 的 4 个 gUnk 池字面量换符号引用 (跳表 .4byte 标签引用两侧同 reloc 无需动), 9676 迭代底分 55 → 0。
+169. **全局直读 + 常量写在前面 → gcc 常量进累加器; 局部快照 → 变量进累加器** (2026-09-06, 案例 BattleFx_UpdateTable/0x08019784, 关联经验 3)。
+     目标 `adds r0,r2; ands r0,r3` (const r2 拷进 r0 做累加器) 与 `adds r0,r3; ands r0,r2`
+     (var 做累加器) 的差别来自 expand_binop 的操作数: `(and REG CONST_INT)` 时 commutative swap
+     恒把 CONST 排右 (op1), op1=REG 前置 → var 进累加器; 但若常量因 preserve_subexpressions_p
+     (-O2 恒真) + rtx_cost>2 被 force_reg, 或 op0 是内存操作数/已被物化进目标寄存器, swap 条件
+     `GET_CODE(op0)==CONST_INT` 不成立 → const 留在 op0 → **const 进累加器**。
+     C 层面控制要点: **不要 `u16 flags = gFlashFlags; if (flags & 0x1000)`** (var 是 REG, const 被 fold
+     排右 → var 累加器); 要写成直读全局且常量在前: `if (0x1000 & gFlashFlags)` → const 累加器 ✓。
+     `x |= 0x4000`(内存 x) 同理给 const-acc; 有 3+ 处 and/or 同此规律时一并生效。
+     连带: 别用 16 位局部做掩码快照再参与所有 and/or, 会统一翻成 var-acc。
+
+170. **`int diff = a - i; v = (s16)diff >> 2;` 中间量锁定 (s16)i 的符号扩展; 单表达式会被截断折叠** (2026-09-06, 案例 BattleFx_UpdateTable/0x08019784)。
+     `v = (s16)((u16)g386 - (s16)i) >> 2` 的 gcc: 结果立即 (s16) 截断 → (s16)i 的符号扩展被
+     值编号折叠成零扩展 (`subs r0,r0,r3` 直接读 u16 home); 目标要 `lsls r1,r3,#16; asrs r1,r1,#16;
+     subs r0,r0,r1`。拆成 `int diff = g386 - i; v = (s16)diff >> 2;` 后 diff 是完整 32 位变量,
+     符号扩展必须物化 → 目标形状。
+
+171. **同一 16 位局部在互斥 switch case 间复用 → gcc 分到同一寄存器 (r6)** (2026-09-06, 案例 BattleFx_UpdateTable/0x08019784)。
+     目标 case1 的 angle、case2 的 v、0x2000-case1 的 amp_float 全用 r6; 把 C 里各自的
+     `u16 angle;` `s16 v;` 改成一个函数级共享 `s16 tmp;` 四处通用 → 三处分配同时对齐
+     (score 8650→7755)。gcc2.95 对不重叠生命期的 16 位局部倾向复用寄存器, 显式共享变量
+     更可靠 (负数比较需要 s16, 用 (u16)/(s16) cast 在定点转型)。
+
+172. **switch 分派树形态 (bgt-X-分离块 vs ble) 是 later block relayout 的产物, 两个同形 switch 会出不同形态; 别为形态差异改 C 结构** (2026-09-06, 案例 BattleFx_UpdateTable/0x08019784, 关联经验 166/168)。
+     同一份 `switch (x) { case 0: break; case 1:...; case 2:...; }` 在某处编成
+     `cmp#1;beq;cmp#1;bgt X;b 退出;X:cmp#2;beq;b 退出`, 另一处编成
+     `cmp#1;beq;cmp#1;ble 退出;cmp#2;beq;b 退出` — 先 RTL 同形, 后段块布局翻转。
+     判定: 只要 target 两处形态不同而 C 同构, 就别硬凑 case 0/default 差异; 先把其他
+     分配差修完再看。真正要控制的是 **if/else 哪支直落**: `if (g386<=0x10F){循环}else{置位}`
+     (循环在真支) 出 `bgt` 到置位块 + 循环直落; 反写 `>0x10F` 循环在假支出 `ble` 到循环。
+
+173. **s16 参数转换链 (`lsls/lsrs` 截断) 会被 combine 吸收进首用点, 破坏入口参数序; 用"结果复用参数作累加器 + `case 0: break`"钉回入口** (2026-09-06, 案例 sub_8051AEC, 同族 sub_801768C)。
+     症状: 5 参插值函数 (`s16 f(s16,s16,s16,s16,u8)`) 反汇编入口参数转换序 = 参数序
+     (arg0→sl, arg1→r0, arg2→r6, arg3→r5), 但把 `result = arg1;` 写成具名局部时,
+     combine 会把 arg1 的转换链 (`ashift+lshiftrt`) 吸收进该赋值语句 (body 内), 序变成
+     arg0, arg2, arg1, arg3 → score 40~500 平台期 (permuter 只给 `arg1 = arg1;` 假招,
+     需人工找真形)。正解: **不建 result 局部, 直接往参数上写**: `case 1: arg1 = (float)arg1 * ...; break;`
+     + 显式 `case 0: break;` (让 switch 值域含 0, 分派树才是 `cmp #1; beq; cmp #1; ble;
+     cmp #2; beq; b` 而不会退化成 `cmp #2` 直链)。default/0 路径 arg1 原样 → r0 直达尾部,
+     天然等价无初始化。判定: 目标尾部 `muls r0, r1, r0` (arg3 * result) 且 default 无 mov。
+     注意 5 参 u8 mode 若声明 s8, 调用点会多 `ldrsb` (经验 173 同条), 必须 u8 + switch 内 `(s8)`。

@@ -203,6 +203,8 @@ extern u8 gUnk_0300073D;
 extern u8 gUnk_03000744;
 extern u8 gUnk_03000765;
 extern u8 gUnk_08393A30[];
+extern float gCosTable[];
+extern float gSinTable[];
 extern u8 gUnk_03000748[];
 extern u8 gUnk_03000758[];
 extern u8 gUnk_03000763;

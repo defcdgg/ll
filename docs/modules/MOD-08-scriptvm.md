@@ -37,8 +37,9 @@ handler 读 `data[1..]` 参数、执行动作、推进 `*ptr`、返回 1=继续�
 | 0x08052758 | ✅C | `BgTiles_LoadSet` | LZ77 gUnk_087ED904[arg0]→0x0600B800 (含空转 if, 见源码注释) |
 | 0x0805291C | ✅C | `Op_CloseWindow` | 关窗口: 清 BG0 显示, 状态\|=0x100 |
 | 0x08051A1C | ✅C | `Op_OpenWindow` | 开窗口: WindowBgBuf 填 0xB000, BG0CNT=charbase2/screenbase31, 状态\|=0x10 |
+| 0x08051AEC | ✅C | `sub_8051AEC` | 浮点插值助手 (同 sub_801768C 家族): base + step*amp*f(step/total,mode)/total; 无调用点 (疑似死代码); 结果复用参数 arg1 (经验 173) |
 | 0x0804F0B8 | ✅C | `CheckObjectKindSlot` (已有名) | 死代码 (无调用点) |
-| 0x0804F10C/17C/280/64C/7F8/F8D8/974/FA04/FB24/80501B8/8050434/805063C/8050720/80511A0/80512C4/80513A0/805144C/8051AEC/8051BE4/80525E8/80529B8/8052AE8/8052F44/8053270 | ❌ | (待匹配) | 804F280=大型角色控制 opcode (调 Chara_SetGfxPal/FreeSprite/StartScriptAnim/AnimWaitDone/Chara_SetWalkPath); 80525E8=BGM/脚本装载入口(场景加载/NewGame 调用; 80526A0 已单独 ✅ 见上); 8052F44=队伍成员条件跳转; 8053270=循环指令 |
+| 0x0804F10C/17C/280/64C/7F8/F8D8/974/FA04/FB24/80501B8/8050434/805063C/8050720/80511A0/80512C4/80513A0/805144C/8051BE4/80525E8/80529B8/8052AE8/8052F44/8053270 | ❌ | (待匹配) | 804F280=大型角色控制 opcode (调 Chara_SetGfxPal/FreeSprite/StartScriptAnim/AnimWaitDone/Chara_SetWalkPath); 80525E8=BGM/脚本装载入口(场景加载/NewGame 调用; 80526A0 已单独 ✅ 见上); 8052F44=队伍成员条件跳转; 8053270=循环指令 |
 
 ## opcode 处理器 (真 C, 按功能分组)
 
@@ -106,10 +107,10 @@ handler 读 `data[1..]` 参数、执行动作、推进 `*ptr`、返回 1=继续�
 0x0805305C→sub_8009B1C, 0x08053078→wait !sub_8009B34, 0x0805309C→FullHealParty, 0x080530B4→sub_800A9C0(EquipItem),
 0x08052B34(✅asm)/0x08052AE8(❌)/0x08052858(`ScriptGotoEntry` 已名)/0x08052878(`Script_Call`)/0x080528C8(`Op_DialogSetup`)/0x0805291C 见上。
 
-## 未匹配 22 个清单
+## 未匹配 21 个清单
 
 804F280(大型角色控制), 804F64C, 804F7F8, 804F974, 804FA04, 804FB24,
-805008C, 80501B8, 8050434, 805063C, 8050720, 80511A0, 80512C4, 80513A0, 805144C, 8051AEC, 8051BE4,
+805008C, 80501B8, 8050434, 805063C, 8050720, 80511A0, 80512C4, 80513A0, 805144C, 8051BE4,
 80525E8(BGM/脚本装载), 80529B8, 8052AE8, 8052F44(队伍条件跳转), 8053270(循环)
 + 已匹配 asm: 8052B34, 8053360(Op_IfMoneyJump)。
 + 已匹配真C: 80526A0 —— 脚本 VM 启动/跳转: 前任 score 25 是 extern 池重定位假分 (经验 164),

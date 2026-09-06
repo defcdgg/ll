@@ -396,7 +396,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8010F10	0x08019304	29	DialogCtx_Clear3	
 0	thumb	code_8010F10	0x0801933c	479	sub_801933C	
 1	thumb	code_8010F10	0x08019748	30	DialogCtx_SetPair	
-0	thumb	code_8010F10	0x08019784	296	sub_8019784	
+1	thumb	code_8010F10	0x08019784	296	BattleFx_UpdateTable	✅ 2026-09-06 opencode: 淡出表生成器 (fade wave table, 同 gFlashFlags 族); 4 段 switch (0x1000/0x2000 x 低 nibble 1/2); 核心=直接读 gFlashFlags 内存 + 常量在前 0x1000 & gF (const-acc 路径) + case2 翻转条件<=0x10F 使循环直落 + int diff 中间量锁定符号扩展; fncheck 字节级通过 (604B)
 1	thumb	code_8010F10	0x080199e0	117	sub_80199E0	✅ 2026-09-05 match_bot: 接zcode-ll; 攻克点=case2 用 bldy/tbl/port 三指针预载 + i=0xFF 使 arm_reorg 把 movs r4,#0xff 落进 ldr→ldrb 延迟槽(内联单表达式恒沉到0x200臂); 空case0 ble下落保持; bytecmp 240B OK, fncheck OK
 1	thumb	code_8010F10	0x08019ad0	95	sub_8019AD0	✅ 2026-09-05 zcode-ll 接管(gpnux→zcode-ll): 闪光效果设置: v=flags&0xFFF0/0xFF0F/0xF0FF(三条独立语句,合一会被常数折叠), |=2, flags=arg1|v|0x1000; gUnk_03000386=0; raw写0x04000048=0x3F/0x40=0xF0/0x44=0x2A0(地址距关系合成-8/+4); DISPCNT|=0x2000; gUnk_030004D4=arg0/D5=0; switch(flags&0xF0){0x10:break, 0x20:BLDY=0x18}(空case与default合流); switch(flags&0xF00){0x100:BLDCNT=0xBF, 0x200:=0xFF}; 原型改为void(u8,u16); fncheck OK 200B
 0	thumb	code_8010F10	0x08019b98	294	sub_8019B98	
@@ -453,7 +453,7 @@ status	isa	module	addr	asm_lines	name	note
 0	thumb	code_801A5EC	0x0801be34	759	sub_801BE34	
 0	thumb	code_801A5EC	0x0801c484	672	sub_801C484	
 0	thumb	code_801A5EC	0x0801ca08	202	sub_801CA08	
-0	thumb	code_801A5EC	0x0801cba4	368	sub_801CBA4	
+0	thumb	code_801A5EC	0x0801cba4	368	sub_801CBA4	⏸ r5/r6互换(obj=r6/anim=r5 vs mine r5/r6, 89r×5≈445pts)+24处结构差异(case0 ab截断/field_12共享/case4死截断/tail序, ~24×100≈2400pts); 最佳候选 permuter/sub_801CBA4/base.c (score=2225, 从7635经case重排0,10,1,2,3,4,6,7,8,9+v1临时+ab=4尾技巧压下); 详情见 progress.md
 1	thumb	code_801A5EC	0x0801ce80	139	sub_801CE80	✅ 2026-09-05 gpnux: switch 跳表 7 分支共享三尾块(0/2→entry+0x409, 1/5→entry+flag=2+B4/B6写, 6+3/4→flag=0x401); case 1 实为 flag=2+写B4/B6(初判误为0x409); case 5 需 off=arg5*2 先算+p8 分开防折叠进 ldrh; 写序用 v1/v2 两临时夹在 store 间; case3/4 及 default 的 entry 未初始化是 ROM 真 UB(读垃圾 r4); 原型 void→(u8*,u8,u16,u8,u8) 调用点5参无截断; permuter base score=0, bytecmp 272B 仅 bl 槽除外, fncheck OK
 0	thumb	code_801A5EC	0x0801cf90	213	sub_801CF90	
 1	thumb	code_801A5EC	0x0801d12c	62	sub_801D12C	
@@ -958,7 +958,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_804F0B8	0x0805008c	141	sub_805008C	✅ 2026-09-03 ll-agent: 脚本泵后台服务; 关键=goto block2(1B)+entryTbl中间指针(4B)+bgRequest内联(1B), 12B→0; fncheck OK 300B
 0	thumb	code_804F0B8	0x080501b8	339	sub_80501B8	
 0	thumb	code_804F0B8	0x08050434	274	sub_8050434	
-0	thumb	code_804F0B8	0x0805063c	114	sub_805063C	
+0	thumb	code_804F0B8	0x0805063c	114	sub_805063C	⏸ 语义全解; 块序/off变量/u32常量/do-while循环/(u=t+1)+base2 已破; 卡 T=(i+0xE0)<<1 的 lsls#10/lsrs#f 编码(当前agbcc恒出#11/#10, 疑编译器版本) 与寄存器home(v/r2↔r4, ret sb, 0xB000 r8); 最好 3170(permuter, y改int毁截断)/5445(人工); 详情 progress.md
 0	thumb	code_804F0B8	0x08050720	1276	sub_8050720	
 1	thumb	code_804F0B8	0x080511a0	68	sub_80511A0	✅ 2026-09-04 llagent: 队列弹取+清空; ret=1 前置于 if 前使 movs r4,#1 落到 prologue; 去掉 if(counter>0) 显式检查, 让 while 循环自身承担零判断 (规则87); i 声明提前 (K&R); fncheck OK 144B
 1	thumb	code_804F0B8	0x08051230	72	Op_ScriptStop	
@@ -966,7 +966,7 @@ status	isa	module	addr	asm_lines	name	note
 0	thumb	code_804F0B8	0x080513a0	74	sub_80513A0	⏸ permuter score 60(不可达0); 差异全为GCC2 S-bit指令选择(adds/movs/lsls/ands/orrs vs add/mov/lsl/and/orr); 语义完全正确; 最佳C见permuter output-60-1
 0	thumb	code_804F0B8	0x0805144c	717	sub_805144C	
 1	thumb	code_804F0B8	0x08051a1c	101	Op_OpenWindow	
-0	thumb	code_804F0B8	0x08051aec	107	sub_8051AEC	
+1	thumb	code_804F0B8	0x08051aec	107	sub_8051AEC	✅ 2026-09-06 opencode: 浮点插值家族(同 sub_801768C); 结果复用参数 arg1 作累加器+case 0: break, 使 s16 参数转换链全留入口按参数序 (combine 不吸收); 第5参 u8 内 cast (s8); fncheck 字节级通过
 0	thumb	code_804F0B8	0x08051be4	1151	sub_8051BE4	
 1	thumb	code_804F0B8	0x08052574	5	Script_GetFlags	
 1	thumb	code_804F0B8	0x08052580	45	Script_ResetVM	

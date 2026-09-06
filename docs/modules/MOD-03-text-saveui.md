@@ -109,6 +109,7 @@
 | 0x08019DF8/E04/E18/E24 | ✅C | `BattleUiFlag_Clear/Set/Get/Reset` | gUnk_03000510 位组 |
 | 0x0801A13C/148/154 | ✅C | `FlashFlag_Clear/Get/Reset` | gUnk_03000384 |
 | 0x0801A168/1DC/218 | ✅C | `BattleFx_Init/Stop/DispOff` | gUnk_030004D4-D7 参数组 + BLDY/BLDCNT |
+| 0x08019784 | ✅C | `BattleFx_UpdateTable` | 淡出波表生成器: 按 gFlashFlags 高低位分派, 从 cos/sin 表 (0x0839C26C/0x0839BCCC float[360]) + gUnk_030004D5 生成 gUnk_03000390[256] 波表 (供 80199E0 读/BLDY) |
 | 0x08019304 | ✅C | `DialogCtx_Clear3` | 清 gUnk_03000348[0..2] (附注释) |
 | 0x08019748 | ✅C | `DialogCtx_SetPair` | 写表项 8 字节 |
 | 0x08019EE0 | ✅C | `DialogCtx_SetHead` | field_8/9/A/C |

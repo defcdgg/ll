@@ -11,6 +11,8 @@ MEMORY {
 
 gUnk_08091948 = 0x08091948;
 gUnk_08393A24 = 0x08393A24;
+gCosTable = 0x0839C26C;   /* float[360] 余弦表 (淡出波) */
+gSinTable = 0x0839BCCC;   /* float[360] 正弦表 (淡出波) */
 gUnk_08093418 = 0x08093418;
 gClassStatCurveTable = 0x080921F0;
 gStatGrowthCurveTables = 0x080923D8;
@@ -33,6 +35,8 @@ gUnk_087EA138 = 0x087EA138;
 gUnk_087EA33C = 0x087EA33C;
 gUnk_087EA368 = 0x087EA368;
 gUnk_087EA38C = 0x087EA38C;
+gUnk_087ED5CC = 0x087ED5CC;    /* u32 数据表 (sub_801CBA4 tail 用) */
+gUnk_087ED5F8 = 0x087ED5F8;    /* u32 数据表 (sub_801CBA4 tail 用) */
 gUnk_087EA394 = 0x087EA394;
 gUnk_087EB1F4 = 0x087EB1F4;
 gUnk_087EB214 = 0x087EB214;
@@ -57,6 +61,7 @@ gUnk_08393A3C = 0x08393A3C;
 gUnk_08393A40 = 0x08393A40;
 gUnk_08393B28 = 0x08393B28;
 gUnk_08393B28_entries = 0x08393B28;   /* 同址别名: u16 视图 (offset 0x10 字段, sub_804D1B4) */
+gUnk_083988A8 = 0x083988A8;    /* 24-byte 动画条目表 (sub_801CBA4 用) */
 gUnk_0839D5BC = 0x0839D5BC;
 gUnk_0839DBF6 = 0x0839DBF6;
 gUnk_03000730_arr = 0x03000730;

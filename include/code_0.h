@@ -407,7 +407,7 @@ void DialogCtx_Clear3();
 void sub_801933C();
 void sub_80196D4();
 void DialogCtx_SetPair(u32, u32, u32, u32, u32);
-void sub_8019784();
+void BattleFx_UpdateTable();
 void sub_80199E0();
 void sub_8019AD0(u8, u16);
 void sub_8019B98();
@@ -1020,7 +1020,7 @@ void sub_80512C4();
 void sub_80513A0();
 void sub_805144C();
 u32 Op_OpenWindow(u32 *);
-void sub_8051AEC();
+s16 sub_8051AEC(s16, s16, s16, s16, u8);  /** 同 sub_801768C 插值家族: 第5参必须 u8 (switch 内 cast (s8)); 结果复用 arg1 做累加器 (default 路径 r0=arg1 直达尾部) **/
 void sub_8051BE4();
 u16 Script_GetFlags();
 void Script_ResetVM();

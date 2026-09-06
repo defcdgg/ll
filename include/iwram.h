@@ -239,6 +239,8 @@ extern u8 gUnk_03000825;
 extern u16 gUnk_03000826;
 extern u8 gUnk_03000828;
 extern u8 gUnk_03000829;
+extern u8 gUnk_03000830[]; ///< 0xC 字节 ID 缓冲 (0x830..0x83B), sub_80489E8 的输出表
+extern u8 gUnk_0300083C;  ///< 上表的项数
 extern u8 gUnk_0300083D;
 extern u8 *gUnk_03000840;
 extern u8 gUnk_03000844;

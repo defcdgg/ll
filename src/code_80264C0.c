@@ -139,7 +139,83 @@ INCLUDE_ASM("asm/nonmatchings", sub_802DA78);
 // @ 0x0802DE04
 INCLUDE_ASM("asm/nonmatchings", sub_802DE04);
 // @ 0x0802DFDC
-INCLUDE_ASM("asm/nonmatchings", sub_802DFDC);
+struct ObjFadeSeq {
+    u8 pad0[0xB4];
+    u16 f_b4;
+    u16 f_b6;
+};
+
+u32 sub_802DFDC(u8 *arg)
+{
+    u32 ret;
+    u16 keys;
+
+    ret = 0;
+    sub_80187E8();
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000828 = arg[0xBF];
+            gUnk_03000829 = arg[0xC0];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            gUnk_03000824 = arg[0x35];
+            sub_80444A4(arg);
+            sub_801CE80(arg, 5, 0x1B4, 0xC, 1);
+            sub_803F5B4(arg);
+            gUnk_03000825 = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 2;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0;
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (*(u16 *)&arg[0x28] > 0x46)
+            {
+                sub_8020CC4(arg, 0xB9, 0x78, 0x2E0, 0xE, 0x2F9, 5);
+                gUnk_03000820 = 0x14;
+            }
+            break;
+        case 20:
+            keys = *(u16 *)&arg[0x54] & 0x800;
+            if (keys != 0)
+                break;
+            sub_8044514(0x5A);
+            gUnk_03000825 = keys;
+            gUnk_03000820 = 0x15;
+            break;
+        case 21:
+            if (sub_80471AC() == 0)
+                gUnk_03000820 = 0x16;
+            if ((*(u16 *)&arg[0x24] & 0x1000) == 0)
+                break;
+            *(u16 *)&arg[0x24] = (*(u16 *)&arg[0x24] & 0xEFFF) | 0x100;
+            break;
+        case 22:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_801CE80(arg, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+            break;
+        case 23:
+            if (!(*(u16 *)&arg[0x54] & 0x1000))
+                break;
+            keys = *(u16 *)&arg[0xB0] & 0xDFFF;
+            *(u16 *)&arg[0xB0] = keys;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && gUnk_03000856 == 0)
+                ret = 1;
+            break;
+    }
+    sub_803F658(arg);
+    gUnk_03000825 += 1;
+    return ret;
+}
 // @ 0x0802E234
 INCLUDE_ASM("asm/nonmatchings", sub_802E234);
 // @ 0x0802E49C
@@ -153,7 +229,77 @@ INCLUDE_ASM("asm/nonmatchings", sub_802EDD8);
 // @ 0x0802F100
 INCLUDE_ASM("asm/nonmatchings", sub_802F100);
 // @ 0x0802F480
-INCLUDE_ASM("asm/nonmatchings", sub_802F480);
+u32 sub_802F480(u8 *arg)
+{
+    u32 ret;
+    u16 keys;
+
+    ret = 0;
+    sub_80187E8();
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000828 = arg[0xBF];
+            gUnk_03000829 = arg[0xC0];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            gUnk_03000824 = arg[0x35];
+            sub_80444A4(arg);
+            sub_801CE80(arg, 5, 0x1B4, 0xC, 1);
+            sub_803F5B4(arg);
+            gUnk_03000825 = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 2;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0;
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (*(u16 *)&arg[0x28] > 0x46)
+            {
+                sub_8020CC4(arg, 0xB9, 0x78, 0x2E0, 0xE, 0x2F9, 5);
+                gUnk_03000820 = 0x14;
+            }
+            break;
+        case 20:
+            keys = *(u16 *)&arg[0x54] & 0x800;
+            if (keys != 0)
+                break;
+            sub_8044514(0x5A);
+            gUnk_03000825 = keys;
+            gUnk_03000820 = 0x15;
+            break;
+        case 21:
+            if (sub_80471AC() == 0)
+                gUnk_03000820 = 0x16;
+            if ((*(u16 *)&arg[0x24] & 0x1000) == 0)
+                break;
+            *(u16 *)&arg[0x24] = (*(u16 *)&arg[0x24] & 0xEFFF) | 0x100;
+            break;
+        case 22:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_801CE80(arg, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+            break;
+        case 23:
+            if (!(*(u16 *)&arg[0x54] & 0x1000))
+                break;
+            keys = *(u16 *)&arg[0xB0] & 0xDFFF;
+            *(u16 *)&arg[0xB0] = keys;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && gUnk_03000856 == 0)
+                ret = 1;
+            break;
+    }
+    sub_803F658(arg);
+    gUnk_03000825 += 1;
+    return ret;
+}
 // @ 0x0802F6D8
 INCLUDE_ASM("asm/nonmatchings", sub_802F6D8);
 // @ 0x0802F9EC
@@ -165,7 +311,77 @@ INCLUDE_ASM("asm/nonmatchings", sub_803029C);
 // @ 0x08030664
 INCLUDE_ASM("asm/nonmatchings", sub_8030664);
 // @ 0x080309B0
-INCLUDE_ASM("asm/nonmatchings", sub_80309B0);
+u32 sub_80309B0(u8 *arg)
+{
+    u32 ret;
+    u16 keys;
+
+    ret = 0;
+    sub_80187E8();
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000828 = arg[0xBF];
+            gUnk_03000829 = arg[0xC0];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            gUnk_03000824 = arg[0x35];
+            sub_80444A4(arg);
+            sub_801CE80(arg, 5, 0x1B4, 0xC, 1);
+            sub_803F5B4(arg);
+            gUnk_03000825 = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 2;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0;
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (*(u16 *)&arg[0x28] > 0x46)
+            {
+                sub_8020CC4(arg, 0xB9, 0x78, 0x2E0, 0xE, 0x2F9, 5);
+                gUnk_03000820 = 0x14;
+            }
+            break;
+        case 20:
+            keys = *(u16 *)&arg[0x54] & 0x800;
+            if (keys != 0)
+                break;
+            sub_8044514(0x5A);
+            gUnk_03000825 = keys;
+            gUnk_03000820 = 0x15;
+            break;
+        case 21:
+            if (sub_80471AC() == 0)
+                gUnk_03000820 = 0x16;
+            if ((*(u16 *)&arg[0x24] & 0x1000) == 0)
+                break;
+            *(u16 *)&arg[0x24] = (*(u16 *)&arg[0x24] & 0xEFFF) | 0x100;
+            break;
+        case 22:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_801CE80(arg, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+            break;
+        case 23:
+            if (!(*(u16 *)&arg[0x54] & 0x1000))
+                break;
+            keys = *(u16 *)&arg[0xB0] & 0xDFFF;
+            *(u16 *)&arg[0xB0] = keys;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && gUnk_03000856 == 0)
+                ret = 1;
+            break;
+    }
+    sub_803F658(arg);
+    gUnk_03000825 += 1;
+    return ret;
+}
 // @ 0x08030C08
 u8 sub_8030C08(u8 *obj)
 {
@@ -1295,31 +1511,916 @@ u32 sub_8034440(u8 *arg)
 }
 */
 // @ 0x080345AC
-INCLUDE_ASM("asm/nonmatchings", sub_80345AC);
+u32 sub_80345AC(u8 *arg)
+{
+    u32 ret;
+    u32 zero;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            sub_8020DE4();
+            gUnk_03000820 = 1;
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x386, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0x3E, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            zero = 0;
+            *(u16 *)&arg[0x24] = keys;
+            sub_801CBA4(arg, zero, gUnk_03000822, gUnk_03000824, zero);
+            gUnk_03000820 = 6;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 8;
+            break;
+        case 8:
+            if (sub_801EEE4(arg, GetObjPool(), 0, 0xB, 0x1E) == 1)
+                gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    return ret;
+}
 // @ 0x08034718
-INCLUDE_ASM("asm/nonmatchings", sub_8034718);
+u32 sub_8034718(u8 *arg, u8 *arg1)
+{
+    u32 ret;
+    u32 zero;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            sub_8048B30(0, 0x1E, 0x3AD);
+            gUnk_03000820 = 1;
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x386, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0x3E, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            zero = 0;
+            *(u16 *)&arg[0x24] = keys;
+            sub_801CBA4(arg, zero, gUnk_03000822, gUnk_03000824, zero);
+            gUnk_03000820 = 6;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 0x12;
+            break;
+        case 0x12:
+            if (sub_80476DC(arg, arg1) == 1)
+                gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    return ret;
+}
 // @ 0x080348A8
-INCLUDE_ASM("asm/nonmatchings", sub_80348A8);
+u32 sub_80348A8(u8 *arg)
+{
+    u32 ret;
+    u32 pool;
+    u8 i;
+    u8 *ptr;
+    u32 zero;
+    u16 keys;
+
+    ret = 0;
+    pool = GetObjPool();
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000820 = 1;
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            gUnk_0300083C = sub_80489E8((u8 *)pool, gUnk_03000830, 1, 0x7F);
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x386, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0x3E, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            zero = 0;
+            *(u16 *)&arg[0x24] = keys;
+            sub_801CBA4(arg, zero, gUnk_03000822, gUnk_03000824, zero);
+            gUnk_03000820 = 6;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            if (sub_80187B4() & 0x220)
+                gUnk_03000820 = 9;
+            else
+                gUnk_03000820 = 0x18;
+            break;
+        case 24:
+            sub_8020CC4(arg, 0x3C, 0x73, 0x1B4, 0xE, 0x37F, 0x14);
+            arg[0x66] = 0;
+            sub_801A2AC(0x410, 0, 7);
+            gUnk_03000820 = 0x19;
+            break;
+        case 25:
+            if (*(u16 *)&arg[0x54] & 0x800)
+                break;
+            Sfx_Play(0xA5, 0, 0);
+            gUnk_03000820 = 0x1A;
+            break;
+        case 26:
+            if (!(*(u16 *)&arg[0x54] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x65], sub_801B954((void **)(arg + 0x3C)));
+            sub_8020CC4(arg, 0x3C, 0x73, 0x1B4, 0xE, 0x380, 0x114);
+            gUnk_03000825 = 0;
+            gUnk_03000820 = 0x1B;
+            break;
+        case 27:
+            if (*(u16 *)&arg[0x54] & 0x800)
+                break;
+            for (i = 0; i < gUnk_0300083C; i++)
+            {
+                ptr = (u8 *)(pool + gUnk_03000830[i] * 0xC8);
+                ptr[0xBE] = 0xFF;
+                ptr[0xAB] = 7;
+                sub_80207A4();
+            }
+            gUnk_03000820 = 0x1C;
+            break;
+        case 28:
+            if (gUnk_03000825 <= 0x27)
+                gUnk_03000825 += 1;
+            else
+            {
+                keys = *(u16 *)&arg[0x54] & 0xFEFF;
+                *(u16 *)&arg[0x54] = keys;
+                gUnk_03000820 = 0x1D;
+            }
+            break;
+        case 29:
+            if (!(*(u16 *)&arg[0x54] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x65], sub_801B954((void **)(arg + 0x3C)));
+            keys = *(u16 *)&arg[0xB0] & 0xDFFF;
+            *(u16 *)&arg[0xB0] = keys;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    return ret;
+}
 // @ 0x08034BFC
-INCLUDE_ASM("asm/nonmatchings", sub_8034BFC);
+u32 sub_8034BFC(u8 *arg)
+{
+    u32 ret;
+    u32 pool;
+    u8 buf[8];
+    u8 i;
+    u8 count;
+    u32 zero;
+    u16 keys;
+
+    ret = 0;
+    pool = GetObjPool();
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000820 = 1;
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x386, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0x3E, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            zero = 0;
+            *(u16 *)&arg[0x24] = keys;
+            sub_801CBA4(arg, zero, gUnk_03000822, gUnk_03000824, zero);
+            gUnk_03000820 = 6;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 8;
+            break;
+        case 8:
+            count = sub_80489E8((u8 *)pool, buf, 1, 7);
+            for (i = 0; i < count; i++)
+            {
+                if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+                    sub_8045F94(pool + buf[i] * 0xC8, 3);
+            }
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    return ret;
+}
 // @ 0x08034D94
-INCLUDE_ASM("asm/nonmatchings", sub_8034D94);
+u32 sub_8034D94(u8 *arg)
+{
+    u32 ret;
+    u32 zero;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            sub_8020DE4();
+            gUnk_03000820 = 1;
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x386, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0x3E, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            zero = 0;
+            *(u16 *)&arg[0x24] = keys;
+            sub_801CBA4(arg, zero, gUnk_03000822, gUnk_03000824, zero);
+            gUnk_03000820 = 6;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 8;
+            break;
+        case 8:
+            if (sub_801EEE4(arg, GetObjPool(), 1, 0, 0x3C) == 1)
+                gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    return ret;
+}
 // @ 0x08034F00
-INCLUDE_ASM("asm/nonmatchings", sub_8034F00);
+u32 sub_8034F00(u8 *arg)
+{
+    u32 ret;
+    u32 zero;
+    u8 v56;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            sub_80444A4(arg);
+            sub_803F5B4(arg);
+            gUnk_03000820 = 1;
+            zero = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 0x38B;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0x23;
+            gUnk_03000825 = zero;
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x387, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0xA5, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            *(u16 *)&arg[0x24] = keys;
+            sub_8020974(arg + 0xC, 0x388, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            sub_8044514(0x32);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_80471AC() == 0)
+            {
+                Sfx_Play(0x66, 1, 0);
+                gUnk_03000820 = 0x14;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 20:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && (v56 = gUnk_03000856) == 0)
+            {
+                sub_801CBA4(arg, 0, gUnk_03000822, gUnk_03000824, v56);
+                gUnk_03000820 = 6;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 1;
+            break;
+    }
+    sub_803F658(arg);
+    return ret;
+}
 // @ 0x08035130
-INCLUDE_ASM("asm/nonmatchings", sub_8035130);
+u32 sub_8035130(u8 *arg)
+{
+    u32 ret;
+    u32 zero;
+    u8 v56;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            sub_80444A4(arg);
+            sub_803F5B4(arg);
+            gUnk_03000820 = 1;
+            zero = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 0x38C;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0x14;
+            gUnk_03000825 = zero;
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x387, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0xA5, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            *(u16 *)&arg[0x24] = keys;
+            sub_8020974(arg + 0xC, 0x388, 0x1B4, 0xD, 2);
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            sub_8044514(0x32);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_80471AC() == 0)
+            {
+                Sfx_Play(0x66, 1, 0);
+                gUnk_03000820 = 0x14;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 20:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && (v56 = gUnk_03000856) == 0)
+            {
+                sub_801CBA4(arg, 0, gUnk_03000822, gUnk_03000824, v56);
+                gUnk_03000820 = 6;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 1;
+            break;
+    }
+    sub_803F658(arg);
+    return ret;
+}
 // @ 0x08035360
 INCLUDE_ASM("asm/nonmatchings", sub_8035360);
 // @ 0x0803586C
-INCLUDE_ASM("asm/nonmatchings", sub_803586C);
+u32 sub_803586C(u8 *arg)
+{
+    u32 ret;
+    u32 pool;
+    u8 i;
+    u32 zero;
+    u8 v56;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            sub_80444A4(arg);
+            sub_803F5B4(arg);
+            gUnk_03000820 = 1;
+            zero = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 0x392;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0x23;
+            gUnk_03000825 = zero;
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x387, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0xA5, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            *(u16 *)&arg[0x24] = keys;
+            sub_8020974(arg + 0xC, 0x388, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            sub_8044514(0x32);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_80471AC() == 0)
+            {
+                Sfx_Play(0x66, 1, 0);
+                gUnk_03000820 = 0x14;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 20:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && (v56 = gUnk_03000856) == 0)
+            {
+                sub_801CBA4(arg, 0, gUnk_03000822, gUnk_03000824, v56);
+                gUnk_03000820 = 6;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            pool = GetObjPool();
+            for (i = 0; i < gUnk_0300083D; i++)
+            {
+                if ((gUnk_03000840[i] & 0xF0) == 0x10)
+                {
+                    if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+                        sub_8045F94(pool + (gUnk_03000840[i] & 0xF) * 0xC8, 2);
+                }
+            }
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    sub_803F658(arg);
+    return ret;
+}
 // @ 0x08035B04
-INCLUDE_ASM("asm/nonmatchings", sub_8035B04);
+u32 sub_8035B04(u8 *arg)
+{
+    u32 ret;
+    u32 pool;
+    u8 i;
+    u32 zero;
+    u8 v56;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            sub_80444A4(arg);
+            sub_803F5B4(arg);
+            gUnk_03000820 = 1;
+            zero = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 0x393;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0x23;
+            gUnk_03000825 = zero;
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x387, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0xA5, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            *(u16 *)&arg[0x24] = keys;
+            sub_8020974(arg + 0xC, 0x388, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            sub_8044514(0x32);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_80471AC() == 0)
+            {
+                Sfx_Play(0x66, 1, 0);
+                gUnk_03000820 = 0x14;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 20:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && (v56 = gUnk_03000856) == 0)
+            {
+                sub_801CBA4(arg, 0, gUnk_03000822, gUnk_03000824, v56);
+                gUnk_03000820 = 6;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            pool = GetObjPool();
+            for (i = 0; i < gUnk_0300083D; i++)
+            {
+                if ((gUnk_03000840[i] & 0xF0) == 0x10)
+                {
+                    if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+                        sub_8045F94(pool + (gUnk_03000840[i] & 0xF) * 0xC8, 3);
+                }
+            }
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    sub_803F658(arg);
+    return ret;
+}
 // @ 0x08035D9C
-INCLUDE_ASM("asm/nonmatchings", sub_8035D9C);
+u32 sub_8035D9C(u8 *arg)
+{
+    u32 ret;
+    u32 pool;
+    u8 i;
+    u32 zero;
+    u8 v56;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            sub_80444A4(arg);
+            sub_803F5B4(arg);
+            gUnk_03000820 = 1;
+            zero = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 0x394;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0x23;
+            gUnk_03000825 = zero;
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x387, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0xA5, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            *(u16 *)&arg[0x24] = keys;
+            sub_8020974(arg + 0xC, 0x388, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            sub_8044514(0x32);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_80471AC() == 0)
+            {
+                Sfx_Play(0x66, 1, 0);
+                gUnk_03000820 = 0x14;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 20:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && (v56 = gUnk_03000856) == 0)
+            {
+                sub_801CBA4(arg, 0, gUnk_03000822, gUnk_03000824, v56);
+                gUnk_03000820 = 6;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            pool = GetObjPool();
+            for (i = 0; i < gUnk_0300083D; i++)
+            {
+                if ((gUnk_03000840[i] & 0xF0) == 0x10)
+                {
+                    if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+                        sub_8045F94(pool + (gUnk_03000840[i] & 0xF) * 0xC8, 5);
+                }
+            }
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    sub_803F658(arg);
+    return ret;
+}
 // @ 0x08036034
-INCLUDE_ASM("asm/nonmatchings", sub_8036034);
+u32 sub_8036034(u8 *arg)
+{
+    u32 ret;
+    u32 pool;
+    u8 i;
+    u32 zero;
+    u8 v56;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            sub_80444A4(arg);
+            sub_803F5B4(arg);
+            gUnk_03000820 = 1;
+            zero = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 0x395;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0x23;
+            gUnk_03000825 = zero;
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x387, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0xA5, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            *(u16 *)&arg[0x24] = keys;
+            sub_8020974(arg + 0xC, 0x388, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            sub_8044514(0x32);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_80471AC() == 0)
+            {
+                Sfx_Play(0x66, 1, 0);
+                gUnk_03000820 = 0x14;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 20:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && (v56 = gUnk_03000856) == 0)
+            {
+                sub_801CBA4(arg, 0, gUnk_03000822, gUnk_03000824, v56);
+                gUnk_03000820 = 6;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            pool = GetObjPool();
+            for (i = 0; i < gUnk_0300083D; i++)
+            {
+                if ((gUnk_03000840[i] & 0xF0) == 0x10)
+                {
+                    if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+                        sub_8045F94(pool + (gUnk_03000840[i] & 0xF) * 0xC8, 6);
+                }
+            }
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    sub_803F658(arg);
+    return ret;
+}
 // @ 0x080362CC
-INCLUDE_ASM("asm/nonmatchings", sub_80362CC);
+u32 sub_80362CC(u8 *arg)
+{
+    u32 ret;
+    u32 pool;
+    u8 i;
+    u32 zero;
+    u8 v56;
+    u16 keys;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+        case 0:
+            gUnk_03000824 = arg[0x35];
+            gUnk_03000822 = *(u16 *)&arg[0x2A];
+            sub_80444A4(arg);
+            sub_803F5B4(arg);
+            gUnk_03000820 = 1;
+            zero = 0;
+            ((struct ObjFadeSeq *)arg)->f_b6 = 0x396;
+            ((struct ObjFadeSeq *)arg)->f_b4 = 0x23;
+            gUnk_03000825 = zero;
+            break;
+        case 1:
+            sub_8020974(arg + 0xC, 0x387, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 2;
+            break;
+        case 2:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            Sfx_Play(0xA5, 1, 0);
+            gUnk_03000820 = 5;
+            break;
+        case 5:
+            if (!(*(u16 *)&arg[0x24] & 0x1000))
+                break;
+            sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+            keys = *(u16 *)&arg[0x24] & 0xEFFF;
+            *(u16 *)&arg[0x24] = keys;
+            sub_8020974(arg + 0xC, 0x388, 0x1B4, 0xC, 2);
+            gUnk_03000820 = 0x12;
+            break;
+        case 18:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            sub_8044514(0x32);
+            gUnk_03000820 = 0x13;
+            break;
+        case 19:
+            if (sub_80471AC() == 0)
+            {
+                Sfx_Play(0x66, 1, 0);
+                gUnk_03000820 = 0x14;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 20:
+            if (gUnk_03000844 == 0 && gUnk_03000845 == 0 && (v56 = gUnk_03000856) == 0)
+            {
+                sub_801CBA4(arg, 0, gUnk_03000822, gUnk_03000824, v56);
+                gUnk_03000820 = 6;
+            }
+            gUnk_03000825 += 1;
+            break;
+        case 6:
+            if (*(u16 *)&arg[0x24] & 0x800)
+                break;
+            gUnk_03000820 = 9;
+            break;
+        case 9:
+            pool = GetObjPool();
+            for (i = 0; i < gUnk_0300083D; i++)
+            {
+                if ((gUnk_03000840[i] & 0xF0) == 0x10)
+                {
+                    if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x13)
+                        sub_8045F94(pool + (gUnk_03000840[i] & 0xF) * 0xC8, 4);
+                }
+            }
+            sub_8045B90(arg, arg[0xA1]);
+            ret = 2;
+            break;
+    }
+    sub_803F658(arg);
+    return ret;
+}
 // @ 0x08036564
 INCLUDE_ASM("asm/nonmatchings", sub_8036564);
 // @ 0x080368FC
@@ -1337,17 +2438,331 @@ INCLUDE_ASM("asm/nonmatchings", sub_8037868);
 // @ 0x08037C40
 INCLUDE_ASM("asm/nonmatchings", sub_8037C40);
 // @ 0x08037E14
-INCLUDE_ASM("asm/nonmatchings", sub_8037E14);
+u32 sub_8037E14(u8 *obj)
+{
+    u32 ret;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        sub_8020DE4();
+        gUnk_03000820 = 0x12;
+        gUnk_03000824 = obj[0x35];
+        gUnk_03000822 = *(u16 *)(obj + 0x2A);
+        break;
+    case 18:
+        sub_8020974(obj + 0xC, 0x3B9, 0x1B4, 0xC, 2);
+        gUnk_03000820 = 0x13;
+        break;
+    case 19:
+        if (*(u16 *)&obj[0x24] & 0x800)
+            break;
+        Sfx_Play(0x3E, 1, 0);
+        gUnk_03000820 = 0x14;
+        break;
+    case 20:
+        if (!(*(u16 *)&obj[0x24] & 0x1000))
+            break;
+        sub_804C3A4(obj[0x35], sub_801B954((void **)(obj + 0xC)));
+        *(u16 *)&obj[0x24] &= 0xEFFF;
+        sub_8020974(obj + 0xC, 0x3BA, 0x1B4, 0xC, 2);
+        gUnk_03000820 = 0x15;
+        break;
+    case 21:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 0x16;
+        break;
+    case 22:
+        if (sub_801EEE4(obj, GetObjPool(), 0, 0, 0x3C) == 1)
+        {
+            sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+        }
+        break;
+    case 23:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 9;
+        break;
+    case 9:
+        sub_8045B90(obj, obj[0xA1]);
+        ret = 2;
+        break;
+    }
+    return ret;
+}
 // @ 0x08037FE8
-INCLUDE_ASM("asm/nonmatchings", sub_8037FE8);
+u32 sub_8037FE8(u8 *obj)
+{
+    u32 ret;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        sub_8020DE4();
+        gUnk_03000820 = 0x12;
+        gUnk_03000824 = obj[0x35];
+        gUnk_03000822 = *(u16 *)(obj + 0x2A);
+        break;
+    case 18:
+        sub_8020974(obj + 0xC, 0x3B9, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x13;
+        break;
+    case 19:
+        if (*(u16 *)&obj[0x24] & 0x800)
+            break;
+        Sfx_Play(0x3E, 1, 0);
+        gUnk_03000820 = 0x14;
+        break;
+    case 20:
+        if (!(*(u16 *)&obj[0x24] & 0x1000))
+            break;
+        sub_804C3A4(obj[0x35], sub_801B954((void **)(obj + 0xC)));
+        *(u16 *)&obj[0x24] &= 0xEFFF;
+        sub_8020974(obj + 0xC, 0x3BA, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x15;
+        break;
+    case 21:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 0x16;
+        break;
+    case 22:
+        if (sub_801EEE4(obj, GetObjPool(), 1, 0, 0x28) == 1)
+        {
+            sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+        }
+        break;
+    case 23:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 9;
+        break;
+    case 9:
+        sub_8045B90(obj, obj[0xA1]);
+        ret = 2;
+        break;
+    }
+    return ret;
+}
 // @ 0x080381BC
-INCLUDE_ASM("asm/nonmatchings", sub_80381BC);
+u32 sub_80381BC(u8 *obj)
+{
+    u32 ret;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        sub_8020DE4();
+        gUnk_03000820 = 0x12;
+        gUnk_03000824 = obj[0x35];
+        gUnk_03000822 = *(u16 *)(obj + 0x2A);
+        break;
+    case 18:
+        sub_8020974(obj + 0xC, 0x3B9, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x13;
+        break;
+    case 19:
+        if (*(u16 *)&obj[0x24] & 0x800)
+            break;
+        Sfx_Play(0x3E, 1, 0);
+        gUnk_03000820 = 0x14;
+        break;
+    case 20:
+        if (!(*(u16 *)&obj[0x24] & 0x1000))
+            break;
+        sub_804C3A4(obj[0x35], sub_801B954((void **)(obj + 0xC)));
+        *(u16 *)&obj[0x24] &= 0xEFFF;
+        sub_8020974(obj + 0xC, 0x3BA, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x15;
+        break;
+    case 21:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 0x16;
+        break;
+    case 22:
+        if (sub_801EEE4(obj, GetObjPool(), 1, 0xC, 0x1E) == 1)
+        {
+            sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+        }
+        break;
+    case 23:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 9;
+        break;
+    case 9:
+        sub_8045B90(obj, obj[0xA1]);
+        ret = 2;
+        break;
+    }
+    return ret;
+}
 // @ 0x08038390
-INCLUDE_ASM("asm/nonmatchings", sub_8038390);
+u32 sub_8038390(u8 *obj)
+{
+    u32 ret;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        sub_8020DE4();
+        gUnk_03000820 = 0x12;
+        gUnk_03000824 = obj[0x35];
+        gUnk_03000822 = *(u16 *)(obj + 0x2A);
+        break;
+    case 18:
+        sub_8020974(obj + 0xC, 0x3B9, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x13;
+        break;
+    case 19:
+        if (*(u16 *)&obj[0x24] & 0x800)
+            break;
+        Sfx_Play(0x3E, 1, 0);
+        gUnk_03000820 = 0x14;
+        break;
+    case 20:
+        if (!(*(u16 *)&obj[0x24] & 0x1000))
+            break;
+        sub_804C3A4(obj[0x35], sub_801B954((void **)(obj + 0xC)));
+        *(u16 *)&obj[0x24] &= 0xEFFF;
+        sub_8020974(obj + 0xC, 0x3BA, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x15;
+        break;
+    case 21:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 0x16;
+        break;
+    case 22:
+        if (sub_801EEE4(obj, GetObjPool(), 0, 0, 0x3E7) == 1)
+        {
+            sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+        }
+        break;
+    case 23:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 9;
+        break;
+    case 9:
+        sub_8045B90(obj, obj[0xA1]);
+        ret = 2;
+        break;
+    }
+    return ret;
+}
 // @ 0x08038568
-INCLUDE_ASM("asm/nonmatchings", sub_8038568);
+u32 sub_8038568(u8 *arg, u8 *arg1)
+{
+    u32 ret;
+    u16 t1;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        sub_8020DE4();
+        gUnk_03000820 = 0x12;
+        gUnk_03000824 = arg[0x35];
+        gUnk_03000822 = *(u16 *)(arg + 0x2A);
+        break;
+    case 18:
+        sub_8020974(arg + 0xC, 0x3B9, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x13;
+        break;
+    case 19:
+        if (*(u16 *)&arg[0x24] & 0x800)
+            break;
+        Sfx_Play(0x3E, 1, 0);
+        gUnk_03000820 = 0x14;
+        break;
+    case 20:
+        if (!(*(u16 *)&arg[0x24] & 0x1000))
+            break;
+        sub_804C3A4(arg[0x35], sub_801B954((void **)(arg + 0xC)));
+        *(u16 *)&arg[0x24] &= 0xEFFF;
+        sub_8020974(arg + 0xC, 0x3BA, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x15;
+        break;
+    case 21:
+        if (!(*(u16 *)&arg[0x24] & 0x800))
+            gUnk_03000820 = 0x16;
+        break;
+    case 22:
+        t1 = *(u16 *)(arg1 + 0x6E) / 3;
+        if (sub_801EEE4(arg, GetObjPool(), 0, 0xA, t1) == 1)
+        {
+            sub_801CBA4(arg, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+        }
+        break;
+    case 23:
+        if (!(*(u16 *)&arg[0x24] & 0x800))
+            gUnk_03000820 = 9;
+        break;
+    case 9:
+        sub_8045B90(arg, arg[0xA1]);
+        ret = 2;
+        break;
+    }
+    return ret;
+}
 // @ 0x0803874C
-INCLUDE_ASM("asm/nonmatchings", sub_803874C);
+u32 sub_803874C(u8 *obj)
+{
+    u32 ret;
+
+    ret = 0;
+    switch (gUnk_03000820)
+    {
+    case 0:
+        sub_8020DE4();
+        gUnk_03000820 = 0x12;
+        gUnk_03000824 = obj[0x35];
+        gUnk_03000822 = *(u16 *)(obj + 0x2A);
+        break;
+    case 18:
+        sub_8020974(obj + 0xC, 0x3B9, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x13;
+        break;
+    case 19:
+        if (*(u16 *)&obj[0x24] & 0x800)
+            break;
+        Sfx_Play(0x3E, 1, 0);
+        gUnk_03000820 = 0x14;
+        break;
+    case 20:
+        if (!(*(u16 *)&obj[0x24] & 0x1000))
+            break;
+        sub_804C3A4(obj[0x35], sub_801B954((void **)(obj + 0xC)));
+        *(u16 *)&obj[0x24] &= 0xEFFF;
+        sub_8020974(obj + 0xC, 0x3BA, 0x1B4, 0xD, 2);
+        gUnk_03000820 = 0x15;
+        break;
+    case 21:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 0x16;
+        break;
+    case 22:
+        if (sub_801EEE4(obj, GetObjPool(), 0, 0xB, 0x1E) == 1)
+        {
+            sub_801CBA4(obj, 0, gUnk_03000822, gUnk_03000824, 0);
+            gUnk_03000820 = 0x17;
+        }
+        break;
+    case 23:
+        if (!(*(u16 *)&obj[0x24] & 0x800))
+            gUnk_03000820 = 9;
+        break;
+    case 9:
+        sub_8045B90(obj, obj[0xA1]);
+        ret = 2;
+        break;
+    }
+    return ret;
+}
 // @ 0x08038920
 INCLUDE_ASM("asm/nonmatchings", sub_8038920);
 // @ 0x08038C84

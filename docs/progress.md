@@ -4304,3 +4304,166 @@ flags &= 0xFFEF; gUnk_03000889 = 0x15;` 直落终态; case0x15 只剩 `obj[0xBE]
 
 **字节定论**: 15×fncheck OK (各 404B, 23 池重定位施加, 7 bl 槽忽略); 全量 make exit=0 +
 SHA1 绿; 进度 716/1059 (67.6%)。code_80264C0 剩 45 个未匹配。
+
+## 2026-09-06 claude-8030D9C: sub_80345AC (717/1059)
+
+**✅ sub_80345AC (161行, code_80264C0)** — sub_8034440 (0x08034440, 2026-09-04 匹配) 的同族克隆:
+switch(gUnk_03000820) 状态机 case0/1/2/5/6/8/9, 全部指令/池/跳表逐条相同, **唯一差异 = case8 的
+`sub_801EEE4(arg, GetObjPool(), 0, 0xB, 0x1E)`**(8034440 是 `(..., 0, 0x32)`)。直接复制其真 C
+改两参 + 改名。语义: 事件演出状态机 (case0 备份 obj[0x35]/obj+0x2A → case1 演出请求 0x386/0x1B4
+→ case2 移动完成(bit11)后 Sfx_Play(0x3E) → case5 bit12 到位后 sub_804C3A4+清bit12+sub_801CBA4
+复位 → case6/8 等待窗口 (0xB 槽, 0x1E 帧超时?) → case9 sub_8045B90 收尾返回 2)。
+原型: code_0.h `void` → `u32 sub_80345AC();` (照 sub_8034440 K&R 先例, 仅返回类型)。
+permuter 0 (10 gUnk 池字符号化) + fndiff 0; fncheck OK 364B (与 8034440 完全对应);
+make exit=0 + SHA1 绿。
+
+## 2026-09-06 claude-8030D9C: sub_8034718 (718/1059)
+
+**✅ sub_8034718 (170行, code_80264C0)** — sub_8034440 同族但**双参**: `u32 sub_8034718(u8 *arg,
+u8 *arg1)` (r1 入口存 r2, 仅 case0x12 使用)。switch(gUnk_03000820) 19 态, case0/1/2/5/6/9/0x12
+有体。与 8034440 差异: ① case0 无 sub_8020DE4, 改调 `sub_8048B30(0, 0x1E, 0x3AD)`; ② case6
+跳 0x12 (非 8); ③ case0x12 = `if (sub_80476DC(arg, arg1) == 1) 进 9` (8034440 的 case8 是
+sub_801EEE4); ④ case9 同款收尾。case 源顺序必须 0x12 在 9 前 (目标布局)。
+
+**参数定型法**: sub_80476DC 未匹配, 但其体内 r6(=第二参)全程当对象指针用
+([r6+0xBF]/[r6+0x54]/[r6+0x2A]/sub_801CBA4(r6,...)) → arg1 是 u8*; 三个调用点
+(8034718/0x8037006/0x8037DA2 同族) 全是转发, 无独立佐证。
+
+**头原型**: `void sub_80476DC()` → `u8` (返回值 lsls/lsrs 截断后 cmp #1 被消费;
+同 sub_801EEE4 void→u8 先例, 另两个调用点还在 INCLUDE_ASM 里不受影响)。
+permuter 0 (10 gUnk 池字符号化) + fndiff 0; fncheck OK 400B (20 池重定位); make exit=0 + SHA1 绿。
+
+## 2026-09-06 glm5-8037E14: sub_8037E14 (719/1059)
+
+**✅ sub_8037E14 (198行, code_80264C0)** — sub_8034440 同族状态机: `u32 sub_8037E14(u8 *obj)`,
+switch(gUnk_03000820) 24 态, case 0/9/18/19/20/21/22/23 有体。流程: case0 sub_8020DE4 → 0x12 →
+case18 `sub_8020974(obj+0xC, 0x3B9, 0x1B4, 0xC, 2)` → 0x13 → case19 !(keys&0x800) 时
+Sfx_Play(0x3E,1,0) → 0x14 → case20 (keys&0x1000) 时 `sub_804C3A4(obj[0x35], sub_801B954(obj+0xC))`
++ `keys &= 0xEFFF` + `sub_8020974(obj+0xC, 0x3BA, 0x1B4, 0xC, 2)` → 0x15 → case21 → 0x16 →
+case22 `sub_801EEE4(obj, GetObjPool(), 0, 0, 0x3C)==1` 时 sub_801CBA4 → 0x17 → case23 → 9 →
+case9 sub_8045B90 收尾返回 2。
+
+**头原型**: code_0.h `void sub_8037E14()` → `u32` (返回 r7, 照 sub_8034440 K&R 先例;
+src 无调用点, 零风险)。
+
+**踩坑复训**: 首次合入把 case 自作主张排成升序 (0,9,18..23) → fncheck FAIL 462B
+(经验 124: case 块源码顺序 = ROM 块发射顺序, GCC2 保序)。恢复已验源序 (0,18..23,9) 即 OK。
+候选阶段 bytecmp 差 40B 全部按 4 字节组落在 10 个 bl 槽 + mine.bin 尾部 148B 纯 veneer
+(基址 0 超 ±4MB), 与既有判据一致, 非真实差异。
+
+permuter 真 0 (10 个 gUnk 池字符号化, 经验 164/168 复用) + base.c 一次过无需探索;
+fncheck OK 466B (35 池重定位, 10 bl 槽忽略); make exit=0 + SHA1 绿。
+
+## 2026-09-06 glm5-8037FE8: sub_8037FE8 (720/1059)
+
+**✅ sub_8037FE8 (198行, code_80264C0)** — sub_8037E14 同族克隆, 全流程同上一条; 仅 3 处常量差:
+case18/20 `sub_8020974(obj+0xC, 0x3B9/0x3BA, 0x1B4, 0xD, 2)` (第4参 0xC→0xD), case22
+`sub_801EEE4(obj, GetObjPool(), 1, 0, 0x28)` (r2 0→1, 栈参 0x3C→0x28)。
+code_0.h `void`→`u32` (无调用点, 照先例)。
+套件搭法已熟: target.s 由 nonmatchings asm 换名生成 + 10 gUnk 池字符号化 (经验164/168)。
+permuter base score=0 一次过; bytecmp 对字面量 target.o 纯 10 bl 槽差 (⚠ 套件 target.o 是
+符号化版时, gUnk 池字会另计 30B 假差异, 判读要么换字面量版要么按 4 字节组归类);
+fncheck OK 466B; make exit=0 + SHA1 绿。
+
+## 2026-09-06 glm5-80381BC: sub_80381BC (721/1059)
+
+**✅ sub_80381BC (198行, code_80264C0)** — sub_8037FE8 同族克隆; 仅 case22 两处常量差:
+`sub_801EEE4(obj, GetObjPool(), 1, 0xC, 0x1E)` (r3 0→0xC, 栈参 0x28→0x1E)。
+code_0.h `void`→`u32` (无调用点)。permuter base score=0 一次过; fncheck OK 466B; SHA1 绿。
+
+**小坑自伤**: bytecmp 用了上一函数遗留的 /tmp 字面量 .s 改名拼 target (内容仍是 8037FE8 的
+字节), 多出 2B 差 — 恰为两函数仅有的常量差, 反向印证 base.c 正确; 用 80381BC 自己的
+nonmatchings asm 重拼后纯 10 bl 槽差。教训: 字面量 target 必须从本函数 asm 现拼, 勿跨函数复用 /tmp 中间物。
+
+## 2026-09-06 glm5-8038390: sub_8038390 (722/1059)
+
+**✅ sub_8038390 (199行, code_80264C0)** — sub_80381BC 同族克隆; 仅 case22 一处差:
+`sub_801EEE4(obj, GetObjPool(), 0, 0, 0x3E7)` (r2/r3 归 0, 栈参 999 超 movs 立即数域
+自动走字面池, C 直接写 0x3E7 即可)。code_0.h `void`→`u32` (无调用点)。
+permuter base score=0 一次过; bytecmp 纯 10 bl 槽差 (target 472B 多一池字);
+fncheck OK 470B; SHA1 绿。
+
+## 2026-09-06 claude-8030D9C: 8034BFC/80348A8 + 前批三函数 (727/1059)
+
+**✅ sub_8034D94 (161行)** = sub_8034440 克隆, case8 sub_801EEE4 参数 (0,0x32)→(1,0x3C)。
+**✅ sub_8035130 (243行)** = sub_8034F00 同构, case0 常量 0x38B/0x23→0x38C/0x14 (0x38C 可
+movs+lsls 合成故无池字, 0x38B 奇数需池 —— 编译器常量合成差异佐证两函数源码同构)。
+
+**✅ sub_8034F00 (243行, 21态)** — 尾部统一 sub_803F658(arg); case19/20 共享 gUnk_03000825++
+尾块 (state 存储跳转线程化合并)。三个新坑:
+① **常量半字 store 必须 struct 字段形式**: `*(u16*)(arg+0xB6) = 0x38B` 会多一条
+   `adds r0, r2` 拷贝; `((struct ObjFadeSeq *)arg)->f_b6 = 0x38B` 才直载 r0 (最小实验证明
+   struct 剪裁改变 store RTL; 库内先例 Sprite_SetupDialogArrow `sprNode->attr2 = 0x892`)。
+② **case20 的 CSE**: `if (... && (v56 = gUnk_03000856) == 0) { sub_801CBA4(..., v56); }`
+   赋值入条件让测试值存活作第 5 参, 免重载 (permuter 发现, 人工化保留)。
+③ **case 源顺序 = 目标布局序 0,1,2,5,18,19,20,6,9** (GCC2 不重排 case 体)。
+另 case0 的 `zero = 0; ... gUnk_03000825 = zero;` 命名临时把零物化提前 (同 8034440 case5 先例)。
+
+**✅ sub_8034BFC (184行, 10态)** — case8: 局部 `u8 buf[8]` + `sub_80489E8(pool, buf, 1, 7)`
+返回数 + `for (i=0; i<count; i++) if (((u32 (*)(void))Rng_LcgNext)() % 0x64 <= 0x27)
+sub_8045F94(pool + buf[i]*0xC8, 3)` (旋转循环形态, count 是寄存器局部)。一次成型。
+
+**✅ sub_80348A8 (382行, 30态最大)** — case0 把 sub_80489E8 结果写进**新登记全局**
+`gUnk_0300083C` (输出表 = 新登记 `gUnk_03000830[]`, 0x830..0x83B); case24/26 用 7 参
+sub_8020CC4 (0x37F/0x380, 0x114/0x14 差异); case27 遍历 gUnk_03000830[] 摘除对象
+(ptr[0xBE]=0xFF, ptr[0xAB]=7, sub_80207A4()); case28 计数 >0x27 后清 0x54&=0xFEFF 进 0x1D;
+case29 清 0xB0&=0xDFFF 落 9 (case6 的 else 经跳转线程化共享同一 state=9 存储)。
+坑① **case25 极性**: 目标是 bit11 **清零**→Sfx_Play(0xA5,0,0)+进 0x1A (与 case2 相反,
+与 0x54 字段语义"演出对象在场"相关)。坑② **case27 循环**: 直接 `*(u8*)(pool+...+0xBE)`
+会得到旋转循环+无拷贝算术; 改**命名指针** `ptr = (u8*)(pool + gUnk_03000830[i]*0xC8);
+ptr[0xBE]=0xFF; ptr[0xAB]=7;` 后 GCC2 出非旋转 for (init; b guard; body; incr; guard) +
+`adds r2,r1; adds r2,#0xbe` / `adds r1,#0xab` 增量寻址 —— 命名指针对象改变了循环旋转决策。
+
+**字节定论**: 5×fncheck OK (D94 364B / F00+5130 各 560B / BFC 408B / 48A8 852B);
+两批 make exit=0 + SHA1 绿; 进度 722→727/1059 (68.6%)。code_80264C0 剩 38 个未匹配。
+
+## 2026-09-06 glm5-8038568: sub_8038568 (728/1059)
+
+**✅ sub_8038568 (206行, code_80264C0)** — 同族**双参**版: `u32 sub_8038568(u8 *arg, u8 *arg1)`
+(照 sub_8034718 命名)。入口 arg1→r2、&gUnk_03000820→r3 (case21/23 `strb [r3]` 消费)。
+case22 有本族首个真除法: `t1 = *(u16 *)(arg1 + 0x6E) / 3;` + `sub_801EEE4(arg, GetObjPool(),
+0, 0xA, t1)` — `bl __udivsi3` + lsls/lsrs 0x10 截断。
+
+**关键**: t1 必须是**命名局部变量先除后调** (照 sub_8045A74 的 `t1=(u16)(*(u16*)(o+0x6e)/10)`
+先例)。首版把 `(u16)(.../3)` 内联进实参表 → GCC 把 GetObjPool 排到除法前, 且寄存器分配整体
+漂移 (arg1 驻 r5、&gUnk 驻 r2), base score 380; 改命名局部后 arg1 驻 r2、&gUnk 驻 r3, 全对齐,
+score 0。bytecmp 需给 `__udivsi3 = 0x08055d61;` 符号 (11 个 bl 槽)。
+code_0.h `void`→`u32` (无调用点)。fncheck OK 482B; SHA1 绿。
+
+## 2026-09-06 glm5-803874C: sub_803874C (729/1059)
+
+**✅ sub_803874C (198行, code_80264C0)** — sub_8038390 同族克隆; 仅 case22 两处常量差:
+`sub_801EEE4(obj, GetObjPool(), 0, 0xB, 0x1E)` (r3 0→0xB, 栈参 0x3E7→0x1E)。
+code_0.h `void`→`u32` (无调用点)。permuter base score=0 一次过; bytecmp 纯 10 bl 槽差;
+fncheck OK 466B; SHA1 绿。
+
+**本日战果**: 一口气收割 0x08037E14-0x0803874C 六连族 (8037E14/8037FE8/80381BC/8038390/
+8038568/803874C, 全部 729/1059)。族规律: 同一 24 态 switch(gUnk_03000820) 骨架, 差异仅在
+case18/20 的 sub_8020974 第4参 (0xC/0xD)、case22 的 sub_801EEE4 五参组合、以及 8038568 的
+双参+除法变体。经验 164/168 (target.s gUnk 池字符号化取真 0) 六连复用, 成熟管线。
+
+## 2026-09-06 claude-8030D9C: 克隆族收割批 (716→738/1059, 69.7%)
+
+相似度扫描 (.scratch/claude-8030D9C/famsim.py: 同模块规范化指令序列两两比对 + vs 已匹配模板)
+发现 13 个克隆簇 + 36 个模板相似对。本批收割:
+
+**✅ sub_804D708 (code_8044394)** = sub_804D310 纯克隆 (2行=标签), 池 0x08393B28 符号化。142B OK。
+**✅ 262行三连体 sub_802F480/802DFDC/80309B0 (code_80264C0)** — 24态 BGM 演出 (尾部
+sub_803F658+计数无条件); case0 备份 0xBF/C0 + sub_801CE80(obj,5,0x1B4,0xC,1) + 0xB6=2/0xB4=0
+(struct 形式); case19 sub_8020CC4(0xB9,0x78,0x2E0,0xE,0x2F9,5); case20 keys=0x54&0x800 复用;
+case21 flags=(&0xEFFF)|0x100; case9 三重测试 ret=1。**一次成型全 0** (三员逐指令全同)。
+老挂起 80309B0 借此终结。
+**✅ 294行五连体 sub_803586C/6034/5B04/5D9C/62CC** — F00 家族扩展 (0.873): case0 常量
+0x392-0x396 (5D9C 用 movs+lsls 合成 0x394), case1/5 第4参 0xC, case9 改对象遍历
+(gUnk_03000840[i]&0xF0==0x10 + Rng%0x64≤{0x27,0x13} → sub_8045F94(pool+(x&0xF)*0xC8, {2..6})),
+case序 0,1,2,5,18,19,20,6,9。664B×5 OK。
+**⏸ 67行对 sub_804BD54/804BE90 + 变体 804B7B0/804B8E8** — 高寄存器分配域 (arg0→sb/
+table→sl/mask→r8): 最优 C 停 990, permuter 12k 迭代 → 420 (底分 5, do-while(0) 屏障 +
+重算地址形态, 存 permuter/sub_804BD54/candidates/best420.c); 三变体 base.c 就绪待攻。
+**⏸ 91-98四连体 sub_804D840/804DC24** — D3A0 同族: case1 的 obj[0xC2]=Rng&obj[0xBC]
+复用 switch 值 (r4) + entry 索引 +8 不折叠; value 中转变量版最优 700 分 (base.c 留档);
+D4FC/DB64 (17/26行差) 未动。**⏸ 444行对 803D20C/803CE0C (14行差) / 611行对 8029BF8/802A86C
+(16行差) / sub_80368FC (F00变体 36行差) 未动。**
+**⚠ 事故**: 收尾发现 src/code_80264C0.c 被截空 (与 glm5 并行写竞态), 从 HEAD 基线重放
+全部 21 个合并恢复 (含 glm5 的 8037E14/7FE8/81BC/8390/8568/874C), 见 INCIDENTS.md。
+**字节定论**: 22×fncheck OK (本批); make exit=0 + SHA1 绿; audit 738 全过。

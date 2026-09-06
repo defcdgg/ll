@@ -2863,7 +2863,33 @@ INCLUDE_ASM("asm/nonmatchings", sub_804D5B4);
 // 概率判定+drop道具。⚠ 2026-09-03 还原 INCLUDE_ASM: 原 C 代码比 ROM 少 4 字节
 // (ROM 尾部死 store `movs r0,#0; strb r0,[obj+0xBC]` 被 C 编译器优化掉),
 // 直接导致全局 +4 位移 bug。待用 do-while 屏障/中间变量复现死 store 后重匹配。
-INCLUDE_ASM("asm/nonmatchings", sub_804D708);
+void sub_804D708(u8 *obj, u8 *arg1)
+{
+    u8 values[8];
+    u8 count;
+    u8 value;
+    u8 zero;
+    Unk_804D1B4_Entry *entry;
+
+    count = sub_80489E8(arg1, values, 0, 0x6F);
+    if (((u32 (*)(void))Rng_LcgNext)() % 0x65 < count * 10)
+        obj[0xBC] = 1;
+    else
+        obj[0xBC] = 0;
+    obj[0xBC] = 0;
+    entry = &gUnk_08393B28_entries[*(u16 *)(*(u32 *)(obj + 0x88) + 2)];
+    zero = 0;
+    switch (entry->field_10)
+    {
+        case 0:
+            value = values[(u32)(u8)Rng_LcgNext() % count];
+            obj[0xBD] = value;
+            break;
+        case 1:
+            obj[0xBD] = zero;
+            break;
+    }
+}
 // @ 0x0804D798
 INCLUDE_ASM("asm/matchings", sub_804D798); /* 函数清单修正: tsv=1 且 .s 已在 matchings/ (坑7); 见 INCIDENTS.md */
 // @ 0x0804D840

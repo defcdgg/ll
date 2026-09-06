@@ -6,6 +6,8 @@ build/
 *.map
 
 tools/agbcc/
+# 生成的报表 (gen_reports.py 可随时重建, 不入库)
+docs/reports/
 
 *.dump
 

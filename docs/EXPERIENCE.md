@@ -1832,3 +1832,4 @@ grep '^Register ' gccdump.lreg; grep '^;; Register .* in' gccdump.lreg; rm -f gc
 167. **整数算术避免指针规范化**: `i * 0xC8 + (u32)arg1` 经 (u32) 转整数加法, keeps op0=mult →
      `adds rd, r_mult, r_base`; 直接 `arg1 + i * 0xC8` 会被 fold 成 ptr+int (op0=ptr) 翻转
      `adds rd, r_base, r_mult` (2026-09-06, 案例 sub_801DEDC/DF90)。
+168. **半字 `|= K` 的 orrs 寄存器互换用命名临时修 (同族两处同时命中)**: 目标 `ldrh r1; movs r0,#K; orrs r0,r1; strh r0`(载荷在 r1、常量在 r0), 直接 `x |= K`/显式 `x = x|K`/`x = K|x` 全给镜像形状 (load r0/const r1); 函数顶声明 `u16 t;` + `t = x|K; x = t;` 一次修正 case0 与 case2-else 两处 (2026-09-06, 案例 sub_8030D9C; 同族 sub_8030F30/80310C4/8030C08 同构可复用)。另: 跳表函数 permuter 真 0 的完整路径 = 按 164 把套件 target.s 的 4 个 gUnk 池字面量换符号引用 (跳表 .4byte 标签引用两侧同 reloc 无需动), 9676 迭代底分 55 → 0。

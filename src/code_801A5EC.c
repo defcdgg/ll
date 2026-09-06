@@ -90,56 +90,10 @@ INCLUDE_ASM("asm/nonmatchings", sub_801AD0C);
 // @ 0x0801B0B8
 INCLUDE_ASM("asm/nonmatchings", sub_801B0B8);
 
-INCLUDE_ASM("asm/nonmatchings", sub_801B570);
 
 // @ 0x0801B570
 // extern const u8 gUnk_08393A30[];
-// void sub_801B570(u8 *arg0)
-// {
-//     Unk_801A5EC *obj = (Unk_801A5EC *)arg0;
-//     u16 *p;
-//     u16 *entry;
-//     u16 n0;
-//     u16 value;
-//     u16 offset;
-//     u16 count;
-//     u16 i;
-//     s16 counter;
-//     u8 tile;
-
-//     if (obj->f_18 & 0x200)
-//         return;
-
-//     tile = 1;
-//     counter = *(u16 *)obj->f_04 - 1;
-//     while (counter >= 0)
-//     {
-//         offset = ((u16 *)obj->f_0C)[counter];
-//         p = sub_801B8E8((u16 *)(obj->f_04 + offset), obj->f_1C);
-//         value = *p;
-//         entry = (u16 *)(obj->f_00 + ((u16 *)obj->f_08)[value]);
-//         n0 = *entry;
-//         entry++;
-//         count = *entry;
-//         entry++;
-//         entry += n0 * 4;
-//         for (i = 0; i < count; i++)
-//         {
-//             if (!(obj->f_18 & 0x800))
-//             {
-//                 u32 src = 0x0202B2C0 + (((u32)entry[2] << 22) >> 17);
-//                 u32 dst = 0x0600C000 + (tile << 5);
-//                 DmaSet(3, (void *)src, (void *)dst,
-//                        (DMA_ENABLE << 16) | (gUnk_08393A30[(((u8 *)entry)[3] >> 6) + ((((u8 *)entry)[1] >> 6) << 2)] << 4));
-//                 DmaWait(3);
-//                 tile = (u8)(tile + gUnk_08393A30[(((u8 *)entry)[3] >> 6) + ((((u8 *)entry)[1] >> 6) << 2)]);
-//             }
-//             entry += 3;
-//         }
-//         counter--;
-//     }
-// }
-
+INCLUDE_ASM("asm/nonmatchings", sub_801B570);
 // @ 0x0801B688
 INCLUDE_ASM("asm/matchings", sub_801B688);
 
@@ -701,7 +655,33 @@ void sub_801DB3C(u8 *arg0, u8 arg1, u16 arg2)
 }
 
 // @ 0x0801DC20
-INCLUDE_ASM("asm/nonmatchings", sub_801DC20);
+void sub_801DC20(u8 *arg0, u8 arg1)
+{
+    u8 buf[8];
+    u8 *pool;
+    u8 count;
+    u8 i;
+    sub_8048D40(arg0);
+    pool = GetObjPool();
+    count = sub_80489E8(pool, buf, 0, 0x7F);
+    for (i = 0; i < count; i++)
+    {
+        if (arg0[0xBE] == pool[buf[i] * 0xC8 + 0xBE])
+            break;
+    }
+    gUnk_030006A0[buf[i]].data = (u32)arg0;
+    ListNode_InitKey((UnkNode *)&gUnk_030006A0[buf[i]], arg1);
+    ListNode_InsertSorted((UnkNode *)0x03000690, (UnkNode *)&gUnk_030006A0[buf[i]]);
+    sub_8045F94(arg0, 8);
+    *(u16 *)(arg0 + 0xB2) = 0;
+    sub_804E7EC(arg0);
+    if (arg0[0xBE] <= 6)
+    {
+        *(u16 *)(arg0 + 0x88) = 0;
+        *(u16 *)(arg0 + 0xB0) |= 2;
+    }
+    *(u8 *)0x030006F0 += 1;
+}
 
 
 /* 从对象排序链表 (0x030006A0) 摘除节点, 清对象字段并按 field_BE 分派:

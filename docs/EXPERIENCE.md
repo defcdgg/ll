@@ -1790,3 +1790,45 @@ grep '^Register ' gccdump.lreg; grep '^;; Register .* in' gccdump.lreg; rm -f gc
      ⑤ 比较类表达式的操作数序勿翻: `n > i`/`v > 0x1FF` 对应 `cmp r7,r4`/`cmp r1,sb`。⑥ 未初始化
      局部在目标里同样无初始化指令时, C 也保持无初值, 别"修"它。
      关联: 经验 156/164, 经验 29, 经验 152 (子树分组控制调度)。
+160. **链表摘链必须用 u32 字指针, 结构体指针会被别名分析"优化"掉目标重载** (2026-09-06, 案例 sub_801DD04)。
+     `node->prev->next = node->next` 的 struct-typed 访问让 GCC2 判定"存储与后续读取无别名",
+     CSE 掉目标里的两次重载 (ldr [r1]/[r3] 各出现两次)。改用 u32 视图:
+     `((u32 *)prev)[2] = *np; ((u32 *)next)[1] = *pp;` —— u32 存储与 u32 读取同别名集 → 保留重载,
+     且 `[r,#8]` 偏移寻址保留 (ARRAY_REF 常量下标折进寻址)。配套: `u32 prev = *pp;` 早读语句
+     (在另一地址计算前) 定调度序; `*pp = 0` 的零寄存器自动复用 prev 的死寄存器。
+161. **RAM 字面常量基址的 +off 会折进池 (0x030006A0+4 → 池 0x030006A4), 注册符号 + 中间变量才能保住运行时加** (2026-09-06, 案例 sub_801DD04/801DF90)。
+     `u8 *p = (u8 *)0x030006A0 + 4;` 单语句 → 池 0x...A4 (树级折叠); 拆两条语句也救不了字面量;
+     必须 iwram.h/linker.ld 注册符号 (经验 73 的 RAM 版) 且基址先存变量: `arr = gSym; p = (u8 *)arr + 4;`
+     —— DECL 初始化为符号引用, expand 不折, 产出 `adds rX, r0, #4`。经验 6 的补充: 符号+常量
+     直接表达式 (`&gSym[idx].prev`) 仍会折成 `.word gSym+4` addend, 必须经变量中转。
+162. **K&R 空参原型 `void f();` 之后的定义不允许带默认提升的形参 (u8/s16), 且中间补全原型也被 egcs 拒绝** (2026-09-06, 案例 sub_801FA10)。
+     `void f(); void f(u8*, u8){}` → "argument type has a default promotion can't match empty
+     parameter name list"; 插入中间原型 `void f(u8*, u8);` 同样报错。解法 = 升级 code_0.h 原型为全原型,
+     前提是所有调用点传常量/已截断实参 (零代码影响), 改完必须 fncheck 全部调用方。
+     定义侧用 int 形参虽合法但改变 `arg & 0xF` 的 ands 操作数序 (QI 语义丢失), 不可取。
+163. **statement 拆分锁调度序**: 独立的地址算术/常量物化会被 GCC2 调度器自由重排, 把中间值提成
+     具名局部语句可钉死顺序 (2026-09-06, 案例 sub_801DF90/801DEDC)。
+     `off = arg0[0xC2] * 2; anim += 8; *(u16 *)(anim + off)` 三语句产出目标的
+     `lsls; adds r1,#8; adds r1,r1,r0` 序; 单表达式会被重结合成 `ldrh [r0,#8]` 偏移折叠。
+     `anim += 8` 语句 (变量回写) 是"运行时加"的最强锚点。反向: u16 变量的第二次赋值
+     (`idx = idx + x`) 会在 case 内物化截断 (lsls/lsrs), 目标截断在合并点时须保持单表达式赋值。
+164. **TU 状态泄漏的可迭代性**: 同一 C 在 standalone (permuter) 与 in-TU (真身) 的寄存器分配可以
+     双向不同 —— standalone 正确而 in-TU 出 tie (sub_801DF90: standalone score 105 可复现,
+     in-TU 剩 2 处调度 tie), 也可能反过来 (sub_801FA10: standalone 不出 z=0 的 r5, in-TU 一次成型)。
+     对策: ①候选先 standalone 打磨形状, 再 in-TU fncheck 定案; ②in-TU tie 不必硬磕 ——
+     每次落地其他函数都会重洗 TU 状态, 挂起候选换天重试即可; ③重试成本 = 一次 40s 编译 + fncheck。
+165. **`~x` 掩码的 GCC2 展开是 `movs #(x+1); negs`, 所以掩码常量必须逐位核对** (2026-09-06, 案例 sub_801D378)。
+     目标 `movs r2,#4; rsbs r2,r2,#0` = -(4) = ~3 (清除 bits 0-1), 不是 ~4!
+     若 C 写 `& ~4` 会编成 movs#5+negs (差一位)。RSBS(0) = 取负 = -(x), ~x = -(x+1)。
+     同族: `& ~0x1FF` 经池 (0xFFFFFE00), `& 0x1FF` 直接池; u8 变量上的 `& ~4` 会被折叠成
+     8-bit 立即数 ands (0xFB) —— 目标保持 32-bit 运行时形式时必须用 int 临时承接 (t = oam[1];
+     t &= ~3; oam[1] = t;)。掩码跨块复用 (r6/r5/r4/r3) 来自同常量表达式的高序 CSE。
+166. **arg1 两分支 + default 的分派必须写 switch —— if/else-if 会内联首块** (2026-09-06, 案例 sub_801EC3C)。
+     目标 `cmp/beq; cmp/beq; b default; <case体表体外置>` 是 switch 的形状; if/else-if 会把
+     第一个 then 块内联进派发表后。同理: 单一共享 `return result` (无早退) 让 result 保持寄存器
+     home → 声明处初始化 (u8 result = 0x20;) 提升到函数顶 → 高优先级长寿命量挤走参数寄存器,
+     `push {r4,lr}` + callee-saved 自然出现。**case 体按源顺序排放** (case 7 在 case 8 前),
+     相同掩码链的 case 体 (case 4/5/8) 自动共享比较尾 (b ED0A)。
+167. **整数算术避免指针规范化**: `i * 0xC8 + (u32)arg1` 经 (u32) 转整数加法, keeps op0=mult →
+     `adds rd, r_mult, r_base`; 直接 `arg1 + i * 0xC8` 会被 fold 成 ptr+int (op0=ptr) 翻转
+     `adds rd, r_base, r_mult` (2026-09-06, 案例 sub_801DEDC/DF90)。

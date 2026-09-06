@@ -1,6 +1,6 @@
 # MOD-04 场景对象核心 (0x0801A3C4-0x08020D50)
 
-> 分析人: plan (2026-08-31)。源文件 `src/code_801A3C4.c` (642 行, 30 个真 C 函数)。
+> 分析人: plan (2026-08-31)。源文件原为单一 `src/code_801A3C4.c`; 2026-09-06 zcode-ll2 为解除 TU 状态泄漏对 sub_8020B54 local_alloc tiebreak 的扰动 (经验 148), 拆分为 `src/code_801A3C4.c`(仅 sub_801A3C4) + `src/code_801A5EC.c`(sub_801A5EC..sub_8020CC4), linker.ld 两 .o 顺序拼接, functions.tsv module 列已同步。
 > **核心发现: 场景对象 (0xC8 字节) 有自己的脚本 VM** — 对象头部 +0x0/+0x4 是两个代码区指针,
 > +0x8/+0xC 是命令流指针; 行为按 `*(u16*)(obj+0x18) & 0xF` 的 kind 值经
 > `gUnk_0839CE7C[]` 函数表分发 (类似 MOD-08 的 opcode 表, 但按对象类型)。

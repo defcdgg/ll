@@ -643,7 +643,7 @@ const u32 gUnk_08078CAC[] = INCBIN_U32("data/raw_data/unk_8078CAC.bin");
 const u32 gUnk_08079294[] = INCBIN_U32("data/raw_data/byte_8079294.bin");
 
 /* 29 16-color palettes used by the 89 dialog portrait graphics. */
-const u16 gDialogPortraitPalettes[] = INCBIN_U16("data/raw_data/unk_80798A8.bin");
+const u16 gDialogPortraitPalettes[] = INCBIN_U16("data/raw_data/gDialogPortraitPalettes.bin");
 
 const u32 gUnk_08079C4C[] = INCBIN_U32("data/raw_data/unk_8079C4C.bin");
 const u32 gUnk_0807A4C8[] = INCBIN_U32("data/raw_data/unk_807A4C8.bin");

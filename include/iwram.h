@@ -183,6 +183,18 @@ extern u8 *gUnk_030006F8[];
 extern u8 gUnk_03000714;
 extern u8 gUnk_03000715;
 extern u8 gUnk_03000716;
+
+/* 对象排序链表节点 (0xC8 字节对象池的槽位链, 见 src/code_801A5EC.c sub_801DD04):
+ * key@0, prev@4, next@8, data@12, 节点 16 字节 */
+typedef struct Unk_030006A0
+{
+    u8 key;
+    u8 pad_1[3];
+    struct Unk_030006A0 *prev;
+    struct Unk_030006A0 *next;
+    u32 data;
+} Unk_030006A0;
+extern Unk_030006A0 gUnk_030006A0[];
 extern u32 gUnk_03000718;
 extern u8 gUnk_0300071C;
 extern u32 gUnk_03000730;

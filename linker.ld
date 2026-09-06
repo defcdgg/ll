@@ -49,9 +49,12 @@ gUnk_0839CC4C = 0x0839CC4C;
 gUnk_0839CC4C_entries = 0x0839CC4C;
 gUnk_0839CE38 = 0x0839CE38;
 gUnk_0839CEFC = 0x0839CEFC;
+gUnk_083987EC = 0x083987EC;
 gUnk_083989B0 = 0x083989B0;    /* 菜单/对话图标表 A (sub_8018E34 用) */
 gUnk_083989CB = 0x083989CB;    /* 菜单/对话图标表 B (sub_8018E34 用) */
 gUnk_083989DC = 0x083989DC;    /* 菜单/对话图标表 C (sub_8018E34 用) */
+gUnk_08393A3C = 0x08393A3C;
+gUnk_08393A40 = 0x08393A40;
 gUnk_08393B28 = 0x08393B28;
 gUnk_08393B28_entries = 0x08393B28;   /* 同址别名: u16 视图 (offset 0x10 字段, sub_804D1B4) */
 gUnk_0839D5BC = 0x0839D5BC;
@@ -223,6 +226,7 @@ SECTIONS {
         . = 0x0000068C; gUnk_0300068C = .;
         . = 0x0000068D; gUnk_0300068D = .;
         . = 0x0000068E; gUnk_0300068E = .;
+        . = 0x000006A0; gUnk_030006A0 = .;
         . = 0x000006F8; gUnk_030006F8 = .;
         . = 0x00000714; gUnk_03000714 = .;
         . = 0x00000715; gUnk_03000715 = .;
@@ -587,6 +591,7 @@ SECTIONS {
         src/save.o(.text);
         src/code_8010F10.o(.text);
         src/code_801A3C4.o(.text);
+        src/code_801A5EC.o(.text);
         src/code_8020D50.o(.text);
         src/code_80264C0.o(.text);
         src/code_8044394.o(.text);

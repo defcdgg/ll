@@ -4129,3 +4129,68 @@ ld 插的 veneer —— 装置伪影, mine.o 的 .text 实际 144B 与目标同�
 **收尾**: TSV status 0→1, match_fn.sh 一次通过: **fncheck OK 144B (2 池重定位, 2 bl 忽略)**,
 make + sha1 通过, audit 690/1059 (65%)。镜像姊妹 sub_804F974 (全置位版?) 仍挂起 ——
 预期同根因, 套件 target.s 池符号化 + 找承重分配语句应可复制本路径。
+
+## 2026-09-06 zcode-ll2: code_801A3C4.c 拆分 + 4 函数匹配 (≤200行批次)
+
+**核心突破: 拆分 C 文件解除 TU 状态泄漏扰动 (经验 148 的解法落地)**
+- `src/code_801A3C4.c` 拆为 `A=code_801A3C4.c{sub_801A3C4}` + `B=code_801A5EC.c{sub_801A5EC..sub_8020CC4}`。
+  B 的编译器状态 = 2026-09-02 获胜态 (sub_801A3C4 转真 C 之前), 拆分本身零扰动 (audit 691/691 全绿)。
+- sub_8020B54 ✅ 直接复用 09-02 真身 (do-while 屏障), fncheck OK 60B。
+- sub_801DDB0 ✅ 落地 09-04 byte-exact 候选 (gUnk_0839B2D4 命名符号), 扰动消失, fncheck OK 148B。
+- linker.ld 插入 `src/code_801A5EC.o(.text);` 于 code_801A3C4 之后; functions.tsv module 列经 tsv_init 重推导。
+- **注意**: 若未来 B 文件再加真 C 函数, 需重验 sub_8020B54/sub_8020B90..CC4 的 tiebreak (尾部函数敏感)。
+
+**✅ sub_801FA10 (168B, permuter score 0)**
+- 语义: `*(u16*)(obj+0xB0)` 低 4 位替换为 arg1, switch(val&0xF) case1/2 调 sub_801B81C 传 ROM 表常量。
+- 关键: ①`z=0` 局部变量跨 case 活 (r5), 字面 0 不行; ②`val = *(u16*)(...) & 0xFFF0` 与 `val |= arg1 & 0xF`
+  拆写, z=0 夹在中间 (决定 movs r5,#0 的位置); ③code_0.h 的 K&R `()` 原型升全原型
+  `void sub_801FA10(u8 *, u8);` —— u8 形参带默认提升, C89 禁止空参表声明后定义 u8 形参 (int 形参
+  会改变 ands 操作数序), 两调用点 (FEBC/D50:175) 均传常量 → 零字节影响, fncheck 验证。
+
+**✅ sub_801DD04 (172B)**
+- 语义: 对象排序链表 (0x030006A0, 16B 节点 {key,prev,next,data}) 摘除 idx 节点 + 清对象字段 +
+  按 field_BE 三分派 (≤0xA→CBA4, ≤0x70→CA08, 其余→CE80) + sub_801D12C(obj,0)。
+- ①注册 `gUnk_030006A0` 符号 (iwram.h typedef + linker.ld 0x6A0) —— 字面常量基址的 +4 会被折进
+  池 (0x030006A4), 符号基址+中间变量才保留运行时 `adds` (经验 73 的 RAM 版); ②摘链核心必须用
+  **u32 字指针** `((u32 *)prev)[2] = *np;` —— 结构体字段存储与指针标量读取在 GCC2 别名集下判无冲突
+  会省掉目标中的两次重载; ③`u32 prev = *pp;` 早读 (在 np 计算前) 定调度序。
+- permuter 单函数编译无法复现 TU 态 (score≥960), 以 fncheck 为准 (经验 74)。
+
+**⏸ sub_801DEDC (97行) / sub_801DF90 (95行) — 候选成型, 仅剩 TU 态调度 tie**
+- 姊妹函数: 按 (s8)obj[0xBC] 选 0x08393B28 表项, 按 entry->field_10 二次分派 (与 DD04 同尾)。
+- DF90: **standalone 可复现** (permuter/sub_801DF90/output-105-1, score 105 = 纯池重定位罚分);
+  in-TU 仅剩 2 处调度 tie (count 区 movs r5,#7 位置; `adds r1, r0, r6` 操作数序)。
+  关键技巧: case1 `off = arg0[0xC2] * 2; anim += 8; *(u16 *)(anim + off)` 语句拆分 (锁 +8 运行时加)。
+- DEDC: 结构 100% 解 (off/idx 拆分 + entry 移出 switch 得到共享 ×20/截断), 剩 val home tie (r3 vs r0, 12B)。
+  候选: permuter/sub_801DEDC/candidates/{v1_val_r3_tie.c, v2_valfirst.c}。
+- **重启路径**: 任意其他函数落地改变 TU 状态后, 直接重试候选 (每变一次 tie 重洗)。
+
+**事故**: TSV 是 7 列, 用 `split("\t",5)` 把 note 写进了 name 列 (AGENTS 示例歧义), 已修复并记 INCIDENTS。
+
+## 2026-09-06 zcode-ll2 (续): EC3C 匹配 + DEDC/DF90 复活 + D378/20228 候选成型
+
+**✅ sub_801EC3C (260B, 跳转表)** — 关键顺序:
+1. arg1 分派必须是 **switch**(case 体表体外置), if/else-if 会内联首块;
+2. **单一共享 `return result;`**(无早退) → result 保住寄存器 home (r1) → `u8 result = 0x20;`
+   提升到函数顶 → `push {r4, lr}` 自然出现 (arg0 被挤出低寄存器);
+3. **case 体按源顺序排放**: case 7 必须在 case 8 前 (跳转表体顺序 = 源序);
+4. `result = x * 8` 的 u8 赋值合并 ×8 与截断 → `lsls r0,#0x1b; lsrs r1,r0,#0x18`;
+5. 注册 gUnk_08393A3C/A40 符号。
+
+**✅ sub_801DEDC (180B) / sub_801DF90 (176B) 复活** — 上一轮 tie 经状态变化+微调后全解:
+- entry 计算放 case 内 + `(u16)` 强转 → cross-jump 合并尾部 (DED);
+- `kindBE` 临时 + if 形式 + `i * 0xC8 + (u32)arg1` 整数算术 (避免指针规范化翻转操作数序) (DED/DF9);
+- case1 `off = arg0[0xC2] * 2; anim += 8; *(u16 *)(anim + off)` 语句拆分锁 +8 运行时加 (DF9)。
+
+**⏸ sub_801D378 (120行) / sub_8020228 (120行) — 结构 100% 解, 剩分配 tie**
+- D378: `int t` 临时 + 位掩码链 (掩码 ~3/~0xC/~0x10/~0x20/~0xE/~0x1FF — GCC2 `~x` → `movs #(x+1); negs`
+  实证! ~4 会编成 movs#5+negs, 目标是 movs#4+rsbs → 掩码常量必须逐位核对) + tile 三元 + `return --idx`。
+  头部已对齐 (push/idx→r8/oam→r7); 剩 sl-vs-sb 高位寄存器选择 + idx 读取形状 tie。候选:
+  permuter/sub_801D378/candidates/v1_t_temp.c。
+- 20228: 表拷贝全解 (u16 读→u8 存 0xAA/0xA9、双读 field_2/field_4 是别名阻塞 CSE 的正确形状);
+  剩 muls 区双拷贝 (目标 in-place r1)。候选: permuter/sub_8020228/candidates/v1_tbl_else.c。
+  已升 code_0.h: `void sub_8020228(u8 *, u8 *, u8);` / `u8 sub_801D378(u8 *, u8);`。
+- 重试路径: 落地其他函数改变 TU 状态后直接换入候选重编 (每次 ~40s)。
+
+**本批新增匹配**: sub_801FA10 / sub_801DD04 / sub_801DEDC / sub_801DF90 / sub_801EC3C (+复用 8020B54/801DDB0)
+进度 691 → 699 / 1059 (66.0%)。剩余 ≤200 行: DC20/B570/ED40/E1D8/200E8/20648/20228⏸/D378⏸/F76C⏸/D214⏸/A6F4⏸。

@@ -178,7 +178,88 @@ u32 Op_RemovePartyMember(u32 *ptr)
     return 1;
 }
 // @ 0x0804F7F8
-INCLUDE_ASM("asm/nonmatchings", sub_804F7F8);
+// 脚本 opcode: 队伍添加 (Op_RemovePartyMember 的镜像)。
+//   1) 把 data[1] 按升序插入 gPartyMemberIds[0..4] (已存在则跳过; 插入点后整体后移, 末位溢出丢弃);
+//   2) Chara_ClearTempStatus(data[1]); gPartyMemberIds[5] = 0xFF;
+//   3) 编队槽: 取 gPartyStats[id-1].field_unk[5] 记录的旧槽,
+//      旧槽为空(0xFF) → 直接占回; 否则先查该 id 是否已在 gBattleFormationIds (在 → 仅回填槽号),
+//      再找首个空槽(0xFF) → 写入 id 并回填槽号; 全满 → 不动。
+u32 Op_AddPartyMember(u32 *ptr)
+{
+    u8 *data;
+    u8 i;
+    u8 temp;
+    u8 val;
+    u8 memberId;
+    u8 newId;
+    u8 idx;
+
+    data = (u8 *)*ptr;
+    i = 0;
+    if (gPartyMemberIds[0] == data[1])
+        goto after;
+    do
+    {
+        // 死赋值(下一次迭代即被覆盖): 拉长 newId 伪寄存器寿命, 使全局分配把 ptr 给 r6、
+        // newId 给 r7 (缺则 ptr 落 r7、stats 基址溢出从 ip 变 r7, 差 2 条指令)。
+        newId = gPartyMemberIds[i];
+        if (gPartyMemberIds[i] > data[1])
+        {
+            val = data[1];
+            for (; i <= 4; i++)
+            {
+                temp = gPartyMemberIds[i];
+                gPartyMemberIds[i] = val;
+                val = temp;
+            }
+            goto after;
+        }
+        i++;
+        if (i > 4)
+            goto after;
+    } while (gPartyMemberIds[i] != data[1]);
+after:
+    Chara_ClearTempStatus(data[1]);
+    gPartyMemberIds[5] = 0xFF;
+
+    memberId = data[1];
+    idx = memberId;
+    if (memberId != 0)
+        idx = memberId - 1;
+
+    if (gBattleFormationIds[gPartyStats[idx].field_unk[5]] == 0xFF)
+    {
+        gBattleFormationIds[gPartyStats[idx].field_unk[5]] = memberId;
+    }
+    else
+    {
+        i = 0;
+        newId = memberId;
+        do
+        {
+            if (gBattleFormationIds[i] == memberId)
+            {
+                gPartyStats[idx].field_unk[5] = i;
+                goto end;
+            }
+            i++;
+        } while (i <= 4);
+        i = 0;
+        do
+        {
+            if (gBattleFormationIds[i] == 0xFF)
+            {
+                gBattleFormationIds[i] = newId;
+                gPartyStats[idx].field_unk[5] = i;
+                goto end;
+            }
+            i++;
+        } while (i <= 4);
+    }
+end:
+    *ptr += 2;
+    return 1;
+}
 // @ 0x0804F8D8
 // 脚本 opcode: 按 gAfterBattleCounter 状态机分派。
 //   state==3: 若 (sub_80187B4()&0x40)!=0 或 data[1]==0 → *ptr+=4;

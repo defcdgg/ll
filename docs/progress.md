@@ -4571,3 +4571,124 @@ source.c (3170, y 改 int 不可读)。permuter 产物 <2905 的都是 score 假
   ⑥ **核心: 去 local 快照, 直接读全局 + 常量在前**: `u16 flags = gFlashFlags; if (flags & 0x1000)` 让 and 的操作数全是 REG → gcc 把**变量**当累加器 (`adds r0,r3;ands r0,r2` ✗); 改 `if (0x1000 & gFlashFlags)` (常量在源文本前 + 内存操作数) → 常量进累加器 (`adds r0,r2;ands r0,r3` ✓, 目标全 3 处 and/or 同此)。expab_binop 的 commutative swap 只在 op0 是 CONST_INT 或 REG 顺序下触发, 经 preserve_subexpressions_p(-O2) force_reg 后行为不同;
   ⑦ 原型/命名: code_0.h `void sub_8019784();` 保持; 全链改名 → `BattleFx_UpdateTable`。
 - fncheck OK (604B @0x08019784, 0 池重定位); 全量 make+SHA1 绿。进度 718/1059 (67.8%)。
+
+## 2026-09-06 glm-batch: code_8044394 批量攻坚 (2 匹配 + 3 深度候选)
+
+任务: 匹配 code_8044394.c 下 <200 行全部未匹配函数 (~60 个)。本轮完成 2 个, 3 个推进到 90%+ 并留档。
+
+### ✅ sub_8048C30 (43行, fncheck 80B)
+- 结构 = 外层 `if (obj[0xBE] <= 0xA)` + 内层**无 default** switch (case 组 0..7 / 8..10 物理重复同体,
+  GCC2 比较树 + jump.c 折叠体; 经验 69/72); default = `(u8)(obj[0xBE]-0xC) <= 0x64` 边界 + 查表。
+- 表 0x0839D5BC 访问三坑: ①数组形式 `tbl[k*6+4]` 出 (idx+4)+base 序 ✗; ②struct 视图被 ARM ABI
+  对齐到 8B (lsls#3) ✗; ③`*(tbl + 4 + k2*6)` 直用符号把 +4 折进池常量 ✗ —— 正解 = **指针局部**
+  `const u8 *tbl = gUnk_0839D5BC;` + `*(tbl + 4 + idx)`/`*(tbl + 5 + idx)` (池放基址, 运行时 adds #4/#5,
+  第二次访问复用 r2 in-place += 5)。idx=k2*6 须独立变量 (两次 `*(p + idx)` 共用)。
+- 两个 flag 先读入变量再 `||` (目标两次 load 后才比较, 非短路形式)。
+- permuter base score = 0 (compile.sh 加 `.equ gUnk_0839D5BC, 0x0839D5BC` 解决池重定位虚分, 经验 29)。
+
+### ✅ sub_8048C80 (58行, fncheck 106B, 3 bl 忽略)
+- **幽灵栈帧真因**: 未使用的 `u8 values[8];` 局部数组 (经验 174)。此前挂起记录猜"编译器版本差异"不成立。
+- 阈值求和: `threshold = base + (sw + v1);` 两次独立 SET (经验 175)。
+- switch case 序 = ROM 序 2,5,3+default (经验 124); Rng 需 `((u32 (*)(void))Rng_LcgNext)() % 100` + (u16) 截断。
+- code_0.h 原型 `void sub_8048C80()` → `u8 sub_8048C80(u8 *)` (无调用点, 安全)。
+
+### ⏸ sub_804BD54 (67行, 候选差 ~6B 指令)
+- C10C byte-style 模板 + `(s8)entry[0] == -1` continue + mask 变量。唯一残差 = -1 常量物化点
+  (见 EXPERIENCE 176)。候选 = permuter/sub_804BD54/base.c。
+
+### ⏸ sub_8049D58 (77行, 候选差 ~8B 指令)
+- 状态机 + DMA (DmaCopy16(3, 0x02035AC0, 0x06007000, 0x800) + DmaWait —— cnt=0x80000400 反推 16bit/0x800B)。
+- case0 的 `u8 *ptr` 局部防池折叠 (同 8C30 ③)。残差 = 入口截断 `adds r1,r0,#0` 保 r0 原始 arg0
+  (case1/case2/default 经 copy-prop 直返 r0; 我方就地截断杀 r0 → 全路径重载 r3)。
+- 候选 = permuter/sub_8049D58/base.c (v3)。
+
+### ⏸ sub_804B3C0 (79行, 候选差 74B = 纯寄存器 home 级联)
+- 控制流/掩码/循环全部对齐: 掩码须变量 `mask = ~0x10;` (常量被窄化成 movs#0xEF, 规则 76 推广);
+  循环须显式 `if (count != 0) { do { entry[0xF] += 1; if (entry[0xF] > 7) break; count = (u8)(count >> 1); } while (count != 0); }`
+  —— while 形式被 GCC2 旋转 + 首迭代剥离 (0-store 前传成 movs#1), do-while 不旋转逐指令命中;
+  count 用 `max` 局部 (两分支各读一次 entry[2])。
+- 残差 = flags 落 r5 (我 r2) / count 移位 tmp (我 in-place) / ldrsb temp home —— local-alloc 优先级。
+- 候选 = permuter/sub_804B3C0/base.c (v5)。
+
+### ⏸ sub_804D840 (91行, 候选差 ~4 指令)
+- D1B4+DABC 混合: rng%0x65<=0x45 定 obj[0xBC] → `switch (*(s8 *)(obj + 0xBC))` case0 = D1B4 式 +2 读 /
+  case1 = `obj[0xC2] = *(s8 *)(obj + 0xBC) & Rng()` → DABC 式 `((Unk_804DABC_Ptr *)*)->field_8[obj[0xC2]]`。
+- 关键: (s8) 强转会出 ldrb+shifts; 必须 s8 指针解引用才出 ldrsb; switch-case 值会被 GCC2 常量传播进
+  case 体 (v1 的 `& 3` 幻影), 用表达式 scrutinee + case 内重评同一表达式 (CSE 复用寄存器) 可避免。
+- 残差 = 入口 scrutinee 区: 目标 `movs r4,#0; ldrsb r4,[r1,r4]` (复用 if/else 的 r1 地址, 零索引落 dest),
+  我方多一条 `adds r4,r1,#0` 地址拷贝 + scrutinee 落 r0 —— local-alloc join 点 tiebreak。
+- 候选 = permuter/sub_804D840/base.c (v3)。
+
+### ✅ Op_AddPartyMember (原 sub_804F7F8, 117行, 2026-09-06, zcode-glm)
+- 语义 = Op_RemovePartyMember 的镜像: 把 data[1] 升序插入 gPartyMemberIds[0..4] (已存在跳过;
+  插入点后整体后移、末位溢出丢弃), Chara_ClearTempStatus + gPartyMemberIds[5]=0xFF,
+  再做编队槽管理 (gPartyStats[id-1].field_unk[5] 记录槽号 ↔ gBattleFormationIds[0..4])。
+- **part1 插入排序**: 目标是"头在顶不旋转"的 do-while —— C 必须 `i=0; if (ids[0]==m) goto after;
+  do {...} while (ids[i]!=m);` 且出口用 **goto** 不能用 break (break 触发 GCC2 旋转+首迭代剥离,
+  出现跳进循环头 + data[1] 三份拷贝, 差 2000 分级)。break→goto 一处改动词节全中。
+- **双 home = 双源变量**: 目标 memberId 走 r4(早)→r7(晚) 两个 home = 源码里 scan2 的编队存储
+  用的是**第二个变量** newId (`newId = memberId;` 在 scan1 入口), GCC2 无 live-range split,
+  单变量不可能两 home。t1: else 块首 `newId = memberId;`。
+- **scan1/scan2 循环**: 也必须 do-while (`i=0; do{...}while(i<=4);`), for 形态会多出顶部守卫。
+- **r6/r7 互换 (残差最后 2 条)**: ptr 应落 r6、newId 落 r7, 我方反着 —— greg dump 量化:
+  newId pri 0.0741 (2 refs/27 insns) vs ptr 0.0678 (4/118), newId 以 9% 优势先拿 r6。
+  解法 = part1 循环头加死赋值 `newId = gPartyMemberIds[i];` (无读取, cse2 删除) 拉长 newId
+  寿命 → pri 掉到 0.017 → ptr 回 r6。详见 EXPERIENCE 177。
+  (do-while(0) 屏障也能翻 newId 但把 ptr 挤到 r8, 级联更大; u8/u16/s16 类型无效 —— PROMOTE_MODE 全 SImode。)
+- 验证: permuter 25 (=6 个池字的渲染差地板, bytecmp/fncheck 为准); bytecmp OK (仅 bl 槽 4B,
+  链接期解析); fncheck OK 224B; make+SHA1 绿; 已改名 Op_AddPartyMember (全链, SHA1 复绿)。
+- 教训: 挂起 note 说"差 170B+"的前人卡点其实是整体结构 (for/break/单变量), 换到 do-while+goto+
+  双变量后只差 2 条 home, 再用死赋值收尾。**先从同 C 文件已匹配的镜像函数抄结构**是最高效起手。
+
+### ⏸ sub_805063C (114行, 语义全解, 差35B, 2026-09-06, void-main)
+- 语义 = tile 动画帧写入(Op_LoadTileGfx 家族, 与 code_8044394.c 的 sub_804ABF8 同族但更复杂):
+  `frame = *(u16 *)(gUnk_0862D574 + gUnk_03000F2A * 2 + arg1 * 18)` (动画 arg1 的当前帧值);
+  `ptr = dest + (arg2 + arg3 * 32)` (32 列 tilemap 的 [行 arg3][列 arg2]);
+  frame > 0xEFF → return 1 (动画越界); frame <= 0xDF → 直写帧号 `ptr[0]=(frame&0xFF)*2+0xB000,
+  ptr[0x20]=(frame&0xFF)*2+0xB001`(帧值即 tile 对, 直写); 0xE0..0xEFF → 在 gUnk_03000EE8[0..gUnk_03000F24)
+  线性搜 frame 取下标 i(未找到 = count), 写 `t=(u16)(i+0xE0)*2; ptr[0]=0xB000+t, ptr[0x20]=t+1+0xB000`
+  (重定向到已分配块, 每块 2 tile); 成功路径 `gUnk_03000F2A++`。返回 u32 (0/1), 三个调用方
+  (sub_8050720/sub_805144C/sub_8051BE4, 全未匹配)均忽略返回值, 实参 = (0x02005800, u8, u8, u8)。
+- 结构要点(已验证): (1) 两个 if 必须写 `if (frame <= 0xEFF){ if (frame <= 0xDF){直写} else {搜索}
+  counter++ } else {ret = 1}` 的嵌套 <= 形式 —— GCC2 的 if/else 布局是"then 贯穿/else 分支",
+  直写形式才落出 bhi 到尾部 ret=1 块; (2) 表读取表达式必须**内联展开多次**(比较×2/直写×2/循环×1),
+  不能缓存进局部 —— 读取是 u16 访问与 strh 可能别名, store 后必然重读, 缓存会让 store2 丢失重读;
+  (3) 搜索循环必须 `for(i=0;i<count;i++){if(arr[i]==frame)break;}` 的 **break 形式**, && 条件形式
+  会被 GCC2 旋转成 [incr, c1, c2] 体, 与目标 [c2, incr, c1] 不符; (4) 循环比较的操作数顺序要写
+  `frame == arr[i]` (寄存器侧在前) 才出 `cmp r4, r0`。
+- **常量物化三大坑 (本轮最大发现, 见 EXPERIENCE 167-169)**: ① 直接 `ptr[0] = x + 0xB000` 的
+  strh 目标会把常量按 HImode 符号扩展成 -0x5000 进池 (值等价字节不同); 必须经 u32 中转
+  `v = ... + 0xB000; ptr[0] = v;` 保持 SImode 正数 —— 可移位(0xB000=0xB0<<8)走 movs+lsls,
+  不可移位(0xB001)走正数池。② `+1 + 0xB000` 会被 combine 折叠成 0xB001 池; 目标里不折叠是因为
+  GCSE 把 0xB000 合并成共享伪寄存器(寄存器不可折叠) —— 多处使用的常量让 GCC 自己建寄存器即可,
+  但 0xB000 的物化要落在两个 store 之前(循环头前的 preheader), `v = x + 1;` 与 `v += 0xB000;`
+  拆两句可阻止重结合。③ 同一常量 0xB000 目标里出现两种物化形态: 直写分支 `movs 0xB0; lsls 8`
+  (thumb.md define_split 扫描 i=0..24 低位优先的产物), 搜索分支 `movs 0xB; lsls 12` —— 后者是
+  **物化被 GCSE/LICM 提升后重拆分 + combine 合并移位的双拆分痕迹**, 说明原 C 的 base 赋值在循环内
+  被提升出循环; 本复刻(赋值在循环内/循环外)都只得到单拆分形态, 提升未复现。
+- **兄弟函数结构移植失败教训**: sub_804ABF8 的 `base=表; off=counter*2+arg1*18; 读(base+off)` 局部
+  变量风格在 head 上形状完美(表地址最先加载、off 单次计算), 但 off/tbl 的 pre-cse 存活范围跨循环
+  (循环内的读取引用它们) → global-alloc 的 REG_LIVE_LENGTH 拉低 pri → 全部级联到高位寄存器
+  (prologue 多存一个)。v19/v20(4565/2425) 均劣于全内联形态; 循环内读取必须保持全内联, tbl/off
+  只出现在 head/store1 路径才可行(v20 2425, 仍劣)。最终最佳 = 全内联 + permuter 变体。
+- **permuter 多轮研磨实录**: 10 轮 × 580s (-j 1), 每轮 promote 最优再跑。有效技巧:
+  `i = arg3 * 32; ptr = dest + (arg2 + i);` (把乘法提升为具名变量, 1235 分) → `int new_var;
+  new_var = 0xB001;` (把池常量变成具名 int 变量, 665 分) → base 赋值挪进循环 (885 分) →
+  `tbl + (new_var2 = off)` 内联赋值 (595 分)。new_var/空转 if-else 屏障的本质 = 改变伪寄存器
+  创建顺序与 PRI (floor_log2(nrefs)*nrefs/LL*size, global.c allocno_compare)。
+- 残差 35B 明细: ptr 求和 dest(r2 vs r3, 6B)、直写分支 +tbl 地址 dest 与 store1 和的 dest
+  (~14B)、搜索分支 i/count 寄存器互换 + ptr+0x40 落 r4 vs r7 + base 物化位置与形态 + E 值
+  re-read(经 tbl+off 地址重读) vs 寄存器 copy (~15B)。全部是 GCC2 local-alloc 排列与
+  拆分/提升 pass 历史痕迹, 表达式/语句形状已穷尽 (v1-v25 变体见 permuter/sub_805063C/ 历史)。
+- 候选 = permuter/sub_805063C/base.c (bytecmp 35B/228B 差, 语义与目标逐条核对一致)。
+  **未达分数 0, 按铁律 6 未合入 src**。下一步建议: 从 sub_8050720 (同文件未匹配, 大函数) 匹配后
+  回看其对本函数的调用点上下文; 或用 -da 转储对比 allocno PRI 排布逐项拉齐 (EXPERIENCE 117/177)。
+
+### ⭐ BD54 四孪生 (BD54/B7B0/B8E8/BE90) 的 -1 提升问题破解 (2026-09-06 第二轮)
+挂起多轮的 `-1 提升问题` (EXPERIENCE 176 的失败存档) 本轮通过 **RTL 级取证 + 受控实验矩阵** 完整破解:
+- `agbcc -dL` loop dump 直接打印 movable 的 savings/life/desirable —— 无需猜测;
+- 直写 `(s8)x == -1` 的 -1 链 (QI化+扩展对, savings2/life4) 被 loop.c 合法提升 (104 ≥ 45);
+- 正解 = 中间 u32 变量 (convert_move 出 ldrsb) + 无符号比较 (常量 INTVAL>0 走 cmpsi PATH A,
+  force_reg 伪寄存器 life=1 不可提升) + flags 先读 + `index*16 + base` 操作数序防等价替换。
+四孪生候选全部收敛到 **20B 差** (bl 槽 8B + scratch 旋转 12B), 详见 EXPERIENCE 181。
+scratch 旋转 (flags/v/-1 的 r0/r1/r2 分配) 为最后一道 local-alloc tiebreak, 待后续攻克。

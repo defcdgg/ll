@@ -1874,3 +1874,86 @@ grep '^Register ' gccdump.lreg; grep '^;; Register .* in' gccdump.lreg; rm -f gc
      cmp #2; beq; b` 而不会退化成 `cmp #2` 直链)。default/0 路径 arg1 原样 → r0 直达尾部,
      天然等价无初始化。判定: 目标尾部 `muls r0, r1, r0` (arg3 * result) 且 default 无 mov。
      注意 5 参 u8 mode 若声明 s8, 调用点会多 `ldrsb` (经验 173 同条), 必须 u8 + switch 内 `(s8)`。
+
+174. **"幽灵栈帧" (`sub sp,#8`/`add sp,#8` 全函数零 `[sp]` 访问) 的真因 = 未使用的 `u8 values[8];` 局部数组** (2026-09-06, 案例 sub_8048C80, 挂起→0)。
+     同文件姊妹函数 (sub_804C9B4/D1B4/D310/C8E0/666C 等) 都有真使用的 `u8 values[8]` 传给 sub_80489E8,
+     本函数是模板复刻残留 —— 数组虽零引用, GCC2 仍为其分配 8B 栈帧。等价 C 不写数组则帧消失 (差 4B/帧位移级联)。
+     排查手法: 在已匹配函数里 grep `sub sp, #8` + 零 `sp]` 访问, 找到 C9B4 一看源码即中。
+     关联: 经验 71 (类型宽度是分配器输入), 规则 76。
+
+175. **求和链的 adds 操作数序由"结果 dest 是否已是操作数"决定; 两次独立 SET 才能保住 `adds rd, rn, rm` 的 rn=基址序** (2026-09-06, 案例 sub_8048C80)。
+     目标 `adds r4,r4,r1; adds r4,r2,r4` (先 sw+v1 再 base+sw): 写 `threshold = base + (sw + v1);`
+     (dest=threshold 不在操作数里) 逐字节命中; 写 `sw = base + sw;` (dest=sw 是操作数) 会触发
+     dest-first 重排成 `adds r4,r4,r2`。左结合 `base + sw + v1` 树序也不对 (先算 base+sw)。
+     关联: 经验 146/147 (重结合)。
+
+176. **`(s8)x == -1` 走 cmpsi 的 cmn 路径 (`movs rN,#1; cmn`), 后续 pass 把 cmn 转成 cmp -1 时 -1 常量落在哪由分配决定; 目标"循环内 movs#1+rsbs 重物化"要求 +1 伪寄存器不被 loop 提升** (2026-09-06, 案例 sub_804BD54/B7B0/B8E8/BE90 家族, 未解)。
+     实测 (t1-t6): cast/switch单case/struct-s8字段/s8指针/`(s8)x+1==0` 全部把 -1 提升到循环外
+     (占掉一个 callee-saved, 挤掉 base 的 home 致 base 每轮重载池, 级联 ~66B)。
+     -g 变体同。突破口猜测: 让 cmn 操作数 +1 与调用实参 1 共享伪寄存器 (多 basic 块使用 →
+     reg_in_basic_block_p 阻止提升), 或找到让 reload 而非 expand 物化的写法。
+     关联: thumb.md cmpsi expand (agbcc 源码 -255..0 走 cmn), 经验 29。
+177. **死赋值拉长伪寄存器寿命 → 翻转 global-alloc 的 allocno 顺序 (r6/r7 home 互换)** (2026-09-06, 案例 Op_AddPartyMember/sub_804F7F8, 2030分→全指令命中)。
+     症状: 全函数只剩两条指令差 —— 目标 `adds r6,r0,#0`(ptr→r6)+`adds r7,r4,#0`(id拷贝→r7),
+     我方恰好 r6/r7 互换 (ptr→r7、拷贝→r6), 连带 `strb r7,[r1]`→r6、`mov ip,r1`→`adds r7,r1,#0`。
+     根因 = global-alloc 按 `pri = floor_log2(n_refs)*n_refs/live_length*10000*size` 降序发号
+     (EXPERIENCE 117 方法): newId (2 refs/27 insns, pri 0.0741) 恰好排在 ptr (4 refs/118 insns, 0.0678)
+     前一位 → newId 先拿 r6, ptr 只剩 r7。两者只差 9%。
+     正解: 在 part-1 循环里给 newId 加一条**死赋值** `newId = gPartyMemberIds[i];`
+     (下一迭代即被覆盖、part-2 重新赋值, 无任何读取) —— newId 的 allocno 寿命横跨全函数,
+     pri 掉到 2/118 级, ptr 升回首位拿 r6。死赋值在 cse2 后被删除, 输出零指令代价。
+     permuter 的变异形式 `(newId = gPartyMemberIds[i]) > data[1]` 同效 (读取走 CSE 临时, set 仍死);
+     ⚠ 若把比较也写成读 newId (`if (newId > m)`), set 变活 → newId 有了 part-1 home → 反而更糟。
+     判定: 仅剩两条 home 互换 + agbcc -da 的 greg dump 里两 allocno 的 pri 差 <10% 时, 找"能否给
+     低 pri 侧加死赋值拉寿命"。注意 -da 的 greg "across N insns" 数的是 **RTL insn 数** (post-pass),
+     不是 thumb 指令数; PROMOTE_MODE 把 u8/u16 局部全提升 SImode, **换变量类型 (u8/u16/s16) 不能改
+     size 旋钮** (greg sorted order 里 size 恒为 1)。
+     关联: 经验 117 (allocno_compare 取数法), 经验 17/116(第二个) (do-while 屏障 —— 本例试过屏障
+     也翻得动 newId 但把 ptr 挤到 r8, 级联更大, 不如死赋值外科)。
+178. **⭐⭐⭐ 直写 `ptr[0] = x + 大常量` 的 strh 目标会触发 GCC2 HImode 符号扩展, 常量进池变负数; 经 u32 中间变量转存才能保持 SImode 正数形态** (2026-09-06, 案例 sub_805063C)。
+     - 现象: `ptr[0] = (d & 0xFF) * 2 + 0xB000;` → 池字 `.word -0x5000` (0xFFFFB000);
+       同值经 u32 临时 `v = (d & 0xFF) * 2 + 0xB000; ptr[0] = v;` → 池字 `.word 0xb000` 且
+       常量走 `movs #0xb0; lsls #8` 物化。strh 存储结果相同, **字节不同**。
+     - 机理: 直接对 HImode 目标的 store, GCC2 把 RHS 放进 HImode 语境, 常量按 16 位符号扩展
+       (0xB000 → -0x5000), 符号扩展后的常量不再是 byte<<shift 可移位形式 → 只能池加载;
+       SImode 正常算术里的常量保持正数 → thumb.md define_split (i=0..24 扫描 val ⊆ 0xFF<<i,
+       低位优先) 拆成 movs+lsls。u16 中间变量**不行**(仍负), 必须 u32/int。
+     - 推论: 池字面量的正负与 movs+lsls/ldr 形态是字节级判据; fndiff 报 "常量区大面积差异"
+       时先查是不是这个。关联: 经验 29 (池重定位假分)。
+179. **多处使用的大常量会被 GCSE 合并成共享伪寄存器, 从而阻止 combine 折叠; 源码侧用"拆语句"配合** (2026-09-06, 案例 sub_805063C 搜索分支)。
+     - 目标形状: store1 = `0xB000 + t`, store2 = `t + 1 + 0xB000` —— 后者不被折叠成 0xB001 池,
+     因为 0xB000 已是寄存器 (r8), combine 折不动寄存器。源码写 `v = 0xB000 + x; ptr[0] = v;
+     v = x + 1; v += 0xB000; ptr[0x20] = v;` (0xB000 出现两次) 即可让 GCC 自建共享寄存器;
+     但 `v = x + 1 + 0xB000;` 单表达式会被折叠/重结合成 x + 0xB001 池 —— **+1 和 +大常量必须
+     拆成两句** (`v = x + 1; v += 0xB000;`), 且物化点要落在循环头前的 preheader。
+     - 若手写 `u32 base = 0xB000;` 变量且赋值在循环前, 效果等同; 但变量存活范围跨循环时会
+     在 global-alloc 里被挤到高位寄存器 (见 180), 不如让 GCC 自己合并。
+180. **⭐⭐ 兄弟函数的"表指针/off 局部变量"风格不能无脑移植到含循环的函数: pre-cse 存活范围跨循环 → global-alloc 级联到高位寄存器** (2026-09-06, 案例 sub_805063C vs sub_804ABF8)。
+     - sub_804ABF8 (无循环) 的 `base=表; off=counter*2+arg1*18;` 局部风格形状完美 (表地址最先
+     加载 —— 表变量赋值语句在最前); 移植到 sub_805063C 后, off/tbl 在循环体内被引用
+     (pre-cse RTL), REG_LIVE_LENGTH 拉长 → allocno pri (global.c allocno_compare:
+     floor_log2(nrefs)*nrefs/LL*10000*size) 掉级 → 分到 ip/r8 级联 (prologue 多存一个), 4565 分。
+     - 正解: head 用局部变量可以 (表地址最先加载的形状只有它能出), 但**循环体内的读取必须全内联**
+     (自己的 counter-load/a18/table), 不引用这些局部 —— post-cse 后 tbl/off 只剩 head/store1
+     路径的引用, 不与循环寄存器冲突。全内联 + 头部局部 = 585 分 (差 35B)。
+     - 附: 同一常量 0xB000 目标里出现 `movs 0xB0; lsls 8` 与 `movs 0xB; lsls 12` 两种物化 ——
+     后者是物化被 GCSE/LICM 提升出循环后**重拆分**(0xB0→0xB<<4) + combine 合并移位(4+8=12) 的
+     双拆分痕迹, 复刻该形态需让 base 赋值在循环内被提升, 本轮未复现 (赋值在循环内外都只有单拆分)。
+     关联: 经验 117 (allocno 取数法), 经验 177 (死赋值拉 pri)。
+
+181. **⭐⭐⭐ `(s8)x == -1` 循环内 -1 常量提升问题的完整解法: 中间 u32 变量 + 无符号比较** (2026-09-06, 案例 sub_804BD54/B7B0/B8E8/BE90 四孪生, 从"不可解"到仅差 12B)。
+     直写 `if ((s8)x == -1)` 时 GCC2 把 -1 QI 化 + 符号扩展对 (movs#1+negs 链, life=4, savings=2),
+     loop.c 判定 `13×savings×life(104) ≥ insn_count(45)` → 整链提升到循环外, 挤掉 base 的 callee-saved
+     寄存器 → base 每轮重载池 (级联 66B)。
+     **正解三件套**:
+     ① `u32 v = *(s8 *)(entry + 0);` —— 经中间 u32 变量: convert_move(MEM→SI, signed) 在 expand 期
+        直接发 extendqisi2 (ldrsb), 值立即为 SI;
+     ② `if (v == -1)` —— v 为 u32, 比较无符号, 常量 INTVAL=4294967295 > 0 (64位 HOST) →
+        cmpsi 走 PATH A `force_reg(-1)` → 该 pseudo life=1 savings=1 → 13 < 45 不可提升 →
+        movs+negs 留在循环内 = 目标形状;
+     ③ 读 entry[0] 入 flags 局部须在 -1 检查**之前** (目标 ldrb 在 ldrsb 前)。
+     另: `entry = base + index * 16` 的 base 会被 update_equiv_regs 等价替换 (REG_EQUAL(symbol) note)
+     导致 base 每轮重载池; 写成 `entry = index * 16 + base` 使替换后 (plus (symbol) (reg)) 不过
+     general_operand 校验 → base 保住 callee-saved 寄存器。
+     诊断工具: `agbcc -dL` (loop dump 直接打印每个 movable 的 savings/life/desirable!) +
+     `-ds` (cse 后 RTL 查 -1 链形态)。关联: 经验 176 (本文的失败存档), 经验 29, 规则 76。

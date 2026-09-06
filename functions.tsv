@@ -803,8 +803,8 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8044394	0x08048b88	19	sub_8048B88	
 1	thumb	code_8044394	0x08048bac	19	sub_8048BAC	✅ 2026-09-02 qwen: obj[0xBE]<=10? gUnk_0839CC4C_entries[obj[0x8D]].value:0 (4B表{u16,u8 value@2,u8}, 家族同 sub_8048B88 读+0); 结构体数组视图需别名符号 gUnk_0839CC4C_entries@0x0839CC4C (u8[] 视图被 sub_8048B88 占用; 直址 cast 致 base-late 寄存器错配, 唯全局 struct[] 声明才 base-early); fncheck OK 36B; 全ROM SHA1 绿
 1	thumb	code_8044394	0x08048bd0	42	sub_8048BD0	
-0	thumb	code_8044394	0x08048c30	43	sub_8048C30	
-0	thumb	code_8044394	0x08048c80	58	sub_8048C80	⏸概率判定, 语义全解: threshold=switch(arg0[0xAB]{2→5,3→0x14,5→0xa,else→0x14}) + (kind<=10?arg0[0x8B]:0) + (kind<=10?5:0x14), 返 (u16)(((u32(*)(void))Rng_LcgNext)()%100) < threshold; 首句 GetObjPool() 结果被丢弃; 卡点(不可复现编译器伪影): ① 目标有 8B 幽灵栈帧(sub sp,#8/add sp,#8, 中间零 [sp] 访问)——等价C(含 long long/取址局部/不同返回型)均不触发, 疑原编译器版本差异; ② 第二个 adds 的操作数序 adds r4,r2,r4 vs 我恒 adds r4,r4,r2; 实际仅差 ~6B 但帧位移致级联; 候选 permuter/sub_8048C80/v4.c(已 thr=u32 出 bhs、switch{2,3,5} 出 cmp#3 支、(u32(*)(void)) 出 __umodsi3)
+1	thumb	code_8044394	0x08048c30	43	sub_8048C30	✅ 2026-09-06 glm-batch: 外层if(x<=0xA)+内层无default switch双case组(0..7/8..10同体物理重复出比较树, 经验69/72); default=(u8)(x-0xC)<=0x64边界+表flags经指针局部tbl+4/+5与idx=k2*6变量对(阻止CSE出adds r2,#5, 规则76/经验126); 两flag先载变量再||; tbl局部池基址+运行时+4防池折叠; permuter base score=0; bytecmp OK 80B
+1	thumb	code_8044394	0x08048c80	58	sub_8048C80	✅ 2026-09-06 glm-batch: 幽灵栈帧真因=未使用的 u8 values[8] 局部数组 GCC2 仍分配 8B 帧 (姊妹函数模板残留, 同文件 C9B4/D1B4 等真使用); 求和须 threshold=base+(sw+v1) 两次独立 SET(dest 非操作数) 才出 adds r4,r2,r4 序, 赋回 sw 会触发 dest-first 重排; switch case 序 2,5,3+default(经验124); Rng 需 (u32(*)(void)) 强转+u16 截断; permuter base score=0; fncheck 待验
 1	thumb	code_8044394	0x08048cec	46	sub_8048CEC	
 1	thumb	code_8044394	0x08048d40	19	sub_8048D40	✅ 2026-09-02 opencode: obj[0xBE]<=10 时清零 0x7E..0x86 五个u16; 关键=写5条 *(u16*)(arg0+const)=0 (用*ptr++/数组索引会致 r0/r1 互换 FAIL); fncheck OK 36B
 1	thumb	code_8044394	0x08048d64	17	sub_8048D64	✅ 2026-09-02 opencode: min((u16)(obj[0x6E]-obj[0x6C]), arg1) 语义: diff<arg1返(u16)diff否则arg1; u16形参/返回触发 lsl/lsr#16; fncheck OK 30B
@@ -818,9 +818,9 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8044394	0x080498e0	57	sub_80498E0	✅ 2026-09-03 gpnux: 磁盘动画帧写入器; 关键=扁平一维索引 tbl[byte*8+frame] + u16 ofs=byte*8 独立语句(避免u8截断且让frame载入落在lsls之后, 破4B调度地板); 规则17/87寄存器轮换靠 const u8*tbl 局部首载归位; 120B exact
 0	thumb	code_8044394	0x08049958	181	sub_8049958	
 0	thumb	code_8044394	0x08049ad8	73	sub_8049AD8	⏸ 2026-09-04 opencode: 语义全解(battle stat成长: 遍历idx=(i+251+s)&0xff, diff=sub_8048818-sub_80455A0, (s16)diff>0则sub_8045688加值返回s+i否则13); 卡diff区LRA live-range-split: 目标 subs r0/adds r2(纯拷贝)/strh r0/lsls r0 需 int diff home在r0+拷贝到r2给call第3参; 标准agbcc下 separate store→int diff home r2(subs r2无拷贝), combined store(t6)→subs r0但diff成u16→call截断lsrs#0x10(差6字节); permuter最优output-10(差2字节)用diff=a重赋值偷改数据流不可读; 候选存permuter/sub_8049AD8/candidates/; 详情progress.md
-0	thumb	code_8044394	0x08049b70	86	sub_8049B70	
+0	thumb	code_8044394	0x08049b70	86	sub_8049B70	⏸ 2026-09-06 glm-batch: 语义全解(tile DMA入口查找: gUnk_0300096C=u16*ctx指针, tile=*ctx, TileDma_GetCtx(&local)返回count, tile<=0xDF则tile&=0xFF输出0xFFFFB000+tile*2/0xFFFFB001+tile*2到arg0[0]/[0x20], 否则线性搜索ctx项匹配tile得idx输出(idx+0xE0)*2, 尾*ctxPtr+=2字节, *(u16*)(旧ctx+2)==0xF00返回1否0); 候选permuter/sub_8049B70/base.c(v1, 122B差); 卡点: ①0xFFFFB000常量物化(目标: 池加载; 我: movs+lsls构造低16位, GCC2对strh的语义等价构造) ②arg0的home(r5 vs r6) ③搜索循环结构(while+break与do-while形态) ④0xFFFFB000/1需池常量注册确认
 0	thumb	code_8044394	0x08049c1c	152	sub_8049C1C	
-0	thumb	code_8044394	0x08049d58	77	sub_8049D58	
+0	thumb	code_8044394	0x08049d58	77	sub_8049D58	⏸ 2026-09-06 glm-batch: 语义全解(switch gUnk_03000948{case0: 0x910!=0且0x930&0x800==0→return(u8)sub_801B8AC(0x918,0x945); case1空; case2: 0x910>1→DmaCopy16(3,0x02035AC0,0x06007000,0x800)+DmaWait(3)}; 候选permuter/sub_8049D58/base.c case0/case2体已逐指令对齐(ptr局部防池折叠); 卡点=入口截断: 目标adds r1,r0,#0保r0原始arg0(case1/case2/default经copy-prop直返r0, 仅case0失败路adds r0,r3,#0), 我方lsls r0就地截断杀r0→全路径重载+共享块与尾合并(差~8B); K&R/int参数/调序均无效; 需让截断tmp不落r0(分配器input)
 0	thumb	code_8044394	0x08049df8	402	sub_8049DF8	
 0	thumb	code_8044394	0x0804a148	273	sub_804A148	
 0	thumb	code_8044394	0x0804a368	821	sub_804A368	
@@ -830,7 +830,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8044394	0x0804abd0	19	sub_804ABD0	✅ 2026-09-02 opencode: 填 gUnk_02035B04 u16[i]与[i+0x20]=0xB001, i=0..0x19; 新登记 EWRAM 0x02035B04; for(i<=0x19) bottom-test bls; fncheck OK 40B
 1	thumb	code_8044394	0x0804abf8	50	sub_804ABF8	✅ 2026-09-02 gpnux: tile动画帧写入; 关键=off拆局部变量 + arg1*18/counter*2两个局部(第二次读复用base, 否则add顺序差); 表gUnk_0862D574[u8*, index arg1*18+counter*2], GBA tilemap值data*2-0x5000/-0x4FFF; fncheck OK 104B
 1	thumb	code_8044394	0x0804ac60	42	sub_804AC60	
-0	thumb	code_8044394	0x0804acc0	50	sub_804ACC0	⏸ count/arg0扩展home互换+1拷贝(65分); 与AB40同族
+0	thumb	code_8044394	0x0804acc0	50	sub_804ACC0	⏸ 2026-09-06 glm-batch: 语义全解(tile表扫描: count/i计数0xF00出现arg0次, 返回&table[i], 调sub_8045134(0x6F1E)+TileDma_GetCtx+sub_80187C0(0x400)); 候选permuter/sub_804ACC0/base.c(v6, 39B差含3bl槽12B); 关键发现: ①count须u32(homes才对: arg0→r2/count→r3/i→r1/table→r6/base→r5/0xF00→r4全同目标) ②table赋值须在count/i之后 ③base=table拷贝在if内 ④剩余: 重复peel(mine: if(i<arg0)+while旋转peel×2/目标1个)+count++无截断(目标有lsls/lsrs截断, 但count改u16则homes全崩)——count的u32类型与u16截断语义冲突待解
 1	thumb	code_8044394	0x0804ad24	23	sub_804AD24	
 1	thumb	code_8044394	0x0804ad54	6	sub_804AD54	
 1	thumb	code_8044394	0x0804ad60	53	sub_804AD60	
@@ -843,20 +843,20 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_8044394	0x0804b1f8	18	sub_804B1F8	
 1	thumb	code_8044394	0x0804b224	46	sub_804B224	
 0	thumb	code_8044394	0x0804b288	153	sub_804B288	
-0	thumb	code_8044394	0x0804b3c0	79	sub_804B3C0	
+0	thumb	code_8044394	0x0804b3c0	79	sub_804B3C0	⏸ 2026-09-06 glm-batch: 语义全解(动画帧步进: entry[0]&0x10定方向, 正放entry[3]++达entry[2]-1则entry[0]&=~0x10(掩码须变量防窄化,规则76), 反放--entry[3]==0则|=0x10; entry[0xF]=0后count=entry[2]>>1循环(count=(u8)(count>>1), ++entry[0xF]>7break)须显式guard+do-while(while形式被GCC2旋转剥离首迭代常量传播破坏); 尾调B56C(arg2+(s8)entry[1]*32, arg3+arg1*32, (u8)(entry[2]-entry[3]), entry+0xC); 候选permuter/sub_804B3C0/base.c(v5)控制流/掩码/循环全对齐, 差74B=纯寄存器home级联(flags r5/count移位tmp/local-alloc优先级)
 1	thumb	code_8044394	0x0804b458	61	sub_804B458	
 0	thumb	code_8044394	0x0804b4d0	81	sub_804B4D0	
 0	thumb	code_8044394	0x0804b56c	123	sub_804B56C	
 0	thumb	code_8044394	0x0804b654	180	sub_804B654	
-0	thumb	code_8044394	0x0804b7b0	67	sub_804B7B0	⏸ =sub_804BD54变体(sub_804C3A4/sub_804C420/gUnk_03000AE8), base.c就绪1120分, 同高寄存器分配墙
+0	thumb	code_8044394	0x0804b7b0	67	sub_804B7B0	⏸ 2026-09-06 glm-batch: BD54孪生(表0x03000AE8,调C3A4/C420),v12机制直接迁移,-1已循环内物化; 候选permuter/sub_804B7B0/base.c仅差20B=bl槽+scratch旋转(同BD54,见其note④⑤)
 0	thumb	code_8044394	0x0804b834	94	sub_804B834	
-0	thumb	code_8044394	0x0804b8e8	67	sub_804B8E8	⏸ =sub_804B7B0逐指令全同(仅标签), 同挂
+0	thumb	code_8044394	0x0804b8e8	67	sub_804B8E8	⏸ 2026-09-06 glm-batch: 与B7B0逐字节相同(仅标签),BD54机制迁移; 候选permuter/sub_804B8E8/base.c仅差20B=bl槽+scratch旋转(同BD54)
 0	thumb	code_8044394	0x0804b96c	265	sub_804B96C	
 1	thumb	code_8044394	0x0804bb64	61	sub_804BB64	
 0	thumb	code_8044394	0x0804bbdc	196	sub_804BBDC	
-0	thumb	code_8044394	0x0804bd54	67	sub_804BD54	⏸ 高寄存器分配域(arg0→sb/table→sl/mask→r8): 最优C停990, permuter 12k迭代→420(底分5); 候选存permuter/sub_804BD54/candidates/best420.c(do-while(0)屏障+重算地址形态); 67行对804BE90逐指令全同可套用; 详情见progress.md
+0	thumb	code_8044394	0x0804bd54	67	sub_804BD54	⏸ 2026-09-06 glm-batch: -1提升问题已破解! 语义全解(遍历gUnk_03000BE8 16B项,field_0==-1跳过,&0x20==0调C5F8(field_1,1),C674(arg0+i),field_0/1|=mask,field_2/3=0); 关键①读entry[0]入flags局部(顺序在-1检查前)②v=*(s8*)(entry+0)入u32局部(convert_move出ldrsb)③v==-1无符号比较→常量INTVAL=4294967295>0→cmpsi PATH A force_reg→life=1不可提升→movs+negs循环内物化=目标形状④entry=base+index*16须index*16+base序(reg_equiv替换validate拒符号在第二操作数)⑤flags先于v读; 候选permuter/sub_804BD54/base.c(v13)仅差20B=bl槽8B+scratch旋转12B(flags→r2/v→r1/-1→r0 vs 目标flags→r1/v→r0/-1→r2, local-alloc旋转tiebreak)
 0	thumb	code_8044394	0x0804bdd8	95	sub_804BDD8	
-0	thumb	code_8044394	0x0804be90	67	sub_804BE90	⏸ =sub_804BD54逐指令全同(仅标签), 同挂: 高寄存器分配域; 候选候选/套件就绪
+0	thumb	code_8044394	0x0804be90	67	sub_804BE90	⏸ 2026-09-06 glm-batch: 与BD54逐字节相同(同表同调用仅标签),v12机制直接迁移; 候选permuter/sub_804BE90/base.c仅差20B=bl槽+scratch旋转(同BD54)
 0	thumb	code_8044394	0x0804bf14	265	sub_804BF14	
 1	thumb	code_8044394	0x0804c10c	61	sub_804C10C	
 1	thumb	code_8044394	0x0804c184	5	sub_804C184	
@@ -909,11 +909,11 @@ status	isa	module	addr	asm_lines	name	note
 0	thumb	code_8044394	0x0804d5b4	175	sub_804D5B4	
 1	thumb	code_8044394	0x0804d708	71	sub_804D708	✅ 2026-09-06 claude-8030D9C: =sub_804D310纯克隆(2行=标签); 池0x08393B28符号化; permuter 0; fncheck OK 144B
 1	thumb	code_8044394	0x0804d798	81	sub_804D798	⏸ 2026-09-02 opencode: 概率判定+随机槽道具, 姊妹sub_804D708同族但obj[0xBC]恒1+obj[0xC2]=(Rng&3)选offset; standalone fncheck过但全文件编译ands r0,r1 vs r1,r0+&obj[0xC2]调度差; 候选permuter/sub_804D798/
-0	thumb	code_8044394	0x0804d840	91	sub_804D840	⏸ D3A0同族变体: case1的obj[0xC2]=Rng&obj[0xBC]复用switch值(r4)+entry索引+8不折叠; 最优700分(value中转变量), permuter待攻; 候选在permuter/sub_804D840/base.c; DC24=其常量变体(0x65/0x45→0x64/0x3B)
+0	thumb	code_8044394	0x0804d840	91	sub_804D840	⏸ 2026-09-06 glm-batch: 语义全解(D1B4+DABC混合: rng%%0x65<=0x45定obj[0xBC], switch(*(s8*)(obj+0xBC)){case0: entry=D1B4式+2读; case1: obj[0xC2]=(s8)obj[0xBC]&Rng→DABC式field_8[obj[0xC2]]}; 尾switch entry->field_10 选values[value局部]或0); 候选permuter/sub_804D840/base.c(v3)尾部/两case体逐指令对齐; 残差=入口scrutinee区: 目标movs r4,#0+ldrsb r4,[r1,r4](复用if/else的r1地址,零索引落dest寄存器), 我方adds r4,r1,#0地址拷贝+scrutinee落r0(~4指令home级联); (s8)obj[0xBC]强转会出ldrb+shifts而非ldrsb, 须s8指针解引用; switch-case值常量传播进case体(GCC2)需用表达式scrutinee阻止
 0	thumb	code_8044394	0x0804d8f4	143	sub_804D8F4	
 0	thumb	code_8044394	0x0804da04	93	sub_804DA04	
-0	thumb	code_8044394	0x0804dabc	83	sub_804DABC	
-0	thumb	code_8044394	0x0804db64	98	sub_804DB64	
+1	thumb	code_8044394	0x0804dabc	83	sub_804DABC	✅ 2026-09-06 glm-batch: D1B4姊妹; 两处ROM冗余store(obj[0xBC]条件写后恒写1, obj[0xC2]==1时覆0)须按ROM保留; 概率<=0x45(cmp#0x45非折叠的<0x46); obj[0x88]解引用+8处u16数组须struct成员数组形式(Unk_804DABC_Ptr)否则+8被折进ldrh位移; value局部使case0的store地址后算(D1B4同款); permuter base score=0; 6 bl 槽=24B 全差
+0	thumb	code_8044394	0x0804db64	98	sub_804DB64	⏸ 2026-09-06 glm-batch: 语义全解(D840+DABC混合: rng%0x65<=0x45定obj[0xBC], switch(*(s8*)&obj[0xBC]){case0: D1B4式+2读; case1: obj[0xC2]=Rng%5, ==2则=bc, DABC式field_8[obj[0xC2]]}; 尾switch field_10选values[value局部]或0; 候选permuter/sub_804DB64/base.c(w3)逐指令大半对齐(ldrsb经u32 bc局部触发, 经验170迁移), 差74B: ①(u8)cast位置(mine在&obj[0xC2]计算前/目标在store后) ②+8与idx*2的adds序(mine: ldrh位移+8/目标: adds r1,#8先) ③scratch家族
 0	thumb	code_8044394	0x0804dc24	91	sub_804DC24	⏸ =sub_804D840常量变体(0x65/0x45→0x64/0x3B), base.c就绪700分, 同挂
 0	thumb	code_8044394	0x0804dcd8	75	sub_804DCD8	⏸ 2026-09-04 opencode: 概率判定+掉落道具(姊妹sub_804D1B4/D260/D708/D798同族); 真身差4B=2指令: region1 obj[0xBC]=1覆盖需 adds r2,r1,#0(把&obj[0xBC]从r1拷到r2,r1复用给obj[0xC2]=0的0)+case1 obj[0xBD]=0需addr=r1/val=r0; 我的straight-line obj[0xC2]=0给addr=r0(148B vs 目标152B); 命名符号/switch/变量/交换~15变体+permuter(地板240=148B;152B输出靠clobber count的hack不可读)全失败; 根因=global-alloc live-range-split(复用r1给值+拷地址), agbcc从干净C产不出, 同sub_804D798的&obj[0xC2]调度坑; 落地148B版会位移sub_804DD70破ROM(fncheck的OK漏报尺寸差,须看size); 候选permuter/sub_804DCD8/
 1	thumb	code_8044394	0x0804dd70	14	sub_804DD70	
@@ -948,7 +948,7 @@ status	isa	module	addr	asm_lines	name	note
 0	thumb	code_804F0B8	0x0804f280	454	sub_804F280	
 0	thumb	code_804F0B8	0x0804f64c	130	sub_804F64C	
 1	thumb	code_804F0B8	0x0804f768	76	Op_RemovePartyMember	
-0	thumb	code_804F0B8	0x0804f7f8	117	sub_804F7F8	⏸ 复杂队伍添加opcode(插入排序gPartyMemberIds+formation槽管理gUnk_03004A88/ac0); 尝试member缓存/inline均差170B+; 待细攻
+1	thumb	code_804F0B8	0x0804f7f8	117	Op_AddPartyMember	✅ 2026-09-06 zcode-glm: 插入排序用do-while+goto免旋转; scan2存储用第二变量newId; part1死赋值拉长newId寿命翻转r6/r7分配(经验170); bytecmp OK(仅bl槽)
 1	thumb	code_804F0B8	0x0804f8d8	78	sub_804F8D8	✅ 2026-09-02 ll-agent: 状态机opcode(gAfterBattleCounter 0→初始化置5返0, 3→测sub_80187B4()&0x40/data[1]跳转表或+4返1); 关键=用goto setup强制setup落分支目标(非goto分支反转差127B)+u16 idx=data[1]*2中间量; fncheck OK 156B
 1	thumb	code_804F0B8	0x0804f974	74	sub_804F974	✅ 2026-09-06 claude06: 姊妹sub_804FA94已注释的两大坑一次命中: ① 跳转路径用`u16 *tbl=(u16*)0x02016000;`提升变量+`*ptr=tbl[data[2]]+0x02016200;`字面量基址(符号/交换顺序破r2→r1); ② 推进路径必须嵌套块内`u32 step=t+3; *ptr=*ptr+step;`让t+3独立于*ptr装载; 与sub_80526A0姊妹(字面量tbl vs 符号 tbl 决定case2寄存器分配); fncheck OK
 1	thumb	code_804F0B8	0x0804fa04	74	sub_804FA04	
@@ -958,7 +958,7 @@ status	isa	module	addr	asm_lines	name	note
 1	thumb	code_804F0B8	0x0805008c	141	sub_805008C	✅ 2026-09-03 ll-agent: 脚本泵后台服务; 关键=goto block2(1B)+entryTbl中间指针(4B)+bgRequest内联(1B), 12B→0; fncheck OK 300B
 0	thumb	code_804F0B8	0x080501b8	339	sub_80501B8	
 0	thumb	code_804F0B8	0x08050434	274	sub_8050434	
-0	thumb	code_804F0B8	0x0805063c	114	sub_805063C	⏸ 语义全解; 块序/off变量/u32常量/do-while循环/(u=t+1)+base2 已破; 卡 T=(i+0xE0)<<1 的 lsls#10/lsrs#f 编码(当前agbcc恒出#11/#10, 疑编译器版本) 与寄存器home(v/r2↔r4, ret sb, 0xB000 r8); 最好 3170(permuter, y改int毁截断)/5445(人工); 详情 progress.md
+0	thumb	code_804F0B8	0x0805063c	114	sub_805063C	⏸ 2026-09-06 void-main: 语义全解(tile动画帧写 tilemap: 表 gUnk_0862D574[arg1][0x03000F2A] 读帧值, >0xEFF→返1, <=0xDF→直写 ptr[0]/ptr[0x20]=(帧&0xFF)*2+0xB000/0xB001, 其余→搜 gUnk_03000EE8[0..0x03000F24) 找帧值取下标 i, 写 (u16)(i+0xE0)*2+0xB000/+1, 计数器++); 结构全对齐(permuter 10轮 11565→585, 差35B), 残差=GCC2分配/常量物化痕迹(ptr求和dest、store1和入r0、i/count寄存器、base物化0xB0<<8 vs 0xB<<12双拆分、E值re-read vs copy); 最佳候选=permuter/sub_805063C/base.c; 详情见 progress.md ⏸sub_805063C
 0	thumb	code_804F0B8	0x08050720	1276	sub_8050720	
 1	thumb	code_804F0B8	0x080511a0	68	sub_80511A0	✅ 2026-09-04 llagent: 队列弹取+清空; ret=1 前置于 if 前使 movs r4,#1 落到 prologue; 去掉 if(counter>0) 显式检查, 让 while 循环自身承担零判断 (规则87); i 声明提前 (K&R); fncheck OK 144B
 1	thumb	code_804F0B8	0x08051230	72	Op_ScriptStop	

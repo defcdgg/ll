@@ -1561,10 +1561,89 @@ extern u8 gUnk_0839BB4C[];
 extern u8 gUnk_0839D5BC[];
 
 // @ 0x08048C30
-INCLUDE_ASM("asm/nonmatchings", sub_8048C30);
+u8 sub_8048C30(u8 *obj)
+{
+    u8 ret = 0;
+    if (obj[0xBE] <= 0xA)
+    {
+        switch (obj[0xBE])
+        {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            ret = 1;
+            break;
+        case 8:
+        case 9:
+        case 10:
+            ret = 1;
+            break;
+        }
+    }
+    else
+    {
+        if ((u8)(obj[0xBE] - 0xC) <= 0x64)
+        {
+            const u8 *tbl = gUnk_0839D5BC;
+            int k2 = obj[0xBE] - 0xC;
+            int idx = k2 * 6;
+            const u8 *p = tbl + 4;
+            u8 flagA = *(p + idx);
+            const u8 *q = tbl + 5;
+            u8 flagB = *(q + idx);
+            if (flagA == 1 || flagB == 1)
+                ret = 1;
+        }
+    }
+    return ret;
+}
 
 // @ 0x08048C80
-INCLUDE_ASM("asm/nonmatchings", sub_8048C80);
+u8 sub_8048C80(u8 *obj)
+{
+    // 8 字节数组在本函数中未被使用, 但 GCC2 仍为其保留栈帧 (对应目标 sub sp,#8 / add sp,#8);
+    // 同文件 sub_804C9B4/sub_804D1B4 等姊妹函数的 values[8] 是真使用, 本函数是模板复刻残留
+    u8 values[8];
+    u8 ret = 0;
+    u32 v1;
+    u32 base;
+    u32 sw;
+    u32 threshold;
+
+    GetObjPool(obj);
+    if (obj[0xBE] <= 0xA)
+    {
+        base = 5;
+        v1 = obj[0x8B];
+    }
+    else
+    {
+        base = 0x14;
+        v1 = 0;
+    }
+    switch (obj[0xAB])
+    {
+    case 2:
+        sw = 5;
+        break;
+    case 5:
+        sw = 0xA;
+        break;
+    case 3:
+    default:
+        sw = 0x14;
+        break;
+    }
+    threshold = base + (sw + v1);
+    if ((u16)(((u32 (*)(void))Rng_LcgNext)() % 100) < threshold)
+        ret = 1;
+    return ret;
+}
 // @ 0x08048CEC
 u8 sub_8048CEC(u8 *obj)
 {
@@ -2899,7 +2978,42 @@ INCLUDE_ASM("asm/nonmatchings", sub_804D8F4);
 // @ 0x0804DA04
 INCLUDE_ASM("asm/nonmatchings", sub_804DA04);
 // @ 0x0804DABC
-INCLUDE_ASM("asm/nonmatchings", sub_804DABC);
+typedef struct
+{
+    u8 pad_0[8];
+    u16 field_8[4];
+} Unk_804DABC_Ptr;
+
+void sub_804DABC(u8 *obj, u8 *arg1)
+{
+    u8 values[8];
+    u8 count;
+    u8 value;
+    u8 v;
+    Unk_804D1B4_Entry *entry;
+
+    count = sub_80489E8(arg1, values, 0, 0x6F);
+    if (((u32 (*)(void))Rng_LcgNext)() % 0x65 <= 0x45)
+        obj[0xBC] = 1;
+    else
+        obj[0xBC] = 0;
+    obj[0xBC] = 1;
+    v = ((u32 (*)(void))Rng_LcgNext)() & 3;
+    obj[0xC2] = v;
+    if (v == 1)
+        obj[0xC2] = 0;
+    entry = &gUnk_08393B28_entries[((Unk_804DABC_Ptr *)(*(u32 *)(obj + 0x88)))->field_8[obj[0xC2]]];
+    switch (entry->field_10)
+    {
+    case 0:
+        value = values[(u32)(u8)Rng_LcgNext() % count];
+        obj[0xBD] = value;
+        break;
+    case 1:
+        obj[0xBD] = 0;
+        break;
+    }
+}
 // @ 0x0804DB64
 INCLUDE_ASM("asm/nonmatchings", sub_804DB64);
 // @ 0x0804DC24
